@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+﻿import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   MapPin,
@@ -22,7 +22,7 @@ import {
 } from 'lucide-react';
 import { exportVenues } from '../utils/exportUtils';
 
-const API_BASE_URL = 'http://localhost:5000/api';
+const API_BASE_URL = import.meta.env.VITE_NODE_API_URL ? `/api` : '/node-api';
 
 const Venues = () => {
   const navigate = useNavigate();
@@ -330,7 +330,7 @@ const Venues = () => {
                         {venue.facilities && venue.facilities.length > 0
                           ? venue.facilities.slice(0, 2).map(f => f.name || f).join(', ') +
                             (venue.facilities.length > 2 ? ` +${venue.facilities.length - 2}` : '')
-                          : '—'}
+                          : 'â€”'}
                       </td>
                       <td>
                         <span className={getStatusBadgeClass(venue.status)}>

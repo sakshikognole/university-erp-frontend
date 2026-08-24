@@ -1,8 +1,8 @@
-import React, { useState, useEffect, useRef } from 'react';
+﻿import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Users, GraduationCap, Building2, UserPlus, ChevronDown, Loader2 } from 'lucide-react';
 
-const API_BASE_URL = 'http://localhost:5000/api';
+const API_BASE_URL = import.meta.env.VITE_NODE_API_URL ? `/api` : '/node-api';
 
 const SuperAdminDashboard = () => {
   const navigate = useNavigate();

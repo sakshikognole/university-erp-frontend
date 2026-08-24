@@ -2,9 +2,11 @@ import React, { createContext, useContext, useState, useEffect } from 'react';
 
 const AuthContext = createContext();
 
-// In production (Vercel) this reads VITE_NODE_API_URL from the environment.
-// In local dev it falls back to localhost:5000.
-const API_BASE_URL = `${import.meta.env.VITE_NODE_API_URL || 'http://localhost:5000'}/api`;
+// Reads the Node backend URL baked in at build time by Vite.
+// On Render Static Site: VITE_NODE_API_URL = https://university-erp-node.onrender.com
+// Local dev: falls back to empty string so the Vite proxy path /node-api is used.
+const NODE_URL = import.meta.env.VITE_NODE_API_URL || '';
+const API_BASE_URL = NODE_URL ? `${NODE_URL}/api` : '/node-api';
 
 const authHeaders = () => ({
   'Content-Type': 'application/json',

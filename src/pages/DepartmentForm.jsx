@@ -1,8 +1,8 @@
-import React, { useState, useEffect } from 'react';
+﻿import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams, Link } from 'react-router-dom';
 import { ArrowLeft, Building2, Save, AlertCircle, CheckCircle2, Loader2 } from 'lucide-react';
 
-const API_BASE_URL = 'http://localhost:5000/api';
+const API_BASE_URL = import.meta.env.VITE_NODE_API_URL ? `/api` : '/node-api';
 
 const DepartmentForm = () => {
   const { id } = useParams();

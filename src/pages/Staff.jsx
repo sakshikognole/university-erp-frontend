@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+﻿import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   Users,
@@ -18,7 +18,7 @@ import {
 } from 'lucide-react';
 import { exportStaff } from '../utils/exportUtils';
 
-const API_BASE_URL = 'http://localhost:5000/api';
+const API_BASE_URL = import.meta.env.VITE_NODE_API_URL ? `/api` : '/node-api';
 
 const Staff = () => {
   const navigate = useNavigate();
@@ -113,7 +113,7 @@ const Staff = () => {
   };
 
   const formatDate = (dateValue) => {
-    if (!dateValue) return '—';
+    if (!dateValue) return 'â€”';
     try {
       return new Date(dateValue).toISOString().slice(0, 10);
     } catch {

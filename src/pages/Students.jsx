@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+﻿import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   GraduationCap,
@@ -19,7 +19,7 @@ import {
 } from 'lucide-react';
 import { exportStudents } from '../utils/exportUtils';
 
-const API_BASE_URL = 'http://localhost:5000/api';
+const API_BASE_URL = import.meta.env.VITE_NODE_API_URL ? `/api` : '/node-api';
 
 const Students = () => {
   const navigate = useNavigate();
@@ -274,7 +274,7 @@ const Students = () => {
                         <span className="dept-name-cell">{student.name}</span>
                       </td>
                       <td>{student.class}</td>
-                      <td>{student.division || '—'}</td>
+                      <td>{student.division || 'â€”'}</td>
                       <td>{student.degree}</td>
                       <td>{student.yearOfEnrollment}</td>
                       <td style={{ textAlign: 'right' }}>

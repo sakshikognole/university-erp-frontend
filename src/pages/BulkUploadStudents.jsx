@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+﻿import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   Upload,
@@ -12,7 +12,7 @@ import {
   Info,
 } from 'lucide-react';
 
-const API_BASE_URL = 'http://localhost:5000/api';
+const API_BASE_URL = import.meta.env.VITE_NODE_API_URL ? `/api` : '/node-api';
 
 const BulkUploadStudents = () => {
   const navigate = useNavigate();
@@ -359,13 +359,13 @@ const BulkUploadStudents = () => {
                           </td>
                           <td>{student.name}</td>
                           <td>{student.class}</td>
-                          <td>{student.division || '—'}</td>
+                          <td>{student.division || 'â€”'}</td>
                           <td>{student.degree}</td>
                           <td>{student.yearOfEnrollment}</td>
                           <td>
                             {student.customFields.length > 0
                               ? student.customFields.map(cf => `${cf.key}: ${cf.value}`).join('; ')
-                              : '—'}
+                              : 'â€”'}
                           </td>
                         </tr>
                       ))}
