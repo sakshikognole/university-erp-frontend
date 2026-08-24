@@ -3119,8 +3119,9 @@ button {
 }
 
 
+
 /* ==========================================
-   APPENDED FROM ERP-2 — FEATURE MODULE STYLES
+   APPENDED FROM ERP-2 - FEATURE MODULE STYLES
    (Books, Clubs, Sports, Student Certificates,
     Letterhead, Handout)
    ========================================== */
@@ -4255,4 +4256,3 @@ button {
   border-top: 1px solid var(--border-color);
   background: var(--bg-secondary);
 }
-
