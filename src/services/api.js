@@ -1,27 +1,29 @@
 import axios from 'axios';
 
-// Runtime URL detection — works without any build-time env vars.
-// On localhost: uses Vite proxy paths (/api, /node-api).
-// On any other host (Render): uses real backend URLs directly.
-const IS_PROD = typeof window !== 'undefined' && window.location.hostname !== 'localhost';
+// Determine backend URLs at runtime based on where the app is running.
+// localhost → Vite proxy (local dev / Docker).
+// anything else → real Render URLs.
+const onLocalhost = window.location.hostname === 'localhost';
 
-const SPRING_BASE = IS_PROD
-  ? 'https://university-erp-spring.onrender.com/api'
-  : '/api';
+const SPRING_BASE = onLocalhost
+  ? '/api'
+  : 'https://university-erp-spring.onrender.com/api';
 
-const NODE_BASE = IS_PROD
-  ? 'https://university-erp-node.onrender.com/api'
-  : '/node-api';
+const NODE_BASE = onLocalhost
+  ? '/node-api'
+  : 'https://university-erp-node.onrender.com/api';
 
 export const springApi = axios.create({ baseURL: SPRING_BASE });
 export const nodeApi   = axios.create({ baseURL: NODE_BASE });
 
-const responseInterceptor = [
+const interceptor = [
   (res) => res.data,
-  (err) => Promise.reject(new Error(err.response?.data?.message || err.message || 'Request failed')),
+  (err) => Promise.reject(new Error(
+    err.response?.data?.message || err.message || 'Request failed'
+  )),
 ];
 
-springApi.interceptors.response.use(...responseInterceptor);
-nodeApi.interceptors.response.use(...responseInterceptor);
+springApi.interceptors.response.use(...interceptor);
+nodeApi.interceptors.response.use(...interceptor);
 
 export default springApi;
