@@ -12,7 +12,7 @@ import {
   Info,
 } from 'lucide-react';
 
-const API_BASE_URL = import.meta.env.VITE_NODE_API_URL ? `/api` : '/node-api';
+const API_BASE_URL = import.meta.env.VITE_NODE_API_URL ? (import.meta.env.VITE_NODE_API_URL + '/api') : '/node-api';
 
 const BulkUploadVenues = () => {
   const navigate = useNavigate();

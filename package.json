@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "node -e \"if(!process.env.VITE_NODE_API_URL||!process.env.VITE_SPRING_API_URL){console.error('ERROR: VITE_NODE_API_URL and VITE_SPRING_API_URL must be set');process.exit(1)}\" && vite build",
+    "build": "vite build",
     "lint": "oxlint",
     "preview": "vite preview"
   },
