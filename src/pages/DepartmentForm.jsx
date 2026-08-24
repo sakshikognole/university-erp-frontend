@@ -1,8 +1,9 @@
-﻿import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams, Link } from 'react-router-dom';
 import { ArrowLeft, Building2, Save, AlertCircle, CheckCircle2, Loader2 } from 'lucide-react';
 
-const API_BASE_URL = import.meta.env.VITE_NODE_API_URL ? (import.meta.env.VITE_NODE_API_URL + '/api') : '/node-api';
+const IS_PROD = window.location.hostname !== 'localhost';
+const API_BASE_URL = IS_PROD ? 'https://university-erp-node.onrender.com/api' : 'http://localhost:5000/api';
 
 const DepartmentForm = () => {
   const { id } = useParams();
