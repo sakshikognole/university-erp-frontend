@@ -83,10 +83,12 @@ const Students = () => {
   // Filter students by search query
   const filteredStudents = students.filter((s) => {
     const query = search.toLowerCase().trim();
-    const nameStr = (s.name || '').toLowerCase();
-    const prnStr = (s.prn || '').toLowerCase();
-    const classStr = (s.class || '').toLowerCase();
-    const degreeStr = (s.degree || '').toLowerCase();
+    // Support both Node field names (name/class/degree) and
+    // Spring Boot field names (studentName/studyingYear/degreeProgramName)
+    const nameStr   = (s.name   || s.studentName        || '').toLowerCase();
+    const prnStr    = (s.prn                             || '').toLowerCase();
+    const classStr  = (s.class  || s.studyingYear        || '').toLowerCase();
+    const degreeStr = (s.degree || s.degreeProgramName   || '').toLowerCase();
     return nameStr.includes(query) || prnStr.includes(query) || classStr.includes(query) || degreeStr.includes(query);
   });
 
@@ -272,11 +274,11 @@ const Students = () => {
                         <span className="code-badge">{student.prn}</span>
                       </td>
                       <td>
-                        <span className="dept-name-cell">{student.name}</span>
+                        <span className="dept-name-cell">{student.name || student.studentName}</span>
                       </td>
-                      <td>{student.class}</td>
-                      <td>{student.division || 'â€”'}</td>
-                      <td>{student.degree}</td>
+                      <td>{student.class || student.studyingYear}</td>
+                      <td>{student.division || '—'}</td>
+                      <td>{student.degree || student.degreeProgramName}</td>
                       <td>{student.yearOfEnrollment}</td>
                       <td style={{ textAlign: 'right' }}>
                         <div className="action-buttons-cell" style={{ justifyContent: 'flex-end' }}>
