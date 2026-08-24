@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import axios from 'axios';
+import { springApi } from '../services/api';
 
 const EMPTY = {
   trustName:   '',
@@ -21,8 +21,12 @@ export default function LetterHeadEditorPage() {
   const [error,   setError]   = useState('');
 
   useEffect(() => {
-    axios.get('/api/letterhead')
-      .then((res) => setForm({ ...EMPTY, ...res.data }))
+    springApi.get('/letterhead')
+      .then((res) => {
+        // springApi interceptor already unwraps res.data,
+        // so res IS the LetterHead object directly
+        setForm({ ...EMPTY, ...(res || {}) });
+      })
       .catch(() => setError('Failed to load letterhead settings.'))
       .finally(() => setLoading(false));
   }, []);
@@ -38,7 +42,7 @@ export default function LetterHeadEditorPage() {
     if (!form.collegeName.trim()) { setError('College name is required.'); return; }
     setSaving(true); setSuccess(''); setError('');
     try {
-      await axios.put('/api/letterhead', form);
+      await springApi.put('/letterhead', form);
       setSuccess('Letterhead saved. It will appear on all new certificates.');
     } catch {
       setError('Failed to save. Please try again.');

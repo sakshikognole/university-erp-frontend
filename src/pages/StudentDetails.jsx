@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import axios from 'axios';
+import { springApi } from '../services/api';
 import StudentInformation from '../components/student/StudentInformation';
 
 export default function StudentDetails() {
@@ -20,7 +20,7 @@ export default function StudentDetails() {
       return;
     }
 
-    axios.get('/api/document-types')
+    springApi.get('/document-types')
       .then((res) => {
         const list = res.data;
         setDocTypes(list);

@@ -38,9 +38,12 @@ export default function BooksPage() {
   const load = useCallback(async () => {
     setLoading(true);
     try {
-      // bookService interceptor returns res.data = { success, message, data: { content:[...] } }
+      // BookController returns ApiResponse<PageResponse<Book>>:
+      // { success, message, data: { content:[], pageNumber, ... } }
+      // springApi interceptor unwraps axios res.data → res = { success, message, data:{...} }
+      // So the PageResponse is at res.data
       const res = await bookService.getAll(search, page, size);
-      const pd  = res.data;   // the PageResponse object inside ApiResponse.data
+      const pd  = res?.data ?? res;   // handle both wrapped and unwrapped shapes
       setBooks(pd?.content ?? []);
       setPageData({
         pageNumber:    pd?.pageNumber    ?? 0,

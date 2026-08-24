@@ -1,6 +1,13 @@
 import { useState, useEffect } from 'react';
 import axios from 'axios';
+import { springApi } from '../services/api';
 import { getAllStudents } from '../services/studentService';
+
+// Use plain axios for blob requests — springApi interceptor breaks binary data
+const onLocalhost = window.location.hostname === 'localhost';
+const SPRING_BASE = onLocalhost
+  ? 'http://localhost:8080'
+  : 'https://university-erp-spring.onrender.com';
 
 export default function HandoutPage() {
   const [students,    setStudents]    = useState([]);
@@ -15,7 +22,7 @@ export default function HandoutPage() {
   useEffect(() => {
     Promise.all([
       getAllStudents(),
-      axios.get('/api/document-types').then((r) => r.data),
+      springApi.get('/document-types'),
     ])
       .then(([s, d]) => { setStudents(s); setDocTypes(d); })
       .catch(() => setError('Failed to load data.'))
@@ -33,7 +40,7 @@ export default function HandoutPage() {
     setGenerating(true); setError(''); setSuccess('');
     try {
       const res = await axios.post(
-        '/api/handout/generate',
+        `${SPRING_BASE}/api/handout/generate`,
         { studentIds: selStudents, documentTypes: selDocs },
         { responseType: 'blob' }
       );
