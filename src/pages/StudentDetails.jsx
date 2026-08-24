@@ -22,7 +22,8 @@ export default function StudentDetails() {
 
     springApi.get('/document-types')
       .then((res) => {
-        const list = res.data;
+        // springApi interceptor unwraps res.data — res IS the array directly
+        const list = Array.isArray(res) ? res : (res.data ?? []);
         setDocTypes(list);
         if (list.length > 0) setDocType(list[0].documentName);
       })

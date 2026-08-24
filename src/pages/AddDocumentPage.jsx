@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import axios from 'axios';
+import { springApi } from '../services/api';
 
 const INSERT_FIELDS = [
   { label: 'Name',               token: '{{name}}' },
@@ -26,8 +26,9 @@ export default function AddDocumentPage() {
 
   async function fetchDocuments() {
     try {
-      const res = await axios.get('/api/document-types');
-      setDocuments(res.data);
+      const res = await springApi.get('/document-types');
+      // springApi interceptor unwraps res.data — res IS the array directly
+      setDocuments(Array.isArray(res) ? res : (res.data ?? []));
     } catch { /* non-fatal */ }
   }
 
@@ -51,7 +52,7 @@ export default function AddDocumentPage() {
     if (!documentName.trim()) { setError('Document name is required.'); return; }
     setLoading(true);
     try {
-      await axios.post('/api/document-types', {
+      await springApi.post('/document-types', {
         documentName:   documentName.trim(),
         defaultContent: content.trim(),
       });
@@ -66,7 +67,7 @@ export default function AddDocumentPage() {
   async function handleDelete(id, name) {
     if (!window.confirm(`Delete "${name}"?`)) return;
     try {
-      await axios.delete(`/api/document-types/${id}`);
+      await springApi.delete(`/document-types/${id}`);
       fetchDocuments();
     } catch { setError('Delete failed.'); }
   }
@@ -78,7 +79,7 @@ export default function AddDocumentPage() {
 
   async function saveEditContent(id) {
     try {
-      await axios.put(`/api/document-types/${id}/content`, { defaultContent: editContent });
+      await springApi.put(`/document-types/${id}/content`, { defaultContent: editContent });
       setEditingId(null);
       fetchDocuments();
     } catch { setError('Failed to save content.'); }
