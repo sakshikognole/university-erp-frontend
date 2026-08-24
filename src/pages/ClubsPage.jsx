@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import axios from 'axios';
+import { springApi } from '../services/api';
 import ClubModal from './ClubModal';
 import ViewClubModal from './ViewClubModal';
 
@@ -20,8 +20,10 @@ export default function ClubsPage() {
   const load = useCallback(async (silent = false) => {
     if (!silent) setLoading(true);
     try {
-      const res = await axios.get('/api/clubs');
-      setClubs(res.data);
+      const res = await springApi.get('/clubs');
+      // springApi interceptor already returns res.data (the body),
+      // so res here is the array directly — not res.data
+      setClubs(Array.isArray(res) ? res : (res.data ?? res ?? []));
     } catch {
       setError('Failed to load clubs.');
     } finally {
@@ -46,10 +48,10 @@ export default function ClubsPage() {
     setSaving(true);
     try {
       if (modalMode === 'add') {
-        await axios.post('/api/clubs', form);
+        await springApi.post('/clubs', form);
         setSuccess('Club added successfully.');
       } else {
-        await axios.put(`/api/clubs/${selClub.id}`, form);
+        await springApi.put(`/clubs/${selClub.id}`, form);
         setSuccess('Club updated successfully.');
       }
       setModalOpen(false);
@@ -65,7 +67,7 @@ export default function ClubsPage() {
     if (!window.confirm(`Delete "${club.clubName}"?`)) return;
     setDeleting(club.id);
     try {
-      await axios.delete(`/api/clubs/${club.id}`);
+      await springApi.delete(`/clubs/${club.id}`);
       setSuccess('Club deleted successfully.');
       load(true); // silent refresh — no flicker
     } catch {

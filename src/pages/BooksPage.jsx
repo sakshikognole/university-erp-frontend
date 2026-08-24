@@ -38,18 +38,17 @@ export default function BooksPage() {
   const load = useCallback(async () => {
     setLoading(true);
     try {
-      // bookService interceptor already unwraps axios response to res.data,
-      // so `res` here IS the response body — no extra .data needed.
+      // bookService interceptor returns res.data = { success, message, data: { content:[...] } }
       const res = await bookService.getAll(search, page, size);
-      const pd  = res;
-      setBooks(pd.content ?? []);
+      const pd  = res.data;   // the PageResponse object inside ApiResponse.data
+      setBooks(pd?.content ?? []);
       setPageData({
-        pageNumber: pd.pageNumber   ?? 0,
-        pageSize:   pd.pageSize     ?? size,
-        totalElements: pd.totalElements ?? 0,
-        totalPages:    pd.totalPages    ?? 0,
-        first: pd.first ?? true,
-        last:  pd.last  ?? true,
+        pageNumber:    pd?.pageNumber    ?? 0,
+        pageSize:      pd?.pageSize      ?? size,
+        totalElements: pd?.totalElements ?? 0,
+        totalPages:    pd?.totalPages    ?? 0,
+        first: pd?.first ?? true,
+        last:  pd?.last  ?? true,
       });
     } catch (e) {
       notify('error', e.message);

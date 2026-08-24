@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import axios from 'axios';
+import { springApi } from '../services/api';
 import SportModal from './SportModal';
 import ViewSportModal from './ViewSportModal';
 
@@ -20,8 +20,10 @@ export default function SportsPage() {
   const load = useCallback(async (silent = false) => {
     if (!silent) setLoading(true);
     try {
-      const res = await axios.get('/api/sports');
-      setSports(res.data);
+      const res = await springApi.get('/sports');
+      // springApi interceptor already returns res.data (the body),
+      // so res here is the array directly — not res.data
+      setSports(Array.isArray(res) ? res : (res.data ?? res ?? []));
     } catch {
       setError('Failed to load sports.');
     } finally {
@@ -45,10 +47,10 @@ export default function SportsPage() {
     setSaving(true);
     try {
       if (modalMode === 'add') {
-        await axios.post('/api/sports', form);
+        await springApi.post('/sports', form);
         setSuccess('Sport added successfully.');
       } else {
-        await axios.put(`/api/sports/${selSport.sportId}`, form);
+        await springApi.put(`/sports/${selSport.sportId}`, form);
         setSuccess('Sport updated successfully.');
       }
       setModalOpen(false);
@@ -64,7 +66,7 @@ export default function SportsPage() {
     if (!window.confirm(`Delete "${sport.sportName}"?`)) return;
     setDeleting(sport.sportId);
     try {
-      await axios.delete(`/api/sports/${sport.sportId}`);
+      await springApi.delete(`/sports/${sport.sportId}`);
       setSuccess('Sport deleted successfully.');
       load(true); // silent refresh — no flicker
     } catch {
