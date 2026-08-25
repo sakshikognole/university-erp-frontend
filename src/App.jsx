@@ -47,6 +47,9 @@ import SportsPage from './pages/SportsPage';
 // --- Sport Team Management (your feature) ---
 import SportTeamsPage from './pages/SportTeamsPage';
 
+// --- Venue Booking (your feature) ---
+import VenueBookingPage from './pages/VenueBookingPage';
+
 // --- Student Certificate (your feature) ---
 import SelectStudent from './pages/SelectStudent';
 import StudentDetails from './pages/StudentDetails';
@@ -118,6 +121,9 @@ function AppRoutes() {
         {/* Sport Management */}
         <Route path="sports"       element={<SportsPage />} />
         <Route path="sport-teams"  element={<SportTeamsPage />} />
+
+        {/* Venue Booking */}
+        <Route path="venue-booking" element={<VenueBookingPage />} />
 
         {/* Student Certificate */}
         <Route path="select-student"      element={<SelectStudent />} />
