@@ -20,10 +20,17 @@ const SPRING_HEALTH_URL = onLocalhost
 
 async function pingServer(url) {
   try {
-    const res = await fetch(url, { method: 'GET', signal: AbortSignal.timeout(5000) });
-    return res.ok;
+    // Use no-cors so the browser doesn't block cross-origin health checks.
+    // With no-cors we can't read the response body or status, but if the
+    // fetch completes without throwing it means the server is reachable.
+    await fetch(url, {
+      method: 'GET',
+      mode: 'no-cors',
+      signal: AbortSignal.timeout(6000),
+    });
+    return true;   // fetch succeeded — server is up
   } catch {
-    return false;
+    return false;  // network error or timeout — server is down
   }
 }
 
