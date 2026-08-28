@@ -24,7 +24,15 @@ export const AuthProvider = ({ children }) => {
     return localStorage.getItem('erp_token') || null;
   });
 
-  const [loading, setLoading] = useState(false);
+  const [loading,      setLoading]      = useState(false);
+  // initializing = true during the very first render cycle.
+  // ProtectedRoute waits for this to be false before deciding to redirect.
+  const [initializing, setInitializing] = useState(true);
+
+  useEffect(() => {
+    // After the first render, localStorage has been read and user state is settled.
+    setInitializing(false);
+  }, []);
 
   useEffect(() => {
     if (user) {
@@ -188,6 +196,7 @@ export const AuthProvider = ({ children }) => {
         user,
         token,
         loading,
+        initializing,
         loginAdmin,
         loginStudent,
         sendOtp,

@@ -3,6 +3,27 @@ import { springApi } from '../services/api';
 import SportTeamModal from './SportTeamModal';
 import ViewSportTeamModal from './ViewSportTeamModal';
 
+// ── Status badge ──────────────────────────────────────────────────────────────
+function StatusBadge({ status }) {
+  const styles = {
+    ACTIVE:   { background: '#dcfce7', color: '#166534', border: '1px solid #86efac' },
+    INACTIVE: { background: '#f1f5f9', color: '#475569', border: '1px solid #cbd5e1' },
+  };
+  const s = styles[status] || styles.INACTIVE;
+  return (
+    <span style={{
+      ...s,
+      padding: '3px 10px',
+      borderRadius: 9999,
+      fontSize: '0.78rem',
+      fontWeight: 600,
+      whiteSpace: 'nowrap',
+    }}>
+      {status}
+    </span>
+  );
+}
+
 export default function SportTeamsPage() {
   const [teams,     setTeams]     = useState([]);
   const [loading,   setLoading]   = useState(true);
@@ -31,7 +52,6 @@ export default function SportTeamsPage() {
 
   useEffect(() => { load(); }, [load]);
 
-  // Auto-clear notifications after 4 s
   useEffect(() => {
     if (!success && !error) return;
     const t = setTimeout(() => { setSuccess(''); setError(''); }, 4000);
@@ -55,7 +75,7 @@ export default function SportTeamsPage() {
       setModalOpen(false);
       load(true);
     } catch (err) {
-      setError(err.response?.data?.error || err.message || 'Failed to save team.');
+      setError(err.message || 'Failed to save team.');
     } finally {
       setSaving(false);
     }
@@ -75,7 +95,6 @@ export default function SportTeamsPage() {
     }
   };
 
-  // Filter by search
   const filtered = teams.filter((t) => {
     const q = search.toLowerCase();
     return (
@@ -100,17 +119,6 @@ export default function SportTeamsPage() {
         </button>
       </div>
 
-      {/* ── Search ── */}
-      <div style={{ marginBottom: 20 }}>
-        <input
-          className="books-form-control"
-          style={{ maxWidth: 360 }}
-          placeholder="Search by team name, sport ID, or coach..."
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-        />
-      </div>
-
       {/* ── Notifications ── */}
       {success && (
         <div className="books-alert books-alert-success">
@@ -125,96 +133,102 @@ export default function SportTeamsPage() {
         </div>
       )}
 
-      {/* ── Content ── */}
-      {loading ? (
-        <p className="books-loading">Loading sport teams...</p>
-      ) : filtered.length === 0 ? (
-        <div className="card" style={{ padding: '40px', textAlign: 'center' }}>
-          <p className="stu-info-text">
-            {search
-              ? `No teams matched "${search}".`
-              : 'No teams added yet. Click "+ Add Team" to get started.'}
-          </p>
+      {/* ── Table card ── */}
+      <div className="card" style={{ padding: '1.5rem' }}>
+
+        {/* Search + count row */}
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem', gap: '1rem', flexWrap: 'wrap' }}>
+          <input
+            className="books-form-control"
+            style={{ maxWidth: 340 }}
+            placeholder="Search by team name, sport ID, or coach..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+          />
+          <span style={{ fontSize: '0.82rem', color: '#6b7280', whiteSpace: 'nowrap' }}>
+            Total: {filtered.length} team{filtered.length !== 1 ? 's' : ''}
+          </span>
         </div>
-      ) : (
-        <div className="sport-grid">
-          {filtered.map((team) => (
-            <div
-              key={team.teamId}
-              className="sport-card"
-              onClick={() => openView(team)}
-              style={{ cursor: 'pointer' }}
-            >
-              {/* Top colour strip */}
-              <div className={`sport-card-strip ${
-                team.status === 'ACTIVE' ? 'sport-strip-active' : 'sport-strip-inactive'
-              }`} />
 
-              <div className="sport-card-body">
-
-                {/* Card header */}
-                <div className="sport-card-header">
-                  <div>
-                    <p className="sport-card-id">{team.teamId}</p>
-                    <h3 className="sport-card-name">{team.teamName}</h3>
-                  </div>
-                  <span className={`sport-status-badge ${
-                    team.status === 'ACTIVE' ? 'sport-badge-active' : 'sport-badge-inactive'
-                  }`}>
-                    {team.status}
-                  </span>
-                </div>
-
-                {/* Details */}
-                <div className="sport-card-details">
-                  <div className="sport-detail-item">
-                    <span className="sport-detail-label">Sport ID</span>
-                    <span className="sport-detail-value">{team.sportId}</span>
-                  </div>
-                  <div className="sport-detail-item">
-                    <span className="sport-detail-label">Coach</span>
-                    <span className="sport-detail-value">{team.coachName}</span>
-                  </div>
-                  <div className="sport-detail-item">
-                    <span className="sport-detail-label">Members</span>
-                    <span className="sport-detail-value">
+        {/* ── Table ── */}
+        {loading ? (
+          <p className="books-loading">Loading sport teams...</p>
+        ) : filtered.length === 0 ? (
+          <div style={{ textAlign: 'center', padding: '2.5rem 0', color: '#9ca3af' }}>
+            <p style={{ fontSize: '0.95rem' }}>
+              {search
+                ? `No teams matched "${search}".`
+                : 'No teams added yet. Click "+ Add Team" to get started.'}
+            </p>
+          </div>
+        ) : (
+          <div className="books-table-wrap">
+            <table className="books-table">
+              <thead>
+                <tr>
+                  <th>#</th>
+                  <th>Team ID</th>
+                  <th>Team Name</th>
+                  <th>Sport ID</th>
+                  <th>Coach</th>
+                  <th>Members</th>
+                  <th>Status</th>
+                  <th>Description</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {filtered.map((team, idx) => (
+                  <tr key={team.teamId}>
+                    <td style={{ color: '#9ca3af' }}>{idx + 1}</td>
+                    <td>
+                      <span style={{ fontFamily: 'monospace', fontSize: '0.82rem', fontWeight: 600 }}>
+                        {team.teamId}
+                      </span>
+                    </td>
+                    <td style={{ fontWeight: 600, color: '#111827' }}>{team.teamName}</td>
+                    <td>{team.sportId}</td>
+                    <td>{team.coachName}</td>
+                    <td style={{ textAlign: 'center' }}>
                       {Array.isArray(team.members) ? team.members.length : 0}
-                    </span>
-                  </div>
-                </div>
-
-                {/* Description preview */}
-                {team.description && (
-                  <p className="sport-card-desc">
-                    {team.description.length > 90
-                      ? team.description.slice(0, 90) + '...'
-                      : team.description}
-                  </p>
-                )}
-
-              </div>
-
-              {/* Footer actions — stopPropagation so card click doesn't fire */}
-              <div className="sport-card-footer" onClick={(e) => e.stopPropagation()}>
-                <button
-                  className="books-btn books-btn-sm books-btn-ghost"
-                  onClick={() => openEdit(team)}
-                >
-                  Edit
-                </button>
-                <button
-                  className="books-btn books-btn-sm books-btn-danger"
-                  onClick={() => handleDelete(team)}
-                  disabled={deleting === team.teamId}
-                >
-                  {deleting === team.teamId ? 'Deleting...' : 'Delete'}
-                </button>
-              </div>
-
-            </div>
-          ))}
-        </div>
-      )}
+                    </td>
+                    <td><StatusBadge status={team.status} /></td>
+                    <td style={{ maxWidth: 200, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                      {team.description || '—'}
+                    </td>
+                    <td>
+                      <div className="books-actions">
+                        <button
+                          className="books-btn books-btn-sm books-btn-ghost"
+                          onClick={() => openView(team)}
+                          title="View"
+                        >
+                          View
+                        </button>
+                        <button
+                          className="books-btn books-btn-sm books-btn-ghost"
+                          onClick={() => openEdit(team)}
+                          title="Edit"
+                        >
+                          Edit
+                        </button>
+                        <button
+                          className="books-btn books-btn-sm books-btn-danger"
+                          onClick={() => handleDelete(team)}
+                          disabled={deleting === team.teamId}
+                          title="Delete"
+                        >
+                          {deleting === team.teamId ? 'Deleting...' : 'Delete'}
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </div>
 
       <SportTeamModal
         isOpen={modalOpen}
