@@ -46,9 +46,20 @@ import SportsPage from './pages/SportsPage';
 
 // --- Sport Team Management (your feature) ---
 import SportTeamsPage from './pages/SportTeamsPage';
+import SportTeamPage  from './pages/SportTeamPage';
 
 // --- Venue Booking (your feature) ---
 import VenueBookingPage from './pages/VenueBookingPage';
+
+// --- Study Materials (your feature) ---
+import UploadMaterialsPage  from './pages/UploadMaterialsPage';
+import DisplayMaterialsPage from './pages/DisplayMaterialsPage';
+
+// --- Payment Management (your feature) ---
+import PaymentPage from './pages/PaymentPage';
+
+// --- Hostel Management (your feature) ---
+import HostelPage from './pages/HostelPage';
 
 // --- Student Certificate (your feature) ---
 import SelectStudent from './pages/SelectStudent';
@@ -121,9 +132,20 @@ function AppRoutes() {
         {/* Sport Management */}
         <Route path="sports"       element={<SportsPage />} />
         <Route path="sport-teams"  element={<SportTeamsPage />} />
+        <Route path="sport-team-v2" element={<SportTeamPage />} />
 
         {/* Venue Booking */}
         <Route path="venue-booking" element={<VenueBookingPage />} />
+
+        {/* Study Materials */}
+        <Route path="upload-materials"  element={<UploadMaterialsPage />} />
+        <Route path="display-materials" element={<DisplayMaterialsPage />} />
+
+        {/* Payment Management */}
+        <Route path="payment" element={<PaymentPage />} />
+
+        {/* Hostel Management */}
+        <Route path="hostel" element={<HostelPage />} />
 
         {/* Student Certificate */}
         <Route path="select-student"      element={<SelectStudent />} />
