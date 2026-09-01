@@ -86,7 +86,7 @@ export default function UploadMaterialsPage() {
     if (!window.confirm(`Delete "${material.fileName}"?`)) return;
     setDeletingFileId(material.materialId);
     try {
-      await springApi.delete(`/api/materials/${material.materialId}`, { headers: HEADERS });
+      await springApi.delete(`/materials/${material.materialId}`, { headers: HEADERS });
       setSuccess(`"${material.fileName}" deleted.`);
       loadFolderFiles(selectedFolderId);
     } catch (err) {
@@ -133,7 +133,7 @@ export default function UploadMaterialsPage() {
     setFolderError('');
     try {
       const res = await springApi.post(
-        '/api/material-folders',
+        '/material-folders',
         { folderName: newFolderName.trim(), parentFolderId: '' },
         { headers: HEADERS },
       );
