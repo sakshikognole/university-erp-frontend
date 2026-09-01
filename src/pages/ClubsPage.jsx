@@ -1,11 +1,14 @@
 import { useState, useEffect, useCallback } from 'react';
-import { springApi } from '../services/api';
+import { springApi, springGet } from '../services/api';
+import PageLoader from '../components/PageLoader';
+import PageError  from '../components/PageError';
 import ClubModal from './ClubModal';
 import ViewClubModal from './ViewClubModal';
 
 export default function ClubsPage() {
   const [clubs,      setClubs]      = useState([]);
   const [loading,    setLoading]    = useState(true);
+  const [pageError,  setPageError]  = useState('');
   const [saving,     setSaving]     = useState(false);
   const [deleting,   setDeleting]   = useState(null); // holds id being deleted
   const [modalOpen,  setModalOpen]  = useState(false);
@@ -18,14 +21,13 @@ export default function ClubsPage() {
 
   // silent=true means refresh without showing loading spinner (no flicker)
   const load = useCallback(async (silent = false) => {
-    if (!silent) setLoading(true);
+    if (!silent) { setLoading(true); setPageError(''); }
     try {
-      const res = await springApi.get('/clubs');
-      // springApi interceptor already returns res.data (the body),
-      // so res here is the array directly — not res.data
+      const res = await springGet('/clubs');
       setClubs(Array.isArray(res) ? res : (res.data ?? res ?? []));
-    } catch {
-      setError('Failed to load clubs.');
+    } catch (err) {
+      if (!silent) setPageError(err.message || 'Failed to load clubs.');
+      else setError('Failed to refresh clubs.');
     } finally {
       if (!silent) setLoading(false);
     }
@@ -136,7 +138,9 @@ export default function ClubsPage() {
 
       {/* Content */}
       {loading ? (
-        <p className="books-loading">Loading clubs...</p>
+        <PageLoader message="Loading clubs..." />
+      ) : pageError ? (
+        <PageError message={pageError} onRetry={load} />
       ) : ordered.length === 0 ? (
         <div className="card" style={{ padding: '40px', textAlign: 'center' }}>
           <p className="stu-info-text">No clubs added yet. Click "+ Add Club" to get started.</p>

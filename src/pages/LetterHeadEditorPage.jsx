@@ -1,5 +1,7 @@
 import { useState, useEffect } from 'react';
-import { springApi } from '../services/api';
+import { springApi, springGet } from '../services/api';
+import PageLoader from '../components/PageLoader';
+import PageError  from '../components/PageError';
 
 const EMPTY = {
   trustName:   '',
@@ -21,13 +23,11 @@ export default function LetterHeadEditorPage() {
   const [error,   setError]   = useState('');
 
   useEffect(() => {
-    springApi.get('/letterhead')
+    springGet('/letterhead')
       .then((res) => {
-        // springApi interceptor already unwraps res.data,
-        // so res IS the LetterHead object directly
         setForm({ ...EMPTY, ...(res || {}) });
       })
-      .catch(() => setError('Failed to load letterhead settings.'))
+      .catch((err) => setError(err.message || 'Failed to load letterhead settings.'))
       .finally(() => setLoading(false));
   }, []);
 
@@ -51,9 +51,8 @@ export default function LetterHeadEditorPage() {
     }
   }
 
-  if (loading) {
-    return <div className="page-container"><p className="stu-info-text">Loading...</p></div>;
-  }
+  if (loading) return <PageLoader message="Loading letterhead settings..." />;
+  if (error && !form.collegeName) return <PageError message={error} onRetry={() => { setError(''); setLoading(true); springGet('/letterhead').then(r => setForm({ ...EMPTY, ...(r||{}) })).catch(e => setError(e.message)).finally(() => setLoading(false)); }} />;
 
   return (
     <div className="page-container">

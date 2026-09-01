@@ -5,6 +5,8 @@ import {
   fetchVenues,
   generateBookingId,
 } from '../services/venueBookingService';
+import PageLoader from '../components/PageLoader';
+import PageError  from '../components/PageError';
 
 // ── Status badge helper ───────────────────────────────────────────────────────
 const STATUS_STYLE = {
@@ -254,10 +256,12 @@ export default function VenueBookingPage() {
   const [events,   setEvents]   = useState([]);
   const [venues,   setVenues]   = useState([]);
   const [dropping, setDropping] = useState(true);
+  const [dropError, setDropError] = useState('');
 
   // Booking list
   const [bookings,  setBookings]  = useState([]);
   const [loading,   setLoading]   = useState(true);
+  const [pageError, setPageError] = useState('');
 
   // Form state
   const [form,      setForm]      = useState({ ...EMPTY_FORM, bookingId: generateBookingId() });
@@ -274,12 +278,13 @@ export default function VenueBookingPage() {
 
   // ── Load dropdown data + bookings ──
   const loadBookings = useCallback(async (silent = false) => {
-    if (!silent) setLoading(true);
+    if (!silent) { setLoading(true); setPageError(''); }
     try {
       const res = await venueBookingService.getAll();
       setBookings(Array.isArray(res) ? res : (res.data ?? []));
-    } catch {
-      setError('Failed to load bookings.');
+    } catch (err) {
+      if (!silent) setPageError(err.message || 'Failed to load bookings.');
+      else setError('Failed to refresh bookings.');
     } finally {
       if (!silent) setLoading(false);
     }
@@ -287,12 +292,13 @@ export default function VenueBookingPage() {
 
   useEffect(() => {
     const init = async () => {
+      setDropping(true); setDropError('');
       try {
         const [evRes, vnRes] = await Promise.all([fetchEvents(), fetchVenues()]);
         setEvents(evRes);
         setVenues(vnRes);
-      } catch {
-        setError('Failed to load events or venues.');
+      } catch (err) {
+        setDropError(err.message || 'Failed to load events or venues.');
       } finally {
         setDropping(false);
       }
@@ -422,7 +428,9 @@ export default function VenueBookingPage() {
         </h2>
 
         {dropping ? (
-          <p className="books-loading">Loading events and venues...</p>
+          <PageLoader message="Loading events and venues..." />
+        ) : dropError ? (
+          <PageError message={dropError} onRetry={() => { const init = async () => { setDropping(true); setDropError(''); try { const [e,v] = await Promise.all([fetchEvents(), fetchVenues()]); setEvents(e); setVenues(v); } catch(err) { setDropError(err.message); } finally { setDropping(false); } }; init(); }} />
         ) : (
           <form onSubmit={handleSubmit}>
 
@@ -549,7 +557,9 @@ export default function VenueBookingPage() {
         </div>
 
         {loading ? (
-          <p className="books-loading">Loading bookings...</p>
+          <PageLoader message="Loading bookings..." />
+        ) : pageError ? (
+          <PageError message={pageError} onRetry={() => loadBookings()} />
         ) : bookings.length === 0 ? (
           <div style={{ textAlign: 'center', padding: '2.5rem 0', color: '#9ca3af' }}>
             <p style={{ fontSize: '0.95rem' }}>No booking requests yet.</p>

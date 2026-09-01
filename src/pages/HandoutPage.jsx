@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react';
 import axios from 'axios';
-import { springApi } from '../services/api';
+import { springApi, springGet } from '../services/api';
+import PageLoader from '../components/PageLoader';
+import PageError  from '../components/PageError';
 import { getAllStudents } from '../services/studentService';
 
 // Use plain axios for blob requests — springApi interceptor breaks binary data
@@ -19,15 +21,25 @@ export default function HandoutPage() {
   const [error,       setError]       = useState('');
   const [success,     setSuccess]     = useState('');
 
-  useEffect(() => {
-    Promise.all([
-      getAllStudents(),
-      springApi.get('/document-types'),
-    ])
-      .then(([s, d]) => { setStudents(s); setDocTypes(d); })
-      .catch(() => setError('Failed to load data.'))
-      .finally(() => setLoading(false));
-  }, []);
+  const [pageError, setPageError] = useState('');
+
+  async function loadData() {
+    setLoading(true); setPageError('');
+    try {
+      const [s, d] = await Promise.all([
+        getAllStudents(),
+        springGet('/document-types'),
+      ]);
+      setStudents(s);
+      setDocTypes(Array.isArray(d) ? d : (d.data ?? []));
+    } catch (err) {
+      setPageError(err.message || 'Failed to load data.');
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  useEffect(() => { loadData(); }, []);
 
   const toggleStudent = (id)   => setSelStudents((p) => p.includes(id)   ? p.filter((x) => x !== id)   : [...p, id]);
   const toggleDoc     = (name) => setSelDocs    ((p) => p.includes(name) ? p.filter((x) => x !== name) : [...p, name]);
@@ -60,7 +72,8 @@ export default function HandoutPage() {
     }
   }
 
-  if (loading) return <div className="page-container"><p className="stu-info-text">Loading...</p></div>;
+  if (loading) return <PageLoader message="Loading students and certificate types..." />;
+  if (pageError) return <PageError message={pageError} onRetry={loadData} />;
 
   return (
     <div className="page-container">

@@ -1,6 +1,8 @@
 import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { getAllStudents } from '../services/studentService';
+import PageLoader from '../components/PageLoader';
+import PageError  from '../components/PageError';
 import Pagination from '../components/Pagination';
 
 const DEFAULT_PAGE = {
@@ -18,17 +20,20 @@ export default function SelectStudent() {
   const [page,        setPage]        = useState(0);
   const [size,        setSize]        = useState(5);
   const [loading,     setLoading]     = useState(true);
+  const [pageError,   setPageError]   = useState('');
   const [selected,    setSelected]    = useState(null);
   const [error,       setError]       = useState('');
   const timer = useRef(null);
 
-  // Load all students once
-  useEffect(() => {
+  function loadStudents() {
+    setLoading(true); setPageError('');
     getAllStudents()
       .then((data) => setAllStudents(data))
-      .catch(() => setError('Failed to load students.'))
+      .catch((err) => setPageError(err.message || 'Failed to load students.'))
       .finally(() => setLoading(false));
-  }, []);
+  }
+
+  useEffect(() => { loadStudents(); }, []);
 
   // Filter + paginate on the client side whenever search/page/size changes
   useEffect(() => {
@@ -102,7 +107,9 @@ export default function SelectStudent() {
 
         {/* Table */}
         {loading ? (
-          <p className="books-loading">Loading students...</p>
+          <PageLoader message="Loading students..." />
+        ) : pageError ? (
+          <PageError message={pageError} onRetry={loadStudents} />
         ) : (
           <div className="books-table-wrap">
             <table className="books-table">

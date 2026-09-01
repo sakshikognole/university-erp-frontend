@@ -1,5 +1,7 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import bookService from '../services/bookService';
+import PageLoader from '../components/PageLoader';
+import PageError  from '../components/PageError';
 import BookModal from './BookModal';
 import ViewBookModal from './ViewBookModal';
 import Pagination from '../components/Pagination';
@@ -18,6 +20,7 @@ export default function BooksPage() {
   const [page,     setPage]     = useState(0);
   const [size,     setSize]     = useState(10);
   const [loading,  setLoading]  = useState(true);
+  const [pageError,setPageError]= useState('');
   const [saving,   setSaving]   = useState(false);
   const [deleting, setDeleting] = useState(false);
 
@@ -37,6 +40,7 @@ export default function BooksPage() {
 
   const load = useCallback(async () => {
     setLoading(true);
+    setPageError('');
     try {
       // BookController returns ApiResponse<PageResponse<Book>>:
       // { success, message, data: { content:[], pageNumber, ... } }
@@ -54,7 +58,7 @@ export default function BooksPage() {
         last:  pd?.last  ?? true,
       });
     } catch (e) {
-      notify('error', e.message);
+      setPageError(e.message || 'Failed to load books.');
     } finally {
       setLoading(false);
     }
@@ -134,7 +138,9 @@ export default function BooksPage() {
         </div>
 
         {loading ? (
-          <p className="books-loading">Loading...</p>
+          <PageLoader message="Loading books..." />
+        ) : pageError ? (
+          <PageError message={pageError} onRetry={load} />
         ) : (
           <div className="books-table-wrap">
             <table className="books-table">

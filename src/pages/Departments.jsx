@@ -1,24 +1,13 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
-  Building2,
-  Plus,
-  Download,
-  Search,
-  Edit,
-  Trash2,
-  FileText,
-  FileSpreadsheet,
-  Printer,
-  ChevronDown,
-  AlertCircle,
-  AlertTriangle,
-  CheckCircle2,
-  Loader2,
-  X,
+  Building2, Plus, Download, Search, Edit, Trash2, FileText,
+  FileSpreadsheet, Printer, ChevronDown, AlertCircle,
+  AlertTriangle, CheckCircle2, Loader2, X,
 } from 'lucide-react';
 import { exportDepartments } from '../utils/exportUtils';
 import { useAuth } from '../context/AuthContext';
+import PageError from '../components/PageError';
 
 const IS_PROD = window.location.hostname !== 'localhost';
 const API_BASE_URL = IS_PROD ? 'https://university-erp-node.onrender.com/api' : 'http://localhost:5000/api';

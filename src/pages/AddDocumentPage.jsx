@@ -1,5 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
-import { springApi } from '../services/api';
+import { springApi, springGet } from '../services/api';
+import PageLoader from '../components/PageLoader';
+import PageError  from '../components/PageError';
 
 const INSERT_FIELDS = [
   { label: 'Name',               token: '{{name}}' },
@@ -14,6 +16,8 @@ export default function AddDocumentPage() {
   const [documentName, setDocumentName] = useState('');
   const [content,      setContent]      = useState('');
   const [documents,    setDocuments]    = useState([]);
+  const [docsLoading,  setDocsLoading]  = useState(true);
+  const [docsError,    setDocsError]    = useState('');
   const [editingId,    setEditingId]    = useState(null);
   const [editContent,  setEditContent]  = useState('');
   const [success,      setSuccess]      = useState('');
@@ -25,11 +29,15 @@ export default function AddDocumentPage() {
   useEffect(() => { fetchDocuments(); }, []);
 
   async function fetchDocuments() {
+    setDocsLoading(true); setDocsError('');
     try {
-      const res = await springApi.get('/document-types');
-      // springApi interceptor unwraps res.data — res IS the array directly
+      const res = await springGet('/document-types');
       setDocuments(Array.isArray(res) ? res : (res.data ?? []));
-    } catch { /* non-fatal */ }
+    } catch (err) {
+      setDocsError(err.message || 'Failed to load document types.');
+    } finally {
+      setDocsLoading(false);
+    }
   }
 
   function insertToken(token, ref, value, setValue) {
@@ -149,7 +157,11 @@ export default function AddDocumentPage() {
           Existing Document Types ({documents.length})
         </p>
 
-        {documents.length === 0 ? (
+        {docsLoading ? (
+          <PageLoader message="Loading document types..." />
+        ) : docsError ? (
+          <PageError message={docsError} onRetry={fetchDocuments} />
+        ) : documents.length === 0 ? (
           <p className="stu-info-text">No document types added yet.</p>
         ) : (
           <div className="stu-doc-list">

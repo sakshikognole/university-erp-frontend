@@ -1,5 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
-import { springApi } from '../services/api';
+import { springApi, springGet } from '../services/api';
+import PageLoader from '../components/PageLoader';
+import PageError  from '../components/PageError';
 import SportTeamModal from './SportTeamModal';
 import ViewSportTeamModal from './ViewSportTeamModal';
 
@@ -27,6 +29,7 @@ function StatusBadge({ status }) {
 export default function SportTeamsPage() {
   const [teams,     setTeams]     = useState([]);
   const [loading,   setLoading]   = useState(true);
+  const [pageError, setPageError] = useState('');
   const [saving,    setSaving]    = useState(false);
   const [deleting,  setDeleting]  = useState(null);
   const [search,    setSearch]    = useState('');
@@ -39,12 +42,13 @@ export default function SportTeamsPage() {
   const [error,     setError]     = useState('');
 
   const load = useCallback(async (silent = false) => {
-    if (!silent) setLoading(true);
+    if (!silent) { setLoading(true); setPageError(''); }
     try {
-      const res = await springApi.get('/sport-teams');
+      const res = await springGet('/sport-teams');
       setTeams(Array.isArray(res) ? res : (res.data ?? []));
-    } catch {
-      setError('Failed to load sport teams.');
+    } catch (err) {
+      if (!silent) setPageError(err.message || 'Failed to load sport teams.');
+      else setError('Failed to refresh sport teams.');
     } finally {
       if (!silent) setLoading(false);
     }
@@ -152,7 +156,9 @@ export default function SportTeamsPage() {
 
         {/* ── Table ── */}
         {loading ? (
-          <p className="books-loading">Loading sport teams...</p>
+          <PageLoader message="Loading sport teams..." />
+        ) : pageError ? (
+          <PageError message={pageError} onRetry={load} />
         ) : filtered.length === 0 ? (
           <div style={{ textAlign: 'center', padding: '2.5rem 0', color: '#9ca3af' }}>
             <p style={{ fontSize: '0.95rem' }}>

@@ -1,11 +1,14 @@
 import { useState, useEffect, useCallback } from 'react';
-import { springApi } from '../services/api';
+import { springApi, springGet } from '../services/api';
+import PageLoader from '../components/PageLoader';
+import PageError  from '../components/PageError';
 import SportModal from './SportModal';
 import ViewSportModal from './ViewSportModal';
 
 export default function SportsPage() {
   const [sports,     setSports]     = useState([]);
   const [loading,    setLoading]    = useState(true);
+  const [pageError,  setPageError]  = useState('');
   const [saving,     setSaving]     = useState(false);
   const [deleting,   setDeleting]   = useState(null);
   const [modalOpen,  setModalOpen]  = useState(false);
@@ -18,14 +21,13 @@ export default function SportsPage() {
 
   // silent=true means refresh without showing loading spinner (no flicker)
   const load = useCallback(async (silent = false) => {
-    if (!silent) setLoading(true);
+    if (!silent) { setLoading(true); setPageError(''); }
     try {
-      const res = await springApi.get('/sports');
-      // springApi interceptor already returns res.data (the body),
-      // so res here is the array directly — not res.data
+      const res = await springGet('/sports');
       setSports(Array.isArray(res) ? res : (res.data ?? res ?? []));
-    } catch {
-      setError('Failed to load sports.');
+    } catch (err) {
+      if (!silent) setPageError(err.message || 'Failed to load sports.');
+      else setError('Failed to refresh sports.');
     } finally {
       if (!silent) setLoading(false);
     }
@@ -112,7 +114,9 @@ export default function SportsPage() {
 
       {/* Cards */}
       {loading ? (
-        <p className="books-loading">Loading sports...</p>
+        <PageLoader message="Loading sports..." />
+      ) : pageError ? (
+        <PageError message={pageError} onRetry={load} />
       ) : sports.length === 0 ? (
         <div className="card" style={{ padding: '40px', textAlign: 'center' }}>
           <p className="stu-info-text">No sports added yet. Click "+ Add Sport" to get started.</p>
