@@ -59,7 +59,7 @@ export default function HostelRoomModal({ isOpen, blockId, onClose, onSaved }) {
     lookupTimer.current = setTimeout(async () => {
       try {
         const res = await springApi.get(`/students/by-prn/${trimmed}`);
-        setNamePreview(res.data.studentName);
+        setNamePreview(res.studentName || res.data?.studentName || 'Not found');
       } catch {
         setNamePreview('Not found');
       }

@@ -19,7 +19,7 @@ export default function SportTeamPage() {
     if (!silent) setLoading(true);
     try {
       const res = await springApi.get('/sport-teams');
-      setTeams(res.data);
+      setTeams(Array.isArray(res) ? res : (res ?? []));
     } catch {
       setError('Failed to load sport teams.');
     } finally {

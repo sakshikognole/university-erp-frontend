@@ -32,8 +32,8 @@ export default function TeamDetails({ teamId, onBack }) {
         springApi.get(`/sport-teams/${teamId}`),
         springApi.get(`/sport-teams/${teamId}/requests`),
       ]);
-      setTeam(teamRes.data);
-      setRequests(reqRes.data);
+      setTeam(teamRes);
+      setRequests(Array.isArray(reqRes) ? reqRes : []);
     } catch {
       setError('Failed to load team details.');
     } finally {
@@ -77,7 +77,7 @@ export default function TeamDetails({ teamId, onBack }) {
     lookupTimer.current = setTimeout(async () => {
       try {
         const res = await springApi.get(`/students/by-prn/${trimmed}`);
-        setNamePreview(res.data.studentName);
+        setNamePreview(res.studentName || res.data?.studentName || 'Not found');
       } catch {
         setNamePreview('Not found');
       }

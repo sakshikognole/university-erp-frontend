@@ -35,7 +35,7 @@ export default function DisplayMaterialsPage() {
         const res = await springApi.get('/material-folders', {
           params: { all: true },
         });
-        setSubjects(res.data);
+        setSubjects(Array.isArray(res) ? res : []);
       } catch {
         setError('Failed to load subjects.');
       } finally {
@@ -56,7 +56,7 @@ export default function DisplayMaterialsPage() {
         const res = await springApi.get('/materials', {
           params: { folderId: selectedSubject },
         });
-        setMaterials(res.data);
+        setMaterials(Array.isArray(res) ? res : []);
       } catch {
         setError('Failed to load materials.');
       } finally {

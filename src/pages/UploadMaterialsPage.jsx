@@ -69,7 +69,7 @@ export default function UploadMaterialsPage() {
         headers: HEADERS,
         params:  { folderId },
       });
-      setFolderFiles(res.data);
+      setFolderFiles(Array.isArray(res) ? res : []);
     } catch {
       // silently fail — main error shown elsewhere
     } finally {
@@ -118,7 +118,7 @@ export default function UploadMaterialsPage() {
         headers: HEADERS,
         params:  { all: true },
       });
-      setFolders(res.data);
+      setFolders(Array.isArray(res) ? res : []);
     } catch {
       setError('Failed to load folders.');
     } finally {
@@ -137,11 +137,11 @@ export default function UploadMaterialsPage() {
         { folderName: newFolderName.trim(), parentFolderId: '' },
         { headers: HEADERS },
       );
-      setFolders((prev) => [...prev, res.data]);
-      setSelectedFolderId(res.data.folderId);
+      setFolders((prev) => [...prev, res]);
+      setSelectedFolderId(res.folderId);
       setNewFolderName('');
       setShowNewFolder(false);
-      setSuccess(`Folder "${res.data.folderName}" created and selected.`);
+      setSuccess(`Folder "${res.folderName}" created and selected.`);
     } catch (err) {
       setFolderError(err.message || 'Failed to create folder.');
     } finally {

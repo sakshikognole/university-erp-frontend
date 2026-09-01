@@ -196,7 +196,7 @@ export default function PaymentPage() {
   const loadCombinations = useCallback(async () => {
     try {
       const res = await springApi.get('/payment-combinations');
-      setCombinations(res.data);
+      setCombinations(Array.isArray(res) ? res : []);
     } catch { /* silently ignore */ }
   }, []);
 
@@ -206,7 +206,7 @@ export default function PaymentPage() {
       const res = await springApi.get('/payment-titles', {
         params: { page: 0, size: 1000 },
       });
-      setAllTitles(res.data.content ?? []);
+      setAllTitles((res?.content ?? res) ?? []);
     } catch { /* silently ignore */ }
   }, []);
 

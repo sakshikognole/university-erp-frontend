@@ -40,8 +40,8 @@ export default function HostelBlockDetails({ block: blockProp, onBack }) {
         springApi.get(`/hostel-blocks/${lookupKey}`),
         springApi.get('/hostel-rooms', { params: { blockId: lookupKey } }),
       ]);
-      setBlock(blkRes.data);
-      const fetchedRooms = roomRes.data;
+      setBlock(blkRes);
+      const fetchedRooms = Array.isArray(roomRes) ? roomRes : [];
       setRooms(fetchedRooms);
       // keep selRoom in sync
       if (selRoom) {
@@ -114,7 +114,7 @@ export default function HostelBlockDetails({ block: blockProp, onBack }) {
     lookupTimer.current = setTimeout(async () => {
       try {
         const res = await springApi.get(`/students/by-prn/${trimmed}`);
-        setNamePreview(res.data.studentName);
+        setNamePreview(res.studentName || res.data?.studentName || 'Not found');
       } catch {
         setNamePreview('Not found');
       }
