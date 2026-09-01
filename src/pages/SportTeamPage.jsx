@@ -1,19 +1,23 @@
 import { springApi } from '../services/api';
 import { useState, useEffect, useCallback } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import TeamForm from './TeamForm';
 import TeamDetails from './TeamDetails';
 
 export default function SportTeamPage() {
-  const [teams,       setTeams]       = useState([]);
-  const [loading,     setLoading]     = useState(true);
-  const [saving,      setSaving]      = useState(false);
-  const [deleting,    setDeleting]    = useState(null);
-  const [formOpen,    setFormOpen]    = useState(false);
-  const [formMode,    setFormMode]    = useState('add');
-  const [selTeam,     setSelTeam]     = useState(null);
-  const [viewTeamId,  setViewTeamId]  = useState(null); // null = list view
-  const [success,     setSuccess]     = useState('');
-  const [error,       setError]       = useState('');
+  const [searchParams, setSearchParams] = useSearchParams();
+  // ?team=T001 → shows TeamDetails; no param → shows list
+  const viewTeamId = searchParams.get('team');
+
+  const [teams,    setTeams]    = useState([]);
+  const [loading,  setLoading]  = useState(true);
+  const [saving,   setSaving]   = useState(false);
+  const [deleting, setDeleting] = useState(null);
+  const [formOpen, setFormOpen] = useState(false);
+  const [formMode, setFormMode] = useState('add');
+  const [selTeam,  setSelTeam]  = useState(null);
+  const [success,  setSuccess]  = useState('');
+  const [error,    setError]    = useState('');
 
   const load = useCallback(async (silent = false) => {
     if (!silent) setLoading(true);
@@ -29,16 +33,17 @@ export default function SportTeamPage() {
 
   useEffect(() => { load(); }, [load]);
 
-  // Auto-clear alerts after 4 seconds
   useEffect(() => {
     if (!success && !error) return;
     const t = setTimeout(() => { setSuccess(''); setError(''); }, 4000);
     return () => clearTimeout(t);
   }, [success, error]);
 
-  const openAdd  = ()      => { setSelTeam(null); setFormMode('add');  setFormOpen(true); };
-  const openEdit = (team)  => { setSelTeam(team); setFormMode('edit'); setFormOpen(true); };
-  const openView = (team)  => { setViewTeamId(team.teamId); };
+  const openAdd  = ()     => { setSelTeam(null); setFormMode('add');  setFormOpen(true); };
+  const openEdit = (team) => { setSelTeam(team); setFormMode('edit'); setFormOpen(true); };
+  // Navigate to detail view by setting URL param
+  const openView = (team) => setSearchParams({ team: team.teamId });
+  const goBack   = ()     => { setSearchParams({}); load(true); };
 
   const handleSave = async (form) => {
     setSaving(true);
@@ -73,20 +78,20 @@ export default function SportTeamPage() {
     }
   };
 
-  // If a team is selected for viewing, show TeamDetails instead of the list
+  // ── Detail view — survives refresh because teamId is in the URL ──
   if (viewTeamId) {
     return (
       <TeamDetails
         teamId={viewTeamId}
-        onBack={() => { setViewTeamId(null); load(true); }}
+        onBack={goBack}
       />
     );
   }
 
+  // ── List view ─────────────────────────────────────────────────────
   return (
     <div className="page-container">
 
-      {/* Header */}
       <div className="st-page-header">
         <div>
           <h1 className="page-title">Sport Teams</h1>
@@ -97,7 +102,6 @@ export default function SportTeamPage() {
         </button>
       </div>
 
-      {/* Alerts */}
       {success && (
         <div className="books-alert books-alert-success">
           <span>{success}</span>
@@ -111,7 +115,6 @@ export default function SportTeamPage() {
         </div>
       )}
 
-      {/* Table */}
       {loading ? (
         <p className="books-loading">Loading sport teams...</p>
       ) : teams.length === 0 ? (
@@ -167,7 +170,6 @@ export default function SportTeamPage() {
         </div>
       )}
 
-      {/* Add / Edit form modal */}
       <TeamForm
         isOpen={formOpen}
         mode={formMode}

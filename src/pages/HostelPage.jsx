@@ -1,5 +1,6 @@
 import { springApi } from '../services/api';
 import { useState, useEffect, useCallback } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import Pagination from '../components/Pagination';
 import HostelBlockModal from './HostelBlockModal';
 import HostelBlockDetails from './HostelBlockDetails';
@@ -10,22 +11,19 @@ const DEFAULT_PAGE = {
 };
 
 export default function HostelPage() {
-  const [blocks,       setBlocks]       = useState([]);
-  const [pageData,     setPageData]     = useState(DEFAULT_PAGE);
-  const [page,         setPage]         = useState(0);
-  const [size,         setSize]         = useState(6);
-  const [loading,      setLoading]      = useState(true);
+  const [searchParams, setSearchParams] = useSearchParams();
+  // ?block=HB001 → shows HostelBlockDetails; no param → shows list
+  const viewBlockId = searchParams.get('block');
 
-  // modal
-  const [modalOpen,    setModalOpen]    = useState(false);
-  const [editBlock,    setEditBlock]    = useState(null);
-
-  // detail view — pass full block object
-  const [viewBlock,    setViewBlock]    = useState(null);
-
-  // feedback
-  const [success,      setSuccess]      = useState('');
-  const [error,        setError]        = useState('');
+  const [blocks,    setBlocks]    = useState([]);
+  const [pageData,  setPageData]  = useState(DEFAULT_PAGE);
+  const [page,      setPage]      = useState(0);
+  const [size,      setSize]      = useState(6);
+  const [loading,   setLoading]   = useState(true);
+  const [modalOpen, setModalOpen] = useState(false);
+  const [editBlock, setEditBlock] = useState(null);
+  const [success,   setSuccess]   = useState('');
+  const [error,     setError]     = useState('');
 
   useEffect(() => {
     if (!success && !error) return;
@@ -33,7 +31,6 @@ export default function HostelPage() {
     return () => clearTimeout(t);
   }, [success, error]);
 
-  // ── Load blocks ───────────────────────────────────────────────────────
   const load = useCallback(async (silent = false) => {
     if (!silent) setLoading(true);
     try {
@@ -46,9 +43,9 @@ export default function HostelPage() {
         pageNumber:    pd.number       ?? 0,
         pageSize:      pd.size         ?? size,
         totalElements: pd.totalElements ?? 0,
-        totalPages:    pd.totalPages ?? 0,
-        first:         pd.first ?? true,
-        last:          pd.last ?? true,
+        totalPages:    pd.totalPages    ?? 0,
+        first:         pd.first        ?? true,
+        last:          pd.last         ?? true,
       });
     } catch {
       setError('Failed to load hostel blocks.');
@@ -59,9 +56,11 @@ export default function HostelPage() {
 
   useEffect(() => { load(); }, [load]);
 
-  // ── Handlers ──────────────────────────────────────────────────────────
-  const openAdd  = ()      => { setEditBlock(null); setModalOpen(true); };
+  const openAdd  = ()      => { setEditBlock(null);  setModalOpen(true); };
   const openEdit = (block) => { setEditBlock(block); setModalOpen(true); };
+  // Navigate to detail by putting blockId in URL — survives refresh
+  const openView = (block) => setSearchParams({ block: block.blockId });
+  const goBack   = ()      => { setSearchParams({}); load(true); };
 
   const handleDelete = async (block) => {
     if (!window.confirm(`Delete "${block.hostelName}"?`)) return;
@@ -80,21 +79,23 @@ export default function HostelPage() {
     load(true);
   };
 
-  // ── Detail view ───────────────────────────────────────────────────────
-  if (viewBlock) {
+  // ── Detail view — URL driven so refresh restores the same block ──
+  if (viewBlockId) {
+    // Find the block in the already-loaded list, or pass just the id
+    // HostelBlockDetails fetches the block itself by blockId
+    const blockObj = blocks.find(b => b.blockId === viewBlockId) || { blockId: viewBlockId };
     return (
       <HostelBlockDetails
-        block={viewBlock}
-        onBack={() => { setViewBlock(null); load(true); }}
+        block={blockObj}
+        onBack={goBack}
       />
     );
   }
 
-  // ── Render ────────────────────────────────────────────────────────────
+  // ── List view ─────────────────────────────────────────────────────
   return (
     <div className="page-container">
 
-      {/* Header */}
       <div className="books-page-header">
         <div>
           <h1 className="page-title">Hostel Management</h1>
@@ -105,7 +106,6 @@ export default function HostelPage() {
         </button>
       </div>
 
-      {/* Alerts */}
       {success && (
         <div className="books-alert books-alert-success">
           <span>{success}</span>
@@ -119,7 +119,6 @@ export default function HostelPage() {
         </div>
       )}
 
-      {/* Cards */}
       {loading ? (
         <p className="books-loading">Loading hostel blocks...</p>
       ) : blocks.length === 0 ? (
@@ -131,7 +130,6 @@ export default function HostelPage() {
           {blocks.map((block) => (
             <div key={block.blockId} className="hst-card">
 
-              {/* Top: type badge + active status */}
               <div className="hst-card-top">
                 <span className={`hst-badge hst-badge-${block.type?.toLowerCase()}`}>
                   {block.type}
@@ -142,15 +140,13 @@ export default function HostelPage() {
                 </span>
               </div>
 
-              {/* Block info */}
               <div className="hst-card-id">{block.blockId}</div>
               <div className="hst-card-name">{block.hostelName}</div>
 
-              {/* Footer actions */}
               <div className="hst-card-footer">
                 <button
                   className="books-btn books-btn-sm books-btn-primary"
-                  onClick={() => setViewBlock(block)}
+                  onClick={() => openView(block)}
                 >
                   View
                 </button>
@@ -173,14 +169,12 @@ export default function HostelPage() {
         </div>
       )}
 
-      {/* Pagination */}
       <Pagination
         pageData={pageData}
         onPageChange={(p) => setPage(p)}
         onSizeChange={(s) => { setSize(s); setPage(0); }}
       />
 
-      {/* Add / Edit modal */}
       <HostelBlockModal
         isOpen={modalOpen}
         block={editBlock}
