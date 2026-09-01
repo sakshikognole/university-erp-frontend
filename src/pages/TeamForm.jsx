@@ -19,8 +19,8 @@ export default function TeamForm({ isOpen, mode, team, onSave, onClose, loading 
     if (!isOpen) return;
     springApi.get('/sports')
       .then((res) => {
-        // Only show ACTIVE sports
-        setSports(res.data.filter((s) => s.status === 'ACTIVE'));
+        const sports = Array.isArray(res) ? res : (res.data ?? res ?? []);
+        setSports(sports.filter((s) => s.status === 'ACTIVE'));
       })
       .catch(() => setSports([]));
   }, [isOpen]);

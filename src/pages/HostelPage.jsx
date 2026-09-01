@@ -40,15 +40,15 @@ export default function HostelPage() {
       const res = await springApi.get('/hostel-blocks', {
         params: { page, size },
       });
-      const pd = res.data;
-      setBlocks(pd.content);
+      const pd = res;
+      setBlocks(pd.content ?? []);
       setPageData({
         pageNumber:    pd.number       ?? 0,
         pageSize:      pd.size         ?? size,
-        totalElements: pd.totalElements,
-        totalPages:    pd.totalPages,
-        first:         pd.first,
-        last:          pd.last,
+        totalElements: pd.totalElements ?? 0,
+        totalPages:    pd.totalPages ?? 0,
+        first:         pd.first ?? true,
+        last:          pd.last ?? true,
       });
     } catch {
       setError('Failed to load hostel blocks.');

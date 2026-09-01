@@ -91,7 +91,7 @@ export default function HostelRoomModal({ isOpen, blockId, onClose, onSaved }) {
         roomNo:   form.roomNo.trim(),
         capacity: Number(form.capacity),
       });
-      const newRoom = res.data;
+      const newRoom = res;
 
       // 2. Add students if any were listed (optional)
       for (const s of prnList) {

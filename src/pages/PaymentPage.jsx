@@ -175,15 +175,16 @@ export default function PaymentPage() {
       const res = await springApi.get('/payment-titles', {
         params: { page, size },
       });
-      const pd = res.data;
-      setTitles(pd.content);
+      // springApi interceptor already unwraps res.data — res IS the Page object
+      const pd = res;
+      setTitles(pd.content ?? []);
       setPageData({
         pageNumber:    pd.number       ?? pd.pageNumber    ?? 0,
         pageSize:      pd.size         ?? pd.pageSize      ?? size,
-        totalElements: pd.totalElements,
-        totalPages:    pd.totalPages,
-        first:         pd.first,
-        last:          pd.last,
+        totalElements: pd.totalElements ?? 0,
+        totalPages:    pd.totalPages    ?? 0,
+        first:         pd.first        ?? true,
+        last:          pd.last         ?? true,
       });
     } catch {
       setError('Failed to load payment titles.');
