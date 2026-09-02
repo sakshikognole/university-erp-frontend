@@ -12,7 +12,7 @@ const EMPTY = {
   bookLocation: '', department: '',
 };
 
-export default function BookModal({ isOpen, mode, book, onSave, onClose, loading }) {
+export default function BookModal({ isOpen, mode, book, onSave, onClose, loading, dupError, onDupOk }) {
   const [form,   setForm]   = useState(EMPTY);
   const [errors, setErrors] = useState({});
 
@@ -76,6 +76,44 @@ export default function BookModal({ isOpen, mode, book, onSave, onClose, loading
 
         <form onSubmit={submit} onKeyDown={handleKeyDown}>
           <div className="books-modal-body">
+
+            {/* Duplicate warning — shown inside modal with OK button */}
+            {dupError && (
+              <div style={{
+                background: '#fef2f2',
+                border: '1px solid #fca5a5',
+                borderRadius: 8,
+                padding: '12px 16px',
+                marginBottom: 16,
+                display: 'flex',
+                flexDirection: 'column',
+                gap: 10,
+              }}>
+                <div style={{ display: 'flex', gap: 10, alignItems: 'flex-start' }}>
+                  <span style={{ fontSize: '1.2rem' }}>⚠️</span>
+                  <p style={{ color: '#dc2626', fontWeight: 600, margin: 0, fontSize: '0.9rem' }}>
+                    {dupError}
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  onClick={onDupOk}
+                  style={{
+                    alignSelf: 'flex-end',
+                    padding: '6px 20px',
+                    background: '#dc2626',
+                    color: '#fff',
+                    border: 'none',
+                    borderRadius: 6,
+                    fontWeight: 600,
+                    cursor: 'pointer',
+                    fontSize: '0.85rem',
+                  }}
+                >
+                  OK
+                </button>
+              </div>
+            )}
 
             <div className="books-form-group">
               <label className="books-form-label">Book Title *</label>

@@ -22,6 +22,7 @@ export default function BooksPage() {
   const [loading,  setLoading]  = useState(true);
   const [pageError,setPageError]= useState('');
   const [saving,   setSaving]   = useState(false);
+  const [dupError, setDupError] = useState('');  // shown inside BookModal
   const [deleting, setDeleting] = useState(false);
 
   const [modalOpen, setModalOpen] = useState(false);
@@ -74,8 +75,8 @@ export default function BooksPage() {
 
   const onSizeChange = (s) => { setSize(s); setPage(0); };
 
-  const openAdd  = ()  => { setSelBook(null); setModalMode('add');  setModalOpen(true); };
-  const openEdit = (b) => { setSelBook(b);    setModalMode('edit'); setModalOpen(true); };
+  const openAdd  = ()  => { setSelBook(null); setModalMode('add');  setDupError(''); setModalOpen(true); };
+  const openEdit = (b) => { setSelBook(b);    setModalMode('edit'); setDupError(''); setModalOpen(true); };
   const openView = (b) => { setViewBook(b);   setViewOpen(true); };
   const openDel  = (b) => { setDelBook(b);    setDelOpen(true); };
 
@@ -95,7 +96,8 @@ export default function BooksPage() {
             b.authorName.trim().toLowerCase() === form.authorName.trim().toLowerCase()
         );
         if (isDuplicate) {
-          notify('error', `Book "${form.bookTitle}" by ${form.authorName} already exists.`);
+          // Show warning inside the modal with an OK button — not behind it
+          setDupError(`Book "${form.bookTitle}" by ${form.authorName} already exists.`);
           setSaving(false);
           return;
         }
@@ -261,8 +263,10 @@ export default function BooksPage() {
         mode={modalMode}
         book={selBook}
         onSave={handleSave}
-        onClose={() => setModalOpen(false)}
+        onClose={() => { setModalOpen(false); setDupError(''); }}
         loading={saving}
+        dupError={dupError}
+        onDupOk={() => setDupError('')}
       />
       <ViewBookModal
         isOpen={viewOpen}
