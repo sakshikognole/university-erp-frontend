@@ -5623,3 +5623,144 @@ button {
     gap: 10px;
   }
 }
+/* ==========================================
+   BOOKS — MOBILE ACCORDION CARDS (Defect #1)
+   show .book-mob-list on mobile, hide on desktop
+   show .book-desk-table on desktop, hide on mobile
+   ========================================== */
+
+/* Default: show table, hide mobile cards */
+.book-mob-list  { display: none; }
+.book-desk-table { display: block; }
+
+/* Mobile only (<=768px): flip visibility */
+@media (max-width: 768px) {
+  .book-mob-list   { display: block; }
+  .book-desk-table { display: none; }
+}
+
+/* ── Mobile card wrapper ── */
+.book-mob-card {
+  border: 1px solid var(--border-color, #e5e7eb);
+  border-radius: 10px;
+  margin-bottom: 8px;
+  overflow: hidden;
+  background: #fff;
+}
+
+/* ── Tap header ── */
+.book-mob-header {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 14px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  text-align: left;
+  gap: 10px;
+}
+
+.book-mob-header:active {
+  background: #f9fafb;
+}
+
+.book-mob-summary {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex: 1;
+  min-width: 0;
+}
+
+.book-mob-num {
+  min-width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: #111827;
+  color: #fff;
+  font-size: 0.72rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.book-mob-title-wrap {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.book-mob-title {
+  font-weight: 600;
+  font-size: 0.9rem;
+  color: #111827;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.book-mob-author {
+  font-size: 0.78rem;
+  color: #6b7280;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.book-mob-chevron {
+  font-size: 0.65rem;
+  color: #9ca3af;
+  flex-shrink: 0;
+}
+
+/* ── Expanded detail rows ── */
+.book-mob-details {
+  border-top: 1px solid #f3f4f6;
+  padding: 12px 14px 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.book-mob-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.85rem;
+}
+
+.book-mob-label {
+  color: #6b7280;
+  font-weight: 500;
+  flex-shrink: 0;
+  margin-right: 8px;
+}
+
+.book-mob-value {
+  color: #111827;
+  text-align: right;
+}
+
+.book-mob-value.mono {
+  font-family: monospace;
+  font-size: 0.8rem;
+  color: #6b7280;
+}
+
+/* ── Action buttons row ── */
+.book-mob-actions {
+  display: flex;
+  gap: 8px;
+  padding-top: 8px;
+  border-top: 1px solid #f3f4f6;
+  margin-top: 4px;
+}
+
+.book-mob-actions .books-btn {
+  flex: 1;
+  justify-content: center;
+}

@@ -13,6 +13,59 @@ const DEFAULT_PAGE = {
   totalPages: 0, first: true, last: true,
 };
 
+// ── Mobile accordion card — shown only on small screens via CSS ──────────────
+function BookMobileCard({ book, index, page, size, isExpanded, onToggle, onView, onEdit, onDel }) {
+  return (
+    <div className="book-mob-card">
+      {/* Tap header to expand/collapse */}
+      <button
+        type="button"
+        className="book-mob-header"
+        onClick={onToggle}
+        aria-expanded={isExpanded}
+      >
+        <div className="book-mob-summary">
+          <span className="book-mob-num">{page * size + index + 1}</span>
+          <div className="book-mob-title-wrap">
+            <span className="book-mob-title">{book.bookTitle}</span>
+            <span className="book-mob-author">{book.authorName}</span>
+          </div>
+        </div>
+        <span className="book-mob-chevron">{isExpanded ? '▲' : '▼'}</span>
+      </button>
+
+      {/* Expanded details */}
+      {isExpanded && (
+        <div className="book-mob-details">
+          <div className="book-mob-row">
+            <span className="book-mob-label">Book ID</span>
+            <span className="book-mob-value mono">{book.bookId || '—'}</span>
+          </div>
+          <div className="book-mob-row">
+            <span className="book-mob-label">Total Copies</span>
+            <span className="book-mob-value">{book.totalCopies}</span>
+          </div>
+          <div className="book-mob-row">
+            <span className="book-mob-label">Location</span>
+            <span className="book-mob-value">{book.bookLocation}</span>
+          </div>
+          <div className="book-mob-row">
+            <span className="book-mob-label">Department</span>
+            <span className="book-mob-value">
+              <span className="books-badge">{book.department}</span>
+            </span>
+          </div>
+          <div className="book-mob-actions">
+            <button className="books-btn books-btn-sm books-btn-ghost"  onClick={() => onView(book)}>View</button>
+            <button className="books-btn books-btn-sm books-btn-warning" onClick={() => onEdit(book)}>Edit</button>
+            <button className="books-btn books-btn-sm books-btn-danger"  onClick={() => onDel(book)}>Delete</button>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
 export default function BooksPage() {
   const [books,    setBooks]    = useState([]);
   const [pageData, setPageData] = useState(DEFAULT_PAGE);
@@ -36,6 +89,10 @@ export default function BooksPage() {
   const [alert, setAlert] = useState({ type: '', message: '' });
   const notify  = (type, message) => setAlert({ type, message });
   const dismiss = () => setAlert({ type: '', message: '' });
+
+  // Mobile accordion — only one book expanded at a time
+  const [expandedId, setExpandedId] = useState(null);
+  const toggleExpand = (id) => setExpandedId(prev => prev === id ? null : id);
 
   const timer = useRef(null);
 
@@ -189,68 +246,77 @@ export default function BooksPage() {
         ) : pageError ? (
           <PageError message={pageError} onRetry={load} />
         ) : (
-          <div className="books-table-wrap">
-            <table className="books-table">
-              <thead>
-                <tr>
-                  <th>Book ID</th>
-                  <th>#</th>
-                  <th>Book Title</th>
-                  <th>Author</th>
-                  <th>Copies</th>
-                  <th>Location</th>
-                  <th>Department</th>
-                  <th>Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                {books.length === 0 ? (
-                  <tr>
-                    <td colSpan={8}>
-                      <div className="books-empty">No books found.</div>
-                    </td>
-                  </tr>
-                ) : books.map((b, i) => (
-                  <tr key={b.id}>
-                    <td><span style={{fontFamily:'monospace',fontSize:'0.78rem',color:'#6b7280'}}>{b.bookId || '—'}</span></td>
-                    <td>{page * size + i + 1}</td>
-                    <td>{b.bookTitle}</td>
-                    <td>{b.authorName}</td>
-                    <td>{b.totalCopies}</td>
-                    <td>{b.bookLocation}</td>
-                    <td>
-                      <span className="books-badge">{b.department}</span>
-                    </td>
-                    <td>
-                      <div className="books-actions">
-                        <button
-                          className="books-btn books-btn-sm books-btn-ghost"
-                          onClick={() => openView(b)}
-                          title="View"
-                        >
-                          View
-                        </button>
-                        <button
-                          className="books-btn books-btn-sm books-btn-warning"
-                          onClick={() => openEdit(b)}
-                          title="Edit"
-                        >
-                          Edit
-                        </button>
-                        <button
-                          className="books-btn books-btn-sm books-btn-danger"
-                          onClick={() => openDel(b)}
-                          title="Delete"
-                        >
-                          Delete
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+          <>
+            {/* ── Mobile view — accordion cards (hidden on tablet/desktop) ── */}
+            <div className="book-mob-list">
+              {books.length === 0 ? (
+                <p className="books-empty" style={{ padding: '2rem', textAlign: 'center' }}>
+                  No books found.
+                </p>
+              ) : books.map((b, i) => (
+                <BookMobileCard
+                  key={b.id}
+                  book={b}
+                  index={i}
+                  page={page}
+                  size={size}
+                  isExpanded={expandedId === b.id}
+                  onToggle={() => toggleExpand(b.id)}
+                  onView={openView}
+                  onEdit={openEdit}
+                  onDel={openDel}
+                />
+              ))}
+            </div>
+
+            {/* ── Desktop/tablet view — full table (hidden on mobile) ── */}
+            <div className="book-desk-table">
+              <div className="books-table-wrap">
+                <table className="books-table">
+                  <thead>
+                    <tr>
+                      <th>Book ID</th>
+                      <th>#</th>
+                      <th>Book Title</th>
+                      <th>Author</th>
+                      <th>Copies</th>
+                      <th>Location</th>
+                      <th>Department</th>
+                      <th>Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {books.length === 0 ? (
+                      <tr>
+                        <td colSpan={8}>
+                          <div className="books-empty">No books found.</div>
+                        </td>
+                      </tr>
+                    ) : books.map((b, i) => (
+                      <tr key={b.id}>
+                        <td><span style={{fontFamily:'monospace',fontSize:'0.78rem',color:'#6b7280'}}>{b.bookId || '—'}</span></td>
+                        <td>{page * size + i + 1}</td>
+                        <td>{b.bookTitle}</td>
+                        <td>{b.authorName}</td>
+                        <td>{b.totalCopies}</td>
+                        <td>{b.bookLocation}</td>
+                        <td>
+                          <span className="books-badge">{b.department}</span>
+                        </td>
+                        <td>
+                          <div className="books-actions">
+                            <button className="books-btn books-btn-sm books-btn-ghost"   onClick={() => openView(b)} title="View">View</button>
+                            <button className="books-btn books-btn-sm books-btn-warning" onClick={() => openEdit(b)} title="Edit">Edit</button>
+                            <button className="books-btn books-btn-sm books-btn-danger"  onClick={() => openDel(b)}  title="Delete">Delete</button>
+                          </div>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </>
         )}
 
         <Pagination
