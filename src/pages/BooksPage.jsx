@@ -169,7 +169,7 @@ export default function BooksPage() {
               <tbody>
                 {Array.from({ length: size }).map((_, i) => (
                   <tr key={i}>
-                    {Array.from({ length: 7 }).map((__, j) => (
+                    {Array.from({ length: 8 }).map((__, j) => (
                       <td key={j}>
                         <div style={{
                           height: 14,
@@ -193,6 +193,7 @@ export default function BooksPage() {
             <table className="books-table">
               <thead>
                 <tr>
+                  <th>Book ID</th>
                   <th>#</th>
                   <th>Book Title</th>
                   <th>Author</th>
@@ -205,12 +206,13 @@ export default function BooksPage() {
               <tbody>
                 {books.length === 0 ? (
                   <tr>
-                    <td colSpan={7}>
+                    <td colSpan={8}>
                       <div className="books-empty">No books found.</div>
                     </td>
                   </tr>
                 ) : books.map((b, i) => (
                   <tr key={b.id}>
+                    <td><span style={{fontFamily:'monospace',fontSize:'0.78rem',color:'#6b7280'}}>{b.bookId || '—'}</span></td>
                     <td>{page * size + i + 1}</td>
                     <td>{b.bookTitle}</td>
                     <td>{b.authorName}</td>
