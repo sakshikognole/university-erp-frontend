@@ -5586,3 +5586,40 @@ button {
   color: var(--text-secondary);
   font-size: 14px;
 }
+/* ==========================================
+   BOOKS — DEFECT FIXES
+   ========================================== */
+
+/* Defects #7 + #8: skeleton shimmer animation */
+@keyframes books-shimmer {
+  0%   { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+/* Defect #1: responsive table on mobile — horizontal scroll + min widths */
+@media (max-width: 768px) {
+  .books-table-wrap {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .books-table {
+    min-width: 640px;  /* force a minimum width so all columns stay readable */
+  }
+
+  .books-search-input {
+    width: 100%;
+    max-width: 100%;
+  }
+
+  .books-toolbar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .books-page-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+}

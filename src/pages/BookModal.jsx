@@ -58,6 +58,14 @@ export default function BookModal({ isOpen, mode, book, onSave, onClose, loading
     onSave({ ...form, totalCopies: Number(form.totalCopies) });
   };
 
+  // Defects #3 + #4: ensure Enter key submits from any field including select
+  const handleKeyDown = (e) => {
+    if (e.key === 'Enter' && e.target.tagName !== 'TEXTAREA') {
+      e.preventDefault();
+      submit(e);
+    }
+  };
+
   return (
     <div className="books-overlay">
       <div className="books-modal">
@@ -66,7 +74,7 @@ export default function BookModal({ isOpen, mode, book, onSave, onClose, loading
           <button className="books-modal-close" onClick={onClose}>x</button>
         </div>
 
-        <form onSubmit={submit}>
+        <form onSubmit={submit} onKeyDown={handleKeyDown}>
           <div className="books-modal-body">
 
             <div className="books-form-group">

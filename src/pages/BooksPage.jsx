@@ -138,7 +138,36 @@ export default function BooksPage() {
         </div>
 
         {loading ? (
-          <PageLoader message="Loading books..." />
+          // Defects #7 + #8: skeleton loader gives instant visual feedback
+          // instead of blank screen while waiting for API response
+          <div className="books-table-wrap">
+            <table className="books-table">
+              <thead>
+                <tr>
+                  <th>#</th><th>Book Title</th><th>Author</th>
+                  <th>Copies</th><th>Location</th><th>Department</th><th>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {Array.from({ length: size }).map((_, i) => (
+                  <tr key={i}>
+                    {Array.from({ length: 7 }).map((__, j) => (
+                      <td key={j}>
+                        <div style={{
+                          height: 14,
+                          background: 'linear-gradient(90deg, #f3f4f6 25%, #e5e7eb 50%, #f3f4f6 75%)',
+                          backgroundSize: '200% 100%',
+                          borderRadius: 4,
+                          animation: 'books-shimmer 1.4s infinite',
+                          width: j === 1 ? '80%' : j === 6 ? '60%' : '50%',
+                        }} />
+                      </td>
+                    ))}
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         ) : pageError ? (
           <PageError message={pageError} onRetry={load} />
         ) : (
