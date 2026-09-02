@@ -83,6 +83,18 @@ export default function BooksPage() {
     setSaving(true);
     try {
       if (modalMode === 'add') {
+        // Frontend duplicate check — compare case-insensitively against loaded books
+        // This works even if backend cache is stale
+        const isDuplicate = books.some(
+          (b) =>
+            b.bookTitle.trim().toLowerCase() === form.bookTitle.trim().toLowerCase() &&
+            b.authorName.trim().toLowerCase() === form.authorName.trim().toLowerCase()
+        );
+        if (isDuplicate) {
+          notify('error', `Book "${form.bookTitle}" by ${form.authorName} already exists.`);
+          setSaving(false);
+          return;
+        }
         await bookService.create(form);
         notify('success', 'Book added successfully');
       } else {
@@ -92,7 +104,8 @@ export default function BooksPage() {
       setModalOpen(false);
       load();
     } catch (e) {
-      notify('error', e.message);
+      // Keep modal open and show error inside it so user can fix the form
+      notify('error', e.message || 'Failed to save book.');
     } finally {
       setSaving(false);
     }
