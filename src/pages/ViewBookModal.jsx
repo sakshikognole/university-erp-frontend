@@ -4,7 +4,7 @@ export default function ViewBookModal({ isOpen, book, onClose }) {
   if (!isOpen || !book) return null;
 
   const rows = [
-    ['Book ID',       book.id],
+    ['Book ID',       book.bookId || book.id],
     ['Book Title',    book.bookTitle],
     ['Author Name',   book.authorName],
     ['Total Copies',  book.totalCopies],
