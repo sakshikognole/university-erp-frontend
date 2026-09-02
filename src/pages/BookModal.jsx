@@ -8,7 +8,7 @@ const DEPARTMENTS = [
 ];
 
 const EMPTY = {
-  bookTitle: '', authorName: '', totalCopies: '',
+  bookId: '', bookTitle: '', authorName: '', totalCopies: '',
   bookLocation: '', department: '',
 };
 
@@ -21,11 +21,12 @@ export default function BookModal({ isOpen, mode, book, onSave, onClose, loading
     setForm(
       mode === 'edit' && book
         ? {
-            bookTitle:   book.bookTitle,
-            authorName:  book.authorName,
-            totalCopies: book.totalCopies,
-            bookLocation: book.bookLocation,
-            department:  book.department,
+            bookId:       book.bookId       || '',
+            bookTitle:    book.bookTitle     || '',
+            authorName:   book.authorName    || '',
+            totalCopies:  book.totalCopies   ?? '',
+            bookLocation: book.bookLocation  || '',
+            department:   book.department    || '',
           }
         : EMPTY
     );
@@ -36,9 +37,13 @@ export default function BookModal({ isOpen, mode, book, onSave, onClose, loading
 
   const validate = () => {
     const e = {};
-    if (!form.bookTitle.trim())    e.bookTitle    = 'Required';
-    if (!form.authorName.trim())   e.authorName   = 'Required';
-    if (form.totalCopies === '')   e.totalCopies  = 'Required';
+    if (mode === 'add' && !form.bookId.trim())
+      e.bookId = 'Book ID is required';
+    else if (mode === 'add' && !/^[A-Za-z0-9\-_]+$/.test(form.bookId.trim()))
+      e.bookId = 'Only letters, numbers, hyphens and underscores allowed';
+    if (!form.bookTitle.trim())   e.bookTitle    = 'Required';
+    if (!form.authorName.trim())  e.authorName   = 'Required';
+    if (form.totalCopies === '')  e.totalCopies  = 'Required';
     else if (Number(form.totalCopies) < 0) e.totalCopies = 'Cannot be negative';
     if (!form.bookLocation.trim()) e.bookLocation = 'Required';
     if (!form.department)          e.department   = 'Select a department';
@@ -58,7 +63,6 @@ export default function BookModal({ isOpen, mode, book, onSave, onClose, loading
     onSave({ ...form, totalCopies: Number(form.totalCopies) });
   };
 
-  // Defects #3 + #4: ensure Enter key submits from any field including select
   const handleKeyDown = (e) => {
     if (e.key === 'Enter' && e.target.tagName !== 'TEXTAREA') {
       e.preventDefault();
@@ -77,17 +81,12 @@ export default function BookModal({ isOpen, mode, book, onSave, onClose, loading
         <form onSubmit={submit} onKeyDown={handleKeyDown}>
           <div className="books-modal-body">
 
-            {/* Duplicate warning — shown inside modal with OK button */}
+            {/* Duplicate warning */}
             {dupError && (
               <div style={{
-                background: '#fef2f2',
-                border: '1px solid #fca5a5',
-                borderRadius: 8,
-                padding: '12px 16px',
-                marginBottom: 16,
-                display: 'flex',
-                flexDirection: 'column',
-                gap: 10,
+                background: '#fef2f2', border: '1px solid #fca5a5',
+                borderRadius: 8, padding: '12px 16px', marginBottom: 16,
+                display: 'flex', flexDirection: 'column', gap: 10,
               }}>
                 <div style={{ display: 'flex', gap: 10, alignItems: 'flex-start' }}>
                   <span style={{ fontSize: '1.2rem' }}>⚠️</span>
@@ -95,32 +94,49 @@ export default function BookModal({ isOpen, mode, book, onSave, onClose, loading
                     {dupError}
                   </p>
                 </div>
-                <button
-                  type="button"
-                  onClick={onDupOk}
-                  style={{
-                    alignSelf: 'flex-end',
-                    padding: '6px 20px',
-                    background: '#dc2626',
-                    color: '#fff',
-                    border: 'none',
-                    borderRadius: 6,
-                    fontWeight: 600,
-                    cursor: 'pointer',
-                    fontSize: '0.85rem',
-                  }}
-                >
+                <button type="button" onClick={onDupOk} style={{
+                  alignSelf: 'flex-end', padding: '6px 20px',
+                  background: '#dc2626', color: '#fff', border: 'none',
+                  borderRadius: 6, fontWeight: 600, cursor: 'pointer', fontSize: '0.85rem',
+                }}>
                   OK
                 </button>
               </div>
             )}
+
+            {/* Book ID — user enters in add mode, read-only in edit */}
+            <div className="books-form-group">
+              <label className="books-form-label">
+                Book ID *
+                {mode === 'add' && (
+                  <span style={{ fontWeight: 400, color: '#9ca3af', fontSize: '0.78rem', marginLeft: 6 }}>
+                    e.g. BK-001, CS-101
+                  </span>
+                )}
+              </label>
+              <input
+                className={`books-form-control ${errors.bookId ? 'err' : ''}`}
+                name="bookId"
+                value={form.bookId}
+                onChange={change}
+                placeholder="Enter a unique Book ID"
+                disabled={mode === 'edit'}
+                style={mode === 'edit' ? {
+                  background: '#f9fafb', color: '#6b7280',
+                  cursor: 'not-allowed', fontFamily: 'monospace',
+                } : {}}
+                autoFocus={mode === 'add'}
+              />
+              {errors.bookId && <p className="books-form-err">{errors.bookId}</p>}
+            </div>
 
             <div className="books-form-group">
               <label className="books-form-label">Book Title *</label>
               <input
                 className={`books-form-control ${errors.bookTitle ? 'err' : ''}`}
                 name="bookTitle" value={form.bookTitle} onChange={change}
-                placeholder="Enter book title" autoFocus
+                placeholder="Enter book title"
+                autoFocus={mode === 'edit'}
               />
               {errors.bookTitle && <p className="books-form-err">{errors.bookTitle}</p>}
             </div>
@@ -173,10 +189,8 @@ export default function BookModal({ isOpen, mode, book, onSave, onClose, loading
           </div>
 
           <div className="books-modal-foot">
-            <button
-              type="button" className="books-btn books-btn-ghost"
-              onClick={onClose} disabled={loading}
-            >
+            <button type="button" className="books-btn books-btn-ghost"
+              onClick={onClose} disabled={loading}>
               Cancel
             </button>
             <button type="submit" className="books-btn books-btn-primary" disabled={loading}>

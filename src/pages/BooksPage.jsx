@@ -153,8 +153,16 @@ export default function BooksPage() {
             b.authorName.trim().toLowerCase() === form.authorName.trim().toLowerCase()
         );
         if (isDuplicate) {
-          // Show warning inside the modal with an OK button — not behind it
           setDupError(`Book "${form.bookTitle}" by ${form.authorName} already exists.`);
+          setSaving(false);
+          return;
+        }
+        // Also check bookId uniqueness on frontend before hitting API
+        const idTaken = books.some(
+          (b) => b.bookId && b.bookId.trim().toLowerCase() === form.bookId.trim().toLowerCase()
+        );
+        if (idTaken) {
+          setDupError(`Book ID "${form.bookId}" is already in use. Please enter a different ID.`);
           setSaving(false);
           return;
         }
