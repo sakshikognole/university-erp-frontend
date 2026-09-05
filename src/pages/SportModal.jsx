@@ -40,12 +40,55 @@ export default function SportModal({ isOpen, mode, sport, onSave, onClose, loadi
 
   const validate = () => {
     const e = {};
-    if (!form.sportId.trim())   e.sportId   = 'Required';
-    if (!form.sportName.trim()) e.sportName = 'Required';
-    if (form.capacity === '')   e.capacity  = 'Required';
-    else if (Number(form.capacity) < 1) e.capacity = 'Must be greater than 0';
-    if (!form.status)           e.status    = 'Required';
-    if (!form.venueId.trim())   e.venueId   = 'Required';
+
+    // ── Sport ID validation ──────────────────────────────────────────────
+    // Defects 1, 2, 3:
+    // - Must NOT be only alphabets   (e.g. "SPT" is invalid)
+    // - Must NOT be only numbers     (e.g. "001" is invalid)
+    // - Must NOT contain special chars (e.g. "SPT@01" is invalid)
+    // - Must contain BOTH letters AND numbers, no special characters
+    const sportIdRegex = /^(?=.*[A-Za-z])(?=.*[0-9])[A-Za-z0-9]+$/;
+    if (!form.sportId.trim()) {
+      e.sportId = 'Sport ID is required';
+    } else if (!sportIdRegex.test(form.sportId.trim())) {
+      e.sportId = 'Sport ID must contain both letters and numbers (e.g. SPT001). No special characters allowed.';
+    }
+
+    // ── Sport Name validation ────────────────────────────────────────────
+    // Defects 7, 8:
+    // - Must NOT accept only numbers  (e.g. "123" is invalid)
+    // - Must NOT accept special chars (e.g. "Cricket@" is invalid)
+    // - Only letters and spaces allowed
+    const sportNameRegex = /^[A-Za-z\s]+$/;
+    if (!form.sportName.trim()) {
+      e.sportName = 'Sport name is required';
+    } else if (!sportNameRegex.test(form.sportName.trim())) {
+      e.sportName = 'Sport name must contain only letters and spaces. Numbers and special characters are not allowed.';
+    }
+
+    // ── Capacity validation ──────────────────────────────────────────────
+    if (form.capacity === '') {
+      e.capacity = 'Required';
+    } else if (Number(form.capacity) < 1) {
+      e.capacity = 'Must be greater than 0';
+    }
+
+    // ── Status validation ────────────────────────────────────────────────
+    if (!form.status) e.status = 'Required';
+
+    // ── Venue ID validation ──────────────────────────────────────────────
+    // Defects 4, 5, 6:
+    // - Must NOT be only alphabets   (e.g. "VENUE" is invalid)
+    // - Must NOT be only numbers     (e.g. "001" is invalid)
+    // - Must NOT contain special chars (e.g. "VEN@01" is invalid)
+    // - Must contain BOTH letters AND numbers, no special characters
+    const venueIdRegex = /^(?=.*[A-Za-z])(?=.*[0-9])[A-Za-z0-9\-]+$/;
+    if (!form.venueId.trim()) {
+      e.venueId = 'Venue ID is required';
+    } else if (!venueIdRegex.test(form.venueId.trim())) {
+      e.venueId = 'Venue ID must contain both letters and numbers (e.g. VEN001). No special characters allowed.';
+    }
+
     return e;
   };
 
