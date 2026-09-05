@@ -1,6 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
 import { springApi, springGet } from '../services/api';
-import PageLoader from '../components/PageLoader';
 import PageError  from '../components/PageError';
 import ClubModal from './ClubModal';
 import ViewClubModal from './ViewClubModal';
@@ -118,6 +117,17 @@ export default function ClubsPage() {
     return p ? p.clubName : parentClubId;
   };
 
+  // Skeleton shimmer helper — returns inline style for a shimmer placeholder
+  const skel = (width, height, margin = 0, borderRadius = 4) => ({
+    width,
+    height,
+    margin,
+    borderRadius,
+    background: 'linear-gradient(90deg,#f3f4f6 25%,#e5e7eb 50%,#f3f4f6 75%)',
+    backgroundSize: '200% 100%',
+    animation: 'books-shimmer 1.4s infinite',
+  });
+
   return (
     <div className="page-container">
 
@@ -148,7 +158,27 @@ export default function ClubsPage() {
 
       {/* Content */}
       {loading ? (
-        <PageLoader message="Loading clubs..." />
+        /* Skeleton cards — same layout as real club cards so the wait feels
+           intentional. Render free tier cold starts take 5-6s on first load. */
+        <div className="club-grid">
+          {Array.from({ length: 6 }).map((_, i) => (
+            <div key={i} className="club-card" style={{ pointerEvents: 'none' }}>
+              <div className="club-card-top" style={{ padding: '14px 16px 10px' }}>
+                <div style={skel(80, 13)} />
+                <div style={skel(50, 13)} />
+              </div>
+              <div className="club-card-body" style={{ padding: '0 16px 14px' }}>
+                <div style={skel('70%', 16, '0 0 8px')} />
+                <div style={skel('90%', 11)} />
+                <div style={{ ...skel('60%', 11), marginTop: 4 }} />
+                <div style={{ display:'flex', gap:8, marginTop:12 }}>
+                  <div style={skel(70, 28, 0, 6)} />
+                  <div style={skel(70, 28, 0, 6)} />
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
       ) : pageError ? (
         <PageError message={pageError} onRetry={load} />
       ) : ordered.length === 0 ? (
