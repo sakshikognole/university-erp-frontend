@@ -50,6 +50,15 @@ export default function ClubsPage() {
     setSaving(true);
     try {
       if (modalMode === 'add') {
+        // Defect 4: Duplicate Club ID check — compare against loaded clubs
+        const isDuplicate = clubs.some(
+          (c) => c.clubId.trim().toUpperCase() === form.clubId.trim().toUpperCase()
+        );
+        if (isDuplicate) {
+          setError(`Club ID "${form.clubId}" already exists. Please use a different Club ID.`);
+          setSaving(false);
+          return;
+        }
         await springApi.post('/clubs', form);
         setSuccess('Club added successfully.');
       } else {
@@ -57,9 +66,10 @@ export default function ClubsPage() {
         setSuccess('Club updated successfully.');
       }
       setModalOpen(false);
-      load(true); // silent refresh — no flicker
+      load(true);
     } catch (err) {
-      setError(err.response?.data?.error || 'Failed to save club.');
+      // Fixed: use err.message (interceptor converts all errors to Error objects)
+      setError(err.message || 'Failed to save club.');
     } finally {
       setSaving(false);
     }

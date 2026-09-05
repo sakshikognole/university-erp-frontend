@@ -50,9 +50,31 @@ export default function ClubModal({ isOpen, mode, club, parentClubs, onSave, onC
 
   const validate = () => {
     const e = {};
-    if (!form.clubId.trim())    e.clubId    = 'Required';
-    if (!form.clubName.trim())  e.clubName  = 'Required';
-    if (!form.status)           e.status    = 'Required';
+
+    // ── Club ID: must contain BOTH letters AND numbers, no special characters ──
+    // Defects 2, 3: blocks special chars, blocks only-letters, blocks only-numbers
+    const clubIdRegex = /^(?=.*[A-Za-z])(?=.*[0-9])[A-Za-z0-9]+$/;
+    if (!form.clubId.trim()) {
+      e.clubId = 'Club ID is required';
+    } else if (/[^A-Za-z0-9]/.test(form.clubId.trim())) {
+      e.clubId = 'Club ID must not contain special characters (letters and numbers only).';
+    } else if (!/[0-9]/.test(form.clubId.trim())) {
+      e.clubId = 'Club ID must contain at least one number (e.g. CLB001).';
+    } else if (!/[A-Za-z]/.test(form.clubId.trim())) {
+      e.clubId = 'Club ID must contain at least one letter (e.g. CLB001).';
+    }
+
+    // ── Club Name: only letters and spaces, no numbers or special characters ──
+    // Defects 1, 5: blocks numbers, special chars — in both add and edit mode
+    if (!form.clubName.trim()) {
+      e.clubName = 'Club name is required';
+    } else if (/\d/.test(form.clubName)) {
+      e.clubName = 'Club name must not contain numbers.';
+    } else if (!/^[A-Za-z\s]+$/.test(form.clubName.trim())) {
+      e.clubName = 'Club name must contain only letters and spaces. Special characters are not allowed.';
+    }
+
+    if (!form.status) e.status = 'Required';
     return e;
   };
 
