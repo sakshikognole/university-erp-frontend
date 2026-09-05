@@ -47,27 +47,35 @@ export default function SportsPage() {
 
   const handleSave = async (form) => {
     setSaving(true);
+    // Show a hint after 3 seconds if still saving (free tier cold start)
+    const slowTimer = setTimeout(() => {
+      setError('Server is waking up (free tier). Please wait a moment...');
+    }, 3000);
     try {
       if (modalMode === 'add') {
-        // Defect 1: Duplicate Sport ID check — compare against loaded sports
         const isDuplicate = sports.some(
           (s) => s.sportId.trim().toUpperCase() === form.sportId.trim().toUpperCase()
         );
         if (isDuplicate) {
+          clearTimeout(slowTimer);
           setError(`Sport ID "${form.sportId}" already exists. Please use a different Sport ID.`);
           setSaving(false);
           return;
         }
         await springApi.post('/sports', form);
+        clearTimeout(slowTimer);
+        setError('');
         setSuccess('Sport added successfully.');
       } else {
         await springApi.put(`/sports/${selSport.sportId}`, form);
+        clearTimeout(slowTimer);
+        setError('');
         setSuccess('Sport updated successfully.');
       }
       setModalOpen(false);
       load(true);
     } catch (err) {
-      // Fixed: use err.message (interceptor converts all errors to Error objects)
+      clearTimeout(slowTimer);
       setError(err.message || 'Failed to save sport.');
     } finally {
       setSaving(false);
