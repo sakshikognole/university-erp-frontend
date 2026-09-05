@@ -34,7 +34,9 @@ export default function SportModal({ isOpen, mode, sport, onSave, onClose, loadi
 
   const change = (e) => {
     const { name, value } = e.target;
-    setForm((f) => ({ ...f, [name]: value }));
+    // Defect 3: auto-uppercase Venue ID as user types
+    const finalValue = name === 'venueId' ? value.toUpperCase() : value;
+    setForm((f) => ({ ...f, [name]: finalValue }));
     setErrors((er) => ({ ...er, [name]: '' }));
   };
 
@@ -55,15 +57,16 @@ export default function SportModal({ isOpen, mode, sport, onSave, onClose, loadi
     }
 
     // ── Sport Name validation ────────────────────────────────────────────
-    // Defects 7, 8:
-    // - Must NOT accept only numbers  (e.g. "123" is invalid)
-    // - Must NOT accept special chars (e.g. "Cricket@" is invalid)
-    // - Only letters and spaces allowed
+    // Defects 2, 4, 5, 7, 8:
+    // - Must NOT accept numbers alone, combined with letters, or special chars
+    // - Only letters (A-Z, a-z) and spaces allowed
     const sportNameRegex = /^[A-Za-z\s]+$/;
     if (!form.sportName.trim()) {
       e.sportName = 'Sport name is required';
+    } else if (/\d/.test(form.sportName)) {
+      e.sportName = 'Sport name must not contain numbers.';
     } else if (!sportNameRegex.test(form.sportName.trim())) {
-      e.sportName = 'Sport name must contain only letters and spaces. Numbers and special characters are not allowed.';
+      e.sportName = 'Sport name must contain only letters and spaces. Special characters are not allowed.';
     }
 
     // ── Capacity validation ──────────────────────────────────────────────
@@ -77,16 +80,23 @@ export default function SportModal({ isOpen, mode, sport, onSave, onClose, loadi
     if (!form.status) e.status = 'Required';
 
     // ── Venue ID validation ──────────────────────────────────────────────
-    // Defects 4, 5, 6:
-    // - Must NOT be only alphabets   (e.g. "VENUE" is invalid)
-    // - Must NOT be only numbers     (e.g. "001" is invalid)
-    // - Must NOT contain special chars (e.g. "VEN@01" is invalid)
-    // - Must contain BOTH letters AND numbers, no special characters
+    // Defects 4-8 (edit mode): validation applies in BOTH add and edit modes.
+    // Venue ID is editable in edit mode so must be validated every time.
+    // - Must NOT be only alphabets, only numbers, or contain special chars
+    // - Must contain BOTH letters AND numbers; hyphens allowed
     const venueIdRegex = /^(?=.*[A-Za-z])(?=.*[0-9])[A-Za-z0-9\-]+$/;
     if (!form.venueId.trim()) {
       e.venueId = 'Venue ID is required';
     } else if (!venueIdRegex.test(form.venueId.trim())) {
-      e.venueId = 'Venue ID must contain both letters and numbers (e.g. VEN001). No special characters allowed.';
+      if (/[^A-Za-z0-9\-]/.test(form.venueId.trim())) {
+        e.venueId = 'Venue ID must not contain special characters (only letters, numbers, hyphens).';
+      } else if (!/[0-9]/.test(form.venueId.trim())) {
+        e.venueId = 'Venue ID must contain at least one number (e.g. VEN001).';
+      } else if (!/[A-Za-z]/.test(form.venueId.trim())) {
+        e.venueId = 'Venue ID must contain at least one letter (e.g. VEN001).';
+      } else {
+        e.venueId = 'Venue ID must contain both letters and numbers (e.g. VEN001).';
+      }
     }
 
     return e;

@@ -49,6 +49,15 @@ export default function SportsPage() {
     setSaving(true);
     try {
       if (modalMode === 'add') {
+        // Defect 1: Duplicate Sport ID check — compare against loaded sports
+        const isDuplicate = sports.some(
+          (s) => s.sportId.trim().toUpperCase() === form.sportId.trim().toUpperCase()
+        );
+        if (isDuplicate) {
+          setError(`Sport ID "${form.sportId}" already exists. Please use a different Sport ID.`);
+          setSaving(false);
+          return;
+        }
         await springApi.post('/sports', form);
         setSuccess('Sport added successfully.');
       } else {
@@ -56,9 +65,10 @@ export default function SportsPage() {
         setSuccess('Sport updated successfully.');
       }
       setModalOpen(false);
-      load(true); // silent refresh — no flicker
+      load(true);
     } catch (err) {
-      setError(err.response?.data?.error || 'Failed to save sport.');
+      // Fixed: use err.message (interceptor converts all errors to Error objects)
+      setError(err.message || 'Failed to save sport.');
     } finally {
       setSaving(false);
     }
