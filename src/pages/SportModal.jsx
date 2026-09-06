@@ -9,7 +9,7 @@ const EMPTY = {
   venueId:     '',
 };
 
-export default function SportModal({ isOpen, mode, sport, onSave, onClose, loading }) {
+export default function SportModal({ isOpen, mode, sport, onSave, onClose, loading, dupError, onDupOk }) {
   const [form,   setForm]   = useState(EMPTY);
   const [errors, setErrors] = useState({});
 
@@ -120,6 +120,29 @@ export default function SportModal({ isOpen, mode, sport, onSave, onClose, loadi
 
         <form onSubmit={submit}>
           <div className="books-modal-body">
+
+            {/* Duplicate ID popup — shown inside modal with OK button */}
+            {dupError && (
+              <div style={{
+                background: '#fef2f2', border: '1px solid #fca5a5',
+                borderRadius: 8, padding: '12px 16px', marginBottom: 16,
+                display: 'flex', flexDirection: 'column', gap: 10,
+              }}>
+                <div style={{ display: 'flex', gap: 10, alignItems: 'flex-start' }}>
+                  <span style={{ fontSize: '1.3rem' }}>⚠️</span>
+                  <p style={{ color: '#dc2626', fontWeight: 600, margin: 0, fontSize: '0.9rem' }}>
+                    {dupError}
+                  </p>
+                </div>
+                <button type="button" onClick={onDupOk} style={{
+                  alignSelf: 'flex-end', padding: '6px 24px',
+                  background: '#dc2626', color: '#fff', border: 'none',
+                  borderRadius: 6, fontWeight: 600, cursor: 'pointer', fontSize: '0.85rem',
+                }}>
+                  OK
+                </button>
+              </div>
+            )}
 
             {/* Sport ID + Sport Name */}
             <div className="club-form-row">

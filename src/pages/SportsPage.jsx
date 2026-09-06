@@ -18,6 +18,7 @@ export default function SportsPage() {
   const [viewSport,  setViewSport]  = useState(null);
   const [success,    setSuccess]    = useState('');
   const [error,      setError]      = useState('');
+  const [dupError,   setDupError]   = useState(''); // shown inside modal
 
   // silent=true means refresh without showing loading spinner (no flicker)
   const load = useCallback(async (silent = false) => {
@@ -41,8 +42,8 @@ export default function SportsPage() {
     return () => clearTimeout(t);
   }, [success, error]);
 
-  const openAdd  = ()       => { setSelSport(null); setModalMode('add');  setModalOpen(true); };
-  const openEdit = (sport)  => { setSelSport(sport); setModalMode('edit'); setModalOpen(true); };
+  const openAdd  = ()       => { setSelSport(null); setModalMode('add');  setDupError(''); setModalOpen(true); };
+  const openEdit = (sport)  => { setSelSport(sport); setModalMode('edit'); setDupError(''); setModalOpen(true); };
   const openView = (sport)  => { setViewSport(sport); setViewOpen(true); };
 
   const handleSave = async (form) => {
@@ -58,7 +59,7 @@ export default function SportsPage() {
         );
         if (isDuplicate) {
           clearTimeout(slowTimer);
-          setError(`Sport ID "${form.sportId}" already exists. Please use a different Sport ID.`);
+          setDupError(`Sport ID "${form.sportId}" already exists. Please use a different Sport ID.`);
           setSaving(false);
           return;
         }
@@ -210,8 +211,10 @@ export default function SportsPage() {
         mode={modalMode}
         sport={selSport}
         onSave={handleSave}
-        onClose={() => setModalOpen(false)}
+        onClose={() => { setModalOpen(false); setDupError(''); }}
         loading={saving}
+        dupError={dupError}
+        onDupOk={() => setDupError('')}
       />
 
       <ViewSportModal

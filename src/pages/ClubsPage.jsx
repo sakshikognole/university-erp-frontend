@@ -17,6 +17,7 @@ export default function ClubsPage() {
   const [viewClub,   setViewClub]   = useState(null);
   const [error,      setError]      = useState('');
   const [success,    setSuccess]    = useState('');
+  const [dupError,   setDupError]   = useState(''); // shown inside modal
 
   // silent=true means refresh without showing loading spinner (no flicker)
   const load = useCallback(async (silent = false) => {
@@ -41,8 +42,8 @@ export default function ClubsPage() {
     return () => clearTimeout(t);
   }, [success, error]);
 
-  const openAdd  = ()      => { setSelClub(null); setModalMode('add');  setModalOpen(true); };
-  const openEdit = (club)  => { setSelClub(club); setModalMode('edit'); setModalOpen(true); };
+  const openAdd  = ()      => { setSelClub(null); setModalMode('add');  setDupError(''); setModalOpen(true); };
+  const openEdit = (club)  => { setSelClub(club); setModalMode('edit'); setDupError(''); setModalOpen(true); };
   const openView = (club)  => { setViewClub(club); setViewOpen(true); };
 
   const handleSave = async (form) => {
@@ -54,7 +55,7 @@ export default function ClubsPage() {
           (c) => c.clubId.trim().toUpperCase() === form.clubId.trim().toUpperCase()
         );
         if (isDuplicate) {
-          setError(`Club ID "${form.clubId}" already exists. Please use a different Club ID.`);
+          setDupError(`Club ID "${form.clubId}" already exists. Please use a different Club ID.`);
           setSaving(false);
           return;
         }
@@ -288,8 +289,10 @@ export default function ClubsPage() {
         club={selClub}
         parentClubs={parentClubs}
         onSave={handleSave}
-        onClose={() => setModalOpen(false)}
+        onClose={() => { setModalOpen(false); setDupError(''); }}
         loading={saving}
+        dupError={dupError}
+        onDupOk={() => setDupError('')}
       />
 
       <ViewClubModal
