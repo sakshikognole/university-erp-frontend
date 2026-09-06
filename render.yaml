@@ -1,0 +1,18 @@
+services:
+  - type: web
+    name: university-erp-frontend1
+    runtime: static
+    region: singapore
+    plan: free
+    rootDir: .
+    buildCommand: npm install && npm run build
+    staticPublishPath: ./dist
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html
+    envVars:
+      - key: VITE_NODE_API_URL
+        sync: false    # Set to your Node backend Render URL
+      - key: VITE_SPRING_API_URL
+        sync: false    # Set to your Spring Boot backend Render URL
