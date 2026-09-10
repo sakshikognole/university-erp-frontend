@@ -5,12 +5,12 @@ const EMPTY = {
   teamName:    '',
   sportId:     '',
   coachName:   '',
-  members:     '',   // comma-separated in the form, converted to array on save
+  members:     '',
   status:      'ACTIVE',
   description: '',
 };
 
-export default function SportTeamModal({ isOpen, mode, team, onSave, onClose, loading }) {
+export default function SportTeamModal({ isOpen, mode, team, onSave, onClose, loading, dupError, onDupOk }) {
   const [form,   setForm]   = useState(EMPTY);
   const [errors, setErrors] = useState({});
 
@@ -42,11 +42,36 @@ export default function SportTeamModal({ isOpen, mode, team, onSave, onClose, lo
 
   const validate = () => {
     const e = {};
-    if (!form.teamId.trim())    e.teamId    = 'Required';
-    if (!form.teamName.trim())  e.teamName  = 'Required';
-    if (!form.sportId.trim())   e.sportId   = 'Required';
-    if (!form.coachName.trim()) e.coachName = 'Required';
-    if (!form.status)           e.status    = 'Required';
+
+    // ── Defects 3, 4, 5: Team ID validation ─────────────────────────────
+    // Must contain both letters AND numbers, no special characters
+    if (!form.teamId.trim()) {
+      e.teamId = 'Team ID is required.';
+    } else if (/[^A-Za-z0-9\-]/.test(form.teamId.trim())) {
+      e.teamId = 'Team ID must not contain special characters (letters and numbers only).';
+    } else if (!/[A-Za-z]/.test(form.teamId.trim())) {
+      e.teamId = 'Team ID must contain at least one letter (e.g. TM001).';
+    } else if (!/[0-9]/.test(form.teamId.trim())) {
+      e.teamId = 'Team ID must contain at least one number (e.g. TM001).';
+    }
+
+    // Team Name
+    if (!form.teamName.trim()) e.teamName = 'Team Name is required.';
+
+    // Sport ID
+    if (!form.sportId.trim()) e.sportId = 'Sport ID is required.';
+
+    // ── Defects 7, 8: Coach Name validation ─────────────────────────────
+    // Must contain only letters and spaces — no numbers or special characters
+    if (!form.coachName.trim()) {
+      e.coachName = 'Coach Name is required.';
+    } else if (/\d/.test(form.coachName)) {
+      e.coachName = 'Coach Name must not contain numbers.';
+    } else if (!/^[A-Za-z\s.]+$/.test(form.coachName.trim())) {
+      e.coachName = 'Coach Name must contain only letters and spaces. Special characters are not allowed.';
+    }
+
+    if (!form.status) e.status = 'Required';
     return e;
   };
 
@@ -54,7 +79,6 @@ export default function SportTeamModal({ isOpen, mode, team, onSave, onClose, lo
     e.preventDefault();
     const errs = validate();
     if (Object.keys(errs).length) { setErrors(errs); return; }
-    // Convert comma-separated string to clean array
     const membersArray = form.members
       .split(',')
       .map((m) => m.trim())
@@ -73,6 +97,27 @@ export default function SportTeamModal({ isOpen, mode, team, onSave, onClose, lo
 
         <form onSubmit={submit}>
           <div className="books-modal-body">
+
+            {/* Defect 6: Duplicate Team ID popup — visible inside modal */}
+            {dupError && (
+              <div style={{
+                background: '#fef2f2', border: '1px solid #fca5a5',
+                borderRadius: 8, padding: '12px 16px', marginBottom: 16,
+                display: 'flex', flexDirection: 'column', gap: 10,
+              }}>
+                <div style={{ display: 'flex', gap: 10, alignItems: 'flex-start' }}>
+                  <span style={{ fontSize: '1.3rem' }}>⚠️</span>
+                  <p style={{ color: '#dc2626', fontWeight: 600, margin: 0, fontSize: '0.9rem' }}>
+                    {dupError}
+                  </p>
+                </div>
+                <button type="button" onClick={onDupOk} style={{
+                  alignSelf: 'flex-end', padding: '6px 24px',
+                  background: '#dc2626', color: '#fff', border: 'none',
+                  borderRadius: 6, fontWeight: 600, cursor: 'pointer', fontSize: '0.85rem',
+                }}>OK</button>
+              </div>
+            )}
 
             {/* Team ID + Team Name */}
             <div className="club-form-row">
@@ -154,7 +199,7 @@ export default function SportTeamModal({ isOpen, mode, team, onSave, onClose, lo
                 className="books-form-control"
                 name="description" value={form.description} onChange={change}
                 placeholder="Brief description of the team..."
-                rows={3}
+                rows={2}
                 style={{ resize: 'vertical', fontFamily: 'inherit' }}
               />
             </div>
@@ -163,9 +208,7 @@ export default function SportTeamModal({ isOpen, mode, team, onSave, onClose, lo
 
           <div className="books-modal-foot">
             <button type="button" className="books-btn books-btn-ghost"
-              onClick={onClose} disabled={loading}>
-              Cancel
-            </button>
+              onClick={onClose} disabled={loading}>Cancel</button>
             <button type="submit" className="books-btn books-btn-primary" disabled={loading}>
               {loading ? 'Saving...' : mode === 'add' ? 'Add Team' : 'Save Changes'}
             </button>
