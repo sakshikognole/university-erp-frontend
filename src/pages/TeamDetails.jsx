@@ -72,12 +72,12 @@ export default function TeamDetails({ teamId, onBack }) {
     const trimmed = value.trim();
     if (!trimmed) { setNamePreview(''); return; }
 
-    // Debounce: lookup after user stops typing for 400ms
-    setNamePreview('...');
+    setNamePreview('Looking up...');
     lookupTimer.current = setTimeout(async () => {
       try {
         const res = await springApi.get(`/students/by-prn/${trimmed}`);
-        setNamePreview(res.studentName || res.data?.studentName || 'Not found');
+        const name = res?.studentName || res?.data?.studentName;
+        setNamePreview(name || 'Not found');
       } catch {
         setNamePreview('Not found');
       }
@@ -203,7 +203,7 @@ export default function TeamDetails({ teamId, onBack }) {
           <input
             className="st-prn-input"
             value={
-              namePreview === '...'        ? 'Looking up...' :
+              namePreview === 'Looking up...'        ? 'Looking up...' :
               namePreview === 'Not found'  ? 'Student not found' :
               namePreview
             }
