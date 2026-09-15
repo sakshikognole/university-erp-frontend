@@ -15,6 +15,7 @@ import {
   MonitorPlay,
   CreditCard,
   BedDouble,
+  ClipboardList,
   GraduationCap,
   MapPin,
   UserCheck,
@@ -39,6 +40,7 @@ export const navigationConfig = {
     { label: 'Study Materials',       path: '/display-materials',      icon: MonitorPlay },
     { label: 'Payment',               path: '/payment',                icon: CreditCard },
     { label: 'Hostel',                path: '/hostel',                 icon: BedDouble },
+    { label: 'Exams',                 path: '/exams',                  icon: ClipboardList },
     { label: 'Certificates',          path: '/select-student',         icon: FileText },
     { label: 'Add Document',          path: '/add-document',           icon: FilePlus },
     { label: 'Handout',               path: '/handout',                icon: Send },
@@ -71,6 +73,7 @@ export const navigationConfig = {
     { label: 'Upload Materials', path: '/upload-materials', icon: Upload },
     { label: 'Certificates',     path: '/select-student',   icon: FileText },
     { label: 'Handout',          path: '/handout',          icon: Send },
+    { label: 'Exams',            path: '/exams',            icon: ClipboardList },
   ],
 
   // ── Finance Officer ──────────────────────────────────────────────────────
@@ -105,5 +108,6 @@ export const navigationConfig = {
     { label: 'Study Materials',  path: '/display-materials',icon: MonitorPlay },
     { label: 'Certificates',     path: '/select-student',   icon: FileText },
     { label: 'Handout',          path: '/handout',          icon: Send },
+    { label: 'Exams',            path: '/exams',            icon: ClipboardList },
   ],
 };

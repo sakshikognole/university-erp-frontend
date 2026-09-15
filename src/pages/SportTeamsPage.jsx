@@ -14,15 +14,74 @@ function StatusBadge({ status }) {
   const s = styles[status] || styles.INACTIVE;
   return (
     <span style={{
-      ...s,
-      padding: '3px 10px',
-      borderRadius: 9999,
-      fontSize: '0.78rem',
-      fontWeight: 600,
-      whiteSpace: 'nowrap',
+      ...s, padding: '3px 10px', borderRadius: 9999,
+      fontSize: '0.78rem', fontWeight: 600, whiteSpace: 'nowrap',
+    }}>{status}</span>
+  );
+}
+
+// ── Defect 1: Mobile accordion card (shown only on ≤768px) ───────────────────
+function MobileTeamCard({ team, onView, onEdit, onDelete, deleting }) {
+  const [open, setOpen] = useState(false);
+  return (
+    <div style={{
+      border: '1px solid #e5e7eb', borderRadius: 10,
+      marginBottom: 8, overflow: 'hidden', background: '#fff',
     }}>
-      {status}
-    </span>
+      {/* Tap to expand */}
+      <button
+        type="button"
+        onClick={() => setOpen((o) => !o)}
+        style={{
+          width: '100%', display: 'flex', alignItems: 'center',
+          justifyContent: 'space-between', padding: '12px 14px',
+          background: 'none', border: 'none', cursor: 'pointer', gap: 10,
+        }}
+      >
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', minWidth: 0 }}>
+          <span style={{ fontWeight: 700, color: '#111827', fontSize: '0.9rem',
+            overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: '100%' }}>
+            {team.teamName}
+          </span>
+          <span style={{ fontFamily: 'monospace', fontSize: '0.75rem', color: '#6b7280' }}>
+            {team.teamId}
+          </span>
+        </div>
+        <span style={{ fontSize: '0.65rem', color: '#9ca3af', flexShrink: 0 }}>
+          {open ? '▲' : '▼'}
+        </span>
+      </button>
+
+      {/* Expanded details */}
+      {open && (
+        <div style={{ borderTop: '1px solid #f3f4f6', padding: '12px 14px 10px' }}>
+          {[
+            ['Sport ID',  team.sportId],
+            ['Coach',     team.coachName],
+            ['Members',   Array.isArray(team.members) ? team.members.length : 0],
+            ['Status',    <StatusBadge key="s" status={team.status} />],
+            ['Description', team.description || '—'],
+          ].map(([label, val]) => (
+            <div key={label} style={{ display: 'flex', justifyContent: 'space-between',
+              alignItems: 'flex-start', padding: '5px 0',
+              borderBottom: '1px solid #f9fafb', fontSize: '0.85rem' }}>
+              <span style={{ color: '#6b7280', fontWeight: 500, flexShrink: 0, marginRight: 8 }}>{label}</span>
+              <span style={{ color: '#111827', textAlign: 'right' }}>{val}</span>
+            </div>
+          ))}
+          <div style={{ display: 'flex', gap: 8, marginTop: 10 }}>
+            <button className="books-btn books-btn-sm books-btn-ghost" style={{ flex: 1, justifyContent: 'center' }}
+              onClick={() => onView(team)}>View</button>
+            <button className="books-btn books-btn-sm books-btn-ghost" style={{ flex: 1, justifyContent: 'center' }}
+              onClick={() => onEdit(team)}>Edit</button>
+            <button className="books-btn books-btn-sm books-btn-danger" style={{ flex: 1, justifyContent: 'center' }}
+              onClick={() => onDelete(team)} disabled={deleting === team.teamId}>
+              {deleting === team.teamId ? '...' : 'Delete'}
+            </button>
+          </div>
+        </div>
+      )}
+    </div>
   );
 }
 
@@ -40,6 +99,7 @@ export default function SportTeamsPage() {
   const [viewTeam,  setViewTeam]  = useState(null);
   const [success,   setSuccess]   = useState('');
   const [error,     setError]     = useState('');
+  const [dupError,  setDupError]  = useState(''); // Defect 6: inside modal
 
   const load = useCallback(async (silent = false) => {
     if (!silent) { setLoading(true); setPageError(''); }
@@ -62,14 +122,23 @@ export default function SportTeamsPage() {
     return () => clearTimeout(t);
   }, [success, error]);
 
-  const openAdd  = ()     => { setSelTeam(null); setModalMode('add');  setModalOpen(true); };
-  const openEdit = (team) => { setSelTeam(team); setModalMode('edit'); setModalOpen(true); };
+  const openAdd  = ()     => { setSelTeam(null); setModalMode('add');  setDupError(''); setModalOpen(true); };
+  const openEdit = (team) => { setSelTeam(team); setModalMode('edit'); setDupError(''); setModalOpen(true); };
   const openView = (team) => { setViewTeam(team); setViewOpen(true); };
 
   const handleSave = async (form) => {
     setSaving(true);
     try {
       if (modalMode === 'add') {
+        // Defect 6: duplicate check
+        const isDuplicate = teams.some(
+          (t) => t.teamId.trim().toUpperCase() === form.teamId.trim().toUpperCase()
+        );
+        if (isDuplicate) {
+          setDupError(`Team ID "${form.teamId}" already exists. Please use a different Team ID.`);
+          setSaving(false);
+          return;
+        }
         await springApi.post('/sport-teams', form);
         setSuccess('Team added successfully.');
       } else {
@@ -112,7 +181,7 @@ export default function SportTeamsPage() {
   return (
     <div className="page-container">
 
-      {/* ── Header ── */}
+      {/* Header */}
       <div className="books-page-header">
         <div>
           <h1 className="page-title">Sport Teams</h1>
@@ -123,7 +192,7 @@ export default function SportTeamsPage() {
         </button>
       </div>
 
-      {/* ── Notifications ── */}
+      {/* Notifications */}
       {success && (
         <div className="books-alert books-alert-success">
           <span>{success}</span>
@@ -137,11 +206,12 @@ export default function SportTeamsPage() {
         </div>
       )}
 
-      {/* ── Table card ── */}
+      {/* Table card */}
       <div className="card" style={{ padding: '1.5rem' }}>
 
-        {/* Search + count row */}
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem', gap: '1rem', flexWrap: 'wrap' }}>
+        {/* Search + count */}
+        <div style={{ display: 'flex', justifyContent: 'space-between',
+          alignItems: 'center', marginBottom: '1rem', gap: '1rem', flexWrap: 'wrap' }}>
           <input
             className="books-form-control"
             style={{ maxWidth: 340 }}
@@ -154,7 +224,6 @@ export default function SportTeamsPage() {
           </span>
         </div>
 
-        {/* ── Table ── */}
         {loading ? (
           <PageLoader message="Loading sport teams..." />
         ) : pageError ? (
@@ -162,77 +231,82 @@ export default function SportTeamsPage() {
         ) : filtered.length === 0 ? (
           <div style={{ textAlign: 'center', padding: '2.5rem 0', color: '#9ca3af' }}>
             <p style={{ fontSize: '0.95rem' }}>
-              {search
-                ? `No teams matched "${search}".`
-                : 'No teams added yet. Click "+ Add Team" to get started.'}
+              {search ? `No teams matched "${search}".` : 'No teams added yet. Click "+ Add Team" to get started.'}
             </p>
           </div>
         ) : (
-          <div className="books-table-wrap">
-            <table className="books-table">
-              <thead>
-                <tr>
-                  <th>#</th>
-                  <th>Team ID</th>
-                  <th>Team Name</th>
-                  <th>Sport ID</th>
-                  <th>Coach</th>
-                  <th>Members</th>
-                  <th>Status</th>
-                  <th>Description</th>
-                  <th>Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                {filtered.map((team, idx) => (
-                  <tr key={team.teamId}>
-                    <td style={{ color: '#9ca3af' }}>{idx + 1}</td>
-                    <td>
-                      <span style={{ fontFamily: 'monospace', fontSize: '0.82rem', fontWeight: 600 }}>
-                        {team.teamId}
-                      </span>
-                    </td>
-                    <td style={{ fontWeight: 600, color: '#111827' }}>{team.teamName}</td>
-                    <td>{team.sportId}</td>
-                    <td>{team.coachName}</td>
-                    <td style={{ textAlign: 'center' }}>
-                      {Array.isArray(team.members) ? team.members.length : 0}
-                    </td>
-                    <td><StatusBadge status={team.status} /></td>
-                    <td style={{ maxWidth: 200, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                      {team.description || '—'}
-                    </td>
-                    <td>
-                      <div className="books-actions">
-                        <button
-                          className="books-btn books-btn-sm books-btn-ghost"
-                          onClick={() => openView(team)}
-                          title="View"
-                        >
-                          View
-                        </button>
-                        <button
-                          className="books-btn books-btn-sm books-btn-ghost"
-                          onClick={() => openEdit(team)}
-                          title="Edit"
-                        >
-                          Edit
-                        </button>
-                        <button
-                          className="books-btn books-btn-sm books-btn-danger"
-                          onClick={() => handleDelete(team)}
-                          disabled={deleting === team.teamId}
-                          title="Delete"
-                        >
-                          {deleting === team.teamId ? 'Deleting...' : 'Delete'}
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+          <>
+            {/* ── Defect 1: Mobile accordion (≤768px) ── */}
+            <div className="sport-team-mob">
+              {filtered.map((team) => (
+                <MobileTeamCard
+                  key={team.teamId}
+                  team={team}
+                  onView={openView}
+                  onEdit={openEdit}
+                  onDelete={handleDelete}
+                  deleting={deleting}
+                />
+              ))}
+            </div>
+
+            {/* ── Desktop table (>768px) ── */}
+            <div className="sport-team-desk">
+              <div className="books-table-wrap">
+                <table className="books-table">
+                  <thead>
+                    <tr>
+                      <th>#</th>
+                      <th>Team ID</th>
+                      <th>Team Name</th>
+                      <th>Sport ID</th>
+                      <th>Coach</th>
+                      <th>Members</th>
+                      <th>Status</th>
+                      <th>Description</th>
+                      <th>Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {filtered.map((team, idx) => (
+                      <tr key={team.teamId}>
+                        <td style={{ color: '#9ca3af' }}>{idx + 1}</td>
+                        <td>
+                          <span style={{ fontFamily: 'monospace', fontSize: '0.82rem', fontWeight: 600 }}>
+                            {team.teamId}
+                          </span>
+                        </td>
+                        <td style={{ fontWeight: 600, color: '#111827' }}>{team.teamName}</td>
+                        <td>{team.sportId}</td>
+                        <td>{team.coachName}</td>
+                        <td style={{ textAlign: 'center' }}>
+                          {Array.isArray(team.members) ? team.members.length : 0}
+                        </td>
+                        <td><StatusBadge status={team.status} /></td>
+                        <td style={{ maxWidth: 180, overflow: 'hidden',
+                          textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                          {team.description || '—'}
+                        </td>
+                        <td>
+                          <div className="books-actions">
+                            <button className="books-btn books-btn-sm books-btn-ghost"
+                              onClick={() => openView(team)}>View</button>
+                            <button className="books-btn books-btn-sm books-btn-ghost"
+                              onClick={() => openEdit(team)}>Edit</button>
+                            <button className="books-btn books-btn-sm books-btn-danger"
+                              onClick={() => handleDelete(team)}
+                              disabled={deleting === team.teamId}>
+                              {deleting === team.teamId ? 'Deleting...' : 'Delete'}
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </>
         )}
       </div>
 
@@ -241,8 +315,10 @@ export default function SportTeamsPage() {
         mode={modalMode}
         team={selTeam}
         onSave={handleSave}
-        onClose={() => setModalOpen(false)}
+        onClose={() => { setModalOpen(false); setDupError(''); }}
         loading={saving}
+        dupError={dupError}
+        onDupOk={() => setDupError('')}
       />
 
       <ViewSportTeamModal

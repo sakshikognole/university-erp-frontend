@@ -1,13 +1,19 @@
 export default function ViewSportTeamModal({ isOpen, team, onClose }) {
   if (!isOpen || !team) return null;
 
-  const badgeClass = team.status === 'ACTIVE'
-    ? 'sport-badge-active'
-    : 'sport-badge-inactive';
+  const badgeStyle = team.status === 'ACTIVE'
+    ? { background: '#dcfce7', color: '#166534', border: '1px solid #86efac' }
+    : { background: '#f1f5f9', color: '#475569', border: '1px solid #cbd5e1' };
 
   return (
     <div className="books-overlay">
-      <div className="books-modal" style={{ maxWidth: 520 }}>
+      {/* Defect 2: modal width 100% on mobile, max 520px on desktop — no horizontal scroll */}
+      <div className="books-modal" style={{
+        maxWidth: 520,
+        width: '95%',
+        maxHeight: '90vh',
+        overflowY: 'auto',
+      }}>
 
         <div className="books-modal-head">
           <h3>Team Details</h3>
@@ -16,50 +22,56 @@ export default function ViewSportTeamModal({ isOpen, team, onClose }) {
 
         <div className="books-modal-body">
 
-          {/* ID + status row */}
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
+          {/* Team ID + Status */}
+          <div style={{ display: 'flex', justifyContent: 'space-between',
+            alignItems: 'center', marginBottom: 12, flexWrap: 'wrap', gap: 8 }}>
             <span style={{ fontFamily: 'monospace', fontSize: '0.8rem', color: '#6b7280' }}>
               {team.teamId}
             </span>
-            <span className={`sport-status-badge ${badgeClass}`}>{team.status}</span>
+            <span style={{
+              ...badgeStyle, padding: '3px 10px', borderRadius: 9999,
+              fontSize: '0.78rem', fontWeight: 600, whiteSpace: 'nowrap',
+            }}>{team.status}</span>
           </div>
 
-          {/* Team name */}
-          <h2 style={{ margin: '0 0 16px', fontSize: '1.25rem', fontWeight: 700 }}>
+          {/* Team Name */}
+          <h2 style={{ margin: '0 0 16px', fontSize: '1.1rem', fontWeight: 700,
+            wordBreak: 'break-word' }}>
             {team.teamName}
           </h2>
 
-          {/* Info grid */}
-          <div className="sport-card-details" style={{ marginBottom: 16 }}>
-            <div className="sport-detail-item">
-              <span className="sport-detail-label">Sport ID</span>
-              <span className="sport-detail-value">{team.sportId}</span>
-            </div>
-            <div className="sport-detail-item">
-              <span className="sport-detail-label">Coach</span>
-              <span className="sport-detail-value">{team.coachName}</span>
-            </div>
-            <div className="sport-detail-item">
-              <span className="sport-detail-label">Total Members</span>
-              <span className="sport-detail-value">
-                {Array.isArray(team.members) ? team.members.length : 0}
-              </span>
-            </div>
-          </div>
+          {/* Details — stacked rows, no horizontal overflow */}
+          <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.87rem' }}>
+            <tbody>
+              {[
+                ['Sport ID',      team.sportId],
+                ['Coach',         team.coachName],
+                ['Status',        team.status],
+                ['Total Members', Array.isArray(team.members) ? team.members.length : 0],
+              ].map(([label, val]) => (
+                <tr key={label} style={{ borderBottom: '1px solid #f3f4f6' }}>
+                  <td style={{ padding: '8px 4px', fontWeight: 600, color: '#6b7280',
+                    width: '40%', verticalAlign: 'top' }}>{label}</td>
+                  <td style={{ padding: '8px 4px', color: '#111827',
+                    wordBreak: 'break-word' }}>{val}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
 
           {/* Members chips */}
           {Array.isArray(team.members) && team.members.length > 0 && (
-            <div style={{ marginBottom: 16 }}>
-              <p className="sport-detail-label" style={{ marginBottom: 8 }}>Members</p>
+            <div style={{ marginTop: 14 }}>
+              <p style={{ fontSize: '0.82rem', fontWeight: 600, color: '#6b7280',
+                marginBottom: 8 }}>Members</p>
               <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
                 {team.members.map((m, i) => (
                   <span key={i} style={{
                     background: '#eff6ff', color: '#2563eb',
                     borderRadius: 6, padding: '3px 10px',
                     fontSize: '0.82rem', fontWeight: 500,
-                  }}>
-                    {m}
-                  </span>
+                    wordBreak: 'break-word',
+                  }}>{m}</span>
                 ))}
               </div>
             </div>
@@ -67,9 +79,11 @@ export default function ViewSportTeamModal({ isOpen, team, onClose }) {
 
           {/* Description */}
           {team.description && (
-            <div>
-              <p className="sport-detail-label" style={{ marginBottom: 6 }}>Description</p>
-              <p style={{ fontSize: '0.9rem', color: '#374151', lineHeight: 1.6, margin: 0 }}>
+            <div style={{ marginTop: 14 }}>
+              <p style={{ fontSize: '0.82rem', fontWeight: 600, color: '#6b7280',
+                marginBottom: 6 }}>Description</p>
+              <p style={{ fontSize: '0.9rem', color: '#374151', lineHeight: 1.6,
+                margin: 0, wordBreak: 'break-word' }}>
                 {team.description}
               </p>
             </div>

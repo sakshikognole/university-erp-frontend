@@ -63,10 +63,39 @@ export default function TeamForm({ isOpen, mode, team, onSave, onClose, loading 
 
   const validate = () => {
     const e = {};
-    if (!form.teamId.trim())      e.teamId      = 'Team ID is required.';
-    if (!form.sportId)            e.sportId     = 'Sport is required.';
-    if (!form.coachName.trim())   e.coachName   = 'Coach Name is required.';
-    if (!form.captainName.trim()) e.captainName = 'Captain Name is required.';
+
+    // Team ID: must have both letters and numbers, no special chars
+    if (!form.teamId.trim()) {
+      e.teamId = 'Team ID is required.';
+    } else if (/[^A-Za-z0-9\-]/.test(form.teamId.trim())) {
+      e.teamId = 'Team ID must not contain special characters.';
+    } else if (!/[A-Za-z]/.test(form.teamId.trim())) {
+      e.teamId = 'Team ID must contain at least one letter (e.g. T001).';
+    } else if (!/[0-9]/.test(form.teamId.trim())) {
+      e.teamId = 'Team ID must contain at least one number (e.g. T001).';
+    }
+
+    if (!form.sportId) e.sportId = 'Sport is required.';
+
+    // Coach Name: letters, spaces and dots only — no numbers, no alphanumeric combos, no special chars
+    const nameRegex = /^[A-Za-z\s.]+$/;
+    if (!form.coachName.trim()) {
+      e.coachName = 'Coach Name is required.';
+    } else if (/\d/.test(form.coachName)) {
+      e.coachName = 'Coach Name must not contain numbers or alphanumeric combinations.';
+    } else if (!nameRegex.test(form.coachName.trim())) {
+      e.coachName = 'Coach Name must contain only letters and spaces. Special characters are not allowed.';
+    }
+
+    // Captain Name: same rules as Coach Name
+    if (!form.captainName.trim()) {
+      e.captainName = 'Captain Name is required.';
+    } else if (/\d/.test(form.captainName)) {
+      e.captainName = 'Captain Name must not contain numbers or alphanumeric combinations.';
+    } else if (!nameRegex.test(form.captainName.trim())) {
+      e.captainName = 'Captain Name must contain only letters and spaces. Special characters are not allowed.';
+    }
+
     return e;
   };
 

@@ -5764,3 +5764,23 @@ button {
   flex: 1;
   justify-content: center;
 }
+/* ==========================================
+   SPORT TEAMS — MOBILE / DESKTOP TOGGLE
+   ========================================== */
+
+/* Default: show desktop table, hide mobile cards */
+.sport-team-mob  { display: none; }
+.sport-team-desk { display: block; }
+
+/* Mobile (<=768px): flip visibility */
+@media (max-width: 768px) {
+  .sport-team-mob  { display: block; }
+  .sport-team-desk { display: none; }
+
+  /* Ensure modal doesn't overflow on mobile */
+  .books-modal {
+    width: 95% !important;
+    max-height: 90vh;
+    overflow-y: auto;
+  }
+}

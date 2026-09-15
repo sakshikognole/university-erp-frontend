@@ -51,6 +51,10 @@ import SportTeamPage  from './pages/SportTeamPage';
 // --- Venue Booking (your feature) ---
 import VenueBookingPage from './pages/VenueBookingPage';
 
+// --- Exam Management (your feature) ---
+import ExamsPage     from './pages/ExamsPage';
+import ExamMarksPage from './pages/ExamMarksPage';
+
 // --- Study Materials (your feature) ---
 import UploadMaterialsPage  from './pages/UploadMaterialsPage';
 import DisplayMaterialsPage from './pages/DisplayMaterialsPage';
@@ -136,6 +140,10 @@ function AppRoutes() {
 
         {/* Venue Booking */}
         <Route path="venue-booking" element={<VenueBookingPage />} />
+
+        {/* Exam Management */}
+        <Route path="exams"       element={<ExamsPage />} />
+        <Route path="exam-marks"  element={<ExamMarksPage />} />
 
         {/* Study Materials */}
         <Route path="upload-materials"  element={<UploadMaterialsPage />} />
