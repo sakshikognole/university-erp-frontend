@@ -1,12 +1,13 @@
 import { useState, useEffect } from 'react';
 
 const EMPTY = {
-  examId:        '',
-  subject:       '',
-  academicYear:  '',
-  description:   '',
-  displayMode:   'PERCENTAGE',   // 'PERCENTAGE' or 'FRACTION'
-  fractionScale: '10',           // custom scale for FRACTION mode (e.g. 5 means /5)
+  examId:          '',
+  subject:         '',
+  academicYear:    '',
+  description:     '',
+  displayMode:     'PERCENTAGE',
+  percentageScale: '100',   // custom max for PERCENTAGE (e.g. 50 means show out of 50%)
+  fractionScale:   '10',    // custom denominator for FRACTION (e.g. 5 means /5)
 };
 
 export default function ExamModal({
@@ -19,12 +20,13 @@ export default function ExamModal({
     if (!isOpen) return;
     if (mode === 'edit' && exam) {
       setForm({
-        examId:        exam.examId        ?? '',
-        subject:       exam.subject       ?? '',
-        academicYear:  exam.academicYear  ?? '',
-        description:   exam.description   ?? '',
-        displayMode:   exam.displayMode   ?? 'PERCENTAGE',
-        fractionScale: exam.fractionScale != null ? String(exam.fractionScale) : '10',
+        examId:          exam.examId          ?? '',
+        subject:         exam.subject         ?? '',
+        academicYear:    exam.academicYear    ?? '',
+        description:     exam.description     ?? '',
+        displayMode:     exam.displayMode     ?? 'PERCENTAGE',
+        percentageScale: exam.percentageScale != null ? String(exam.percentageScale) : '100',
+        fractionScale:   exam.fractionScale   != null ? String(exam.fractionScale)   : '10',
       });
     } else {
       setForm(EMPTY);
@@ -61,7 +63,8 @@ export default function ExamModal({
     if (Object.keys(errs).length) { setErrors(errs); return; }
     onSave({
       ...form,
-      fractionScale: Number(form.fractionScale) || 10,
+      percentageScale: Number(form.percentageScale) || 100,
+      fractionScale:   Number(form.fractionScale)   || 10,
     });
   };
 
@@ -172,7 +175,30 @@ export default function ExamModal({
                 })}
               </div>
 
-              {/* Fraction scale input — only shown when FRACTION is selected */}
+              {/* Percentage scale input — shown when PERCENTAGE selected */}
+              {form.displayMode === 'PERCENTAGE' && (
+                <div style={{ marginTop: 10, display: 'flex', alignItems: 'center', gap: 10 }}>
+                  <label style={{ fontSize: '0.85rem', color: '#374151', fontWeight: 500, whiteSpace: 'nowrap' }}>
+                    Convert to percentage out of
+                  </label>
+                  <input
+                    type="number"
+                    min="1"
+                    max="100"
+                    className="books-form-control"
+                    name="percentageScale"
+                    value={form.percentageScale}
+                    onChange={change}
+                    style={{ width: 80, padding: '6px 10px' }}
+                    placeholder="100"
+                  />
+                  <span style={{ fontSize: '0.85rem', color: '#6b7280' }}>
+                    e.g. 50 → shows as 40% out of 50
+                  </span>
+                </div>
+              )}
+
+              {/* Fraction scale input — shown when FRACTION selected */}
               {form.displayMode === 'FRACTION' && (
                 <div style={{ marginTop: 10, display: 'flex', alignItems: 'center', gap: 10 }}>
                   <label style={{ fontSize: '0.85rem', color: '#374151', fontWeight: 500, whiteSpace: 'nowrap' }}>
@@ -217,9 +243,9 @@ export default function ExamModal({
               <span>ℹ️</span>
               <span>
                 T1/T2 max = <strong>20</strong> marks. SEE max = <strong>50</strong> marks.
-                {form.displayMode === 'FRACTION' && form.fractionScale
-                  ? ` Marks will be shown as fractions out of ${form.fractionScale} (e.g. 20 marks → /${form.fractionScale} scale).`
-                  : ' Marks will be shown as percentage.'}
+                {form.displayMode === 'PERCENTAGE'
+                  ? ` Marks shown as % out of ${form.percentageScale || 100} (e.g. 15/20 → ${((15/20)*(Number(form.percentageScale)||100)).toFixed(0)}%).`
+                  : ` Marks shown as fractions out of ${form.fractionScale || 10} (e.g. 15/20 → ${((15/20)*(Number(form.fractionScale)||10)).toFixed(2)}/${form.fractionScale || 10}).`}
               </span>
             </div>
 

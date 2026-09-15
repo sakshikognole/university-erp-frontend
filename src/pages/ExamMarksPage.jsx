@@ -338,6 +338,8 @@ th{background:#1e3a5f;color:#fff;padding:7px 10px;text-align:left;border:1px sol
   const max    = MAX[activeTab];
   const tc     = TAB_COLOR[activeTab];
   const isFraction  = (exam?.displayMode ?? 'PERCENTAGE') === 'FRACTION';
+  // percentageScale: user-defined max % (default 100). e.g. 50 means show out of 50%
+  const pctScale    = Number(exam?.percentageScale ?? 100) || 100;
   // fractionScale: user-defined denominator (default 10). e.g. scale=5 means 20 marks → /5
   const fracScale   = Number(exam?.fractionScale ?? 10) || 10;
 
@@ -382,8 +384,8 @@ th{background:#1e3a5f;color:#fff;padding:7px 10px;text-align:left;border:1px sol
       }}>
         <span>
           <strong>{activeTab}</strong> — Max Marks: <strong>{max}</strong>
-          {isT1T2 && <> &nbsp;&middot;&nbsp; Display: <strong>{isFraction ? `Fraction (/` + fracScale + `)` : 'Percentage (%)'}</strong></>}
-          {!isT1T2 && <> &nbsp;&middot;&nbsp; Display: <strong>{isFraction ? `Fraction (/` + fracScale + `)` : 'Percentage (%)'}</strong></>}
+          {isT1T2 && <> &nbsp;&middot;&nbsp; Display: <strong>{isFraction ? `Fraction (/` + fracScale + `)` : `Percentage (out of ` + pctScale + `%)`}</strong></>}
+          {!isT1T2 && <> &nbsp;&middot;&nbsp; Display: <strong>{isFraction ? `Fraction (/` + fracScale + `)` : `Percentage (out of ` + pctScale + `%)`}</strong></>}
         </span>
         <span style={{ fontSize: '0.78rem', opacity: 0.8 }}>
           {currentRows.length} student{currentRows.length !== 1 ? 's' : ''}
@@ -460,12 +462,12 @@ th{background:#1e3a5f;color:#fff;padding:7px 10px;text-align:left;border:1px sol
                     </th>
                     {isT1T2 && (
                       <th style={{ textAlign: 'center' }}>
-                        {isFraction ? `/${fracScale} Scale` : '% Score'}
+                        {isFraction ? `/${fracScale} Scale` : `% (out of ${pctScale})`}
                       </th>
                     )}
                     {!isT1T2 && (
                       <th style={{ textAlign: 'center' }}>
-                        {isFraction ? `/${fracScale} Scale` : '% Score'}
+                        {isFraction ? `/${fracScale} Scale` : `% (out of ${pctScale})`}
                       </th>
                     )}
                     <th style={{ width: 56, textAlign: 'center' }}>Del</th>
@@ -507,7 +509,7 @@ th{background:#1e3a5f;color:#fff;padding:7px 10px;text-align:left;border:1px sol
                             {comp
                               ? (isFraction
                                   ? `${+((comp.raw / max) * fracScale).toFixed(2)}/${fracScale}`
-                                  : `${comp.percentage}%`)
+                                  : `${+((comp.raw / max) * pctScale).toFixed(2)}%`)
                               : '—'}
                           </td>
                         )}
@@ -516,7 +518,7 @@ th{background:#1e3a5f;color:#fff;padding:7px 10px;text-align:left;border:1px sol
                             {comp
                               ? (isFraction
                                   ? `${+((comp.raw / max) * fracScale).toFixed(2)}/${fracScale}`
-                                  : `${comp.percentage}%`)
+                                  : `${+((comp.raw / max) * pctScale).toFixed(2)}%`)
                               : '—'}
                           </td>
                         )}
