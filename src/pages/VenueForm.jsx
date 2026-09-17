@@ -2,8 +2,11 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { ArrowLeft, Save, AlertCircle, CheckCircle2, Loader2, Plus, X } from 'lucide-react';
 
-const IS_PROD = window.location.hostname !== 'localhost';
-const API_BASE_URL = IS_PROD ? 'https://university-erp-node.onrender.com/api' : 'http://localhost:5000/api';
+const API_BASE_URL = 'http://localhost:5000/api';
+
+// Must match backend constants in superAdminController.js
+const VENUE_ID_REGEX = /^[A-Z0-9]{1,10}(-[A-Z0-9]{1,10}){0,4}$/;
+const VENUE_NAME_REGEX = /^[A-Za-z][A-Za-z0-9 ,.\-'()]{1,99}$/;
 
 const VenueForm = () => {
   const { id } = useParams();
@@ -13,6 +16,7 @@ const VenueForm = () => {
   const [loading, setLoading] = useState(false);
   const [fetching, setFetching] = useState(false);
   const [feedback, setFeedback] = useState({ type: '', message: '' });
+  const [fieldErrors, setFieldErrors] = useState({});
   const [facilityInput, setFacilityInput] = useState({ name: '', details: '' });
   const [formData, setFormData] = useState({
     venueId: '',
@@ -66,6 +70,40 @@ const VenueForm = () => {
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
+    // Clear the field-level error as the user types
+    if (fieldErrors[name]) {
+      setFieldErrors((prev) => ({ ...prev, [name]: '' }));
+    }
+  };
+
+  const validateForm = () => {
+    const errors = {};
+    const venueIdClean = formData.venueId.trim().toUpperCase();
+    const nameClean = formData.name.trim();
+
+    if (!venueIdClean) {
+      errors.venueId = 'Venue ID is required.';
+    } else if (!VENUE_ID_REGEX.test(venueIdClean)) {
+      errors.venueId = 'Venue ID must contain only letters and digits, optionally separated by hyphens (e.g. HALL-101, LAB-CS-01).';
+    }
+
+    if (!nameClean) {
+      errors.name = 'Venue Name is required.';
+    } else if (!VENUE_NAME_REGEX.test(nameClean)) {
+      errors.name = 'Venue Name must start with a letter and may only contain letters, digits, spaces, or basic punctuation ( , . - \' ( ) ).';
+    }
+
+    if (!formData.capacity) {
+      errors.capacity = 'Capacity is required.';
+    } else if (Number(formData.capacity) < 1) {
+      errors.capacity = 'Capacity must be at least 1.';
+    }
+
+    if (!formData.status) {
+      errors.status = 'Status is required.';
+    }
+
+    return errors;
   };
 
   const handleAddFacility = () => {
@@ -99,15 +137,13 @@ const VenueForm = () => {
     e.preventDefault();
     setFeedback({ type: '', message: '' });
 
-    if (!formData.venueId.trim() || !formData.name.trim() || !formData.capacity || !formData.status) {
-      setFeedback({ type: 'error', message: 'Venue ID, Name, Capacity, and Status are required.' });
+    const errors = validateForm();
+    if (Object.keys(errors).length > 0) {
+      setFieldErrors(errors);
+      setFeedback({ type: 'error', message: 'Please fix the errors below before saving.' });
       return;
     }
-
-    if (Number(formData.capacity) < 1) {
-      setFeedback({ type: 'error', message: 'Capacity must be at least 1.' });
-      return;
-    }
+    setFieldErrors({});
 
     setLoading(true);
 
@@ -190,7 +226,7 @@ const VenueForm = () => {
         </div>
       )}
 
-      <div className="card" style={{ maxWidth: '720px' }}>
+      <div className="card venue-form-card" style={{ maxWidth: '720px' }}>
         {fetching ? (
           <div style={{ padding: '3rem', textAlign: 'center', color: 'var(--text-secondary)' }}>
             <Loader2 size={28} className="spin-animate" style={{ margin: '0 auto 0.75rem auto' }} />
@@ -210,12 +246,15 @@ const VenueForm = () => {
                     type="text"
                     id="venueId"
                     name="venueId"
-                    className="form-input"
+                    className={`form-input${fieldErrors.venueId ? ' input-error' : ''}`}
                     placeholder="e.g. HALL-101"
                     value={formData.venueId}
                     onChange={handleInputChange}
                     required
                   />
+                  {fieldErrors.venueId && (
+                    <span className="form-field-error">{fieldErrors.venueId}</span>
+                  )}
                 </div>
 
                 <div className="form-group">
@@ -226,12 +265,15 @@ const VenueForm = () => {
                     type="text"
                     id="name"
                     name="name"
-                    className="form-input"
+                    className={`form-input${fieldErrors.name ? ' input-error' : ''}`}
                     placeholder="e.g. Main Auditorium"
                     value={formData.name}
                     onChange={handleInputChange}
                     required
                   />
+                  {fieldErrors.name && (
+                    <span className="form-field-error">{fieldErrors.name}</span>
+                  )}
                 </div>
               </div>
 
@@ -244,13 +286,16 @@ const VenueForm = () => {
                     type="number"
                     id="capacity"
                     name="capacity"
-                    className="form-input"
+                    className={`form-input${fieldErrors.capacity ? ' input-error' : ''}`}
                     placeholder="e.g. 500"
                     value={formData.capacity}
                     onChange={handleInputChange}
                     min="1"
                     required
                   />
+                  {fieldErrors.capacity && (
+                    <span className="form-field-error">{fieldErrors.capacity}</span>
+                  )}
                 </div>
 
                 <div className="form-group">
@@ -260,7 +305,7 @@ const VenueForm = () => {
                   <select
                     id="status"
                     name="status"
-                    className="form-input"
+                    className={`form-input${fieldErrors.status ? ' input-error' : ''}`}
                     value={formData.status}
                     onChange={handleInputChange}
                     required
@@ -270,6 +315,9 @@ const VenueForm = () => {
                     <option value="MAINTENANCE">Maintenance</option>
                     <option value="RESERVED">Reserved</option>
                   </select>
+                  {fieldErrors.status && (
+                    <span className="form-field-error">{fieldErrors.status}</span>
+                  )}
                 </div>
               </div>
             </div>
@@ -346,7 +394,7 @@ const VenueForm = () => {
             <div className="form-actions-row" style={{ marginTop: '1.5rem' }}>
               <button
                 type="button"
-                className="books-btn books-btn-ghost"
+                className="btn btn-secondary"
                 onClick={() => navigate('/venues')}
                 disabled={loading}
               >
@@ -354,7 +402,7 @@ const VenueForm = () => {
               </button>
               <button
                 type="submit"
-                className="books-btn books-btn-primary"
+                className="btn btn-primary"
                 disabled={loading}
               >
                 {loading ? (

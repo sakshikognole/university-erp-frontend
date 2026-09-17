@@ -22,8 +22,7 @@ import {
 } from 'lucide-react';
 import { exportVenues } from '../utils/exportUtils';
 
-const IS_PROD = window.location.hostname !== 'localhost';
-const API_BASE_URL = IS_PROD ? 'https://university-erp-node.onrender.com/api' : 'http://localhost:5000/api';
+const API_BASE_URL = 'http://localhost:5000/api';
 
 const Venues = () => {
   const navigate = useNavigate();
@@ -161,7 +160,7 @@ const Venues = () => {
   };
 
   return (
-    <div className="page-container">
+    <div className="page-container venues-page">
       <div className="page-header-row">
         <div>
           <h1 className="page-title">Venues</h1>
@@ -255,7 +254,7 @@ const Venues = () => {
             <Search size={16} className="search-icon" />
             <input
               type="text"
-              className="search-input"
+              className="search-input venues-search-input"
               placeholder="Search by Name, Venue ID, Status, or Facilities..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
@@ -331,7 +330,7 @@ const Venues = () => {
                         {venue.facilities && venue.facilities.length > 0
                           ? venue.facilities.slice(0, 2).map(f => f.name || f).join(', ') +
                             (venue.facilities.length > 2 ? ` +${venue.facilities.length - 2}` : '')
-                          : 'â€”'}
+                          : '—'}
                       </td>
                       <td>
                         <span className={getStatusBadgeClass(venue.status)}>

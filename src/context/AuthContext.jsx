@@ -2,18 +2,8 @@ import React, { createContext, useContext, useState, useEffect } from 'react';
 
 const AuthContext = createContext();
 
-// API base URLs — hardcoded for production reliability.
-// Update these if your Render service URLs change.
-const IS_PROD = window.location.hostname !== 'localhost';
-const NODE_URL = IS_PROD
-  ? 'https://university-erp-node.onrender.com'
-  : 'http://localhost:5000';
-const API_BASE_URL = `${NODE_URL}/api`;
+const API_BASE_URL = 'http://localhost:5000/api';
 
-const authHeaders = () => ({
-  'Content-Type': 'application/json',
-  Authorization: `Bearer ${localStorage.getItem('erp_token')}`,
-});
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(() => {
     const savedUser = localStorage.getItem('erp_user');
@@ -24,15 +14,51 @@ export const AuthProvider = ({ children }) => {
     return localStorage.getItem('erp_token') || null;
   });
 
-  const [loading,      setLoading]      = useState(false);
-  // initializing = true during the very first render cycle.
-  // ProtectedRoute waits for this to be false before deciding to redirect.
-  const [initializing, setInitializing] = useState(true);
+  const [loading, setLoading] = useState(false);
+  // authLoading is true until the initial token-expiry check on mount completes.
+  // Components that gate on user.adminType must wait for this to be false before
+  // making access-control decisions, otherwise an expired-token logout() call
+  // during the first render cycle causes a blank-page flash (DEF-001, DEF-002, DEF-015).
+  const [authLoading, setAuthLoading] = useState(true);
 
+  const logout = () => {
+    setUser(null);
+    setToken(null);
+    localStorage.removeItem('erp_user');
+    localStorage.removeItem('erp_token');
+  };
+
+  // Check token expiration on mount and set session timeout check.
+  // authLoading is set to false once this check has run so consumers know
+  // that the auth state is settled and safe to use.
   useEffect(() => {
-    // After the first render, localStorage has been read and user state is settled.
-    setInitializing(false);
-  }, []);
+    let timer;
+    if (token && typeof token === 'string' && token.includes('.')) {
+      try {
+        const parts = token.split('.');
+        if (parts.length === 3) {
+          const base64 = parts[1].replace(/-/g, '+').replace(/_/g, '/');
+          const payload = JSON.parse(atob(base64));
+          if (payload && payload.exp) {
+            const expirationTime = payload.exp * 1000;
+            const timeLeft = expirationTime - Date.now();
+            if (timeLeft <= 0) {
+              logout();
+            } else {
+              timer = setTimeout(() => {
+                logout();
+              }, timeLeft);
+            }
+          }
+        }
+      } catch (e) {
+        // Safe fallback on any decoding error
+      }
+    }
+    // Auth check is complete — unblock any gated consumers
+    setAuthLoading(false);
+    return () => { if (timer) clearTimeout(timer); };
+  }, [token]);
 
   useEffect(() => {
     if (user) {
@@ -183,20 +209,13 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  const logout = () => {
-    setUser(null);
-    setToken(null);
-    localStorage.removeItem('erp_user');
-    localStorage.removeItem('erp_token');
-  };
-
   return (
     <AuthContext.Provider
       value={{
         user,
         token,
         loading,
-        initializing,
+        authLoading,
         loginAdmin,
         loginStudent,
         sendOtp,

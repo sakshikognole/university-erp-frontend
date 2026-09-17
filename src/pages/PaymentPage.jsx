@@ -1,6 +1,8 @@
-import { springApi } from '../services/api';
 import { useState, useEffect, useCallback } from 'react';
+import axios from 'axios';
 import Pagination from '../components/Pagination';
+
+const SPRING_API = 'http://localhost:8080/api';
 
 const DEFAULT_PAGE = {
   pageNumber: 0, pageSize: 10, totalElements: 0,
@@ -9,13 +11,17 @@ const DEFAULT_PAGE = {
 
 // ── Add Payment Modal ─────────────────────────────────────────────────────
 function AddPaymentModal({ isOpen, onClose, onSaved }) {
-  const [form,    setForm]    = useState({ title: '', amount: '', discount: '' });
-  const [errors,  setErrors]  = useState({});
-  const [saving,  setSaving]  = useState(false);
-  const [apiErr,  setApiErr]  = useState('');
+  const [form,   setForm]   = useState({ title: '', amount: '', discount: '' });
+  const [errors, setErrors] = useState({});
+  const [saving, setSaving] = useState(false);
+  const [apiErr, setApiErr] = useState('');
 
   useEffect(() => {
-    if (isOpen) { setForm({ title: '', amount: '', discount: '' }); setErrors({}); setApiErr(''); }
+    if (isOpen) {
+      setForm({ title: '', amount: '', discount: '' });
+      setErrors({});
+      setApiErr('');
+    }
   }, [isOpen]);
 
   if (!isOpen) return null;
@@ -27,11 +33,12 @@ function AddPaymentModal({ isOpen, onClose, onSaved }) {
 
   const validate = () => {
     const e = {};
-    if (!form.title.trim())          e.title    = 'Title is required.';
+    if (!form.title.trim())
+      e.title = 'Title is required.';
     if (!form.amount || isNaN(form.amount) || Number(form.amount) <= 0)
-                                     e.amount   = 'Valid amount is required.';
+      e.amount = 'Valid amount is required.';
     if (form.discount !== '' && (isNaN(form.discount) || Number(form.discount) < 0))
-                                     e.discount = 'Discount must be 0 or more.';
+      e.discount = 'Discount must be 0 or more.';
     return e;
   };
 
@@ -42,7 +49,7 @@ function AddPaymentModal({ isOpen, onClose, onSaved }) {
     setSaving(true);
     setApiErr('');
     try {
-      await springApi.post('/payment-titles', {
+      await axios.post(`${SPRING_API}/payment-titles`, {
         title:    form.title.trim(),
         amount:   Number(form.amount),
         discount: Number(form.discount || 0),
@@ -50,7 +57,7 @@ function AddPaymentModal({ isOpen, onClose, onSaved }) {
       onSaved();
       onClose();
     } catch (err) {
-      setApiErr(err.message || 'Failed to add payment title.');
+      setApiErr(err.response?.data?.error || 'Failed to add payment title.');
     } finally {
       setSaving(false);
     }
@@ -135,7 +142,8 @@ function AddPaymentModal({ isOpen, onClose, onSaved }) {
 }
 
 // ══════════════════════════════════════════════════════════════════════════
-// PaymentPage
+// PaymentPage — Admin payment title + combination management
+// Accessible at /payment-management (Super Admin only)
 // ══════════════════════════════════════════════════════════════════════════
 export default function PaymentPage() {
 
@@ -153,10 +161,10 @@ export default function PaymentPage() {
   const [selected, setSelected] = useState(new Set());
 
   // ── Combinations ──────────────────────────────────────────────────────
-  const [combinations,   setCombinations]   = useState([]);
-  const [creating,       setCreating]       = useState(false);
-  const [viewCombo,      setViewCombo]      = useState(null); // clicked capsule
-  const [allTitles,      setAllTitles]      = useState([]); // flat list for breakdown lookup
+  const [combinations, setCombinations] = useState([]);
+  const [creating,     setCreating]     = useState(false);
+  const [viewCombo,    setViewCombo]    = useState(null);
+  const [allTitles,    setAllTitles]    = useState([]);
 
   // ── Feedback ──────────────────────────────────────────────────────────
   const [success, setSuccess] = useState('');
@@ -168,23 +176,22 @@ export default function PaymentPage() {
     return () => clearTimeout(t);
   }, [success, error]);
 
-  // ── Load titles ───────────────────────────────────────────────────────
+  // ── Load titles (paginated) ───────────────────────────────────────────
   const loadTitles = useCallback(async () => {
     setTitlesLoading(true);
     try {
-      const res = await springApi.get('/payment-titles', {
+      const res = await axios.get(`${SPRING_API}/payment-titles`, {
         params: { page, size },
       });
-      // springApi interceptor already unwraps res.data — res IS the Page object
-      const pd = res;
-      setTitles(pd.content ?? []);
+      const pd = res.data;
+      setTitles(pd.content);
       setPageData({
         pageNumber:    pd.number       ?? pd.pageNumber    ?? 0,
         pageSize:      pd.size         ?? pd.pageSize      ?? size,
-        totalElements: pd.totalElements ?? 0,
-        totalPages:    pd.totalPages    ?? 0,
-        first:         pd.first        ?? true,
-        last:          pd.last         ?? true,
+        totalElements: pd.totalElements,
+        totalPages:    pd.totalPages,
+        first:         pd.first,
+        last:          pd.last,
       });
     } catch {
       setError('Failed to load payment titles.');
@@ -196,18 +203,18 @@ export default function PaymentPage() {
   // ── Load combinations ─────────────────────────────────────────────────
   const loadCombinations = useCallback(async () => {
     try {
-      const res = await springApi.get('/payment-combinations');
-      setCombinations(Array.isArray(res) ? res : []);
+      const res = await axios.get(`${SPRING_API}/payment-combinations`);
+      setCombinations(res.data);
     } catch { /* silently ignore */ }
   }, []);
 
-  // ── Load all titles flat (for breakdown card) ─────────────────────────
+  // ── Load all titles flat (for breakdown card lookup) ──────────────────
   const loadAllTitles = useCallback(async () => {
     try {
-      const res = await springApi.get('/payment-titles', {
+      const res = await axios.get(`${SPRING_API}/payment-titles`, {
         params: { page: 0, size: 1000 },
       });
-      setAllTitles((res?.content ?? res) ?? []);
+      setAllTitles(res.data.content ?? []);
     } catch { /* silently ignore */ }
   }, []);
 
@@ -216,8 +223,8 @@ export default function PaymentPage() {
   useEffect(() => { loadAllTitles(); },    [loadAllTitles]);
 
   // ── Page / size change ────────────────────────────────────────────────
-  const onPageChange = (p) => { setPage(p);    setSelected(new Set()); };
-  const onSizeChange = (s) => { setSize(s);    setPage(0); setSelected(new Set()); };
+  const onPageChange = (p) => { setPage(p); setSelected(new Set()); };
+  const onSizeChange = (s) => { setSize(s); setPage(0); setSelected(new Set()); };
 
   // ── Checkbox handlers ─────────────────────────────────────────────────
   const toggleOne = (titleId) => {
@@ -228,8 +235,8 @@ export default function PaymentPage() {
     });
   };
 
-  const isAllOnPageSelected = titles.length > 0 &&
-    titles.every((t) => selected.has(t.titleId));
+  const isAllOnPageSelected =
+    titles.length > 0 && titles.every((t) => selected.has(t.titleId));
 
   const toggleAll = () => {
     if (isAllOnPageSelected) {
@@ -253,20 +260,19 @@ export default function PaymentPage() {
     setCreating(true);
     setSuccess(''); setError('');
     try {
-      await springApi.post('/payment-combinations', {
+      await axios.post(`${SPRING_API}/payment-combinations`, {
         titleIds: Array.from(selected),
       });
       setSuccess('Payment combination created successfully.');
       setSelected(new Set());
       loadCombinations();
     } catch (err) {
-      setError(err.message || 'Failed to create payment.');
+      setError(err.response?.data?.error || 'Failed to create payment combination.');
     } finally {
       setCreating(false);
     }
   };
 
-  // ── Helpers ───────────────────────────────────────────────────────────
   const fmt = (n) =>
     '₹' + Number(n).toLocaleString('en-IN', { maximumFractionDigits: 0 });
 
@@ -274,19 +280,19 @@ export default function PaymentPage() {
   return (
     <div className="page-container">
 
-      {/* Header — same pattern as BooksPage */}
+      {/* Header */}
       <div className="books-page-header">
         <div>
           <h1 className="page-title">Payment Management</h1>
-          <p className="books-page-sub">
-            Select payment titles and create a payment combination
+          <p className="stu-page-sub">
+            Manage fee titles and create payment combinations for students
           </p>
         </div>
         <button
           className="books-btn books-btn-primary"
           onClick={() => setModalOpen(true)}
         >
-          + Add Payment
+          + Add Payment Title
         </button>
       </div>
 
@@ -294,18 +300,18 @@ export default function PaymentPage() {
       {success && (
         <div className="books-alert books-alert-success">
           <span>{success}</span>
-          <button onClick={() => setSuccess('')}>x</button>
+          <button onClick={() => setSuccess('')}>×</button>
         </div>
       )}
       {error && (
         <div className="books-alert books-alert-error">
           <span>{error}</span>
-          <button onClick={() => setError('')}>x</button>
+          <button onClick={() => setError('')}>×</button>
         </div>
       )}
 
-      {/* ── Table ── */}
-      <div className="card">
+      {/* ── Payment Titles Table ── */}
+      <div className="card" style={{ marginTop: '1.25rem' }}>
         {titlesLoading ? (
           <p className="books-loading">Loading payment titles...</p>
         ) : (
@@ -322,15 +328,17 @@ export default function PaymentPage() {
                       title="Select all on this page"
                     />
                   </th>
+                  <th>Title ID</th>
                   <th>Payment Title</th>
                   <th>Amount</th>
                   <th>Discount</th>
+                  <th>Net Payable</th>
                 </tr>
               </thead>
               <tbody>
                 {titles.length === 0 ? (
                   <tr>
-                    <td colSpan={4}>
+                    <td colSpan={6}>
                       <div className="books-empty">No payment titles found.</div>
                     </td>
                   </tr>
@@ -348,9 +356,15 @@ export default function PaymentPage() {
                         onChange={() => toggleOne(t.titleId)}
                       />
                     </td>
-                    <td>{t.title}</td>
+                    <td><span className="code-badge">{t.titleId}</span></td>
+                    <td style={{ fontWeight: 500 }}>{t.title}</td>
                     <td className="pay-amount">{fmt(t.amount)}</td>
-                    <td className="pay-discount">{fmt(t.amount - t.discount)}</td>
+                    <td style={{ color: '#047857' }}>
+                      {t.discount > 0 ? `- ${fmt(t.discount)}` : '₹0'}
+                    </td>
+                    <td className="pay-discount" style={{ fontWeight: 700 }}>
+                      {fmt(t.amount - t.discount)}
+                    </td>
                   </tr>
                 ))}
               </tbody>
@@ -358,7 +372,6 @@ export default function PaymentPage() {
           </div>
         )}
 
-        {/* ── Pagination — exact same component as BooksPage ── */}
         <Pagination
           pageData={pageData}
           onPageChange={onPageChange}
@@ -366,9 +379,12 @@ export default function PaymentPage() {
         />
       </div>
 
-      {/* ── Create Payment button ── */}
+      {/* ── Create Combination button (shown when rows are selected) ── */}
       {selected.size > 0 && (
         <div className="pay-action-row">
+          <p className="pay-selected-hint">
+            {selected.size} title{selected.size > 1 ? 's' : ''} selected
+          </p>
           <button
             className="books-btn books-btn-primary"
             onClick={handleCreate}
@@ -376,15 +392,17 @@ export default function PaymentPage() {
           >
             {creating
               ? 'Creating...'
-              : `Create Payment (${selected.size} selected)`}
+              : `Create Payment Combination (${selected.size} selected)`}
           </button>
         </div>
       )}
 
-      {/* ── Created Payment Combinations (capsules) ── */}
+      {/* ── Created Payment Combinations ── */}
       {combinations.length > 0 && (
-        <div>
-          <p className="pay-capsules-title">Created Payments</p>
+        <div style={{ marginTop: '2rem' }}>
+          <p className="pay-capsules-title">
+            Created Payment Combinations
+          </p>
           <div className="pay-capsules-wrap">
             {combinations.map((c) => (
               <span
@@ -405,31 +423,20 @@ export default function PaymentPage() {
         </div>
       )}
 
-      {/* ── Combination Breakdown Card (overlay) ── */}
+      {/* ── Combination Breakdown Modal ── */}
       {viewCombo && (
-        <div
-          className="books-overlay"
-          onClick={() => setViewCombo(null)}
-        >
+        <div className="books-overlay" onClick={() => setViewCombo(null)}>
           <div
             className="books-modal"
-            style={{ maxWidth: 480 }}
+            style={{ maxWidth: 500 }}
             onClick={(e) => e.stopPropagation()}
           >
-            {/* Header */}
             <div className="books-modal-head">
-              <h3>
-                {viewCombo.paymentId} — Payment Breakdown
-              </h3>
-              <button
-                className="books-modal-close"
-                onClick={() => setViewCombo(null)}
-              >
+              <h3>{viewCombo.paymentId} — Fee Breakdown</h3>
+              <button className="books-modal-close" onClick={() => setViewCombo(null)}>
                 x
               </button>
             </div>
-
-            {/* Breakdown table */}
             <div className="books-modal-body">
               <div className="books-table-wrap">
                 <table className="books-table">
@@ -437,36 +444,43 @@ export default function PaymentPage() {
                     <tr>
                       <th>Payment Title</th>
                       <th>Amount</th>
-                      <th>After Discount</th>
+                      <th>Discount</th>
+                      <th>Net</th>
                     </tr>
                   </thead>
                   <tbody>
                     {viewCombo.paymentTitles.map((titleName) => {
                       const t = allTitles.find((x) => x.title === titleName);
-                      const amount  = t ? t.amount            : 0;
-                      const final   = t ? t.amount - t.discount : 0;
                       return (
                         <tr key={titleName}>
                           <td>{titleName}</td>
-                          <td className="pay-amount">{fmt(amount)}</td>
-                          <td className="pay-discount">{fmt(final)}</td>
+                          <td className="pay-amount">{fmt(t ? t.amount : 0)}</td>
+                          <td style={{ color: '#047857' }}>
+                            {t && t.discount > 0 ? `- ${fmt(t.discount)}` : '₹0'}
+                          </td>
+                          <td className="pay-discount" style={{ fontWeight: 700 }}>
+                            {fmt(t ? t.amount - t.discount : 0)}
+                          </td>
                         </tr>
                       );
                     })}
                   </tbody>
-                  {/* Total row */}
                   <tfoot>
-                    <tr style={{ borderTop: '2px solid var(--border-color)' }}>
+                    <tr style={{ borderTop: '2px solid var(--border-primary, #e5e7eb)' }}>
                       <td style={{ fontWeight: 700 }}>Total</td>
                       <td className="pay-amount" style={{ fontWeight: 700 }}>
-                        {fmt(
-                          viewCombo.paymentTitles.reduce((sum, name) => {
-                            const t = allTitles.find((x) => x.title === name);
-                            return sum + (t ? t.amount : 0);
-                          }, 0)
-                        )}
+                        {fmt(viewCombo.paymentTitles.reduce((sum, name) => {
+                          const t = allTitles.find((x) => x.title === name);
+                          return sum + (t ? t.amount : 0);
+                        }, 0))}
                       </td>
-                      <td className="pay-discount" style={{ fontWeight: 700, fontSize: 15 }}>
+                      <td style={{ color: '#047857', fontWeight: 700 }}>
+                        {fmt(viewCombo.paymentTitles.reduce((sum, name) => {
+                          const t = allTitles.find((x) => x.title === name);
+                          return sum + (t ? t.discount : 0);
+                        }, 0))}
+                      </td>
+                      <td className="pay-discount" style={{ fontWeight: 800, fontSize: 15 }}>
                         {fmt(viewCombo.totalAmount)}
                       </td>
                     </tr>
@@ -474,8 +488,6 @@ export default function PaymentPage() {
                 </table>
               </div>
             </div>
-
-            {/* Footer */}
             <div className="books-modal-foot">
               <button
                 className="books-btn books-btn-ghost"
@@ -488,13 +500,16 @@ export default function PaymentPage() {
         </div>
       )}
 
-      {/* ── Add Payment Modal ── */}
+      {/* ── Add Payment Title Modal ── */}
       <AddPaymentModal
         isOpen={modalOpen}
         onClose={() => setModalOpen(false)}
-        onSaved={() => { loadTitles(); setSuccess('Payment title added successfully.'); }}
+        onSaved={() => {
+          loadTitles();
+          loadAllTitles();
+          setSuccess('Payment title added successfully.');
+        }}
       />
-
     </div>
   );
 }

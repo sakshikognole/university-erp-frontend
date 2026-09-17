@@ -1,10 +1,40 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { ArrowLeft, GraduationCap, Save, AlertCircle, CheckCircle2, Loader2, Plus, X } from 'lucide-react';
+import {
+  ArrowLeft,
+  Save,
+  AlertCircle,
+  CheckCircle2,
+  Loader2,
+  Plus,
+  X,
+} from 'lucide-react';
+import {
+  validateName,
+  validatePRN,
+  validateClass,
+  validateDivision,
+  validateDegree,
+  validateYearOfEnrollment,
+  validateStudentFields,
+} from '../utils/studentValidation';
 
-const IS_PROD = window.location.hostname !== 'localhost';
-const API_BASE_URL = IS_PROD ? 'https://university-erp-node.onrender.com/api' : 'http://localhost:5000/api';
+const API_BASE_URL = 'http://localhost:5000/api';
 
+// ---------------------------------------------------------------------------
+// FieldError — small red helper text shown beneath an invalid input
+// ---------------------------------------------------------------------------
+const FieldError = ({ message }) =>
+  message ? (
+    <p className="field-error-msg" role="alert">
+      <AlertCircle size={13} style={{ flexShrink: 0 }} />
+      {message}
+    </p>
+  ) : null;
+
+// ---------------------------------------------------------------------------
+// StudentForm — used for both Add (/add-student) and Edit (/students/edit/:id)
+// ---------------------------------------------------------------------------
 const StudentForm = () => {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -13,6 +43,7 @@ const StudentForm = () => {
   const [loading, setLoading] = useState(false);
   const [fetching, setFetching] = useState(false);
   const [feedback, setFeedback] = useState({ type: '', message: '' });
+
   const [formData, setFormData] = useState({
     name: '',
     prn: '',
@@ -23,8 +54,23 @@ const StudentForm = () => {
     customFields: [],
   });
 
+  // Per-field validation error messages
+  const [fieldErrors, setFieldErrors] = useState({});
+  // Track which fields the user has already touched (to show errors on blur)
+  const [touched, setTouched] = useState({});
+
   const [customFieldKey, setCustomFieldKey] = useState('');
   const [customFieldValue, setCustomFieldValue] = useState('');
+
+  // ── Validators per field name ──────────────────────────────────────────
+  const FIELD_VALIDATORS = {
+    name: validateName,
+    prn: validatePRN,
+    class: validateClass,
+    division: validateDivision,
+    degree: validateDegree,
+    yearOfEnrollment: validateYearOfEnrollment,
+  };
 
   const authHeader = () => {
     const token = localStorage.getItem('erp_token');
@@ -38,12 +84,12 @@ const StudentForm = () => {
     if (isEditMode) {
       loadStudentDetails();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id]);
 
   const loadStudentDetails = async () => {
     setFetching(true);
     try {
-      // First try single student endpoint
       const res = await fetch(`${API_BASE_URL}/super-admin/students/${id}`, {
         headers: authHeader(),
       });
@@ -58,7 +104,9 @@ const StudentForm = () => {
         });
         if (allRes.ok) {
           const allStudents = await allRes.json();
-          const found = allStudents.find((s) => s._id === id || s.prn === id || s.prn === id.toUpperCase());
+          const found = allStudents.find(
+            (s) => s._id === id || s.prn === id || s.prn === id.toUpperCase()
+          );
           if (found) {
             populateStudentData(found);
           } else {
@@ -70,7 +118,10 @@ const StudentForm = () => {
       }
     } catch (err) {
       console.error('Error fetching student details:', err);
-      setFeedback({ type: 'error', message: 'Unable to connect to server to load student details.' });
+      setFeedback({
+        type: 'error',
+        message: 'Unable to connect to server to load student details.',
+      });
     } finally {
       setFetching(false);
     }
@@ -86,27 +137,49 @@ const StudentForm = () => {
       yearOfEnrollment: student.yearOfEnrollment || '',
       customFields: Array.isArray(student.customFields) ? student.customFields : [],
     });
+    // Pre-validate so errors show on load for already-invalid legacy data
+    // but only show them when the user touches the fields, so clear touched.
+    setFieldErrors({});
+    setTouched({});
   };
 
+  // ── onChange: update value + re-validate if already touched ───────────
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: name === 'prn' ? value.toUpperCase() : value,
-    }));
+    const newValue = name === 'prn' ? value.toUpperCase() : value;
+
+    setFormData((prev) => ({ ...prev, [name]: newValue }));
+
+    // Live-validate only for fields already touched (so errors clear as user types)
+    if (touched[name] && FIELD_VALIDATORS[name]) {
+      const err = FIELD_VALIDATORS[name](newValue);
+      setFieldErrors((prev) => ({ ...prev, [name]: err }));
+    }
   };
 
+  // ── onBlur: mark field as touched + validate immediately ──────────────
+  const handleBlur = (e) => {
+    const { name, value } = e.target;
+    setTouched((prev) => ({ ...prev, [name]: true }));
+    if (FIELD_VALIDATORS[name]) {
+      const err = FIELD_VALIDATORS[name](value);
+      setFieldErrors((prev) => ({ ...prev, [name]: err }));
+    }
+  };
+
+  // ── Custom fields ──────────────────────────────────────────────────────
   const handleAddCustomField = () => {
     if (!customFieldKey.trim() || !customFieldValue.trim()) {
-      setFeedback({ type: 'error', message: 'Please enter both key and value for custom field.' });
+      setFeedback({ type: 'error', message: 'Please enter both key and value for the custom field.' });
       return;
     }
-
     setFormData((prev) => ({
       ...prev,
-      customFields: [...prev.customFields, { key: customFieldKey.trim(), value: customFieldValue.trim() }],
+      customFields: [
+        ...prev.customFields,
+        { key: customFieldKey.trim(), value: customFieldValue.trim() },
+      ],
     }));
-
     setCustomFieldKey('');
     setCustomFieldValue('');
     setFeedback({ type: '', message: '' });
@@ -119,12 +192,35 @@ const StudentForm = () => {
     }));
   };
 
+  // ── Submit ─────────────────────────────────────────────────────────────
   const handleSubmit = async (e) => {
     e.preventDefault();
     setFeedback({ type: '', message: '' });
 
-    if (!formData.name || !formData.prn || !formData.class || !formData.degree || !formData.yearOfEnrollment) {
-      setFeedback({ type: 'error', message: 'Please fill in all required fields.' });
+    // Mark all validated fields as touched so every error is visible
+    setTouched({ name: true, prn: true, class: true, division: true, degree: true, yearOfEnrollment: true });
+
+    // Run full validation
+    const errors = validateStudentFields({
+      name: formData.name,
+      prn: formData.prn,
+      class: formData.class,
+      division: formData.division,
+      degree: formData.degree,
+      yearOfEnrollment: formData.yearOfEnrollment,
+    });
+
+    setFieldErrors(errors);
+
+    if (Object.keys(errors).length > 0) {
+      setFeedback({
+        type: 'error',
+        message: 'Please fix the highlighted errors before saving.',
+      });
+      // Scroll to first error field
+      const firstErrorField = Object.keys(errors)[0];
+      const el = document.getElementById(firstErrorField);
+      if (el) el.focus();
       return;
     }
 
@@ -140,7 +236,7 @@ const StudentForm = () => {
         headers: authHeader(),
         body: JSON.stringify({
           name: formData.name.trim(),
-          prn: formData.prn.trim(),
+          prn: formData.prn.trim().toUpperCase(),
           class: formData.class.trim(),
           division: formData.division.trim(),
           degree: formData.degree.trim(),
@@ -152,6 +248,14 @@ const StudentForm = () => {
       const data = await res.json();
 
       if (!res.ok) {
+        // If backend returned field-level errors, surface them
+        if (data.errors && Array.isArray(data.errors)) {
+          const beErrors = {};
+          data.errors.forEach(({ field, message }) => {
+            beErrors[field] = message;
+          });
+          setFieldErrors(beErrors);
+        }
         throw new Error(data.message || (isEditMode ? 'Failed to update student' : 'Failed to add student'));
       }
 
@@ -175,8 +279,14 @@ const StudentForm = () => {
     }
   };
 
+  // ── Helper: CSS class for inputs with errors ───────────────────────────
+  const inputClass = (field) =>
+    `form-input${fieldErrors[field] && touched[field] ? ' input-error' : ''}`;
+
+  // ── Render ─────────────────────────────────────────────────────────────
   return (
     <div className="page-container">
+      {/* Page header */}
       <div className="page-header" style={{ marginBottom: '1.5rem' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
           <button
@@ -200,6 +310,7 @@ const StudentForm = () => {
         </div>
       </div>
 
+      {/* Feedback banner */}
       {feedback.message && (
         <div
           className={`feedback-banner ${
@@ -219,11 +330,17 @@ const StudentForm = () => {
       <div className="card" style={{ maxWidth: '720px' }}>
         {fetching ? (
           <div style={{ padding: '3rem', textAlign: 'center', color: 'var(--text-secondary)' }}>
-            <Loader2 size={28} className="spin-animate" style={{ margin: '0 auto 0.75rem auto' }} />
+            <Loader2
+              size={28}
+              className="spin-animate"
+              style={{ margin: '0 auto 0.75rem auto' }}
+            />
             <p>Loading student details...</p>
           </div>
         ) : (
-          <form onSubmit={handleSubmit} className="form-layout">
+          <form onSubmit={handleSubmit} className="form-layout" noValidate>
+
+            {/* ── Row 1: Name + PRN ── */}
             <div className="form-row">
               <div className="form-group">
                 <label className="form-label" htmlFor="name">
@@ -233,12 +350,14 @@ const StudentForm = () => {
                   id="name"
                   name="name"
                   type="text"
-                  className="form-input"
+                  className={inputClass('name')}
                   placeholder="e.g. John Doe"
                   value={formData.name}
                   onChange={handleChange}
-                  required
+                  onBlur={handleBlur}
+                  autoComplete="off"
                 />
+                <FieldError message={touched.name ? fieldErrors.name : ''} />
               </div>
 
               <div className="form-group">
@@ -249,15 +368,19 @@ const StudentForm = () => {
                   id="prn"
                   name="prn"
                   type="text"
-                  className="form-input"
+                  className={inputClass('prn')}
                   placeholder="e.g. PRN2024001"
                   value={formData.prn}
                   onChange={handleChange}
-                  required
+                  onBlur={handleBlur}
+                  autoComplete="off"
+                  inputMode="text"
                 />
+                <FieldError message={touched.prn ? fieldErrors.prn : ''} />
               </div>
             </div>
 
+            {/* ── Row 2: Class + Division ── */}
             <div className="form-row">
               <div className="form-group">
                 <label className="form-label" htmlFor="class">
@@ -267,30 +390,36 @@ const StudentForm = () => {
                   id="class"
                   name="class"
                   type="text"
-                  className="form-input"
+                  className={inputClass('class')}
                   placeholder="e.g. First Year"
                   value={formData.class}
                   onChange={handleChange}
-                  required
+                  onBlur={handleBlur}
+                  autoComplete="off"
                 />
+                <FieldError message={touched.class ? fieldErrors.class : ''} />
               </div>
 
               <div className="form-group">
                 <label className="form-label" htmlFor="division">
-                  Division
+                  Division <span style={{ color: '#ef4444' }}>*</span>
                 </label>
                 <input
                   id="division"
                   name="division"
                   type="text"
-                  className="form-input"
+                  className={inputClass('division')}
                   placeholder="e.g. A, B, C"
                   value={formData.division}
                   onChange={handleChange}
+                  onBlur={handleBlur}
+                  autoComplete="off"
                 />
+                <FieldError message={touched.division ? fieldErrors.division : ''} />
               </div>
             </div>
 
+            {/* ── Row 3: Degree + Year of Enrollment ── */}
             <div className="form-row">
               <div className="form-group">
                 <label className="form-label" htmlFor="degree">
@@ -300,12 +429,14 @@ const StudentForm = () => {
                   id="degree"
                   name="degree"
                   type="text"
-                  className="form-input"
+                  className={inputClass('degree')}
                   placeholder="e.g. B.Tech Computer Science"
                   value={formData.degree}
                   onChange={handleChange}
-                  required
+                  onBlur={handleBlur}
+                  autoComplete="off"
                 />
+                <FieldError message={touched.degree ? fieldErrors.degree : ''} />
               </div>
 
               <div className="form-group">
@@ -316,22 +447,27 @@ const StudentForm = () => {
                   id="yearOfEnrollment"
                   name="yearOfEnrollment"
                   type="text"
-                  className="form-input"
+                  className={inputClass('yearOfEnrollment')}
                   placeholder="e.g. 2024"
                   value={formData.yearOfEnrollment}
                   onChange={handleChange}
-                  required
+                  onBlur={handleBlur}
+                  inputMode="numeric"
+                  maxLength={4}
+                  autoComplete="off"
                 />
+                <FieldError message={touched.yearOfEnrollment ? fieldErrors.yearOfEnrollment : ''} />
               </div>
             </div>
 
+            {/* ── Custom Fields ── */}
             <div className="form-section" style={{ marginTop: '2rem' }}>
               <h3 className="form-section-title">Custom Fields</h3>
-              
+
               <div className="custom-fields-input-row">
                 <div className="form-group" style={{ flex: 1 }}>
                   <label className="form-label" htmlFor="customFieldKey">
-                    Field Name/Key
+                    Field Name / Key
                   </label>
                   <input
                     id="customFieldKey"
@@ -392,6 +528,7 @@ const StudentForm = () => {
               )}
             </div>
 
+            {/* ── Actions ── */}
             <div className="form-actions-row" style={{ marginTop: '1.5rem' }}>
               <button
                 type="button"
@@ -401,7 +538,11 @@ const StudentForm = () => {
               >
                 Cancel
               </button>
-              <button type="submit" className="books-btn books-btn-primary" disabled={loading}>
+              <button
+                type="submit"
+                className="books-btn books-btn-primary"
+                disabled={loading}
+              >
                 {loading ? (
                   <>
                     <Loader2 size={16} className="spin-animate" />

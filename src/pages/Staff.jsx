@@ -18,8 +18,7 @@ import {
 } from 'lucide-react';
 import { exportStaff } from '../utils/exportUtils';
 
-const IS_PROD = window.location.hostname !== 'localhost';
-const API_BASE_URL = IS_PROD ? 'https://university-erp-node.onrender.com/api' : 'http://localhost:5000/api';
+const API_BASE_URL = 'http://localhost:5000/api';
 
 const Staff = () => {
   const navigate = useNavigate();
@@ -114,7 +113,7 @@ const Staff = () => {
   };
 
   const formatDate = (dateValue) => {
-    if (!dateValue) return 'â€”';
+    if (!dateValue) return '—';
     try {
       return new Date(dateValue).toISOString().slice(0, 10);
     } catch {
@@ -207,8 +206,9 @@ const Staff = () => {
             <Search size={16} className="search-icon" />
             <input
               type="text"
-              className="search-input"
-              placeholder="Search by Name, Staff ID, Email, Phone, or Role..."
+              className="search-input staff-search-input"
+              placeholder="Search by Name, Staff ID, Email, Phone or Role"
+              aria-label="Search staff by Name, Staff ID, Email, Phone or Role"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
             />

@@ -1,9 +1,16 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { ArrowLeft, Users, Save, AlertCircle, CheckCircle2, Loader2 } from 'lucide-react';
+import { ArrowLeft, Save, AlertCircle, CheckCircle2, Loader2 } from 'lucide-react';
+import {
+  validateName,
+  validateStaffId,
+  validateEmail,
+  validatePhone,
+  validateRole,
+  VALID_ROLES,
+} from '../utils/staffValidation';
 
-const IS_PROD = window.location.hostname !== 'localhost';
-const API_BASE_URL = IS_PROD ? 'https://university-erp-node.onrender.com/api' : 'http://localhost:5000/api';
+const API_BASE_URL = 'http://localhost:5000/api';
 
 const StaffForm = () => {
   const { id } = useParams();
@@ -13,6 +20,7 @@ const StaffForm = () => {
   const [loading, setLoading] = useState(false);
   const [fetching, setFetching] = useState(false);
   const [feedback, setFeedback] = useState({ type: '', message: '' });
+
   const [formData, setFormData] = useState({
     name: '',
     staffId: '',
@@ -26,6 +34,9 @@ const StaffForm = () => {
     ifscCode: '',
   });
 
+  // Per-field validation error messages
+  const [fieldErrors, setFieldErrors] = useState({});
+
   const authHeader = () => {
     const token = localStorage.getItem('erp_token');
     return {
@@ -38,12 +49,13 @@ const StaffForm = () => {
     if (isEditMode) {
       loadStaffDetails();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id]);
 
   const loadStaffDetails = async () => {
     setFetching(true);
     try {
-      // First try single staff endpoint
+      // Single staff endpoint — no fallback to full list fetch (performance fix)
       const res = await fetch(`${API_BASE_URL}/super-admin/staff/${id}`, {
         headers: authHeader(),
       });
@@ -52,21 +64,8 @@ const StaffForm = () => {
         const staff = await res.json();
         populateStaffData(staff);
       } else {
-        // Fallback: search all staff
-        const allRes = await fetch(`${API_BASE_URL}/super-admin/staff`, {
-          headers: authHeader(),
-        });
-        if (allRes.ok) {
-          const allStaff = await allRes.json();
-          const found = allStaff.find((s) => s._id === id || s.staffId === id || s.staffId === id.toUpperCase());
-          if (found) {
-            populateStaffData(found);
-          } else {
-            setFeedback({ type: 'error', message: 'Staff member not found.' });
-          }
-        } else {
-          setFeedback({ type: 'error', message: 'Failed to load staff details.' });
-        }
+        const data = await res.json().catch(() => ({}));
+        setFeedback({ type: 'error', message: data.message || 'Staff member not found.' });
       }
     } catch (err) {
       console.error('Error fetching staff details:', err);
@@ -98,22 +97,58 @@ const StaffForm = () => {
       accountNumber: staff.bankDetails?.accountNumber || '',
       ifscCode: staff.bankDetails?.ifscCode || '',
     });
+    setFieldErrors({});
   };
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: name === 'staffId' || name === 'ifscCode' ? value.toUpperCase() : value,
-    }));
+    const newValue =
+      name === 'staffId' || name === 'ifscCode' ? value.toUpperCase() : value;
+
+    setFormData((prev) => ({ ...prev, [name]: newValue }));
+
+    // Clear the field error as the user types / selects
+    if (fieldErrors[name]) {
+      setFieldErrors((prev) => ({ ...prev, [name]: '' }));
+    }
+  };
+
+  // Validate a single field on blur
+  const handleBlur = (e) => {
+    const { name, value } = e.target;
+    let err = '';
+    switch (name) {
+      case 'name':      err = validateName(value);    break;
+      case 'staffId':   err = validateStaffId(value); break;
+      case 'email':     err = validateEmail(value);   break;
+      case 'phone':     err = validatePhone(value);   break;
+      case 'role':      err = validateRole(value);    break;
+      default:          break;
+    }
+    setFieldErrors((prev) => ({ ...prev, [name]: err }));
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setFeedback({ type: '', message: '' });
 
-    if (!formData.name || !formData.staffId || !formData.email || !formData.phone || !formData.dateOfJoining || !formData.role) {
-      setFeedback({ type: 'error', message: 'Please fill in all required fields.' });
+    // Validate required fields
+    const errors = {
+      name:    validateName(formData.name),
+      staffId: validateStaffId(formData.staffId),
+      email:   validateEmail(formData.email),
+      phone:   validatePhone(formData.phone),
+      role:    validateRole(formData.role),
+    };
+
+    if (!formData.dateOfJoining) {
+      errors.dateOfJoining = 'Date of Joining is required.';
+    }
+
+    const hasErrors = Object.values(errors).some((e) => e !== '');
+    if (hasErrors) {
+      setFieldErrors(errors);
+      setFeedback({ type: 'error', message: 'Please fix the errors below before saving.' });
       return;
     }
 
@@ -131,7 +166,7 @@ const StaffForm = () => {
           name: formData.name.trim(),
           staffId: formData.staffId.trim(),
           email: formData.email.trim(),
-          phone: formData.phone.trim(),
+          phone: formData.phone.trim().replace(/\s/g, ''),
           dateOfJoining: formData.dateOfJoining,
           role: formData.role.trim(),
           bankDetails: {
@@ -146,7 +181,13 @@ const StaffForm = () => {
       const data = await res.json();
 
       if (!res.ok) {
-        throw new Error(data.message || (isEditMode ? 'Failed to update staff member' : 'Failed to add staff member'));
+        // Surface backend validation / uniqueness errors in the right field
+        if (data.validationErrors) {
+          setFieldErrors((prev) => ({ ...prev, ...data.validationErrors }));
+        }
+        throw new Error(
+          data.message || (isEditMode ? 'Failed to update staff member' : 'Failed to add staff member')
+        );
       }
 
       setFeedback({
@@ -168,6 +209,15 @@ const StaffForm = () => {
       setLoading(false);
     }
   };
+
+  // Helper: renders an inline error for a field
+  const FieldError = ({ field }) =>
+    fieldErrors[field] ? (
+      <span className="form-field-error" role="alert">
+        <AlertCircle size={13} />
+        {fieldErrors[field]}
+      </span>
+    ) : null;
 
   return (
     <div className="page-container">
@@ -210,17 +260,19 @@ const StaffForm = () => {
         </div>
       )}
 
-      <div className="card" style={{ maxWidth: '720px' }}>
+      {/* staff-form wrapper keeps all content within the card width on mobile */}
+      <div className="card staff-form-card">
         {fetching ? (
           <div style={{ padding: '3rem', textAlign: 'center', color: 'var(--text-secondary)' }}>
             <Loader2 size={28} className="spin-animate" style={{ margin: '0 auto 0.75rem auto' }} />
             <p>Loading staff details...</p>
           </div>
         ) : (
-          <form onSubmit={handleSubmit} className="form-layout">
+          <form onSubmit={handleSubmit} className="form-layout" noValidate>
+            {/* ── Personal Information ── */}
             <div className="form-section">
               <h3 className="form-section-title">Personal Information</h3>
-              
+
               <div className="form-row">
                 <div className="form-group">
                   <label className="form-label" htmlFor="name">
@@ -230,12 +282,14 @@ const StaffForm = () => {
                     id="name"
                     name="name"
                     type="text"
-                    className="form-input"
+                    className={`form-input${fieldErrors.name ? ' input-error' : ''}`}
                     placeholder="e.g. Jane Smith"
                     value={formData.name}
                     onChange={handleChange}
-                    required
+                    onBlur={handleBlur}
+                    autoComplete="off"
                   />
+                  <FieldError field="name" />
                 </div>
 
                 <div className="form-group">
@@ -246,12 +300,14 @@ const StaffForm = () => {
                     id="staffId"
                     name="staffId"
                     type="text"
-                    className="form-input"
+                    className={`form-input${fieldErrors.staffId ? ' input-error' : ''}`}
                     placeholder="e.g. STF2024001"
                     value={formData.staffId}
                     onChange={handleChange}
-                    required
+                    onBlur={handleBlur}
+                    autoComplete="off"
                   />
+                  <FieldError field="staffId" />
                 </div>
               </div>
 
@@ -264,12 +320,14 @@ const StaffForm = () => {
                     id="email"
                     name="email"
                     type="email"
-                    className="form-input"
+                    className={`form-input${fieldErrors.email ? ' input-error' : ''}`}
                     placeholder="e.g. jane.smith@university.edu"
                     value={formData.email}
                     onChange={handleChange}
-                    required
+                    onBlur={handleBlur}
+                    autoComplete="off"
                   />
+                  <FieldError field="email" />
                 </div>
 
                 <div className="form-group">
@@ -280,52 +338,72 @@ const StaffForm = () => {
                     id="phone"
                     name="phone"
                     type="tel"
-                    className="form-input"
-                    placeholder="e.g. +91 9876543210"
+                    inputMode="numeric"
+                    maxLength={10}
+                    className={`form-input${fieldErrors.phone ? ' input-error' : ''}`}
+                    placeholder="e.g. 9876543210"
                     value={formData.phone}
                     onChange={handleChange}
-                    required
+                    onBlur={handleBlur}
+                    autoComplete="off"
                   />
+                  <FieldError field="phone" />
                 </div>
               </div>
 
               <div className="form-row">
+                {/* Date of Joining — show a visible text hint on mobile
+                    because <input type="date"> hides its placeholder on iOS/Android.
+                    We use a wrapper with a data-placeholder attribute handled in CSS. */}
                 <div className="form-group">
                   <label className="form-label" htmlFor="dateOfJoining">
                     Date of Joining <span style={{ color: '#ef4444' }}>*</span>
                   </label>
-                  <input
-                    id="dateOfJoining"
-                    name="dateOfJoining"
-                    type="date"
-                    className="form-input"
-                    value={formData.dateOfJoining}
-                    onChange={handleChange}
-                    required
-                  />
+                  <div
+                    className={`date-input-wrapper${!formData.dateOfJoining ? ' date-empty' : ''}`}
+                    data-placeholder="DD-MM-YYYY"
+                  >
+                    <input
+                      id="dateOfJoining"
+                      name="dateOfJoining"
+                      type="date"
+                      className={`form-input${fieldErrors.dateOfJoining ? ' input-error' : ''}`}
+                      value={formData.dateOfJoining}
+                      onChange={handleChange}
+                      onBlur={handleBlur}
+                    />
+                  </div>
+                  <FieldError field="dateOfJoining" />
                 </div>
 
                 <div className="form-group">
                   <label className="form-label" htmlFor="role">
                     Role <span style={{ color: '#ef4444' }}>*</span>
                   </label>
-                  <input
+                  <select
                     id="role"
                     name="role"
-                    type="text"
-                    className="form-input"
-                    placeholder="e.g. Professor, Lecturer, Admin"
+                    className={`form-input${fieldErrors.role ? ' input-error' : ''}`}
                     value={formData.role}
                     onChange={handleChange}
-                    required
-                  />
+                    onBlur={handleBlur}
+                  >
+                    <option value="">— Select Role —</option>
+                    {VALID_ROLES.map((r) => (
+                      <option key={r} value={r}>
+                        {r}
+                      </option>
+                    ))}
+                  </select>
+                  <FieldError field="role" />
                 </div>
               </div>
             </div>
 
+            {/* ── Bank Details ── */}
             <div className="form-section" style={{ marginTop: '2rem' }}>
               <h3 className="form-section-title">Bank Details</h3>
-              
+
               <div className="form-row">
                 <div className="form-group">
                   <label className="form-label" htmlFor="bankName">

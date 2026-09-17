@@ -191,7 +191,7 @@ const ForgotPassword = () => {
                   id="recovery-identifier"
                   type="text"
                   className="form-input"
-                  placeholder="e.g. superadmin@university.edu or PRN2026001"
+                  placeholder="Enter Email Id or PRN Number"
                   value={identifier}
                   onChange={(e) => setIdentifier(e.target.value)}
                   autoFocus
@@ -222,14 +222,6 @@ const ForgotPassword = () => {
                 <label className="form-label" htmlFor="otp-input">
                   6-Digit OTP Verification
                 </label>
-                <button
-                  type="button"
-                  className="resend-otp-btn"
-                  onClick={handleResendOtp}
-                  disabled={resending || loading}
-                >
-                  {resending ? 'Resending...' : 'Resend OTP'}
-                </button>
               </div>
               <div className="input-wrapper">
                 <ShieldCheck size={18} className="input-icon" />
@@ -245,9 +237,16 @@ const ForgotPassword = () => {
                   required
                 />
               </div>
-              {/* <span className="input-help">
-                Test OTP for verification is <strong>000000</strong>
-              </span> */}
+              <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '0.35rem' }}>
+                <button
+                  type="button"
+                  className="resend-otp-btn"
+                  onClick={handleResendOtp}
+                  disabled={resending || loading}
+                >
+                  {resending ? 'Resending...' : 'Resend OTP'}
+                </button>
+              </div>
             </div>
 
             <div className="form-group">
@@ -267,12 +266,13 @@ const ForgotPassword = () => {
                 />
                 <button
                   type="button"
-                  className="input-action-btn"
+                  className="password-toggle-btn"
                   onClick={() => setShowNewPassword(!showNewPassword)}
                   title={showNewPassword ? 'Hide password' : 'Show password'}
+                  aria-label={showNewPassword ? 'Hide password' : 'Show password'}
                   tabIndex={-1}
                 >
-                  {showNewPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                  {showNewPassword ? <Eye size={18} /> : <EyeOff size={18} />}
                 </button>
               </div>
             </div>
@@ -306,12 +306,13 @@ const ForgotPassword = () => {
                 />
                 <button
                   type="button"
-                  className="input-action-btn"
+                  className="password-toggle-btn"
                   onClick={() => setShowRetypePassword(!showRetypePassword)}
                   title={showRetypePassword ? 'Hide password' : 'Show password'}
+                  aria-label={showRetypePassword ? 'Hide password' : 'Show password'}
                   tabIndex={-1}
                 >
-                  {showRetypePassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                  {showRetypePassword ? <Eye size={18} /> : <EyeOff size={18} />}
                 </button>
               </div>
             </div>

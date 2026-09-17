@@ -1,9 +1,11 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Users, GraduationCap, Building2, UserPlus, ChevronDown, Loader2 } from 'lucide-react';
+import { Users, GraduationCap, Building2, UserPlus, ChevronDown, Loader2, Trophy } from 'lucide-react';
 
-const IS_PROD = window.location.hostname !== 'localhost';
-const API_BASE_URL = IS_PROD ? 'https://university-erp-node.onrender.com/api' : 'http://localhost:5000/api';
+// Students, staff, departments → Node/Express backend
+const API_BASE_URL = 'http://localhost:5000/api';
+// Clubs → Spring Boot backend
+const SPRING_API_URL = 'http://localhost:8080/api';
 
 const SuperAdminDashboard = () => {
   const navigate = useNavigate();
@@ -42,26 +44,30 @@ const SuperAdminDashboard = () => {
   const fetchDashboardStats = async () => {
     setLoading(true);
     try {
-      const res = await fetch(`${API_BASE_URL}/super-admin/stats`, {
-        headers: authHeader(),
-      });
-      if (res.ok) {
-        const data = await res.json();
-        setStats({
-          totalStudents: data.stats?.totalStudents || 0,
-          totalStaff: data.stats?.totalStaff || 0,
-          activeDepartments: data.stats?.totalDepartments || 0,
-          activeClubs: 0,
-        });
+      const [statsRes, clubsRes] = await Promise.all([
+        fetch(`${API_BASE_URL}/super-admin/stats`, { headers: authHeader() }),
+        fetch(`${SPRING_API_URL}/clubs`),
+      ]);
+
+      let totalStudents = 0, totalStaff = 0, activeDepartments = 0, activeClubs = 0;
+
+      if (statsRes.ok) {
+        const data = await statsRes.json();
+        totalStudents = data.stats?.totalStudents || 0;
+        totalStaff = data.stats?.totalStaff || 0;
+        activeDepartments = data.stats?.totalDepartments || 0;
       }
+
+      if (clubsRes.ok) {
+        const clubsData = await clubsRes.json();
+        const clubsArray = Array.isArray(clubsData) ? clubsData : [];
+        activeClubs = clubsArray.filter((c) => c.status === 'Active').length;
+      }
+
+      setStats({ totalStudents, totalStaff, activeDepartments, activeClubs });
     } catch (err) {
       console.warn('Failed to fetch stats, using fallback:', err);
-      setStats({
-        totalStudents: 0,
-        totalStaff: 0,
-        activeDepartments: 0,
-        activeClubs: 0,
-      });
+      setStats({ totalStudents: 0, totalStaff: 0, activeDepartments: 0, activeClubs: 0 });
     } finally {
       setLoading(false);
     }
@@ -93,7 +99,7 @@ const SuperAdminDashboard = () => {
       id: 'clubs',
       label: 'Active Clubs',
       value: stats.activeClubs,
-      icon: UserPlus,
+      icon: Trophy,
       color: '#6b7280',
     },
   ];
@@ -160,6 +166,7 @@ const SuperAdminDashboard = () => {
               students: '/students',
               staff: '/staff',
               departments: '/departments',
+              clubs: '/clubs',
             };
             const route = cardRouteMap[card.id];
             const isClickable = Boolean(route);
