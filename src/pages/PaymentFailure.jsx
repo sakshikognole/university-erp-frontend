@@ -1,4 +1,4 @@
----import React from 'react';
+import React from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import {
   AlertOctagon,
@@ -94,7 +94,7 @@ const PaymentFailure = () => {
               Attempted Amount
             </div>
             <div style={{ fontSize: '1.25rem', fontWeight: 800, color: '#dc2626', marginTop: '2px' }}>
-              -------{(failureData.attemptedAmount || 0).toLocaleString('en-IN')}
+              ₹{(failureData.attemptedAmount || 0).toLocaleString('en-IN')}
             </div>
           </div>
 

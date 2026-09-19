@@ -1,4 +1,4 @@
----import { springApi } from '../services/api';
+import { springApi } from '../services/api';
 import { useState, useEffect } from 'react';
 
 const EMPTY = {
@@ -77,7 +77,7 @@ export default function TeamForm({ isOpen, mode, team, onSave, onClose, loading 
 
     if (!form.sportId) e.sportId = 'Sport is required.';
 
-    // Coach Name: letters, spaces and dots only -----" no numbers, no alphanumeric combos, no special chars
+    // Coach Name: letters, spaces and dots only — no numbers, no alphanumeric combos, no special chars
     const nameRegex = /^[A-Za-z\s.]+$/;
     if (!form.coachName.trim()) {
       e.coachName = 'Coach Name is required.';
@@ -140,7 +140,7 @@ export default function TeamForm({ isOpen, mode, team, onSave, onClose, loading 
                   value={form.sportId}
                   onChange={handleSportChange}
                 >
-                  <option value="">-----" Select Sport -----"</option>
+                  <option value="">— Select Sport —</option>
                   {sports.map((s) => (
                     <option key={s.sportId} value={s.sportId}>
                       {s.sportName}

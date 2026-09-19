@@ -1,4 +1,4 @@
----/**
+/**
  * PmOtpPage.jsx
  *
  * Route-level wrapper for the OTP step of the Password Management flow.
@@ -25,25 +25,25 @@ const PmOtpPage = () => {
   const state = location.state || {};
   const { flow, pendingPassword } = state;
 
-  // Guard -----" cannot land here without a valid flow in location state.
+  // Guard — cannot land here without a valid flow in location state.
   if (!flow || (flow !== 'firsttime' && flow !== 'login')) {
     return <Navigate to="/password-management" replace />;
   }
 
-  // --"-----"--- Step config mirrors PasswordManagementPage --"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"---
+  // ── Step config mirrors PasswordManagementPage ──────────────────────────
   const firstTimeSteps = ['Setup', 'OTP', 'Done'];
   const loginSteps     = ['OTP', 'New Password', 'Done'];
 
   const steps       = flow === 'firsttime' ? firstTimeSteps : loginSteps;
   const currentStep = 2; // OTP is always step 2 in both flows
 
-  // --"-----"--- Navigation callbacks --"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"---
+  // ── Navigation callbacks ─────────────────────────────────────────────────
   const handleSuccess = () => {
     if (flow === 'firsttime') {
-      // firsttime: OTP screen already saved the password -----' go to success
+      // firsttime: OTP screen already saved the password → go to success
       navigate('/password-management', { state: { screen: 'success', completedFlow: 'firsttime' } });
     } else {
-      // login: OTP verified -----' proceed to new-password screen
+      // login: OTP verified → proceed to new-password screen
       navigate('/password-management', { state: { screen: 'login-newpassword' } });
     }
   };

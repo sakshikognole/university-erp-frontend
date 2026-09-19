@@ -1,4 +1,4 @@
----import React from 'react';
+import React from 'react';
 import { Navigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { Loader2 } from 'lucide-react';
@@ -8,7 +8,7 @@ const SuperAdminRoute = ({ children }) => {
 
     // DEF-001 / DEF-002 / DEF-015: Return a centred spinner while the token
     // expiry check is still running. Returning null caused a completely blank
-    // page on browser refresh and on mobile "Desktop View" switches -----" the
+    // page on browser refresh and on mobile "Desktop View" switches — the
     // DashboardLayout shell disappeared because its parent ProtectedRoute was
     // also null, producing a fully blank viewport until auth settled.
     if (authLoading) {

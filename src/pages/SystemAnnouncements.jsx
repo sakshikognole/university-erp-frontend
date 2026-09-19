@@ -1,4 +1,4 @@
----import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   BellRing,
@@ -139,7 +139,7 @@ const SystemAnnouncements = () => {
   };
 
   const formatDate = (dateStr) => {
-    if (!dateStr) return '-----"';
+    if (!dateStr) return '—';
     try {
       return new Date(dateStr).toLocaleDateString('en-IN', {
         day: '2-digit',
@@ -147,7 +147,7 @@ const SystemAnnouncements = () => {
         year: 'numeric',
       });
     } catch {
-      return '-----"';
+      return '—';
     }
   };
 
@@ -155,7 +155,7 @@ const SystemAnnouncements = () => {
 
   return (
     <div className="page-container">
-      {/* --"-----"--- Page Header --"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"--- */}
+      {/* ── Page Header ─────────────────────────────────────────────────────── */}
       <div className="page-header-row">
         <div>
           <h1 className="page-title">System Announcements</h1>
@@ -176,7 +176,7 @@ const SystemAnnouncements = () => {
         </div>
       </div>
 
-      {/* --"-----"--- Feedback Banner --"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"--- */}
+      {/* ── Feedback Banner ──────────────────────────────────────────────────── */}
       {feedback.message && (
         <div
           className={`feedback-banner ${feedback.type === 'success' ? 'feedback-success' : 'feedback-error'}`}
@@ -194,7 +194,7 @@ const SystemAnnouncements = () => {
         </div>
       )}
 
-      {/* --"-----"--- Table Card --"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"--- */}
+      {/* ── Table Card ───────────────────────────────────────────────────────── */}
       <div className="card table-card" style={{ marginTop: '1.25rem' }}>
         {/* Controls bar */}
         <div className="table-controls-bar">
@@ -380,7 +380,7 @@ const SystemAnnouncements = () => {
         </div>
       </div>
 
-      {/* --"-----"--- Delete Confirm Modal --"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"--- */}
+      {/* ── Delete Confirm Modal ─────────────────────────────────────────────── */}
       {deleteConfirm && (
         <div className="modal-overlay" onClick={() => !deleting && setDeleteConfirm(null)}>
           <div className="modal-content delete-dialog" onClick={(e) => e.stopPropagation()}>

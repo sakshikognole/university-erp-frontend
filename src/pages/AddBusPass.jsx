@@ -1,4 +1,4 @@
----import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import {
   ArrowLeft,
@@ -466,7 +466,7 @@ const AddBusPass = () => {
                     >
                       <UserCheck size={15} />
                       <span>
-                        <strong>{studentInfo.name}</strong> ------- {studentInfo.degree || 'Student'} ({studentInfo.class || 'Enrolled'})
+                        <strong>{studentInfo.name}</strong> • {studentInfo.degree || 'Student'} ({studentInfo.class || 'Enrolled'})
                       </span>
                     </div>
                   )}

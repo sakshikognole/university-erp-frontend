@@ -1,4 +1,4 @@
----export default function ViewSportTeamModal({ isOpen, team, onClose }) {
+export default function ViewSportTeamModal({ isOpen, team, onClose }) {
   if (!isOpen || !team) return null;
 
   const badgeStyle = team.status === 'ACTIVE'
@@ -7,7 +7,7 @@
 
   return (
     <div className="books-overlay">
-      {/* Defect 2: modal width 100% on mobile, max 520px on desktop -----" no horizontal scroll */}
+      {/* Defect 2: modal width 100% on mobile, max 520px on desktop — no horizontal scroll */}
       <div className="books-modal" style={{
         maxWidth: 520,
         width: '95%',
@@ -17,7 +17,7 @@
 
         <div className="books-modal-head">
           <h3>Team Details</h3>
-          <button className="books-modal-close" onClick={onClose}>---</button>
+          <button className="books-modal-close" onClick={onClose}>×</button>
         </div>
 
         <div className="books-modal-body">
@@ -40,7 +40,7 @@
             {team.teamName}
           </h2>
 
-          {/* Details -----" stacked rows, no horizontal overflow */}
+          {/* Details — stacked rows, no horizontal overflow */}
           <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.87rem' }}>
             <tbody>
               {[

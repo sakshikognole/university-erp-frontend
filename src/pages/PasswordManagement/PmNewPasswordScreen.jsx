@@ -1,7 +1,7 @@
----/**
+/**
  * PmNewPasswordScreen.jsx
  *
- * Normal Login flow -----" final step.
+ * Normal Login flow — final step.
  * Shows ONLY New Password + Retype Password (no current password field).
  *
  * Appears after OTP has been verified for the 'login' flow.
@@ -29,12 +29,12 @@ const PmNewPasswordScreen = ({ flow, steps, currentStep, onSuccess, onBack }) =>
   const [loading, setLoading]               = useState(false);
   const [error, setError]                   = useState('');
 
-  // --"-----"--- Real-time match state --"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"---
+  // ── Real-time match state ─────────────────────────────────────────────────
   const retypeTouched     = retypePassword.length > 0;
   const passwordsMatch    = retypeTouched && newPassword === retypePassword;
   const passwordsMismatch = retypeTouched && newPassword !== retypePassword;
 
-  // --"-----"--- Validation --"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"---
+  // ── Validation ────────────────────────────────────────────────────────────
   const validate = () => {
     if (!newPassword) return 'New password cannot be empty.';
     if (newPassword.length < 6) return 'New password must be at least 6 characters.';
@@ -77,7 +77,7 @@ const PmNewPasswordScreen = ({ flow, steps, currentStep, onSuccess, onBack }) =>
           <Lock size={32} />
         </div>
         <h1 className="auth-title">Set New Password</h1>
-        <p className="auth-subtitle">OTP verified -----" choose your new password</p>
+        <p className="auth-subtitle">OTP verified — choose your new password</p>
       </div>
 
       {/* Step indicator */}

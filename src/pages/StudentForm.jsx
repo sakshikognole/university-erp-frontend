@@ -1,4 +1,4 @@
----import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import {
   ArrowLeft,
@@ -24,7 +24,7 @@ const _NODE_URL = _IS_PROD ? 'https://university-erp-node.onrender.com' : 'http:
 const API_BASE_URL = `${_NODE_URL}/api`;
 
 // ---------------------------------------------------------------------------
-// FieldError -----" small red helper text shown beneath an invalid input
+// FieldError — small red helper text shown beneath an invalid input
 // ---------------------------------------------------------------------------
 const FieldError = ({ message }) =>
   message ? (
@@ -35,7 +35,7 @@ const FieldError = ({ message }) =>
   ) : null;
 
 // ---------------------------------------------------------------------------
-// StudentForm -----" used for both Add (/add-student) and Edit (/students/edit/:id)
+// StudentForm — used for both Add (/add-student) and Edit (/students/edit/:id)
 // ---------------------------------------------------------------------------
 const StudentForm = () => {
   const { id } = useParams();
@@ -64,7 +64,7 @@ const StudentForm = () => {
   const [customFieldKey, setCustomFieldKey] = useState('');
   const [customFieldValue, setCustomFieldValue] = useState('');
 
-  // --"-----"--- Validators per field name --"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"---
+  // ── Validators per field name ──────────────────────────────────────────
   const FIELD_VALIDATORS = {
     name: validateName,
     prn: validatePRN,
@@ -145,7 +145,7 @@ const StudentForm = () => {
     setTouched({});
   };
 
-  // --"-----"--- onChange: update value + re-validate if already touched --"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"---
+  // ── onChange: update value + re-validate if already touched ───────────
   const handleChange = (e) => {
     const { name, value } = e.target;
     const newValue = name === 'prn' ? value.toUpperCase() : value;
@@ -159,7 +159,7 @@ const StudentForm = () => {
     }
   };
 
-  // --"-----"--- onBlur: mark field as touched + validate immediately --"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"---
+  // ── onBlur: mark field as touched + validate immediately ──────────────
   const handleBlur = (e) => {
     const { name, value } = e.target;
     setTouched((prev) => ({ ...prev, [name]: true }));
@@ -169,7 +169,7 @@ const StudentForm = () => {
     }
   };
 
-  // --"-----"--- Custom fields --"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"---
+  // ── Custom fields ──────────────────────────────────────────────────────
   const handleAddCustomField = () => {
     if (!customFieldKey.trim() || !customFieldValue.trim()) {
       setFeedback({ type: 'error', message: 'Please enter both key and value for the custom field.' });
@@ -194,7 +194,7 @@ const StudentForm = () => {
     }));
   };
 
-  // --"-----"--- Submit --"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"---
+  // ── Submit ─────────────────────────────────────────────────────────────
   const handleSubmit = async (e) => {
     e.preventDefault();
     setFeedback({ type: '', message: '' });
@@ -281,11 +281,11 @@ const StudentForm = () => {
     }
   };
 
-  // --"-----"--- Helper: CSS class for inputs with errors --"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"---
+  // ── Helper: CSS class for inputs with errors ───────────────────────────
   const inputClass = (field) =>
     `form-input${fieldErrors[field] && touched[field] ? ' input-error' : ''}`;
 
-  // --"-----"--- Render --"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"---
+  // ── Render ─────────────────────────────────────────────────────────────
   return (
     <div className="page-container">
       {/* Page header */}
@@ -342,7 +342,7 @@ const StudentForm = () => {
         ) : (
           <form onSubmit={handleSubmit} className="form-layout" noValidate>
 
-            {/* --"-----"--- Row 1: Name + PRN --"-----"--- */}
+            {/* ── Row 1: Name + PRN ── */}
             <div className="form-row">
               <div className="form-group">
                 <label className="form-label" htmlFor="name">
@@ -382,7 +382,7 @@ const StudentForm = () => {
               </div>
             </div>
 
-            {/* --"-----"--- Row 2: Class + Division --"-----"--- */}
+            {/* ── Row 2: Class + Division ── */}
             <div className="form-row">
               <div className="form-group">
                 <label className="form-label" htmlFor="class">
@@ -421,7 +421,7 @@ const StudentForm = () => {
               </div>
             </div>
 
-            {/* --"-----"--- Row 3: Degree + Year of Enrollment --"-----"--- */}
+            {/* ── Row 3: Degree + Year of Enrollment ── */}
             <div className="form-row">
               <div className="form-group">
                 <label className="form-label" htmlFor="degree">
@@ -462,7 +462,7 @@ const StudentForm = () => {
               </div>
             </div>
 
-            {/* --"-----"--- Custom Fields --"-----"--- */}
+            {/* ── Custom Fields ── */}
             <div className="form-section" style={{ marginTop: '2rem' }}>
               <h3 className="form-section-title">Custom Fields</h3>
 
@@ -530,7 +530,7 @@ const StudentForm = () => {
               )}
             </div>
 
-            {/* --"-----"--- Actions --"-----"--- */}
+            {/* ── Actions ── */}
             <div className="form-actions-row" style={{ marginTop: '1.5rem' }}>
               <button
                 type="button"

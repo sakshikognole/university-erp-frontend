@@ -1,4 +1,4 @@
----import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import {
   ArrowLeft,
@@ -327,7 +327,7 @@ const EventNoticeView = () => {
               <div className="detail-subtext">
                 <Clock size={14} style={{ display: 'inline', marginRight: '4px' }} />
                 {event.eventTime}
-                {event.duration && ` ------- ${event.duration}`}
+                {event.duration && ` • ${event.duration}`}
               </div>
             </div>
           </div>
@@ -537,7 +537,7 @@ const EventNoticeView = () => {
               <div>
                 <div className="delete-item-name">{event.title}</div>
                 <div style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', marginTop: '0.2rem' }}>
-                  {event.category} ------- {event.venue?.name}
+                  {event.category} • {event.venue?.name}
                 </div>
               </div>
               <span className="delete-item-code">{event.eventId}</span>

@@ -1,4 +1,4 @@
----import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   Briefcase, Plus, Download, Search, ChevronDown, FileText, FileSpreadsheet,
@@ -10,7 +10,7 @@ const _IS_PROD = window.location.hostname !== 'localhost';
 const _NODE_URL = _IS_PROD ? 'https://university-erp-node.onrender.com' : 'http://localhost:5000';
 const API_BASE_URL = `${_NODE_URL}/api`;
 
-// --"-----"--- Export helpers --"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"---
+// ── Export helpers ─────────────────────────────────────────────────────────────
 const triggerDownload = (content, filename, mimeType) => {
   const blob = new Blob([content], { type: mimeType });
   const url = URL.createObjectURL(blob);
@@ -32,7 +32,7 @@ const exportCSV = (rows) => {
 const exportTXT = (rows) => {
   const sep = '='.repeat(100);
   const lines = [
-    'UNIVERSITY ERP -----" ALUMNI JOB POSTINGS', `Generated: ${new Date().toLocaleString()}   Total: ${rows.length}`, sep,
+    'UNIVERSITY ERP — ALUMNI JOB POSTINGS', `Generated: ${new Date().toLocaleString()}   Total: ${rows.length}`, sep,
     'JOB ID     ALUMNI ID  COMPANY                  ROLE                     STATUS   EXPIRY',
     '-'.repeat(100),
     ...rows.map(j =>
@@ -64,7 +64,7 @@ const exportPDF = (rows) => {
   </body></html>`;
   const w = window.open('','_blank'); w.document.write(html); w.document.close(); w.print();
 };
-// --"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"---
+// ─────────────────────────────────────────────────────────────────────────────
 
 const getJobStatus = (job) => {
   if (!job.dateOfExpiry) return 'ACTIVE';
@@ -144,7 +144,7 @@ const AlumniJobs = () => {
   const startIndex = (currentPage - 1) * itemsPerPage;
   const current = filtered.slice(startIndex, startIndex + itemsPerPage);
 
-  const fmtDate = (d) => d ? new Date(d).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' }) : '-----"';
+  const fmtDate = (d) => d ? new Date(d).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' }) : '—';
   const isExpired = (d) => d && new Date(d) < new Date();
 
   return (
@@ -269,7 +269,7 @@ const AlumniJobs = () => {
                             Apply
                           </a>
                         ) : (
-                          <span style={{ color: 'var(--text-secondary)', fontSize: '0.8125rem' }}>-----"</span>
+                          <span style={{ color: 'var(--text-secondary)', fontSize: '0.8125rem' }}>—</span>
                         )}
                       </td>
                       <td style={{ textAlign: 'right' }}>

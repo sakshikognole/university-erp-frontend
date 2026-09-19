@@ -1,4 +1,4 @@
----/**
+/**
  * staffValidation.js  (frontend)
  * Shared validation rules for the Staff module.
  * Used by StaffForm (Add/Edit).
@@ -6,31 +6,31 @@
  */
 
 // ---------------------------------------------------------------------------
-// Staff ID -----" must match "STF" + 4-digit year + 3-digit sequence
+// Staff ID — must match "STF" + 4-digit year + 3-digit sequence
 // e.g. STF2024001
 // ---------------------------------------------------------------------------
 export const STAFF_ID_REGEX = /^STF\d{4}\d{3}$/i;
 
 // ---------------------------------------------------------------------------
-// Name -----" letters (including Unicode), spaces, hyphens, apostrophes, dots.
+// Name — letters (including Unicode), spaces, hyphens, apostrophes, dots.
 // Must have at least two words (first + last name).
 // ---------------------------------------------------------------------------
 export const NAME_VALID_CHARS_REGEX = /^[A-Za-z\u00C0-\u024F\u1E00-\u1EFF'. -]+$/;
 
 // ---------------------------------------------------------------------------
-// Email -----" local part: letters/digits/._+-, domain: letters/digits/hyphens,
+// Email — local part: letters/digits/._+-, domain: letters/digits/hyphens,
 // TLD: 2-6 letters. Rejects pure-numeric local parts longer than 15 digits.
 // ---------------------------------------------------------------------------
 export const EMAIL_REGEX = /^[A-Za-z0-9._%+\-]{1,64}@[A-Za-z0-9.\-]+\.[A-Za-z]{2,6}$/;
 const EMAIL_LOCAL_INVALID_CHARS = /[^A-Za-z0-9._%+\-]/;
 
 // ---------------------------------------------------------------------------
-// Phone -----" exactly 10 digits, first digit 6-----"9 (Indian mobile)
+// Phone — exactly 10 digits, first digit 6–9 (Indian mobile)
 // ---------------------------------------------------------------------------
 export const PHONE_REGEX = /^[6-9]\d{9}$/;
 
 // ---------------------------------------------------------------------------
-// Valid roles -----" must match the existing values accepted by the Staff module.
+// Valid roles — must match the existing values accepted by the Staff module.
 // ---------------------------------------------------------------------------
 export const VALID_ROLES = [
   'Professor',
@@ -122,7 +122,7 @@ export function validatePhone(raw) {
 
   if (!/^\d+$/.test(phone)) return 'Phone number must contain only digits.';
   if (phone.length !== 10) return 'Phone number must be exactly 10 digits.';
-  if (!PHONE_REGEX.test(phone)) return 'Enter a valid 10-digit Indian mobile number (starts with 6-----"9).';
+  if (!PHONE_REGEX.test(phone)) return 'Enter a valid 10-digit Indian mobile number (starts with 6–9).';
 
   return '';
 }
@@ -139,7 +139,7 @@ export function validateRole(raw) {
 }
 
 // ---------------------------------------------------------------------------
-// validateStaffFields -----" validate all required fields at once
+// validateStaffFields — validate all required fields at once
 // Returns { fieldName: errorMessage }. Empty object = all valid.
 // ---------------------------------------------------------------------------
 export function validateStaffFields({ name, staffId, email, phone, role }) {

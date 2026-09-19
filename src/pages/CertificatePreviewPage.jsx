@@ -1,4 +1,4 @@
----import { useLocation, useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import CertificatePreview from '../components/student/CertificatePreview';
 
 function resolveContent(template, student) {
@@ -42,7 +42,7 @@ export default function CertificatePreviewPage() {
     <div className="page-container">
       <h1 className="page-title">Certificate Preview</h1>
       <p className="stu-page-sub">
-        {student.studentName}{docType ? ` -----" ${docType}` : ''}
+        {student.studentName}{docType ? ` — ${docType}` : ''}
       </p>
 
       <div className="card stu-form-card" style={{ maxWidth: 800 }}>

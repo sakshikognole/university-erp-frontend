@@ -1,4 +1,4 @@
----import React, { useState, useEffect, useCallback, useRef } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import bookService from '../services/bookService';
 import PageLoader from '../components/PageLoader';
 import PageError  from '../components/PageError';
@@ -13,7 +13,7 @@ const DEFAULT_PAGE = {
   totalPages: 0, first: true, last: true,
 };
 
-// --"-----"--- Mobile accordion card -----" shown only on small screens via CSS --"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"---
+// ── Mobile accordion card — shown only on small screens via CSS ──────────────
 function BookMobileCard({ book, index, page, size, isExpanded, onToggle, onView, onEdit, onDel }) {
   return (
     <div className="book-mob-card">
@@ -31,7 +31,7 @@ function BookMobileCard({ book, index, page, size, isExpanded, onToggle, onView,
             <span className="book-mob-author">{book.authorName}</span>
           </div>
         </div>
-        <span className="book-mob-chevron">{isExpanded ? '-----' : '-----'}</span>
+        <span className="book-mob-chevron">{isExpanded ? '▲' : '▼'}</span>
       </button>
 
       {/* Expanded details */}
@@ -39,7 +39,7 @@ function BookMobileCard({ book, index, page, size, isExpanded, onToggle, onView,
         <div className="book-mob-details">
           <div className="book-mob-row">
             <span className="book-mob-label">Book ID</span>
-            <span className="book-mob-value mono">{book.bookId || '-----"'}</span>
+            <span className="book-mob-value mono">{book.bookId || '—'}</span>
           </div>
           <div className="book-mob-row">
             <span className="book-mob-label">Total Copies</span>
@@ -90,7 +90,7 @@ export default function BooksPage() {
   const notify  = (type, message) => setAlert({ type, message });
   const dismiss = () => setAlert({ type: '', message: '' });
 
-  // Mobile accordion -----" only one book expanded at a time
+  // Mobile accordion — only one book expanded at a time
   const [expandedId, setExpandedId] = useState(null);
   const toggleExpand = (id) => setExpandedId(prev => prev === id ? null : id);
 
@@ -102,7 +102,7 @@ export default function BooksPage() {
     try {
       // BookController returns ApiResponse<PageResponse<Book>>:
       // { success, message, data: { content:[], pageNumber, ... } }
-      // springApi interceptor unwraps axios res.data -----' res = { success, message, data:{...} }
+      // springApi interceptor unwraps axios res.data → res = { success, message, data:{...} }
       // So the PageResponse is at res.data
       const res = await bookService.getAll(search, page, size);
       const pd  = res?.data ?? res;   // handle both wrapped and unwrapped shapes
@@ -255,7 +255,7 @@ export default function BooksPage() {
           <PageError message={pageError} onRetry={load} />
         ) : (
           <>
-            {/* --"-----"--- Mobile view -----" accordion cards (hidden on tablet/desktop) --"-----"--- */}
+            {/* ── Mobile view — accordion cards (hidden on tablet/desktop) ── */}
             <div className="book-mob-list">
               {books.length === 0 ? (
                 <p className="books-empty" style={{ padding: '2rem', textAlign: 'center' }}>
@@ -277,7 +277,7 @@ export default function BooksPage() {
               ))}
             </div>
 
-            {/* --"-----"--- Desktop/tablet view -----" full table (hidden on mobile) --"-----"--- */}
+            {/* ── Desktop/tablet view — full table (hidden on mobile) ── */}
             <div className="book-desk-table">
               <div className="books-table-wrap">
                 <table className="books-table">
@@ -302,7 +302,7 @@ export default function BooksPage() {
                       </tr>
                     ) : books.map((b, i) => (
                       <tr key={b.id}>
-                        <td><span style={{fontFamily:'monospace',fontSize:'0.78rem',color:'#6b7280'}}>{b.bookId || '-----"'}</span></td>
+                        <td><span style={{fontFamily:'monospace',fontSize:'0.78rem',color:'#6b7280'}}>{b.bookId || '—'}</span></td>
                         <td>{page * size + i + 1}</td>
                         <td>{b.bookTitle}</td>
                         <td>{b.authorName}</td>

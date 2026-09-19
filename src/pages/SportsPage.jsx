@@ -1,4 +1,4 @@
----import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { springApi, springGet } from '../services/api';
 import PageLoader from '../components/PageLoader';
 import PageError  from '../components/PageError';
@@ -89,7 +89,7 @@ export default function SportsPage() {
     try {
       await springApi.delete(`/sports/${sport.sportId}`);
       setSuccess('Sport deleted successfully.');
-      load(true); // silent refresh -----" no flicker
+      load(true); // silent refresh — no flicker
     } catch {
       setError('Failed to delete sport.');
     } finally {
@@ -177,14 +177,14 @@ export default function SportsPage() {
                   </div>
                 </div>
 
-                {/* Description -----" 100 chars max on card */}
+                {/* Description — 100 chars max on card */}
                 {sport.description && (
                   <p className="sport-card-desc">{truncate(sport.description)}</p>
                 )}
 
               </div>
 
-              {/* Footer -----" stop propagation so card click doesn't fire */}
+              {/* Footer — stop propagation so card click doesn't fire */}
               <div className="sport-card-footer" onClick={(e) => e.stopPropagation()}>
                 <button
                   className="books-btn books-btn-sm books-btn-ghost"

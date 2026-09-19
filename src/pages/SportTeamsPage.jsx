@@ -1,11 +1,11 @@
----import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { springApi, springGet } from '../services/api';
 import PageLoader from '../components/PageLoader';
 import PageError  from '../components/PageError';
 import SportTeamModal from './SportTeamModal';
 import ViewSportTeamModal from './ViewSportTeamModal';
 
-// --"-----"--- Status badge --"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"---
+// ── Status badge ──────────────────────────────────────────────────────────────
 function StatusBadge({ status }) {
   const styles = {
     ACTIVE:   { background: '#dcfce7', color: '#166534', border: '1px solid #86efac' },
@@ -20,7 +20,7 @@ function StatusBadge({ status }) {
   );
 }
 
-// --"-----"--- Defect 1: Mobile accordion card (shown only on -------768px) --"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"---
+// ── Defect 1: Mobile accordion card (shown only on ≤768px) ───────────────────
 function MobileTeamCard({ team, onView, onEdit, onDelete, deleting }) {
   const [open, setOpen] = useState(false);
   return (
@@ -48,7 +48,7 @@ function MobileTeamCard({ team, onView, onEdit, onDelete, deleting }) {
           </span>
         </div>
         <span style={{ fontSize: '0.65rem', color: '#9ca3af', flexShrink: 0 }}>
-          {open ? '-----' : '-----'}
+          {open ? '▲' : '▼'}
         </span>
       </button>
 
@@ -60,7 +60,7 @@ function MobileTeamCard({ team, onView, onEdit, onDelete, deleting }) {
             ['Coach',     team.coachName],
             ['Members',   Array.isArray(team.members) ? team.members.length : 0],
             ['Status',    <StatusBadge key="s" status={team.status} />],
-            ['Description', team.description || '-----"'],
+            ['Description', team.description || '—'],
           ].map(([label, val]) => (
             <div key={label} style={{ display: 'flex', justifyContent: 'space-between',
               alignItems: 'flex-start', padding: '5px 0',
@@ -196,13 +196,13 @@ export default function SportTeamsPage() {
       {success && (
         <div className="books-alert books-alert-success">
           <span>{success}</span>
-          <button onClick={() => setSuccess('')}>---</button>
+          <button onClick={() => setSuccess('')}>×</button>
         </div>
       )}
       {error && (
         <div className="books-alert books-alert-error">
           <span>{error}</span>
-          <button onClick={() => setError('')}>---</button>
+          <button onClick={() => setError('')}>×</button>
         </div>
       )}
 
@@ -236,7 +236,7 @@ export default function SportTeamsPage() {
           </div>
         ) : (
           <>
-            {/* --"-----"--- Defect 1: Mobile accordion (-------768px) --"-----"--- */}
+            {/* ── Defect 1: Mobile accordion (≤768px) ── */}
             <div className="sport-team-mob">
               {filtered.map((team) => (
                 <MobileTeamCard
@@ -250,7 +250,7 @@ export default function SportTeamsPage() {
               ))}
             </div>
 
-            {/* --"-----"--- Desktop table (>768px) --"-----"--- */}
+            {/* ── Desktop table (>768px) ── */}
             <div className="sport-team-desk">
               <div className="books-table-wrap">
                 <table className="books-table">
@@ -285,7 +285,7 @@ export default function SportTeamsPage() {
                         <td><StatusBadge status={team.status} /></td>
                         <td style={{ maxWidth: 180, overflow: 'hidden',
                           textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                          {team.description || '-----"'}
+                          {team.description || '—'}
                         </td>
                         <td>
                           <div className="books-actions">

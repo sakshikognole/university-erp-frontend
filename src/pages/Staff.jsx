@@ -1,4 +1,4 @@
----import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   Users,
@@ -115,7 +115,7 @@ const Staff = () => {
   };
 
   const formatDate = (dateValue) => {
-    if (!dateValue) return '-----"';
+    if (!dateValue) return '—';
     try {
       return new Date(dateValue).toISOString().slice(0, 10);
     } catch {

@@ -1,4 +1,4 @@
----import React from 'react';
+import React from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext';
 import ProtectedRoute from './components/routes/ProtectedRoute';
@@ -118,7 +118,7 @@ function AppRoutes() {
       <Route path="/login/student" element={<StudentLogin />} />
       <Route path="/forgot-password" element={<ForgotPassword />} />
 
-      {/* Password Management demo module -----" public and isolated */}
+      {/* Password Management demo module — public and isolated */}
       <Route path="/password-management" element={<PasswordManagementPage />} />
       <Route path="/password-management/otp" element={<PmOtpPage />} />
       <Route path="/password-management/test-login" element={<PmTestLogin />} />
@@ -426,7 +426,7 @@ function AppRoutes() {
         <Route path="fee-payment/failure" element={<PaymentFailure />} />
         <Route path="fee-payment/receipt/:id" element={<PaymentSuccess />} />
 
-        {/* Payment Management -----" admin fee/combination management */}
+        {/* Payment Management — admin fee/combination management */}
         <Route
           path="payment-management"
           element={

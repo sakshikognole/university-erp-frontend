@@ -1,4 +1,4 @@
----import React, { useState } from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   Upload, FileSpreadsheet, Download, AlertCircle, CheckCircle2,
@@ -211,9 +211,9 @@ const BulkUploadAlumni = () => {
                           <td><span className="code-badge">{a.alumniId || '(auto)'}</span></td>
                           <td>{a.name}</td>
                           <td>{a.graduationYear}</td>
-                          <td>{a.jobTitle || '-----"'}</td>
-                          <td>{a.currentCompany || '-----"'}</td>
-                          <td>{a.email || '-----"'}</td>
+                          <td>{a.jobTitle || '—'}</td>
+                          <td>{a.currentCompany || '—'}</td>
+                          <td>{a.email || '—'}</td>
                         </tr>
                       ))}
                     </tbody>

@@ -1,4 +1,4 @@
----import { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { springApi, springGet } from '../services/api';
 import PageLoader from '../components/PageLoader';
 import PageError  from '../components/PageError';
@@ -63,7 +63,7 @@ export default function LetterHeadEditorPage() {
 
       <div style={{ display: 'flex', gap: 24, flexWrap: 'wrap', alignItems: 'flex-start' }}>
 
-        {/* --"-----"--- Edit form --"-----"--- */}
+        {/* ── Edit form ── */}
         <form onSubmit={handleSave} noValidate style={{ flex: '1 1 380px' }}>
           <div className="card stu-form-card" style={{ maxWidth: '100%' }}>
             <p className="lh-section-title">Institution Details</p>
@@ -95,7 +95,7 @@ export default function LetterHeadEditorPage() {
                 value={form.logoText} onChange={change}
                 placeholder="Short text shown in logo box on PDF (e.g. LOGO)" />
               <span className="stu-hint">
-                Keep it short -----" 4 to 8 characters works best.
+                Keep it short — 4 to 8 characters works best.
               </span>
             </div>
 
@@ -149,7 +149,7 @@ export default function LetterHeadEditorPage() {
           </div>
         </form>
 
-        {/* --"-----"--- Live preview --"-----"--- */}
+        {/* ── Live preview ── */}
         <div style={{ flex: '1 1 320px' }}>
           <div className="card stu-form-card" style={{ maxWidth: '100%' }}>
             <p className="lh-section-title">Live Preview</p>

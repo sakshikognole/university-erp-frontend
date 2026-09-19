@@ -1,11 +1,11 @@
----import { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import axios from 'axios';
 import { springApi, springGet } from '../services/api';
 import PageLoader from '../components/PageLoader';
 import PageError  from '../components/PageError';
 import { getAllStudents } from '../services/studentService';
 
-// Use plain axios for blob requests -----" springApi interceptor breaks binary data
+// Use plain axios for blob requests — springApi interceptor breaks binary data
 const onLocalhost = window.location.hostname === 'localhost';
 const SPRING_BASE = onLocalhost
   ? 'http://localhost:8080'
@@ -106,7 +106,7 @@ export default function HandoutPage() {
                     <span className="stu-check-text">
                       <strong>{s.studentName}</strong>
                       <span className="stu-check-meta">
-                        {s.studentId} ---- {s.studyingYear} ---- {s.gender}
+                        {s.studentId} · {s.studyingYear} · {s.gender}
                       </span>
                     </span>
                   </label>
@@ -158,7 +158,7 @@ export default function HandoutPage() {
         {selStudents.length > 0 && selDocs.length > 0 && (
           <p className="stu-handout-summary">
             Will generate <strong>{selStudents.length * selDocs.length} PDF(s)</strong>
-            {' '}-----" {selStudents.length} student{selStudents.length > 1 ? 's' : ''} x{' '}
+            {' '}— {selStudents.length} student{selStudents.length > 1 ? 's' : ''} x{' '}
             {selDocs.length} type{selDocs.length > 1 ? 's' : ''}
           </p>
         )}

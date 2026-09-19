@@ -1,4 +1,4 @@
----import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { springApi, springGet } from '../services/api';
 import PageError from '../components/PageError';
@@ -79,7 +79,7 @@ export default function ExamsPage() {
   };
 
   const handleDelete = async (exam) => {
-    if (!window.confirm(`Delete exam "${exam.examId} -----" ${exam.subject}"?`)) return;
+    if (!window.confirm(`Delete exam "${exam.examId} — ${exam.subject}"?`)) return;
     try {
       await springApi.delete(`/exams/${exam.examId}`);
       setSuccess('Exam deleted.');
@@ -202,7 +202,7 @@ export default function ExamsPage() {
                       </span>
                     </td>
                     <td style={{ fontWeight: 500 }}>{exam.subject}</td>
-                    <td style={{ color: '#6b7280' }}>{exam.academicYear || '-----"'}</td>
+                    <td style={{ color: '#6b7280' }}>{exam.academicYear || '—'}</td>
                     <td style={{ textAlign: 'center' }}>
                       <span style={{
                         background: '#f1f5f9', color: '#374151',
