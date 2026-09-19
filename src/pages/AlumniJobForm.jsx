@@ -2,7 +2,9 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { ArrowLeft, Save, AlertCircle, CheckCircle2, Loader2, Check, X } from 'lucide-react';
 
-const API_BASE_URL = 'http://localhost:5000/api';
+const _IS_PROD = window.location.hostname !== 'localhost';
+const _NODE_URL = _IS_PROD ? 'https://university-erp-node.onrender.com' : 'http://localhost:5000';
+const API_BASE_URL = `${_NODE_URL}/api`;
 
 const toInputDate = (d) => {
   if (!d) return '';

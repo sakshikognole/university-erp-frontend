@@ -14,7 +14,9 @@ import {
 } from 'lucide-react';
 import { uploadToCloudinary } from '../utils/cloudinaryUpload';
 
-const API_BASE_URL = 'http://localhost:5000/api';
+const _IS_PROD = window.location.hostname !== 'localhost';
+const _NODE_URL = _IS_PROD ? 'https://university-erp-node.onrender.com' : 'http://localhost:5000';
+const API_BASE_URL = `${_NODE_URL}/api`;
 
 const SystemAnnouncementForm = () => {
   const { id } = useParams();

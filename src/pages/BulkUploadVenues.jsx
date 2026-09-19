@@ -12,7 +12,9 @@ import {
   Info,
 } from 'lucide-react';
 
-const API_BASE_URL = 'http://localhost:5000/api';
+const _IS_PROD = window.location.hostname !== 'localhost';
+const _NODE_URL = _IS_PROD ? 'https://university-erp-node.onrender.com' : 'http://localhost:5000';
+const API_BASE_URL = `${_NODE_URL}/api`;
 
 // Must match backend constants — same rules as Add/Edit Venue
 const VENUE_ID_REGEX = /^[A-Z0-9]{1,10}(-[A-Z0-9]{1,10}){0,4}$/;
