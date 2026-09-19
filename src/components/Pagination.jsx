@@ -1,12 +1,12 @@
 import React from 'react';
 
 /**
- * Reusable pagination bar â€” used by PaymentPage and BooksPage.
+ * Reusable pagination bar â-- used by PaymentPage and BooksPage.
  *
  * Props:
- *   pageData      â€” { pageNumber, pageSize, totalElements, totalPages, first, last }
- *   onPageChange  â€” (pageIndex: number) => void
- *   onSizeChange  â€” (size: number) => void
+ *   pageData      â-- { pageNumber, pageSize, totalElements, totalPages, first, last }
+ *   onPageChange  â-- (pageIndex: number) => void
+ *   onSizeChange  â-- (size: number) => void
  */
 export default function Pagination({ pageData, onPageChange, onSizeChange }) {
   const { pageNumber, pageSize, totalElements, totalPages, first, last } = pageData;
@@ -39,7 +39,7 @@ export default function Pagination({ pageData, onPageChange, onSizeChange }) {
 
   return (
     <div className="books-pagination-bar">
-      {/* Showing Xâ€“Y of Z */}
+      {/* Showing Xâ--Y of Z */}
       <span className="books-pg-info">
         Showing {from} to {to} of {totalElements}
       </span>

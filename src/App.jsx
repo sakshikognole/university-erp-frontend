@@ -118,7 +118,7 @@ function AppRoutes() {
       <Route path="/login/student" element={<StudentLogin />} />
       <Route path="/forgot-password" element={<ForgotPassword />} />
 
-      {/* Password Management demo module â€” public and isolated */}
+      {/* Password Management demo module â-- public and isolated */}
       <Route path="/password-management" element={<PasswordManagementPage />} />
       <Route path="/password-management/otp" element={<PmOtpPage />} />
       <Route path="/password-management/test-login" element={<PmTestLogin />} />
@@ -426,7 +426,7 @@ function AppRoutes() {
         <Route path="fee-payment/failure" element={<PaymentFailure />} />
         <Route path="fee-payment/receipt/:id" element={<PaymentSuccess />} />
 
-        {/* Payment Management â€” admin fee/combination management */}
+        {/* Payment Management â-- admin fee/combination management */}
         <Route
           path="payment-management"
           element={

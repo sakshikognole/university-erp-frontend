@@ -94,7 +94,7 @@ const PaymentFailure = () => {
               Attempted Amount
             </div>
             <div style={{ fontSize: '1.25rem', fontWeight: 800, color: '#dc2626', marginTop: '2px' }}>
-              â‚¹{(failureData.attemptedAmount || 0).toLocaleString('en-IN')}
+              â-¹{(failureData.attemptedAmount || 0).toLocaleString('en-IN')}
             </div>
           </div>
 

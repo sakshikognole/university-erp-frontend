@@ -466,7 +466,7 @@ const AddBusPass = () => {
                     >
                       <UserCheck size={15} />
                       <span>
-                        <strong>{studentInfo.name}</strong> â€¢ {studentInfo.degree || 'Student'} ({studentInfo.class || 'Enrolled'})
+                        <strong>{studentInfo.name}</strong> â-¢ {studentInfo.degree || 'Student'} ({studentInfo.class || 'Enrolled'})
                       </span>
                     </div>
                   )}

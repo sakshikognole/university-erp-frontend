@@ -4,7 +4,7 @@ import { useSearchParams } from 'react-router-dom';
 import TeamForm from './TeamForm';
 import TeamDetails from './TeamDetails';
 
-// â”€â”€ Inline Add Roster Modal â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// â--â-- Inline Add Roster Modal â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--
 function AddRosterModal({ isOpen, teamId, onClose, onSuccess }) {
   const [prnInput,    setPrnInput]    = useState('');
   const [namePreview, setNamePreview] = useState('');
@@ -62,8 +62,8 @@ function AddRosterModal({ isOpen, teamId, onClose, onSuccess }) {
     <div className="books-overlay">
       <div className="books-modal" style={{ maxWidth: 480 }}>
         <div className="books-modal-head">
-          <h3>Add Roster â€” {teamId}</h3>
-          <button className="books-modal-close" onClick={onClose}>Ã—</button>
+          <h3>Add Roster â-- {teamId}</h3>
+          <button className="books-modal-close" onClick={onClose}>Ã-</button>
         </div>
         <div className="books-modal-body">
           {error && <p style={{ color: '#dc2626', fontSize: '0.85rem', marginBottom: 10 }}>{error}</p>}
@@ -74,7 +74,7 @@ function AddRosterModal({ isOpen, teamId, onClose, onSuccess }) {
               <input className="books-form-control" value={prnInput}
                 onChange={handlePrn} placeholder="Enter PRN (press , to add)" />
               <p style={{ fontSize: '0.75rem', color: '#6b7280', marginTop: 4 }}>
-                Type PRN â†’ name auto-fills â†’ press <strong>,</strong> to add
+                Type PRN â-- name auto-fills â-- press <strong>,</strong> to add
               </p>
             </div>
             <div className="books-form-group">
@@ -104,7 +104,7 @@ function AddRosterModal({ isOpen, teamId, onClose, onSuccess }) {
                       <td>
                         <button className="books-btn books-btn-sm books-btn-danger"
                           onClick={() => setPrnList((prev) => prev.filter((x) => x.prn !== p.prn))}>
-                          Ã—
+                          Ã-
                         </button>
                       </td>
                     </tr>
@@ -127,7 +127,7 @@ function AddRosterModal({ isOpen, teamId, onClose, onSuccess }) {
 
 export default function SportTeamPage() {
   const [searchParams, setSearchParams] = useSearchParams();
-  // ?team=T001 â†’ shows TeamDetails; no param â†’ shows list
+  // ?team=T001 â-- shows TeamDetails; no param â-- shows list
   const viewTeamId = searchParams.get('team');
 
   const [teams,    setTeams]    = useState([]);
@@ -196,7 +196,7 @@ export default function SportTeamPage() {
   };
 
   const handleDelete = async (team) => {
-    if (!window.confirm(`Delete team "${team.teamId} â€” ${team.sportName}"?`)) return;
+    if (!window.confirm(`Delete team "${team.teamId} â-- ${team.sportName}"?`)) return;
     setDeleting(team.teamId);
     const slowTimer = setTimeout(() => {
       setError('Server is processing deletion, please wait...');
@@ -215,7 +215,7 @@ export default function SportTeamPage() {
     }
   };
 
-  // â”€â”€ Detail view â€” survives refresh because teamId is in the URL â”€â”€
+  // â--â-- Detail view â-- survives refresh because teamId is in the URL â--â--
   if (viewTeamId) {
     return (
       <TeamDetails
@@ -225,7 +225,7 @@ export default function SportTeamPage() {
     );
   }
 
-  // â”€â”€ List view â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // â--â-- List view â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--
   return (
     <div className="page-container">
 
@@ -253,7 +253,7 @@ export default function SportTeamPage() {
       )}
 
       {loading ? (
-        /* Skeleton loader â€” same layout as table */
+        /* Skeleton loader â-- same layout as table */
         <div className="books-table-wrap">
           <table className="books-table">
             <thead>

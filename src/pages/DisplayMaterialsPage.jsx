@@ -4,20 +4,20 @@ import { useState, useEffect } from 'react';
 // file type icon helper
 function fileIcon(type) {
   switch ((type || '').toLowerCase()) {
-    case 'pdf':           return 'ğŸ“•';
+    case 'pdf':           return 'ğ---';
     case 'jpg':
     case 'jpeg':
-    case 'png':           return 'ğŸ–¼ï¸';
+    case 'png':           return 'ğ--¼ï¸-';
     case 'xls':
-    case 'xlsx':          return 'ğŸ“Š';
-    default:              return 'ğŸ“„';
+    case 'xlsx':          return 'ğ---';
+    default:              return 'ğ---';
   }
 }
 
 // file type badge
 function TypeBadge({ type }) {
   const t = (type || '').toLowerCase();
-  return <span className={`dm-type-badge dm-type-${t}`}>{type || 'â€”'}</span>;
+  return <span className={`dm-type-badge dm-type-${t}`}>{type || 'â--'}</span>;
 }
 
 export default function DisplayMaterialsPage() {
@@ -96,10 +96,10 @@ export default function DisplayMaterialsPage() {
             value={selectedSubject}
             onChange={(e) => setSelectedSubject(e.target.value)}
           >
-            <option value="">â€” Select Subject â€”</option>
+            <option value="">â-- Select Subject â--</option>
             {subjects.map((s) => (
               <option key={s.folderId} value={s.folderId}>
-                ğŸ“ {s.folderName}
+                ğ--- {s.folderName}
               </option>
             ))}
           </select>
@@ -137,7 +137,7 @@ export default function DisplayMaterialsPage() {
                       </td>
                       <td>
                         <div className="books-actions">
-                          {/* View â€” opens inline in browser */}
+                          {/* View â-- opens inline in browser */}
                           <a
                             href={m.fileUrl}
                             target="_blank"
@@ -146,7 +146,7 @@ export default function DisplayMaterialsPage() {
                           >
                             View
                           </a>
-                          {/* Download â€” forces file download */}
+                          {/* Download â-- forces file download */}
                           <a
                             href={m.fileUrl}
                             download={m.fileName}

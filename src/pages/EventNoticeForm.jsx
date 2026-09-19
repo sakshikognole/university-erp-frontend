@@ -309,7 +309,7 @@ const EventNoticeForm = () => {
         }
       }
 
-      // Step 2: send JSON body â€” no multipart needed anymore
+      // Step 2: send JSON body â-- no multipart needed anymore
       const payload = {
         title: formData.title.trim(),
         description: formData.description.trim(),
@@ -651,7 +651,7 @@ const EventNoticeForm = () => {
                   <option value="">-- Choose from Booked Events (Auto-fills details) or enter manually below --</option>
                   {bookedEvents.map((b) => (
                     <option key={b.eventId || b.id} value={b.eventId || b.id}>
-                      {b.eventTitle || b.title} (ID: {b.eventId || b.id}){b.eventType ? ` â€¢ Type: ${b.eventType}` : ''}{b.venueId ? ` â€¢ Venue: ${b.venueId}` : ''}
+                      {b.eventTitle || b.title} (ID: {b.eventId || b.id}){b.eventType ? ` â-¢ Type: ${b.eventType}` : ''}{b.venueId ? ` â-¢ Venue: ${b.venueId}` : ''}
                     </option>
                   ))}
                 </select>

@@ -79,7 +79,7 @@ export default function ClubModal({ isOpen, mode, club, parentClubs, onSave, onC
                 <form onSubmit={submit}>
                     <div className="books-modal-body" style={{ maxHeight: '70vh', overflowY: 'auto' }}>
 
-                        {/* Row 1 â€” Club ID + Club Name */}
+                        {/* Row 1 â-- Club ID + Club Name */}
                         <div className="club-form-row">
                             <div className="books-form-group">
                                 <label className="books-form-label">Club ID *</label>
@@ -102,7 +102,7 @@ export default function ClubModal({ isOpen, mode, club, parentClubs, onSave, onC
                             </div>
                         </div>
 
-                        {/* Row 2 â€” Category + Status */}
+                        {/* Row 2 â-- Category + Status */}
                         <div className="club-form-row">
                             <div className="books-form-group">
                                 <label className="books-form-label">Club Category</label>
@@ -125,11 +125,11 @@ export default function ClubModal({ isOpen, mode, club, parentClubs, onSave, onC
                             </div>
                         </div>
 
-                        {/* Parent Club â€” optional, only for sub-clubs */}
+                        {/* Parent Club â-- optional, only for sub-clubs */}
                         <div className="books-form-group">
                             <label className="books-form-label">
                                 Parent Club
-                                <span className="club-optional-tag">optional â€” leave empty for independent club</span>
+                                <span className="club-optional-tag">optional â-- leave empty for independent club</span>
                             </label>
                             <select
                                 className="books-form-control"

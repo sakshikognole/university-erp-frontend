@@ -7,20 +7,20 @@
  */
 
 // ---------------------------------------------------------------------------
-// PRN â€” must match "PRN" (case-insensitive) followed by 4-digit year and
+// PRN â-- must match "PRN" (case-insensitive) followed by 4-digit year and
 // 3-digit sequence, e.g. PRN2024001.  The schema stores it uppercased.
 // ---------------------------------------------------------------------------
 export const PRN_REGEX = /^PRN\d{4}\d{3}$/i;
 
 // ---------------------------------------------------------------------------
-// Name â€” letters (including accented / Unicode letters), spaces, hyphens,
+// Name â-- letters (including accented / Unicode letters), spaces, hyphens,
 // apostrophes, and dots (for initials like "Dr. A. Smith").
 // Must have at least two words (first + last name).
 // ---------------------------------------------------------------------------
 export const NAME_VALID_CHARS_REGEX = /^[A-Za-z\u00C0-\u024F\u1E00-\u1EFF' . -]+$/;
 
 // ---------------------------------------------------------------------------
-// Year of Enrollment â€” 4-digit year between 1900 and (current year + 1).
+// Year of Enrollment â-- 4-digit year between 1900 and (current year + 1).
 // Stored as a string in the DB.
 // ---------------------------------------------------------------------------
 const CURRENT_YEAR = new Date().getFullYear();
@@ -28,14 +28,14 @@ export const YEAR_MIN = 1900;
 export const YEAR_MAX = CURRENT_YEAR + 1;
 
 // ---------------------------------------------------------------------------
-// Class â€” free-text describing a year level such as "First Year",
+// Class â-- free-text describing a year level such as "First Year",
 // "Second Year", "Third Year", "Fourth Year", "FY", "SY", "TY", etc.
 // Must contain at least one letter; reject pure-number / pure-symbol values.
 // ---------------------------------------------------------------------------
 export const CLASS_VALID_REGEX = /^[A-Za-z0-9 .\-/]+$/;
 
 // ---------------------------------------------------------------------------
-// Degree â€” descriptive text like "B.Tech Computer Science".
+// Degree â-- descriptive text like "B.Tech Computer Science".
 // Must start with a letter and contain at least one letter.
 // Allow letters, digits, spaces, dots, hyphens, parentheses, ampersands,
 // commas (e.g. "B.Sc. (Computer Science)").
@@ -43,7 +43,7 @@ export const CLASS_VALID_REGEX = /^[A-Za-z0-9 .\-/]+$/;
 export const DEGREE_VALID_REGEX = /^[A-Za-z][A-Za-z0-9 .()\-&,/]+$/;
 
 // ---------------------------------------------------------------------------
-// Division â€” single letter A-Z (case insensitive), optionally followed by
+// Division â-- single letter A-Z (case insensitive), optionally followed by
 // a space and a word like "Division" (e.g. "A", "B Division").
 // ---------------------------------------------------------------------------
 export const DIVISION_VALID_REGEX = /^[A-Za-z][A-Za-z0-9 . -]*$/;

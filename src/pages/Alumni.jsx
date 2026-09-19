@@ -27,7 +27,7 @@ const _IS_PROD = window.location.hostname !== 'localhost';
 const _NODE_URL = _IS_PROD ? 'https://university-erp-node.onrender.com' : 'http://localhost:5000';
 const API_BASE_URL = `${_NODE_URL}/api`;
 
-// â”€â”€ Export helpers â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// â--â-- Export helpers â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--
 const triggerDownload = (content, filename, mimeType) => {
   const blob = new Blob([content], { type: mimeType });
   const url = URL.createObjectURL(blob);
@@ -54,7 +54,7 @@ const exportTXT = (rows) => {
   const date = new Date().toLocaleString();
   const sep = '='.repeat(90);
   const lines = [
-    'UNIVERSITY ERP â€” ALUMNI DIRECTORY',
+    'UNIVERSITY ERP â-- ALUMNI DIRECTORY',
     `Generated: ${date}   Total: ${rows.length}`,
     sep,
     'ID         NAME                         YEAR   JOB TITLE                   COMPANY',
@@ -91,7 +91,7 @@ const exportPDF = (rows) => {
   w.print();
 };
 
-// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--
 
 const Alumni = () => {
   const navigate = useNavigate();
@@ -276,8 +276,8 @@ const Alumni = () => {
                       <td><span className="code-badge">{a.alumniId}</span></td>
                       <td><span className="dept-name-cell">{a.name}</span></td>
                       <td>{a.graduationYear}</td>
-                      <td>{a.jobTitle || 'â€”'}</td>
-                      <td>{a.currentCompany || 'â€”'}</td>
+                      <td>{a.jobTitle || 'â--'}</td>
+                      <td>{a.currentCompany || 'â--'}</td>
                       <td>
                         <div style={{ display: 'flex', gap: '8px', alignItems: 'center', flexWrap: 'wrap' }}>
                           {a.socialLinks?.linkedin && (
@@ -318,7 +318,7 @@ const Alumni = () => {
                           )}
                           {!a.socialLinks?.linkedin && !a.socialLinks?.github && !a.socialLinks?.instagram &&
                            !a.socialLinks?.twitter && !a.socialLinks?.portfolio && !a.socialLinks?.other && (
-                            <span style={{ color: 'var(--text-secondary)', fontSize: '0.8125rem' }}>â€”</span>
+                            <span style={{ color: 'var(--text-secondary)', fontSize: '0.8125rem' }}>â--</span>
                           )}
                         </div>
                       </td>

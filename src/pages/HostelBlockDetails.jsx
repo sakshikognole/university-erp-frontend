@@ -32,7 +32,7 @@ export default function HostelBlockDetails({ block: blockProp, onBack }) {
   // Use blockId field if available, otherwise fall back to MongoDB _id
   const lookupKey = block?.blockId || block?.id || block?._id || '';
 
-  // â”€â”€ Load rooms â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // â--â-- Load rooms â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--
   const loadAll = useCallback(async (silent = false) => {
     if (!silent) setLoading(true);
     try {
@@ -57,14 +57,14 @@ export default function HostelBlockDetails({ block: blockProp, onBack }) {
 
   useEffect(() => { loadAll(); }, [loadAll]);
 
-  // â”€â”€ Room saved â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // â--â-- Room saved â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--
   const handleRoomSaved = (msg) => {
     setSuccess(msg);
     setRoomModalOpen(false);
     loadAll(true);
   };
 
-  // â”€â”€ Delete room â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // â--â-- Delete room â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--
   const handleDeleteRoom = async (room) => {
     if (!window.confirm(`Delete room "${room.roomNo}"?`)) return;
     try {
@@ -77,7 +77,7 @@ export default function HostelBlockDetails({ block: blockProp, onBack }) {
     }
   };
 
-  // â”€â”€ Remove student from room â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // â--â-- Remove student from room â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--
   const handleRemoveStudent = async (roomId, prn) => {
     if (!window.confirm('Remove this student from the room?')) return;
     try {
@@ -89,7 +89,7 @@ export default function HostelBlockDetails({ block: blockProp, onBack }) {
     }
   };
 
-  // â”€â”€ PRN lookup â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // â--â-- PRN lookup â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--
   const handlePrnInput = (e) => {
     const value = e.target.value;
     if (value.endsWith(',')) {
@@ -124,7 +124,7 @@ export default function HostelBlockDetails({ block: blockProp, onBack }) {
   const removePrnFromList = (prn) =>
     setPrnList((prev) => prev.filter((p) => p.prn !== prn));
 
-  // â”€â”€ Add students to selected room â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // â--â-- Add students to selected room â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--
   const handleAddStudents = async () => {
     if (!selRoomId) { setError('Please select a room first.'); return; }
     if (prnList.length === 0) { setError('No students in the list.'); return; }
@@ -153,7 +153,7 @@ export default function HostelBlockDetails({ block: blockProp, onBack }) {
     if (errs.length) setError(errs.join(' | '));
   };
 
-  // â”€â”€ Render â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // â--â-- Render â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--
   if (loading) return <p className="books-loading">Loading block details...</p>;
   if (!block)  return <p className="hst-empty">Block not found.</p>;
 
@@ -162,7 +162,7 @@ export default function HostelBlockDetails({ block: blockProp, onBack }) {
 
       {/* Back */}
       <button className="hst-back-link" onClick={onBack}>
-        â† Back to Hostel Management
+        â-- Back to Hostel Management
       </button>
 
       {/* Header */}
@@ -204,7 +204,7 @@ export default function HostelBlockDetails({ block: blockProp, onBack }) {
         </div>
       )}
 
-      {/* â”€â”€ Rooms Table â”€â”€ */}
+      {/* â--â-- Rooms Table â--â-- */}
       <p className="hst-section-title">Rooms ({rooms.length})</p>
 
       {rooms.length === 0 ? (
@@ -263,7 +263,7 @@ export default function HostelBlockDetails({ block: blockProp, onBack }) {
         </div>
       )}
 
-      {/* â”€â”€ Room Detail Panel (shown when a row is clicked) â”€â”€ */}
+      {/* â--â-- Room Detail Panel (shown when a row is clicked) â--â-- */}
       {selRoom && (
         <div style={{
           border: '1px solid var(--border-color)',
@@ -285,7 +285,7 @@ export default function HostelBlockDetails({ block: blockProp, onBack }) {
               className="books-btn books-btn-sm books-btn-ghost"
               onClick={() => setSelRoom(null)}
             >
-              âœ• Close
+              â-- Close
             </button>
           </div>
 
@@ -328,7 +328,7 @@ export default function HostelBlockDetails({ block: blockProp, onBack }) {
         </div>
       )}
 
-      {/* â”€â”€ Add Students Section â”€â”€ */}
+      {/* â--â-- Add Students Section â--â-- */}
       <p className="hst-section-title">Add Students to Room</p>
 
       {/* Room selector */}
@@ -339,12 +339,12 @@ export default function HostelBlockDetails({ block: blockProp, onBack }) {
           value={selRoomId}
           onChange={(e) => setSelRoomId(e.target.value)}
         >
-          <option value="">â€” Select Room â€”</option>
+          <option value="">â-- Select Room â--</option>
           {rooms.map((r) => (
             <option key={r.roomId} value={r.roomId}
                     disabled={r.students?.length >= r.capacity}>
               Room {r.roomNo} ({r.students?.length ?? 0}/{r.capacity})
-              {r.students?.length >= r.capacity ? ' â€” Full' : ''}
+              {r.students?.length >= r.capacity ? ' â-- Full' : ''}
             </option>
           ))}
         </select>
@@ -382,7 +382,7 @@ export default function HostelBlockDetails({ block: blockProp, onBack }) {
       </div>
 
       <p style={{ fontSize: 12, color: 'var(--text-secondary)', marginBottom: 10 }}>
-        Type a PRN â€” name appears below. Press <strong>,</strong> (comma) to add to the list.
+        Type a PRN â-- name appears below. Press <strong>,</strong> (comma) to add to the list.
       </p>
 
       {/* Pending student list */}
@@ -425,7 +425,7 @@ export default function HostelBlockDetails({ block: blockProp, onBack }) {
             </button>
             {!selRoomId && (
               <span style={{ marginLeft: 10, fontSize: 13, color: '#dc2626' }}>
-                â† Select a room first
+                â-- Select a room first
               </span>
             )}
           </div>

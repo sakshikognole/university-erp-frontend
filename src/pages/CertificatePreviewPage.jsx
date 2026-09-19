@@ -42,7 +42,7 @@ export default function CertificatePreviewPage() {
     <div className="page-container">
       <h1 className="page-title">Certificate Preview</h1>
       <p className="stu-page-sub">
-        {student.studentName}{docType ? ` â€” ${docType}` : ''}
+        {student.studentName}{docType ? ` â-- ${docType}` : ''}
       </p>
 
       <div className="card stu-form-card" style={{ maxWidth: 800 }}>

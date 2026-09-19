@@ -89,7 +89,7 @@ export default function SportsPage() {
     try {
       await springApi.delete(`/sports/${sport.sportId}`);
       setSuccess('Sport deleted successfully.');
-      load(true); // silent refresh â€” no flicker
+      load(true); // silent refresh â-- no flicker
     } catch {
       setError('Failed to delete sport.');
     } finally {
@@ -177,14 +177,14 @@ export default function SportsPage() {
                   </div>
                 </div>
 
-                {/* Description â€” 100 chars max on card */}
+                {/* Description â-- 100 chars max on card */}
                 {sport.description && (
                   <p className="sport-card-desc">{truncate(sport.description)}</p>
                 )}
 
               </div>
 
-              {/* Footer â€” stop propagation so card click doesn't fire */}
+              {/* Footer â-- stop propagation so card click doesn't fire */}
               <div className="sport-card-footer" onClick={(e) => e.stopPropagation()}>
                 <button
                   className="books-btn books-btn-sm books-btn-ghost"

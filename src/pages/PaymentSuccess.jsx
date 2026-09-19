@@ -174,7 +174,7 @@ const PaymentSuccess = () => {
             </span>
           </div>
           <p style={{ margin: '0.35rem 0 0 0', opacity: 0.9, fontSize: '0.9rem' }}>
-            Your fee payment of <strong>â‚¹{(currentReceipt.amountPaidThisTransaction || 0).toLocaleString('en-IN')}</strong> has been received and verified. The student record has been updated immediately.
+            Your fee payment of <strong>â-¹{(currentReceipt.amountPaidThisTransaction || 0).toLocaleString('en-IN')}</strong> has been received and verified. The student record has been updated immediately.
           </p>
         </div>
       </div>
@@ -280,7 +280,7 @@ const PaymentSuccess = () => {
               Academic Session
             </div>
             <div style={{ fontWeight: 600, fontSize: '0.95rem', marginTop: '2px' }}>
-              {currentReceipt.academicYear} â€¢ {currentReceipt.semester}
+              {currentReceipt.academicYear} â-¢ {currentReceipt.semester}
             </div>
           </div>
 
@@ -336,7 +336,7 @@ const PaymentSuccess = () => {
                 <div style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>Full prescribed institutional fee for academic term</div>
               </td>
               <td style={{ textAlign: 'right', fontWeight: 600 }}>
-                â‚¹{(currentReceipt.totalFeeAmount || 0).toLocaleString('en-IN')}
+                â-¹{(currentReceipt.totalFeeAmount || 0).toLocaleString('en-IN')}
               </td>
             </tr>
 
@@ -346,7 +346,7 @@ const PaymentSuccess = () => {
                   <div style={{ color: '#047857', fontWeight: 500 }}>Institutional Scholarship / Concession Applied</div>
                 </td>
                 <td style={{ textAlign: 'right', color: '#047857', fontWeight: 600 }}>
-                  - â‚¹{(currentReceipt.discountAmount || 0).toLocaleString('en-IN')}
+                  - â-¹{(currentReceipt.discountAmount || 0).toLocaleString('en-IN')}
                 </td>
               </tr>
             )}
@@ -356,7 +356,7 @@ const PaymentSuccess = () => {
                 <div style={{ fontWeight: 600 }}>Net Payable Fee</div>
               </td>
               <td style={{ textAlign: 'right', fontWeight: 600 }}>
-                â‚¹{Math.max(0, (currentReceipt.totalFeeAmount || 0) - (currentReceipt.discountAmount || 0)).toLocaleString('en-IN')}
+                â-¹{Math.max(0, (currentReceipt.totalFeeAmount || 0) - (currentReceipt.discountAmount || 0)).toLocaleString('en-IN')}
               </td>
             </tr>
 
@@ -366,10 +366,10 @@ const PaymentSuccess = () => {
                 <div style={{ fontWeight: 800, color: '#047857', fontSize: '1rem' }}>
                   Amount Paid in This Transaction
                 </div>
-                <div style={{ fontSize: '0.75rem', color: '#065f46' }}>Status: Verified â€¢ Online Test Gateway</div>
+                <div style={{ fontSize: '0.75rem', color: '#065f46' }}>Status: Verified â-¢ Online Test Gateway</div>
               </td>
               <td style={{ textAlign: 'right', fontWeight: 800, color: '#047857', fontSize: '1.15rem' }}>
-                â‚¹{(currentReceipt.amountPaidThisTransaction || 0).toLocaleString('en-IN')}
+                â-¹{(currentReceipt.amountPaidThisTransaction || 0).toLocaleString('en-IN')}
               </td>
             </tr>
 
@@ -378,7 +378,7 @@ const PaymentSuccess = () => {
                 <div style={{ fontWeight: 600 }}>Total Cumulative Paid So Far</div>
               </td>
               <td style={{ textAlign: 'right', fontWeight: 600, color: '#2563eb' }}>
-                â‚¹{(currentReceipt.totalPaidSoFar || 0).toLocaleString('en-IN')}
+                â-¹{(currentReceipt.totalPaidSoFar || 0).toLocaleString('en-IN')}
               </td>
             </tr>
 
@@ -387,7 +387,7 @@ const PaymentSuccess = () => {
                 <div style={{ fontWeight: 700 }}>Total Remaining Balance</div>
               </td>
               <td style={{ textAlign: 'right', fontWeight: 800, color: currentReceipt.remainingBalance === 0 ? '#047857' : '#dc2626', fontSize: '1rem' }}>
-                â‚¹{(currentReceipt.remainingBalance || 0).toLocaleString('en-IN')}
+                â-¹{(currentReceipt.remainingBalance || 0).toLocaleString('en-IN')}
               </td>
             </tr>
           </tbody>

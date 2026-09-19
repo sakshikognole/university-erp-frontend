@@ -139,7 +139,7 @@ const SystemAnnouncements = () => {
   };
 
   const formatDate = (dateStr) => {
-    if (!dateStr) return 'â€”';
+    if (!dateStr) return 'â--';
     try {
       return new Date(dateStr).toLocaleDateString('en-IN', {
         day: '2-digit',
@@ -147,7 +147,7 @@ const SystemAnnouncements = () => {
         year: 'numeric',
       });
     } catch {
-      return 'â€”';
+      return 'â--';
     }
   };
 
@@ -155,7 +155,7 @@ const SystemAnnouncements = () => {
 
   return (
     <div className="page-container">
-      {/* â”€â”€ Page Header â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
+      {/* â--â-- Page Header â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â-- */}
       <div className="page-header-row">
         <div>
           <h1 className="page-title">System Announcements</h1>
@@ -176,7 +176,7 @@ const SystemAnnouncements = () => {
         </div>
       </div>
 
-      {/* â”€â”€ Feedback Banner â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
+      {/* â--â-- Feedback Banner â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â-- */}
       {feedback.message && (
         <div
           className={`feedback-banner ${feedback.type === 'success' ? 'feedback-success' : 'feedback-error'}`}
@@ -194,7 +194,7 @@ const SystemAnnouncements = () => {
         </div>
       )}
 
-      {/* â”€â”€ Table Card â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
+      {/* â--â-- Table Card â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â-- */}
       <div className="card table-card" style={{ marginTop: '1.25rem' }}>
         {/* Controls bar */}
         <div className="table-controls-bar">
@@ -380,7 +380,7 @@ const SystemAnnouncements = () => {
         </div>
       </div>
 
-      {/* â”€â”€ Delete Confirm Modal â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
+      {/* â--â-- Delete Confirm Modal â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â-- */}
       {deleteConfirm && (
         <div className="modal-overlay" onClick={() => !deleting && setDeleteConfirm(null)}>
           <div className="modal-content delete-dialog" onClick={(e) => e.stopPropagation()}>

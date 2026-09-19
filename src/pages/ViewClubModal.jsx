@@ -12,14 +12,14 @@ export default function ViewClubModal({ isOpen, club, parentClubs, onClose }) {
         { label: 'Club Name', value: club.clubName },
         { label: 'Category', value: club.clubCategory },
         { label: 'Type', value: club.parentClubId ? 'Sub-club' : 'Independent Club' },
-        { label: 'Parent Club', value: getParentName() || 'â€” (Independent)' },
+        { label: 'Parent Club', value: getParentName() || 'â-- (Independent)' },
         { label: 'Status', value: club.status },
-        { label: 'Active Members', value: club.activeMembers ?? 'â€”' },
-        { label: 'Faculty Coordinator', value: club.facultyCoordinator || 'â€”' },
-        { label: 'Student Lead', value: club.studentLeadName || 'â€”' },
-        { label: 'Lead Student ID', value: club.studentLeadId || 'â€”' },
-        { label: 'Lead Role', value: club.studentLeadRole || 'â€”' },
-        { label: 'Description', value: club.description || 'â€”' },
+        { label: 'Active Members', value: club.activeMembers ?? 'â--' },
+        { label: 'Faculty Coordinator', value: club.facultyCoordinator || 'â--' },
+        { label: 'Student Lead', value: club.studentLeadName || 'â--' },
+        { label: 'Lead Student ID', value: club.studentLeadId || 'â--' },
+        { label: 'Lead Role', value: club.studentLeadRole || 'â--' },
+        { label: 'Description', value: club.description || 'â--' },
     ];
 
     return (

@@ -24,7 +24,7 @@ const _NODE_URL = _IS_PROD ? 'https://university-erp-node.onrender.com' : 'http:
 const API_BASE_URL = `${_NODE_URL}/api`;
 
 // ---------------------------------------------------------------------------
-// FieldError â€” small red helper text shown beneath an invalid input
+// FieldError â-- small red helper text shown beneath an invalid input
 // ---------------------------------------------------------------------------
 const FieldError = ({ message }) =>
   message ? (
@@ -35,7 +35,7 @@ const FieldError = ({ message }) =>
   ) : null;
 
 // ---------------------------------------------------------------------------
-// StudentForm â€” used for both Add (/add-student) and Edit (/students/edit/:id)
+// StudentForm â-- used for both Add (/add-student) and Edit (/students/edit/:id)
 // ---------------------------------------------------------------------------
 const StudentForm = () => {
   const { id } = useParams();
@@ -64,7 +64,7 @@ const StudentForm = () => {
   const [customFieldKey, setCustomFieldKey] = useState('');
   const [customFieldValue, setCustomFieldValue] = useState('');
 
-  // â”€â”€ Validators per field name â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // â--â-- Validators per field name â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--
   const FIELD_VALIDATORS = {
     name: validateName,
     prn: validatePRN,
@@ -145,7 +145,7 @@ const StudentForm = () => {
     setTouched({});
   };
 
-  // â”€â”€ onChange: update value + re-validate if already touched â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // â--â-- onChange: update value + re-validate if already touched â--â--â--â--â--â--â--â--â--â--â--
   const handleChange = (e) => {
     const { name, value } = e.target;
     const newValue = name === 'prn' ? value.toUpperCase() : value;
@@ -159,7 +159,7 @@ const StudentForm = () => {
     }
   };
 
-  // â”€â”€ onBlur: mark field as touched + validate immediately â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // â--â-- onBlur: mark field as touched + validate immediately â--â--â--â--â--â--â--â--â--â--â--â--â--â--
   const handleBlur = (e) => {
     const { name, value } = e.target;
     setTouched((prev) => ({ ...prev, [name]: true }));
@@ -169,7 +169,7 @@ const StudentForm = () => {
     }
   };
 
-  // â”€â”€ Custom fields â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // â--â-- Custom fields â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--
   const handleAddCustomField = () => {
     if (!customFieldKey.trim() || !customFieldValue.trim()) {
       setFeedback({ type: 'error', message: 'Please enter both key and value for the custom field.' });
@@ -194,7 +194,7 @@ const StudentForm = () => {
     }));
   };
 
-  // â”€â”€ Submit â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // â--â-- Submit â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--
   const handleSubmit = async (e) => {
     e.preventDefault();
     setFeedback({ type: '', message: '' });
@@ -281,11 +281,11 @@ const StudentForm = () => {
     }
   };
 
-  // â”€â”€ Helper: CSS class for inputs with errors â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // â--â-- Helper: CSS class for inputs with errors â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--
   const inputClass = (field) =>
     `form-input${fieldErrors[field] && touched[field] ? ' input-error' : ''}`;
 
-  // â”€â”€ Render â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // â--â-- Render â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--
   return (
     <div className="page-container">
       {/* Page header */}
@@ -342,7 +342,7 @@ const StudentForm = () => {
         ) : (
           <form onSubmit={handleSubmit} className="form-layout" noValidate>
 
-            {/* â”€â”€ Row 1: Name + PRN â”€â”€ */}
+            {/* â--â-- Row 1: Name + PRN â--â-- */}
             <div className="form-row">
               <div className="form-group">
                 <label className="form-label" htmlFor="name">
@@ -382,7 +382,7 @@ const StudentForm = () => {
               </div>
             </div>
 
-            {/* â”€â”€ Row 2: Class + Division â”€â”€ */}
+            {/* â--â-- Row 2: Class + Division â--â-- */}
             <div className="form-row">
               <div className="form-group">
                 <label className="form-label" htmlFor="class">
@@ -421,7 +421,7 @@ const StudentForm = () => {
               </div>
             </div>
 
-            {/* â”€â”€ Row 3: Degree + Year of Enrollment â”€â”€ */}
+            {/* â--â-- Row 3: Degree + Year of Enrollment â--â-- */}
             <div className="form-row">
               <div className="form-group">
                 <label className="form-label" htmlFor="degree">
@@ -462,7 +462,7 @@ const StudentForm = () => {
               </div>
             </div>
 
-            {/* â”€â”€ Custom Fields â”€â”€ */}
+            {/* â--â-- Custom Fields â--â-- */}
             <div className="form-section" style={{ marginTop: '2rem' }}>
               <h3 className="form-section-title">Custom Fields</h3>
 
@@ -530,7 +530,7 @@ const StudentForm = () => {
               )}
             </div>
 
-            {/* â”€â”€ Actions â”€â”€ */}
+            {/* â--â-- Actions â--â-- */}
             <div className="form-actions-row" style={{ marginTop: '1.5rem' }}>
               <button
                 type="button"

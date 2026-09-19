@@ -167,7 +167,7 @@ const Events = () => {
         if (startDate.toDateString() === endDate.toDateString()) {
           return `${startDate.toLocaleDateString(undefined, options)}`;
         }
-        return `${startDate.toLocaleDateString(undefined, { month: 'short', day: 'numeric' })} â€“ ${endDate.toLocaleDateString(undefined, options)}`;
+        return `${startDate.toLocaleDateString(undefined, { month: 'short', day: 'numeric' })} â-- ${endDate.toLocaleDateString(undefined, options)}`;
       }
       return (startDate || endDate).toLocaleDateString(undefined, options);
     } catch {

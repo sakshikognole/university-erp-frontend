@@ -211,9 +211,9 @@ const BulkUploadAlumni = () => {
                           <td><span className="code-badge">{a.alumniId || '(auto)'}</span></td>
                           <td>{a.name}</td>
                           <td>{a.graduationYear}</td>
-                          <td>{a.jobTitle || 'â€”'}</td>
-                          <td>{a.currentCompany || 'â€”'}</td>
-                          <td>{a.email || 'â€”'}</td>
+                          <td>{a.jobTitle || 'â--'}</td>
+                          <td>{a.currentCompany || 'â--'}</td>
+                          <td>{a.email || 'â--'}</td>
                         </tr>
                       ))}
                     </tbody>

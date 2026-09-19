@@ -115,7 +115,7 @@ const Staff = () => {
   };
 
   const formatDate = (dateValue) => {
-    if (!dateValue) return 'â€”';
+    if (!dateValue) return 'â--';
     try {
       return new Date(dateValue).toISOString().slice(0, 10);
     } catch {

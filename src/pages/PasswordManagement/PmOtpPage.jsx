@@ -25,25 +25,25 @@ const PmOtpPage = () => {
   const state = location.state || {};
   const { flow, pendingPassword } = state;
 
-  // Guard â€” cannot land here without a valid flow in location state.
+  // Guard â-- cannot land here without a valid flow in location state.
   if (!flow || (flow !== 'firsttime' && flow !== 'login')) {
     return <Navigate to="/password-management" replace />;
   }
 
-  // â”€â”€ Step config mirrors PasswordManagementPage â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // â--â-- Step config mirrors PasswordManagementPage â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--
   const firstTimeSteps = ['Setup', 'OTP', 'Done'];
   const loginSteps     = ['OTP', 'New Password', 'Done'];
 
   const steps       = flow === 'firsttime' ? firstTimeSteps : loginSteps;
   const currentStep = 2; // OTP is always step 2 in both flows
 
-  // â”€â”€ Navigation callbacks â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // â--â-- Navigation callbacks â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--
   const handleSuccess = () => {
     if (flow === 'firsttime') {
-      // firsttime: OTP screen already saved the password â†’ go to success
+      // firsttime: OTP screen already saved the password â-- go to success
       navigate('/password-management', { state: { screen: 'success', completedFlow: 'firsttime' } });
     } else {
-      // login: OTP verified â†’ proceed to new-password screen
+      // login: OTP verified â-- proceed to new-password screen
       navigate('/password-management', { state: { screen: 'login-newpassword' } });
     }
   };

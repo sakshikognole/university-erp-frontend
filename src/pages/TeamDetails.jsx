@@ -43,12 +43,12 @@ export default function TeamDetails({ teamId, onBack }) {
 
   useEffect(() => { loadAll(); }, [loadAll]);
 
-  // â”€â”€ PRN lookup â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // â--â-- PRN lookup â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--
 
   const handlePrnInput = (e) => {
     const value = e.target.value;
 
-    // Comma pressed â†’ add current PRN to the table
+    // Comma pressed â-- add current PRN to the table
     if (value.endsWith(',')) {
       const typed = value.slice(0, -1).trim();
       if (typed && namePreview && !namePreview.startsWith('...') && !namePreview.startsWith('Not found')) {
@@ -87,7 +87,7 @@ export default function TeamDetails({ teamId, onBack }) {
   const removePrnFromList = (prn) =>
     setPrnList((prev) => prev.filter((p) => p.prn !== prn));
 
-  // â”€â”€ Roster actions â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // â--â-- Roster actions â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--
 
   const removeFromRoster = async (studentPrn) => {
     if (!window.confirm('Remove this student from the roster?')) return;
@@ -100,7 +100,7 @@ export default function TeamDetails({ teamId, onBack }) {
     }
   };
 
-  // â”€â”€ Request actions â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // â--â-- Request actions â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--
 
   const acceptRequest = async (requestId) => {
     try {
@@ -122,7 +122,7 @@ export default function TeamDetails({ teamId, onBack }) {
     }
   };
 
-  // â”€â”€ Render â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // â--â-- Render â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--
 
   if (loading) return <p className="books-loading">Loading team details...</p>;
   if (!team)   return <p className="st-empty">Team not found.</p>;
@@ -132,7 +132,7 @@ export default function TeamDetails({ teamId, onBack }) {
 
       {/* Back button */}
       <button className="st-back-link" onClick={onBack}>
-        â† Back to Sport Teams
+        â-- Back to Sport Teams
       </button>
 
       {/* Page title */}
@@ -179,7 +179,7 @@ export default function TeamDetails({ teamId, onBack }) {
         </table>
       </div>
 
-      {/* â”€â”€ Roster Section â”€â”€ */}
+      {/* â--â-- Roster Section â--â-- */}
       <p className="st-section-title">Roster</p>
 
       {/* Add student by PRN */}
@@ -221,7 +221,7 @@ export default function TeamDetails({ teamId, onBack }) {
         </div>
 
         <p style={{ fontSize: 12, color: 'var(--text-secondary)', marginBottom: 10 }}>
-          Type a PRN â€” the student name appears below. Press <strong>,</strong> (comma) to add to the list.
+          Type a PRN â-- the student name appears below. Press <strong>,</strong> (comma) to add to the list.
         </p>
 
         {/* Students list table */}
@@ -324,7 +324,7 @@ export default function TeamDetails({ teamId, onBack }) {
         </div>
       )}
 
-      {/* â”€â”€ Student Requests Section â”€â”€ */}
+      {/* â--â-- Student Requests Section â--â-- */}
       <p className="st-section-title">Student Requests</p>
 
       {requests.length === 0 ? (

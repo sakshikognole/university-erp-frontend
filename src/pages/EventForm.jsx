@@ -548,7 +548,7 @@ const EventForm = () => {
                         fontSize: '0.875rem', 
                         color: 'var(--text-secondary)' 
                       }}>
-                        Selected: {selectedVenueName} â€” {formData.venueId}
+                        Selected: {selectedVenueName} â-- {formData.venueId}
                       </div>
                     )}
                     {showVenueDropdown && getFilteredVenues().length > 0 && (
@@ -586,8 +586,8 @@ const EventForm = () => {
                             </div>
                             <div style={{ fontSize: '0.875rem', color: 'var(--text-secondary)', marginTop: '0.125rem' }}>
                               {venue.venueId}
-                              {venue.capacity && ` â€¢ Capacity: ${venue.capacity}`}
-                              {venue.status && ` â€¢ ${venue.status}`}
+                              {venue.capacity && ` â-¢ Capacity: ${venue.capacity}`}
+                              {venue.status && ` â-¢ ${venue.status}`}
                             </div>
                           </div>
                         ))}
@@ -638,7 +638,7 @@ const EventForm = () => {
                         fontSize: '0.875rem', 
                         color: 'var(--text-secondary)' 
                       }}>
-                        Selected: {selectedClubName} â€” {formData.organizerId}
+                        Selected: {selectedClubName} â-- {formData.organizerId}
                       </div>
                     )}
                     {showClubDropdown && getFilteredClubs().length > 0 && (
@@ -676,7 +676,7 @@ const EventForm = () => {
                             </div>
                             <div style={{ fontSize: '0.875rem', color: 'var(--text-secondary)', marginTop: '0.125rem' }}>
                               {club.clubId}
-                              {club.clubCategory && ` â€¢ ${club.clubCategory}`}
+                              {club.clubCategory && ` â-¢ ${club.clubCategory}`}
                             </div>
                           </div>
                         ))}

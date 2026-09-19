@@ -37,20 +37,20 @@ const authHeader = () => {
 };
 
 // ---------------------------------------------------------------------------
-// Students â€” list, search, filter, pagination
+// Students â-- list, search, filter, pagination
 // ---------------------------------------------------------------------------
 const Students = () => {
   const navigate = useNavigate();
 
-  // â”€â”€ Data â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // â--â-- Data â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--
   const [students, setStudents]   = useState([]);
   const [loading, setLoading]     = useState(true);
   const [feedback, _setFeedback]   = useState({ type: '', message: '' });
 
-  // â”€â”€ Search â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // â--â-- Search â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--
   const [search, setSearch] = useState('');
 
-  // â”€â”€ Filters â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // â--â-- Filters â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--
   const [showFilters, setShowFilters] = useState(false);
   const [filters, setFilters] = useState({
     degree:           '',
@@ -66,21 +66,21 @@ const Students = () => {
     divisions:  [],
   });
 
-  // â”€â”€ Download dropdown â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // â--â-- Download dropdown â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--
   const [showDownloadMenu, setShowDownloadMenu] = useState(false);
   const downloadMenuRef = useRef(null);
 
-  // â”€â”€ Pagination â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // â--â-- Pagination â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--
   const [currentPage, setCurrentPage]   = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(10);
 
-  // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--
   // Fetch all students once on mount.
   // We fetch the full list client-side so that filter dropdowns are always
   // populated and searching/filtering is instant without extra round-trips.
   // For very large datasets the backend also accepts query params for
   // server-side filtering (see studentController.getStudents).
-  // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--
   const fetchStudents = useCallback(async () => {
     setLoading(true);
     try {
@@ -108,7 +108,7 @@ const Students = () => {
     }
   }, []);
 
-  // Single useEffect â€” only runs once on mount (fetchStudents is stable)
+  // Single useEffect â-- only runs once on mount (fetchStudents is stable)
   useEffect(() => {
     fetchStudents();
   }, [fetchStudents]);
@@ -124,7 +124,7 @@ const Students = () => {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  // â”€â”€ Filter / search logic â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // â--â-- Filter / search logic â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--
   const filteredStudents = students.filter((s) => {
     // Text search across name, PRN, class, degree
     const query = search.toLowerCase().trim();
@@ -158,7 +158,7 @@ const Students = () => {
     setCurrentPage(1);
   }, [search, filters]);
 
-  // â”€â”€ Pagination â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // â--â-- Pagination â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--
   const totalPages  = Math.ceil(filteredStudents.length / itemsPerPage);
   const startIndex  = (currentPage - 1) * itemsPerPage;
   const endIndex    = startIndex + itemsPerPage;
@@ -173,7 +173,7 @@ const Students = () => {
     setCurrentPage(1);
   };
 
-  // â”€â”€ Filter handlers â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // â--â-- Filter handlers â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--
   const handleFilterChange = (field, value) => {
     setFilters((prev) => ({ ...prev, [field]: value }));
   };
@@ -187,17 +187,17 @@ const Students = () => {
     clearFilters();
   };
 
-  // â”€â”€ Download â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // â--â-- Download â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--
   const handleDownload = (format) => {
     setShowDownloadMenu(false);
     exportStudents(filteredStudents, format);
   };
 
-  // â”€â”€ Render â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // â--â-- Render â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--
   return (
     <div className="page-container">
 
-      {/* â”€â”€ Page header â”€â”€ */}
+      {/* â--â-- Page header â--â-- */}
       <div className="page-header-row">
         <div>
           <h1 className="page-title">Students</h1>
@@ -256,7 +256,7 @@ const Students = () => {
         </div>
       </div>
 
-      {/* â”€â”€ Feedback banner â”€â”€ */}
+      {/* â--â-- Feedback banner â--â-- */}
       {feedback.message && (
         <div
           className={`feedback-banner ${
@@ -269,10 +269,10 @@ const Students = () => {
         </div>
       )}
 
-      {/* â”€â”€ Table card â”€â”€ */}
+      {/* â--â-- Table card â--â-- */}
       <div className="card table-card" style={{ marginTop: '1.25rem' }}>
 
-        {/* â”€â”€ Search + filter bar â”€â”€ */}
+        {/* â--â-- Search + filter bar â--â-- */}
         <div className="table-controls-bar">
           {/* Search box */}
           <div className="search-box-wrapper">
@@ -280,7 +280,7 @@ const Students = () => {
             <input
               type="text"
               className="search-input"
-              placeholder="Search by Name, PRN, Class or Degreeâ€¦"
+              placeholder="Search by Name, PRN, Class or Degreeâ-¦"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
             />
@@ -324,7 +324,7 @@ const Students = () => {
           </div>
         </div>
 
-        {/* â”€â”€ Filter panel (collapsible) â”€â”€ */}
+        {/* â--â-- Filter panel (collapsible) â--â-- */}
         {showFilters && (
           <div className="students-filter-panel">
             <div className="students-filter-grid">
@@ -412,12 +412,12 @@ const Students = () => {
           </div>
         )}
 
-        {/* â”€â”€ Table â”€â”€ */}
+        {/* â--â-- Table â--â-- */}
         <div className="table-container">
           {loading ? (
             <div className="table-loading-state">
               <Loader2 size={24} className="spin-animate" />
-              <p>Loading students listâ€¦</p>
+              <p>Loading students listâ-¦</p>
             </div>
           ) : filteredStudents.length === 0 ? (
             <div className="table-empty-state">
@@ -475,7 +475,7 @@ const Students = () => {
                         <span className="dept-name-cell">{student.name}</span>
                       </td>
                       <td>{student.class}</td>
-                      <td>{student.division || 'â€”'}</td>
+                      <td>{student.division || 'â--'}</td>
                       <td>{student.degree}</td>
                       <td>{student.yearOfEnrollment}</td>
                       <td style={{ textAlign: 'right' }}>
@@ -501,11 +501,11 @@ const Students = () => {
                 </tbody>
               </table>
 
-              {/* â”€â”€ Pagination â”€â”€ */}
+              {/* â--â-- Pagination â--â-- */}
               {totalPages > 1 && (
                 <div className="pagination-controls">
                   <div className="pagination-info">
-                    Showing {startIndex + 1}â€“{Math.min(endIndex, filteredStudents.length)} of{' '}
+                    Showing {startIndex + 1}â--{Math.min(endIndex, filteredStudents.length)} of{' '}
                     {filteredStudents.length} students
                   </div>
 
@@ -542,7 +542,7 @@ const Students = () => {
                       ) {
                         return (
                           <span key={pageNum} className="pagination-dots">
-                            â€¦
+                            â-¦
                           </span>
                         );
                       }

@@ -94,7 +94,7 @@ export default function ClubsPage() {
         ordered.push(p);
         (subMap[p.clubId] || []).forEach((s) => ordered.push(s));
     });
-    // Any sub-club whose parent doesn't exist yet â€” show at end
+    // Any sub-club whose parent doesn't exist yet â-- show at end
     clubs
         .filter((c) => c.parentClubId && !parentList.find((p) => p.clubId === c.parentClubId))
         .forEach((c) => ordered.push(c));
@@ -148,7 +148,7 @@ export default function ClubsPage() {
                             onClick={() => openView(club)}
                             style={{ cursor: 'pointer' }}
                         >
-                            {/* Card top strip â€” colored by status */}
+                            {/* Card top strip â-- colored by status */}
                             <div className={`club-card-strip ${club.status === 'Active' ? 'strip-active' : 'strip-inactive'}`} />
 
                             <div className="club-card-body">
@@ -176,7 +176,7 @@ export default function ClubsPage() {
                                     <p className="club-category">{club.clubCategory}</p>
                                 )}
 
-                                {/* Description â€” truncated to 100 chars on card */}
+                                {/* Description â-- truncated to 100 chars on card */}
                                 {club.description && (
                                     <p className="club-description">
                                         {club.description.length > 100
@@ -206,7 +206,7 @@ export default function ClubsPage() {
                                             <span className="club-detail-label">Student Lead</span>
                                             <span className="club-detail-value">
                                                 {club.studentLeadName}
-                                                {club.studentLeadRole && ` â€” ${club.studentLeadRole}`}
+                                                {club.studentLeadRole && ` â-- ${club.studentLeadRole}`}
                                             </span>
                                         </div>
                                     )}

@@ -19,11 +19,11 @@ import {
   CircleDollarSign,
 } from 'lucide-react';
 
-// Node/Express backend â€” auth, create-order, verify
+// Node/Express backend â-- auth, create-order, verify
 const _IS_PROD = window.location.hostname !== 'localhost';
 const _NODE_URL = _IS_PROD ? 'https://university-erp-node.onrender.com' : 'http://localhost:5000';
 const API_BASE_URL = `${_NODE_URL}/api`;
-// Spring Boot backend â€” fee payment combinations
+// Spring Boot backend â-- fee payment combinations
 const SPRING_API_URL = 'http://localhost:8080/api';
 
 /**
@@ -31,18 +31,18 @@ const SPRING_API_URL = 'http://localhost:8080/api';
  * the existing UI and Razorpay flow expect.
  *
  * PaymentCombination fields:
- *   id, paymentId, paymentTitles (string[] â€” title names), totalAmount, createdAt
+ *   id, paymentId, paymentTitles (string[] â-- title names), totalAmount, createdAt
  *
  * allTitles: PaymentTitle[] fetched from /api/payment-titles (all pages)
  *
  * Mapped to:
- *   _id              â€” MongoDB id of the combination (used as feeRecordId in Razorpay)
- *   feeType          â€” joined title names (e.g. "Bus Fee + Hostel Fee")
- *   totalFeeAmount   â€” gross sum of title.amount (before discount)
- *   discountAmount   â€” total discount = grossAmount - totalAmount
- *   paidAmount       â€” starts at 0; updated locally after successful payment
- *   remainingAmount  â€” net payable = totalAmount (already discount-applied)
- *   status           â€” PENDING / PAID / PARTIAL
+ *   _id              â-- MongoDB id of the combination (used as feeRecordId in Razorpay)
+ *   feeType          â-- joined title names (e.g. "Bus Fee + Hostel Fee")
+ *   totalFeeAmount   â-- gross sum of title.amount (before discount)
+ *   discountAmount   â-- total discount = grossAmount - totalAmount
+ *   paidAmount       â-- starts at 0; updated locally after successful payment
+ *   remainingAmount  â-- net payable = totalAmount (already discount-applied)
+ *   status           â-- PENDING / PAID / PARTIAL
  */
 const mapCombinationToFeeRecord = (combo, allTitles = []) => {
   const titleNames = Array.isArray(combo.paymentTitles) ? combo.paymentTitles : [];
@@ -66,10 +66,10 @@ const mapCombinationToFeeRecord = (combo, allTitles = []) => {
     _id:             combo.id || combo.paymentId,
     paymentId:       combo.paymentId,
     feeType,
-    totalFeeAmount:  resolvedGross,   // gross â€” shown in "Total Fee Amount" column
-    discountAmount,                   // real discount â€” shown in "Discount" column
+    totalFeeAmount:  resolvedGross,   // gross â-- shown in "Total Fee Amount" column
+    discountAmount,                   // real discount â-- shown in "Discount" column
     paidAmount:      0,
-    remainingAmount: combo.totalAmount, // net payable â€” what Razorpay charges
+    remainingAmount: combo.totalAmount, // net payable â-- what Razorpay charges
     status:          'PENDING',
   };
 };
@@ -243,7 +243,7 @@ const FeePayment = () => {
         amount: order?.amount || Math.round(payAmountInRupees * 100), // in paise
         currency: order?.currency || 'INR',
         name: 'University ERP',
-        description: `Fee Payment - â‚¹${payAmountInRupees.toLocaleString('en-IN')}`,
+        description: `Fee Payment - â-¹${payAmountInRupees.toLocaleString('en-IN')}`,
         image: 'https://cdn-icons-png.flaticon.com/512/2997/2997322.png',
         ...(order?.id && !order.id.startsWith('order_test_') ? { order_id: order.id } : {}),
         handler: async function (response) {
@@ -459,15 +459,15 @@ const FeePayment = () => {
                           </span>
                         </td>
                         <td style={{ fontWeight: 600, fontSize: '0.95rem' }}>
-                          â‚¹{(record.totalFeeAmount || 0).toLocaleString('en-IN')}
+                          â-¹{(record.totalFeeAmount || 0).toLocaleString('en-IN')}
                         </td>
                         <td style={{ color: '#047857', fontWeight: 600, fontSize: '0.95rem' }}>
                           {(record.discountAmount || 0) > 0
-                            ? `- â‚¹${(record.discountAmount || 0).toLocaleString('en-IN')}`
-                            : 'â‚¹0'}
+                            ? `- â-¹${(record.discountAmount || 0).toLocaleString('en-IN')}`
+                            : 'â-¹0'}
                         </td>
                         <td style={{ fontWeight: 600, color: '#2563eb', fontSize: '0.95rem' }}>
-                          â‚¹{(record.paidAmount || 0).toLocaleString('en-IN')}
+                          â-¹{(record.paidAmount || 0).toLocaleString('en-IN')}
                         </td>
                         <td
                           style={{
@@ -476,7 +476,7 @@ const FeePayment = () => {
                             fontSize: '1rem',
                           }}
                         >
-                          â‚¹{(record.remainingAmount || 0).toLocaleString('en-IN')}
+                          â-¹{(record.remainingAmount || 0).toLocaleString('en-IN')}
                         </td>
                         <td>
                           <span
@@ -652,7 +652,7 @@ const FeePayment = () => {
         </div>
       </div>
 
-      {/* â”€â”€ Selected Record Detail Card â”€â”€ */}
+      {/* â--â-- Selected Record Detail Card â--â-- */}
       {selectedRecord && (
         <div
           ref={detailRef}
@@ -759,7 +759,7 @@ const FeePayment = () => {
                   </div>
                   <div style={detailValueStyle}>
                     {selectedRecord.degree}
-                    {selectedRecord.class ? ` â€” ${selectedRecord.class}` : ''}
+                    {selectedRecord.class ? ` â-- ${selectedRecord.class}` : ''}
                     {selectedRecord.division ? ` (${selectedRecord.division})` : ''}
                   </div>
                 </div>
@@ -772,7 +772,7 @@ const FeePayment = () => {
                   </div>
                   <div style={detailValueStyle}>
                     {selectedRecord.academicYear}
-                    {selectedRecord.semester ? ` â€¢ ${selectedRecord.semester}` : ''}
+                    {selectedRecord.semester ? ` â-¢ ${selectedRecord.semester}` : ''}
                   </div>
                 </div>
               )}
@@ -784,7 +784,7 @@ const FeePayment = () => {
                   <span>Total Fee Amount</span>
                 </div>
                 <div style={{ ...detailValueStyle, fontWeight: 700 }}>
-                  â‚¹{(selectedRecord.totalFeeAmount || 0).toLocaleString('en-IN')}
+                  â-¹{(selectedRecord.totalFeeAmount || 0).toLocaleString('en-IN')}
                 </div>
               </div>
               <div style={detailItemStyle}>
@@ -794,8 +794,8 @@ const FeePayment = () => {
                 </div>
                 <div style={{ ...detailValueStyle, color: '#047857' }}>
                   {(selectedRecord.discountAmount || 0) > 0
-                    ? `- â‚¹${(selectedRecord.discountAmount || 0).toLocaleString('en-IN')}`
-                    : 'â‚¹0'}
+                    ? `- â-¹${(selectedRecord.discountAmount || 0).toLocaleString('en-IN')}`
+                    : 'â-¹0'}
                 </div>
               </div>
               <div style={detailItemStyle}>
@@ -804,7 +804,7 @@ const FeePayment = () => {
                   <span>Net Payable</span>
                 </div>
                 <div style={{ ...detailValueStyle, fontWeight: 700 }}>
-                  â‚¹{Math.max(
+                  â-¹{Math.max(
                     0,
                     (selectedRecord.totalFeeAmount || 0) - (selectedRecord.discountAmount || 0)
                   ).toLocaleString('en-IN')}
@@ -816,7 +816,7 @@ const FeePayment = () => {
                   <span>Paid Amount</span>
                 </div>
                 <div style={{ ...detailValueStyle, color: '#2563eb', fontWeight: 700 }}>
-                  â‚¹{(selectedRecord.paidAmount || 0).toLocaleString('en-IN')}
+                  â-¹{(selectedRecord.paidAmount || 0).toLocaleString('en-IN')}
                 </div>
               </div>
               <div style={detailItemStyle}>
@@ -831,7 +831,7 @@ const FeePayment = () => {
                     color: selectedRecord.remainingAmount > 0 ? '#dc2626' : '#047857',
                   }}
                 >
-                  â‚¹{(selectedRecord.remainingAmount || 0).toLocaleString('en-IN')}
+                  â-¹{(selectedRecord.remainingAmount || 0).toLocaleString('en-IN')}
                 </div>
               </div>
               {selectedRecord.dueDate && (
@@ -889,7 +889,7 @@ const FeePayment = () => {
                         </span>
                       </div>
                       <span style={{ fontWeight: 700, color: '#111827' }}>
-                        â‚¹{(txn.amount || 0).toLocaleString('en-IN')}
+                        â-¹{(txn.amount || 0).toLocaleString('en-IN')}
                       </span>
                     </div>
                   ))}
@@ -936,7 +936,7 @@ const FeePayment = () => {
                     <>
                       <CreditCard size={17} />
                       <span>
-                        Pay â‚¹{(selectedRecord.remainingAmount || 0).toLocaleString('en-IN')}
+                        Pay â-¹{(selectedRecord.remainingAmount || 0).toLocaleString('en-IN')}
                       </span>
                     </>
                   )}

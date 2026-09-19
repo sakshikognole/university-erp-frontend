@@ -99,7 +99,7 @@ const AlumniJobForm = () => {
       return;
     }
     if (alumniIdStatus === 'checking') {
-      setFeedback({ type: 'error', message: 'Please wait â€” verifying Alumni ID...' });
+      setFeedback({ type: 'error', message: 'Please wait â-- verifying Alumni ID...' });
       return;
     }
     if (form.datePosted && form.dateOfExpiry && new Date(form.dateOfExpiry) < new Date(form.datePosted)) {
@@ -226,7 +226,7 @@ const AlumniJobForm = () => {
             <div className="form-section" style={{ marginTop: '2rem' }}>
               <h3 className="form-section-title">Dates</h3>
               <p style={{ fontSize: '0.8125rem', color: 'var(--text-secondary)', marginBottom: '1rem' }}>
-                Status is calculated automatically â€” jobs are shown as <strong>Active</strong> until the expiry date passes.
+                Status is calculated automatically â-- jobs are shown as <strong>Active</strong> until the expiry date passes.
               </p>
               <div className="form-row">
                 <div className="form-group">

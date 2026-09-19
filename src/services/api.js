@@ -1,8 +1,8 @@
 import axios from 'axios';
 
 // Runtime URL detection.
-// localhost  â†’ Vite proxy (local dev / Docker).
-// Render/any other host â†’ real backend URLs.
+// localhost  â-- Vite proxy (local dev / Docker).
+// Render/any other host â-- real backend URLs.
 const onLocalhost = window.location.hostname === 'localhost';
 
 const SPRING_BASE = onLocalhost
@@ -13,7 +13,7 @@ const NODE_BASE = onLocalhost
   ? '/node-api'
   : 'https://university-erp-node.onrender.com/api';
 
-// â”€â”€ Retry helper â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// â--â-- Retry helper â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--
 // On Render free tier services sleep after 15 min of inactivity.
 // The first request can fail with a network error while the service wakes up.
 // We retry up to 3 times with exponential backoff (1s, 2s, 4s) before giving up.
@@ -37,11 +37,11 @@ async function withRetry(fn, retries = 3, delayMs = 1000) {
   }
 }
 
-// â”€â”€ Axios instances â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// â--â-- Axios instances â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--
 export const springApi = axios.create({ baseURL: SPRING_BASE });
 export const nodeApi   = axios.create({ baseURL: NODE_BASE });
 
-// â”€â”€ Response interceptor â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// â--â-- Response interceptor â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--
 // Unwraps axios response so callers receive the body directly.
 // Surfaces a clean error message on failure.
 const responseInterceptor = [
@@ -59,7 +59,7 @@ const responseInterceptor = [
 springApi.interceptors.response.use(...responseInterceptor);
 nodeApi.interceptors.response.use(...responseInterceptor);
 
-// â”€â”€ Retry-wrapped helpers â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// â--â-- Retry-wrapped helpers â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--
 // Use these instead of springApi/nodeApi directly for initial page data loads.
 // For user-triggered actions (save, delete) use springApi/nodeApi directly
 // since the user can just click again.

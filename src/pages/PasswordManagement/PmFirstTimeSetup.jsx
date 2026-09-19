@@ -1,14 +1,14 @@
 /**
  * PmFirstTimeSetup.jsx
  *
- * First-Time Login â€” Step 1 screen.
+ * First-Time Login â-- Step 1 screen.
  *
  * Fields:
- *   â€¢ Current Password  â€” pre-filled "123456" but editable; user must enter
+ *   â-¢ Current Password  â-- pre-filled "123456" but editable; user must enter
  *                         their actual current password (which may have been
  *                         changed from the default on a previous run).
- *   â€¢ New Password      â€” user enters chosen password
- *   â€¢ Retype Password   â€” must match; red border + inline error if not
+ *   â-¢ New Password      â-- user enters chosen password
+ *   â-¢ Retype Password   â-- must match; red border + inline error if not
  *
  * On Save:
  *   1. Validates all fields client-side.
@@ -33,7 +33,7 @@ import { initFirstTime } from './pmService';
 import PmStepIndicator from './PmStepIndicator';
 
 const PmFirstTimeSetup = ({ steps, currentStep, onSuccess, onBack }) => {
-  // Pre-filled with the default but editable â€” user types their real current password
+  // Pre-filled with the default but editable â-- user types their real current password
   const [currentPassword, setCurrentPassword] = useState('123456');
   const [newPassword, setNewPassword]          = useState('');
   const [retypePassword, setRetypePassword]    = useState('');
@@ -114,7 +114,7 @@ const PmFirstTimeSetup = ({ steps, currentStep, onSuccess, onBack }) => {
 
       <form onSubmit={handleSave} className="auth-form" noValidate>
 
-        {/* â”€â”€ Current Password (editable, pre-filled with default) â”€â”€ */}
+        {/* â--â-- Current Password (editable, pre-filled with default) â--â-- */}
         <div className="form-group">
           <label className="form-label" htmlFor="pm-current-password">
             Current Password
@@ -148,7 +148,7 @@ const PmFirstTimeSetup = ({ steps, currentStep, onSuccess, onBack }) => {
           </span>
         </div>
 
-        {/* â”€â”€ New Password â”€â”€ */}
+        {/* â--â-- New Password â--â-- */}
         <div className="form-group">
           <label className="form-label" htmlFor="pm-new-password">
             New Password
@@ -178,7 +178,7 @@ const PmFirstTimeSetup = ({ steps, currentStep, onSuccess, onBack }) => {
           </div>
         </div>
 
-        {/* â”€â”€ Retype Password â”€â”€ */}
+        {/* â--â-- Retype Password â--â-- */}
         <div className="form-group">
           <div className="form-label-row">
             <label className="form-label" htmlFor="pm-retype-password">

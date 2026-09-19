@@ -1,5 +1,5 @@
 /**
- * PageLoader â€” full-page centered loading spinner.
+ * PageLoader â-- full-page centered loading spinner.
  * Use while initial page data is being fetched.
  *
  * Usage:
