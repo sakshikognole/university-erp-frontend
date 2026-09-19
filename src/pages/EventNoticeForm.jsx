@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+---import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import {
   ArrowLeft,
@@ -309,7 +309,7 @@ const EventNoticeForm = () => {
         }
       }
 
-      // Step 2: send JSON body — no multipart needed anymore
+      // Step 2: send JSON body -----" no multipart needed anymore
       const payload = {
         title: formData.title.trim(),
         description: formData.description.trim(),
@@ -651,7 +651,7 @@ const EventNoticeForm = () => {
                   <option value="">-- Choose from Booked Events (Auto-fills details) or enter manually below --</option>
                   {bookedEvents.map((b) => (
                     <option key={b.eventId || b.id} value={b.eventId || b.id}>
-                      {b.eventTitle || b.title} (ID: {b.eventId || b.id}){b.eventType ? ` • Type: ${b.eventType}` : ''}{b.venueId ? ` • Venue: ${b.venueId}` : ''}
+                      {b.eventTitle || b.title} (ID: {b.eventId || b.id}){b.eventType ? ` ------- Type: ${b.eventType}` : ''}{b.venueId ? ` ------- Venue: ${b.venueId}` : ''}
                     </option>
                   ))}
                 </select>

@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+---import { useState, useEffect } from 'react';
 
 const EMPTY = {
   examId:          '',
@@ -87,7 +87,7 @@ export default function ExamModal({
                 display: 'flex', flexDirection: 'column', gap: 10,
               }}>
                 <div style={{ display: 'flex', gap: 10, alignItems: 'flex-start' }}>
-                  <span style={{ fontSize: '1.3rem' }}>⚠️</span>
+                  <span style={{ fontSize: '1.3rem' }}>---- ------</span>
                   <p style={{ color: '#dc2626', fontWeight: 600, margin: 0, fontSize: '0.9rem' }}>
                     {dupError}
                   </p>
@@ -134,13 +134,13 @@ export default function ExamModal({
               />
             </div>
 
-            {/* Display Mode toggle — only one selectable at a time */}
+            {/* Display Mode toggle -----" only one selectable at a time */}
             <div className="books-form-group">
               <label className="books-form-label">Display Marks As</label>
               <div style={{ display: 'flex', gap: 10, marginTop: 4 }}>
                 {[
                   { value: 'PERCENTAGE', label: '% Percentage', example: 'e.g. 75%' },
-                  { value: 'FRACTION',   label: '⅟ Fraction',   example: 'e.g. 7.5 / scale' },
+                  { value: 'FRACTION',   label: '--...-- Fraction',   example: 'e.g. 7.5 / scale' },
                 ].map((opt) => {
                   const isSelected = form.displayMode === opt.value;
                   return (
@@ -175,7 +175,7 @@ export default function ExamModal({
                 })}
               </div>
 
-              {/* Percentage scale input — shown when PERCENTAGE selected */}
+              {/* Percentage scale input -----" shown when PERCENTAGE selected */}
               {form.displayMode === 'PERCENTAGE' && (
                 <div style={{ marginTop: 10, display: 'flex', alignItems: 'center', gap: 10 }}>
                   <label style={{ fontSize: '0.85rem', color: '#374151', fontWeight: 500, whiteSpace: 'nowrap' }}>
@@ -193,12 +193,12 @@ export default function ExamModal({
                     placeholder="100"
                   />
                   <span style={{ fontSize: '0.85rem', color: '#6b7280' }}>
-                    e.g. 50 → shows as 40% out of 50
+                    e.g. 50 -----' shows as 40% out of 50
                   </span>
                 </div>
               )}
 
-              {/* Fraction scale input — shown when FRACTION selected */}
+              {/* Fraction scale input -----" shown when FRACTION selected */}
               {form.displayMode === 'FRACTION' && (
                 <div style={{ marginTop: 10, display: 'flex', alignItems: 'center', gap: 10 }}>
                   <label style={{ fontSize: '0.85rem', color: '#374151', fontWeight: 500, whiteSpace: 'nowrap' }}>
@@ -216,7 +216,7 @@ export default function ExamModal({
                     placeholder="10"
                   />
                   <span style={{ fontSize: '0.85rem', color: '#6b7280' }}>
-                    e.g. scale = 5 → 20 marks become /5
+                    e.g. scale = 5 -----' 20 marks become /5
                   </span>
                 </div>
               )}
@@ -240,12 +240,12 @@ export default function ExamModal({
               borderRadius: 6, padding: '8px 12px',
               fontSize: '0.83rem', color: '#1d4ed8', display: 'flex', gap: 6,
             }}>
-              <span>ℹ️</span>
+              <span>-------------</span>
               <span>
                 T1/T2 max = <strong>20</strong> marks. SEE max = <strong>50</strong> marks.
                 {form.displayMode === 'PERCENTAGE'
-                  ? ` Marks shown as % out of ${form.percentageScale || 100} (e.g. 15/20 → ${((15/20)*(Number(form.percentageScale)||100)).toFixed(0)}%).`
-                  : ` Marks shown as fractions out of ${form.fractionScale || 10} (e.g. 15/20 → ${((15/20)*(Number(form.fractionScale)||10)).toFixed(2)}/${form.fractionScale || 10}).`}
+                  ? ` Marks shown as % out of ${form.percentageScale || 100} (e.g. 15/20 -----' ${((15/20)*(Number(form.percentageScale)||100)).toFixed(0)}%).`
+                  : ` Marks shown as fractions out of ${form.fractionScale || 10} (e.g. 15/20 -----' ${((15/20)*(Number(form.fractionScale)||10)).toFixed(2)}/${form.fractionScale || 10}).`}
               </span>
             </div>
 

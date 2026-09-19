@@ -1,23 +1,23 @@
-import { springApi } from '../services/api';
+---import { springApi } from '../services/api';
 import { useState, useEffect } from 'react';
 
 // file type icon helper
 function fileIcon(type) {
   switch ((type || '').toLowerCase()) {
-    case 'pdf':           return '📕';
+    case 'pdf':           return '----"---';
     case 'jpg':
     case 'jpeg':
-    case 'png':           return '🖼️';
+    case 'png':           return '-------------';
     case 'xls':
-    case 'xlsx':          return '📊';
-    default:              return '📄';
+    case 'xlsx':          return '----"--';
+    default:              return '----"---';
   }
 }
 
 // file type badge
 function TypeBadge({ type }) {
   const t = (type || '').toLowerCase();
-  return <span className={`dm-type-badge dm-type-${t}`}>{type || '—'}</span>;
+  return <span className={`dm-type-badge dm-type-${t}`}>{type || '-----"'}</span>;
 }
 
 export default function DisplayMaterialsPage() {
@@ -96,10 +96,10 @@ export default function DisplayMaterialsPage() {
             value={selectedSubject}
             onChange={(e) => setSelectedSubject(e.target.value)}
           >
-            <option value="">— Select Subject —</option>
+            <option value="">-----" Select Subject -----"</option>
             {subjects.map((s) => (
               <option key={s.folderId} value={s.folderId}>
-                📁 {s.folderName}
+                ----"-- {s.folderName}
               </option>
             ))}
           </select>
@@ -137,7 +137,7 @@ export default function DisplayMaterialsPage() {
                       </td>
                       <td>
                         <div className="books-actions">
-                          {/* View — opens inline in browser */}
+                          {/* View -----" opens inline in browser */}
                           <a
                             href={m.fileUrl}
                             target="_blank"
@@ -146,7 +146,7 @@ export default function DisplayMaterialsPage() {
                           >
                             View
                           </a>
-                          {/* Download — forces file download */}
+                          {/* Download -----" forces file download */}
                           <a
                             href={m.fileUrl}
                             download={m.fileName}

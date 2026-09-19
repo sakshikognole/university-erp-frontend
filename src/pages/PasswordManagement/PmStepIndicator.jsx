@@ -1,12 +1,12 @@
-/**
+---/**
  * PmStepIndicator.jsx
  *
  * Reusable step indicator bar for the Password Management module.
  * Matches the existing step-indicator-bar styling used in ForgotPassword.jsx.
  *
  * Props:
- *   steps   — string[]  e.g. ['Setup', 'OTP', 'Done']
- *   current — number    1-based index of the active step
+ *   steps   -----" string[]  e.g. ['Setup', 'OTP', 'Done']
+ *   current -----" number    1-based index of the active step
  */
 
 import React from 'react';

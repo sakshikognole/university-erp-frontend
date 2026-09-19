@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+---import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { 
   ArrowLeft, 
@@ -548,7 +548,7 @@ const EventForm = () => {
                         fontSize: '0.875rem', 
                         color: 'var(--text-secondary)' 
                       }}>
-                        Selected: {selectedVenueName} — {formData.venueId}
+                        Selected: {selectedVenueName} -----" {formData.venueId}
                       </div>
                     )}
                     {showVenueDropdown && getFilteredVenues().length > 0 && (
@@ -586,8 +586,8 @@ const EventForm = () => {
                             </div>
                             <div style={{ fontSize: '0.875rem', color: 'var(--text-secondary)', marginTop: '0.125rem' }}>
                               {venue.venueId}
-                              {venue.capacity && ` • Capacity: ${venue.capacity}`}
-                              {venue.status && ` • ${venue.status}`}
+                              {venue.capacity && ` ------- Capacity: ${venue.capacity}`}
+                              {venue.status && ` ------- ${venue.status}`}
                             </div>
                           </div>
                         ))}
@@ -638,7 +638,7 @@ const EventForm = () => {
                         fontSize: '0.875rem', 
                         color: 'var(--text-secondary)' 
                       }}>
-                        Selected: {selectedClubName} — {formData.organizerId}
+                        Selected: {selectedClubName} -----" {formData.organizerId}
                       </div>
                     )}
                     {showClubDropdown && getFilteredClubs().length > 0 && (
@@ -676,7 +676,7 @@ const EventForm = () => {
                             </div>
                             <div style={{ fontSize: '0.875rem', color: 'var(--text-secondary)', marginTop: '0.125rem' }}>
                               {club.clubId}
-                              {club.clubCategory && ` • ${club.clubCategory}`}
+                              {club.clubCategory && ` ------- ${club.clubCategory}`}
                             </div>
                           </div>
                         ))}

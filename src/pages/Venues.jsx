@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+---import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   MapPin,
@@ -332,7 +332,7 @@ const Venues = () => {
                         {venue.facilities && venue.facilities.length > 0
                           ? venue.facilities.slice(0, 2).map(f => f.name || f).join(', ') +
                             (venue.facilities.length > 2 ? ` +${venue.facilities.length - 2}` : '')
-                          : '—'}
+                          : '-----"'}
                       </td>
                       <td>
                         <span className={getStatusBadgeClass(venue.status)}>

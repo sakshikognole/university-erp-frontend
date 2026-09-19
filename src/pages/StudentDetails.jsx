@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+---import { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { springApi } from '../services/api';
 import StudentInformation from '../components/student/StudentInformation';
@@ -22,7 +22,7 @@ export default function StudentDetails() {
 
     springApi.get('/document-types')
       .then((res) => {
-        // springApi interceptor unwraps res.data — res IS the array directly
+        // springApi interceptor unwraps res.data -----" res IS the array directly
         const list = Array.isArray(res) ? res : (res.data ?? []);
         setDocTypes(list);
         if (list.length > 0) setDocType(list[0].documentName);
@@ -33,7 +33,7 @@ export default function StudentDetails() {
       .finally(() => setLoadingDocs(false));
   }, [student, navigate]);
 
-  // Guard render — student will be null only on the very first render before
+  // Guard render -----" student will be null only on the very first render before
   // the effect above fires navigate(); return null prevents a crash meanwhile.
   if (!student) return null;
 

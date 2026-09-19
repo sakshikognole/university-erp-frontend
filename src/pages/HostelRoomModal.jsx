@@ -1,4 +1,4 @@
-import { springApi } from '../services/api';
+---import { springApi } from '../services/api';
 import { useState, useEffect, useRef } from 'react';
 
 const EMPTY = { roomNo: '', capacity: '' };
@@ -34,7 +34,7 @@ export default function HostelRoomModal({ isOpen, blockId, onClose, onSaved }) {
     setErrors((er) => ({ ...er, [name]: '' }));
   };
 
-  // ── PRN lookup ────────────────────────────────────────────────────────
+  // --"-----"--- PRN lookup --"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"---
   const handlePrnInput = (e) => {
     const value = e.target.value;
     if (value.endsWith(',')) {
@@ -69,7 +69,7 @@ export default function HostelRoomModal({ isOpen, blockId, onClose, onSaved }) {
   const removePrn = (prn) =>
     setPrnList((prev) => prev.filter((p) => p.prn !== prn));
 
-  // ── Validate ──────────────────────────────────────────────────────────
+  // --"-----"--- Validate --"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"---
   const validate = () => {
     const e = {};
     if (!form.roomNo.trim())                          e.roomNo   = 'Room number is required.';
@@ -77,7 +77,7 @@ export default function HostelRoomModal({ isOpen, blockId, onClose, onSaved }) {
     return e;
   };
 
-  // ── Submit ────────────────────────────────────────────────────────────
+  // --"-----"--- Submit --"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"---
   const submit = async (ev) => {
     ev.preventDefault();
     const errs = validate();
@@ -101,7 +101,7 @@ export default function HostelRoomModal({ isOpen, blockId, onClose, onSaved }) {
             studentName: s.name,
           });
         } catch {
-          // silently skip if student fails — room was still created
+          // silently skip if student fails -----" room was still created
         }
       }
 
@@ -206,7 +206,7 @@ export default function HostelRoomModal({ isOpen, blockId, onClose, onSaved }) {
             </div>
 
             <p style={{ fontSize: 11, color: 'var(--text-secondary)', marginBottom: 8 }}>
-              Type PRN, name appears — press <strong>,</strong> to add to list.
+              Type PRN, name appears -----" press <strong>,</strong> to add to list.
             </p>
 
             {/* Pending students */}
@@ -231,7 +231,7 @@ export default function HostelRoomModal({ isOpen, blockId, onClose, onSaved }) {
                             className="books-btn books-btn-sm books-btn-ghost"
                             onClick={() => removePrn(p.prn)}
                           >
-                            ✕
+                            -------
                           </button>
                         </td>
                       </tr>

@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+---import { useState, useEffect, useCallback } from 'react';
 import axios from 'axios';
 import Pagination from '../components/Pagination';
 
@@ -9,7 +9,7 @@ const DEFAULT_PAGE = {
   totalPages: 0, first: true, last: true,
 };
 
-// ── Add Payment Modal ─────────────────────────────────────────────────────
+// --"-----"--- Add Payment Modal --"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"---
 function AddPaymentModal({ isOpen, onClose, onSaved }) {
   const [form,   setForm]   = useState({ title: '', amount: '', discount: '' });
   const [errors, setErrors] = useState({});
@@ -90,7 +90,7 @@ function AddPaymentModal({ isOpen, onClose, onSaved }) {
             </div>
             <div className="club-form-row">
               <div className="books-form-group">
-                <label className="books-form-label">Amount (₹) *</label>
+                <label className="books-form-label">Amount (-------) *</label>
                 <input
                   className={`books-form-control ${errors.amount ? 'err' : ''}`}
                   name="amount"
@@ -103,7 +103,7 @@ function AddPaymentModal({ isOpen, onClose, onSaved }) {
                 {errors.amount && <p className="books-form-err">{errors.amount}</p>}
               </div>
               <div className="books-form-group">
-                <label className="books-form-label">Discount (₹)</label>
+                <label className="books-form-label">Discount (-------)</label>
                 <input
                   className={`books-form-control ${errors.discount ? 'err' : ''}`}
                   name="discount"
@@ -120,7 +120,7 @@ function AddPaymentModal({ isOpen, onClose, onSaved }) {
               <p style={{ fontSize: 13, color: 'var(--text-secondary)', marginTop: 4 }}>
                 Final amount after discount:{' '}
                 <strong style={{ color: '#16a34a' }}>
-                  ₹{Math.max(0, Number(form.amount) - Number(form.discount || 0)).toLocaleString('en-IN')}
+                  -------{Math.max(0, Number(form.amount) - Number(form.discount || 0)).toLocaleString('en-IN')}
                 </strong>
               </p>
             )}
@@ -141,32 +141,32 @@ function AddPaymentModal({ isOpen, onClose, onSaved }) {
   );
 }
 
-// ══════════════════════════════════════════════════════════════════════════
-// PaymentPage — Admin payment title + combination management
+// --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+// PaymentPage -----" Admin payment title + combination management
 // Accessible at /payment-management (Super Admin only)
-// ══════════════════════════════════════════════════════════════════════════
+// --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 export default function PaymentPage() {
 
-  // ── Titles (paginated) ────────────────────────────────────────────────
+  // --"-----"--- Titles (paginated) --"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"---
   const [titles,        setTitles]        = useState([]);
   const [pageData,      setPageData]      = useState(DEFAULT_PAGE);
   const [page,          setPage]          = useState(0);
   const [size,          setSize]          = useState(10);
   const [titlesLoading, setTitlesLoading] = useState(true);
 
-  // ── Modal ─────────────────────────────────────────────────────────────
+  // --"-----"--- Modal --"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"---
   const [modalOpen, setModalOpen] = useState(false);
 
-  // ── Checkbox selection ────────────────────────────────────────────────
+  // --"-----"--- Checkbox selection --"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"---
   const [selected, setSelected] = useState(new Set());
 
-  // ── Combinations ──────────────────────────────────────────────────────
+  // --"-----"--- Combinations --"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"---
   const [combinations, setCombinations] = useState([]);
   const [creating,     setCreating]     = useState(false);
   const [viewCombo,    setViewCombo]    = useState(null);
   const [allTitles,    setAllTitles]    = useState([]);
 
-  // ── Feedback ──────────────────────────────────────────────────────────
+  // --"-----"--- Feedback --"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"---
   const [success, setSuccess] = useState('');
   const [error,   setError]   = useState('');
 
@@ -176,7 +176,7 @@ export default function PaymentPage() {
     return () => clearTimeout(t);
   }, [success, error]);
 
-  // ── Load titles (paginated) ───────────────────────────────────────────
+  // --"-----"--- Load titles (paginated) --"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"---
   const loadTitles = useCallback(async () => {
     setTitlesLoading(true);
     try {
@@ -200,7 +200,7 @@ export default function PaymentPage() {
     }
   }, [page, size]);
 
-  // ── Load combinations ─────────────────────────────────────────────────
+  // --"-----"--- Load combinations --"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"---
   const loadCombinations = useCallback(async () => {
     try {
       const res = await axios.get(`${SPRING_API}/payment-combinations`);
@@ -208,7 +208,7 @@ export default function PaymentPage() {
     } catch { /* silently ignore */ }
   }, []);
 
-  // ── Load all titles flat (for breakdown card lookup) ──────────────────
+  // --"-----"--- Load all titles flat (for breakdown card lookup) --"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"---
   const loadAllTitles = useCallback(async () => {
     try {
       const res = await axios.get(`${SPRING_API}/payment-titles`, {
@@ -222,11 +222,11 @@ export default function PaymentPage() {
   useEffect(() => { loadCombinations(); }, [loadCombinations]);
   useEffect(() => { loadAllTitles(); },    [loadAllTitles]);
 
-  // ── Page / size change ────────────────────────────────────────────────
+  // --"-----"--- Page / size change --"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"---
   const onPageChange = (p) => { setPage(p); setSelected(new Set()); };
   const onSizeChange = (s) => { setSize(s); setPage(0); setSelected(new Set()); };
 
-  // ── Checkbox handlers ─────────────────────────────────────────────────
+  // --"-----"--- Checkbox handlers --"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"---
   const toggleOne = (titleId) => {
     setSelected((prev) => {
       const next = new Set(prev);
@@ -254,7 +254,7 @@ export default function PaymentPage() {
     }
   };
 
-  // ── Create combination ────────────────────────────────────────────────
+  // --"-----"--- Create combination --"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"---
   const handleCreate = async () => {
     if (selected.size === 0) return;
     setCreating(true);
@@ -274,9 +274,9 @@ export default function PaymentPage() {
   };
 
   const fmt = (n) =>
-    '₹' + Number(n).toLocaleString('en-IN', { maximumFractionDigits: 0 });
+    '-------' + Number(n).toLocaleString('en-IN', { maximumFractionDigits: 0 });
 
-  // ── Render ────────────────────────────────────────────────────────────
+  // --"-----"--- Render --"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"---
   return (
     <div className="page-container">
 
@@ -300,17 +300,17 @@ export default function PaymentPage() {
       {success && (
         <div className="books-alert books-alert-success">
           <span>{success}</span>
-          <button onClick={() => setSuccess('')}>×</button>
+          <button onClick={() => setSuccess('')}>---</button>
         </div>
       )}
       {error && (
         <div className="books-alert books-alert-error">
           <span>{error}</span>
-          <button onClick={() => setError('')}>×</button>
+          <button onClick={() => setError('')}>---</button>
         </div>
       )}
 
-      {/* ── Payment Titles Table ── */}
+      {/* --"-----"--- Payment Titles Table --"-----"--- */}
       <div className="card" style={{ marginTop: '1.25rem' }}>
         {titlesLoading ? (
           <p className="books-loading">Loading payment titles...</p>
@@ -360,7 +360,7 @@ export default function PaymentPage() {
                     <td style={{ fontWeight: 500 }}>{t.title}</td>
                     <td className="pay-amount">{fmt(t.amount)}</td>
                     <td style={{ color: '#047857' }}>
-                      {t.discount > 0 ? `- ${fmt(t.discount)}` : '₹0'}
+                      {t.discount > 0 ? `- ${fmt(t.discount)}` : '-------0'}
                     </td>
                     <td className="pay-discount" style={{ fontWeight: 700 }}>
                       {fmt(t.amount - t.discount)}
@@ -379,7 +379,7 @@ export default function PaymentPage() {
         />
       </div>
 
-      {/* ── Create Combination button (shown when rows are selected) ── */}
+      {/* --"-----"--- Create Combination button (shown when rows are selected) --"-----"--- */}
       {selected.size > 0 && (
         <div className="pay-action-row">
           <p className="pay-selected-hint">
@@ -397,7 +397,7 @@ export default function PaymentPage() {
         </div>
       )}
 
-      {/* ── Created Payment Combinations ── */}
+      {/* --"-----"--- Created Payment Combinations --"-----"--- */}
       {combinations.length > 0 && (
         <div style={{ marginTop: '2rem' }}>
           <p className="pay-capsules-title">
@@ -415,7 +415,7 @@ export default function PaymentPage() {
                 <span className="pay-capsule-id">{c.paymentId}</span>
                 {c.paymentTitles.join(' + ')}
                 <span style={{ color: '#16a34a', fontWeight: 600, marginLeft: 6 }}>
-                  — {fmt(c.totalAmount)}
+                  -----" {fmt(c.totalAmount)}
                 </span>
               </span>
             ))}
@@ -423,7 +423,7 @@ export default function PaymentPage() {
         </div>
       )}
 
-      {/* ── Combination Breakdown Modal ── */}
+      {/* --"-----"--- Combination Breakdown Modal --"-----"--- */}
       {viewCombo && (
         <div className="books-overlay" onClick={() => setViewCombo(null)}>
           <div
@@ -432,7 +432,7 @@ export default function PaymentPage() {
             onClick={(e) => e.stopPropagation()}
           >
             <div className="books-modal-head">
-              <h3>{viewCombo.paymentId} — Fee Breakdown</h3>
+              <h3>{viewCombo.paymentId} -----" Fee Breakdown</h3>
               <button className="books-modal-close" onClick={() => setViewCombo(null)}>
                 x
               </button>
@@ -456,7 +456,7 @@ export default function PaymentPage() {
                           <td>{titleName}</td>
                           <td className="pay-amount">{fmt(t ? t.amount : 0)}</td>
                           <td style={{ color: '#047857' }}>
-                            {t && t.discount > 0 ? `- ${fmt(t.discount)}` : '₹0'}
+                            {t && t.discount > 0 ? `- ${fmt(t.discount)}` : '-------0'}
                           </td>
                           <td className="pay-discount" style={{ fontWeight: 700 }}>
                             {fmt(t ? t.amount - t.discount : 0)}
@@ -500,7 +500,7 @@ export default function PaymentPage() {
         </div>
       )}
 
-      {/* ── Add Payment Title Modal ── */}
+      {/* --"-----"--- Add Payment Title Modal --"-----"--- */}
       <AddPaymentModal
         isOpen={modalOpen}
         onClose={() => setModalOpen(false)}

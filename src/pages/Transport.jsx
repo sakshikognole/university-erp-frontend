@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+---import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   Bus,
@@ -515,7 +515,7 @@ const Transport = () => {
                         </td>
                         <td>
                           <span className="dept-name-cell">
-                            {route.routeName || '—'}
+                            {route.routeName || '-----"'}
                           </span>
                         </td>
                         <td>
@@ -610,8 +610,8 @@ const Transport = () => {
                             {driver.name}
                           </span>
                         </td>
-                        <td>{driver.phone || '—'}</td>
-                        <td>{driver.licenseNumber || '—'}</td>
+                        <td>{driver.phone || '-----"'}</td>
+                        <td>{driver.licenseNumber || '-----"'}</td>
                         <td>
                           <span
                             style={{
@@ -680,8 +680,8 @@ const Transport = () => {
                             {vehicle.name}
                           </span>
                         </td>
-                        <td>{vehicle.vehicleNumber || '—'}</td>
-                        <td>{vehicle.capacity ? `${vehicle.capacity} seats` : '—'}</td>
+                        <td>{vehicle.vehicleNumber || '-----"'}</td>
+                        <td>{vehicle.capacity ? `${vehicle.capacity} seats` : '-----"'}</td>
                         <td>
                           <span
                             style={{
@@ -734,7 +734,7 @@ const Transport = () => {
                       <th style={{ width: '140px' }}>Student ID</th>
                       <th>Student Name</th>
                       <th style={{ width: '110px' }}>Route ID</th>
-                      <th>Stops (From → To)</th>
+                      <th>Stops (From -----' To)</th>
                       <th style={{ width: '120px' }}>Payment</th>
                       <th style={{ width: '120px' }}>Valid Till</th>
                       <th style={{ width: '140px', textAlign: 'right' }}>Actions</th>
@@ -748,7 +748,7 @@ const Transport = () => {
                           <span className="code-badge">{pass.passId}</span>
                         </td>
                         <td>{pass.studentId}</td>
-                        <td>{pass.studentName || '—'}</td>
+                        <td>{pass.studentName || '-----"'}</td>
                         <td>
                           <span className="code-badge">
                             Route #{pass.routeId}
@@ -756,7 +756,7 @@ const Transport = () => {
                         </td>
                         <td>
                           <span style={{ fontWeight: 500 }}>{pass.fromStop}</span>
-                          <span style={{ margin: '0 6px', color: '#9ca3af' }}>→</span>
+                          <span style={{ margin: '0 6px', color: '#9ca3af' }}>-----'</span>
                           <span style={{ color: '#4b5563' }}>{pass.toStop}</span>
                         </td>
                         <td>
@@ -774,7 +774,7 @@ const Transport = () => {
                           </span>
                         </td>
                         <td>
-                          {pass.validTill ? new Date(pass.validTill).toLocaleDateString() : '—'}
+                          {pass.validTill ? new Date(pass.validTill).toLocaleDateString() : '-----"'}
                         </td>
                         <td style={{ textAlign: 'right' }}>
                           <div className="action-buttons-cell" style={{ justifyContent: 'flex-end' }}>
@@ -928,12 +928,12 @@ const Transport = () => {
                 </div>
                 <div style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', marginTop: '0.2rem' }}>
                   {deleteConfirm.type === 'route'
-                    ? `Driver: ${deleteConfirm.item.driverName} • Vehicle: ${deleteConfirm.item.vehicleName}`
+                    ? `Driver: ${deleteConfirm.item.driverName} ------- Vehicle: ${deleteConfirm.item.vehicleName}`
                     : deleteConfirm.type === 'driver'
-                    ? `Driver ID: ${deleteConfirm.item.driverId} ${deleteConfirm.item.phone ? `• ${deleteConfirm.item.phone}` : ''}`
+                    ? `Driver ID: ${deleteConfirm.item.driverId} ${deleteConfirm.item.phone ? `------- ${deleteConfirm.item.phone}` : ''}`
                     : deleteConfirm.type === 'vehicle'
-                    ? `Vehicle ID: ${deleteConfirm.item.vehicleId} ${deleteConfirm.item.vehicleNumber ? `• ${deleteConfirm.item.vehicleNumber}` : ''}`
-                    : `Student: ${deleteConfirm.item.studentId} • Route #${deleteConfirm.item.routeId}`}
+                    ? `Vehicle ID: ${deleteConfirm.item.vehicleId} ${deleteConfirm.item.vehicleNumber ? `------- ${deleteConfirm.item.vehicleNumber}` : ''}`
+                    : `Student: ${deleteConfirm.item.studentId} ------- Route #${deleteConfirm.item.routeId}`}
                 </div>
               </div>
               <span className="delete-item-code">

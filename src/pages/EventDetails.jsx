@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+---import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import {
   ArrowLeft,
@@ -371,8 +371,8 @@ const EventDetails = () => {
                     <div style={{ fontWeight: '500' }}>{venue.name}</div>
                     <div style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', marginTop: '0.125rem' }}>
                       {venue.venueId}
-                      {venue.capacity && ` • Capacity: ${venue.capacity}`}
-                      {venue.status && ` • ${venue.status}`}
+                      {venue.capacity && ` ------- Capacity: ${venue.capacity}`}
+                      {venue.status && ` ------- ${venue.status}`}
                     </div>
                   </div>
                 ) : (
@@ -405,7 +405,7 @@ const EventDetails = () => {
                     <div style={{ fontWeight: '500' }}>{club.clubName}</div>
                     <div style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', marginTop: '0.125rem' }}>
                       {club.clubId}
-                      {club.clubCategory && ` • ${club.clubCategory}`}
+                      {club.clubCategory && ` ------- ${club.clubCategory}`}
                     </div>
                   </div>
                 ) : (

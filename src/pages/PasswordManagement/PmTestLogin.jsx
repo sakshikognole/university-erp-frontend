@@ -1,4 +1,4 @@
-/**
+---/**
  * PmTestLogin.jsx
  *
  * Standalone test-login page at /password-management/test-login.
@@ -10,7 +10,7 @@
  * and shows a clear success or failure message.
  *
  * IMPORTANT: This is NOT the main ERP login page. It only authenticates
- * the two demo accounts and returns a plain confirmation — no JWT, no session.
+ * the two demo accounts and returns a plain confirmation -----" no JWT, no session.
  */
 
 import React, { useState } from 'react';

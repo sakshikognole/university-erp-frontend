@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+---import { useState, useEffect } from 'react';
 
 const EMPTY = {
   sportId:     '',
@@ -43,7 +43,7 @@ export default function SportModal({ isOpen, mode, sport, onSave, onClose, loadi
   const validate = () => {
     const e = {};
 
-    // ── Sport ID validation ──────────────────────────────────────────────
+    // --"-----"--- Sport ID validation --"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"---
     // Defects 1, 2, 3:
     // - Must NOT be only alphabets   (e.g. "SPT" is invalid)
     // - Must NOT be only numbers     (e.g. "001" is invalid)
@@ -56,7 +56,7 @@ export default function SportModal({ isOpen, mode, sport, onSave, onClose, loadi
       e.sportId = 'Sport ID must contain both letters and numbers (e.g. SPT001). No special characters allowed.';
     }
 
-    // ── Sport Name validation ────────────────────────────────────────────
+    // --"-----"--- Sport Name validation --"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"---
     // Defects 2, 4, 5, 7, 8:
     // - Must NOT accept numbers alone, combined with letters, or special chars
     // - Only letters (A-Z, a-z) and spaces allowed
@@ -69,17 +69,17 @@ export default function SportModal({ isOpen, mode, sport, onSave, onClose, loadi
       e.sportName = 'Sport name must contain only letters and spaces. Special characters are not allowed.';
     }
 
-    // ── Capacity validation ──────────────────────────────────────────────
+    // --"-----"--- Capacity validation --"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"---
     if (form.capacity === '') {
       e.capacity = 'Required';
     } else if (Number(form.capacity) < 1) {
       e.capacity = 'Must be greater than 0';
     }
 
-    // ── Status validation ────────────────────────────────────────────────
+    // --"-----"--- Status validation --"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"---
     if (!form.status) e.status = 'Required';
 
-    // ── Venue ID validation ──────────────────────────────────────────────
+    // --"-----"--- Venue ID validation --"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"---
     // Defects 4-8 (edit mode): validation applies in BOTH add and edit modes.
     // Venue ID is editable in edit mode so must be validated every time.
     // - Must NOT be only alphabets, only numbers, or contain special chars
@@ -121,7 +121,7 @@ export default function SportModal({ isOpen, mode, sport, onSave, onClose, loadi
         <form onSubmit={submit}>
           <div className="books-modal-body">
 
-            {/* Duplicate ID popup — shown inside modal with OK button */}
+            {/* Duplicate ID popup -----" shown inside modal with OK button */}
             {dupError && (
               <div style={{
                 background: '#fef2f2', border: '1px solid #fca5a5',
@@ -129,7 +129,7 @@ export default function SportModal({ isOpen, mode, sport, onSave, onClose, loadi
                 display: 'flex', flexDirection: 'column', gap: 10,
               }}>
                 <div style={{ display: 'flex', gap: 10, alignItems: 'flex-start' }}>
-                  <span style={{ fontSize: '1.3rem' }}>⚠️</span>
+                  <span style={{ fontSize: '1.3rem' }}>---- ------</span>
                   <p style={{ color: '#dc2626', fontWeight: 600, margin: 0, fontSize: '0.9rem' }}>
                     {dupError}
                   </p>

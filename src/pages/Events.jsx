@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+---import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   Calendar,
@@ -167,7 +167,7 @@ const Events = () => {
         if (startDate.toDateString() === endDate.toDateString()) {
           return `${startDate.toLocaleDateString(undefined, options)}`;
         }
-        return `${startDate.toLocaleDateString(undefined, { month: 'short', day: 'numeric' })} – ${endDate.toLocaleDateString(undefined, options)}`;
+        return `${startDate.toLocaleDateString(undefined, { month: 'short', day: 'numeric' })} -----" ${endDate.toLocaleDateString(undefined, options)}`;
       }
       return (startDate || endDate).toLocaleDateString(undefined, options);
     } catch {

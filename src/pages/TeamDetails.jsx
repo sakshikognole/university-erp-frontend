@@ -1,4 +1,4 @@
-import { springApi } from '../services/api';
+---import { springApi } from '../services/api';
 import { useState, useEffect, useCallback, useRef } from 'react';
 
 export default function TeamDetails({ teamId, onBack }) {
@@ -43,12 +43,12 @@ export default function TeamDetails({ teamId, onBack }) {
 
   useEffect(() => { loadAll(); }, [loadAll]);
 
-  // ── PRN lookup ───────────────────────────────────────────────────────────
+  // --"-----"--- PRN lookup --"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"---
 
   const handlePrnInput = (e) => {
     const value = e.target.value;
 
-    // Comma pressed → add current PRN to the table
+    // Comma pressed -----' add current PRN to the table
     if (value.endsWith(',')) {
       const typed = value.slice(0, -1).trim();
       if (typed && namePreview && !namePreview.startsWith('...') && !namePreview.startsWith('Not found')) {
@@ -87,7 +87,7 @@ export default function TeamDetails({ teamId, onBack }) {
   const removePrnFromList = (prn) =>
     setPrnList((prev) => prev.filter((p) => p.prn !== prn));
 
-  // ── Roster actions ───────────────────────────────────────────────────────
+  // --"-----"--- Roster actions --"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"---
 
   const removeFromRoster = async (studentPrn) => {
     if (!window.confirm('Remove this student from the roster?')) return;
@@ -100,7 +100,7 @@ export default function TeamDetails({ teamId, onBack }) {
     }
   };
 
-  // ── Request actions ──────────────────────────────────────────────────────
+  // --"-----"--- Request actions --"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"---
 
   const acceptRequest = async (requestId) => {
     try {
@@ -122,7 +122,7 @@ export default function TeamDetails({ teamId, onBack }) {
     }
   };
 
-  // ── Render ───────────────────────────────────────────────────────────────
+  // --"-----"--- Render --"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"---
 
   if (loading) return <p className="books-loading">Loading team details...</p>;
   if (!team)   return <p className="st-empty">Team not found.</p>;
@@ -132,7 +132,7 @@ export default function TeamDetails({ teamId, onBack }) {
 
       {/* Back button */}
       <button className="st-back-link" onClick={onBack}>
-        ← Back to Sport Teams
+        ------- Back to Sport Teams
       </button>
 
       {/* Page title */}
@@ -179,7 +179,7 @@ export default function TeamDetails({ teamId, onBack }) {
         </table>
       </div>
 
-      {/* ── Roster Section ── */}
+      {/* --"-----"--- Roster Section --"-----"--- */}
       <p className="st-section-title">Roster</p>
 
       {/* Add student by PRN */}
@@ -221,7 +221,7 @@ export default function TeamDetails({ teamId, onBack }) {
         </div>
 
         <p style={{ fontSize: 12, color: 'var(--text-secondary)', marginBottom: 10 }}>
-          Type a PRN — the student name appears below. Press <strong>,</strong> (comma) to add to the list.
+          Type a PRN -----" the student name appears below. Press <strong>,</strong> (comma) to add to the list.
         </p>
 
         {/* Students list table */}
@@ -324,7 +324,7 @@ export default function TeamDetails({ teamId, onBack }) {
         </div>
       )}
 
-      {/* ── Student Requests Section ── */}
+      {/* --"-----"--- Student Requests Section --"-----"--- */}
       <p className="st-section-title">Student Requests</p>
 
       {requests.length === 0 ? (

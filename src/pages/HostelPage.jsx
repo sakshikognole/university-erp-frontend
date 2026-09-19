@@ -1,4 +1,4 @@
-import { springApi } from '../services/api';
+---import { springApi } from '../services/api';
 import { useState, useEffect, useCallback } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import Pagination from '../components/Pagination';
@@ -12,7 +12,7 @@ const DEFAULT_PAGE = {
 
 export default function HostelPage() {
   const [searchParams, setSearchParams] = useSearchParams();
-  // ?block=HB001 → shows HostelBlockDetails; no param → shows list
+  // ?block=HB001 -----' shows HostelBlockDetails; no param -----' shows list
   const viewBlockId = searchParams.get('block');
 
   const [blocks,    setBlocks]    = useState([]);
@@ -58,7 +58,7 @@ export default function HostelPage() {
 
   const openAdd  = ()      => { setEditBlock(null);  setModalOpen(true); };
   const openEdit = (block) => { setEditBlock(block); setModalOpen(true); };
-  // Navigate to detail by putting blockId in URL — survives refresh
+  // Navigate to detail by putting blockId in URL -----" survives refresh
   const openView = (block) => setSearchParams({ block: block.blockId });
   const goBack   = ()      => { setSearchParams({}); load(true); };
 
@@ -79,7 +79,7 @@ export default function HostelPage() {
     load(true);
   };
 
-  // ── Detail view — URL driven so refresh restores the same block ──
+  // --"-----"--- Detail view -----" URL driven so refresh restores the same block --"-----"---
   if (viewBlockId) {
     // Find the block in the already-loaded list, or pass just the id
     // HostelBlockDetails fetches the block itself by blockId
@@ -92,7 +92,7 @@ export default function HostelPage() {
     );
   }
 
-  // ── List view ─────────────────────────────────────────────────────
+  // --"-----"--- List view --"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"-----"---
   return (
     <div className="page-container">
 

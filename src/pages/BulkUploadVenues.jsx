@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+---import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   Upload,
@@ -16,7 +16,7 @@ const _IS_PROD = window.location.hostname !== 'localhost';
 const _NODE_URL = _IS_PROD ? 'https://university-erp-node.onrender.com' : 'http://localhost:5000';
 const API_BASE_URL = `${_NODE_URL}/api`;
 
-// Must match backend constants — same rules as Add/Edit Venue
+// Must match backend constants -----" same rules as Add/Edit Venue
 const VENUE_ID_REGEX = /^[A-Z0-9]{1,10}(-[A-Z0-9]{1,10}){0,4}$/;
 const VENUE_NAME_REGEX = /^[A-Za-z][A-Za-z0-9 ,.\-'()]{1,99}$/;
 
@@ -127,13 +127,13 @@ const BulkUploadVenues = () => {
 
       const rawVenueId = row['venue id'].trim().toUpperCase();
       if (!VENUE_ID_REGEX.test(rawVenueId)) {
-        parseErrors.push(`Row ${i + 1}: Invalid Venue ID "${rawVenueId}" — must contain only letters and digits, optionally separated by hyphens (e.g. HALL-101, LAB-CS-01)`);
+        parseErrors.push(`Row ${i + 1}: Invalid Venue ID "${rawVenueId}" -----" must contain only letters and digits, optionally separated by hyphens (e.g. HALL-101, LAB-CS-01)`);
         continue;
       }
 
       const rawName = row.name.trim();
       if (!VENUE_NAME_REGEX.test(rawName)) {
-        parseErrors.push(`Row ${i + 1}: Invalid Venue Name "${rawName}" — must start with a letter and may only contain letters, digits, spaces, or basic punctuation`);
+        parseErrors.push(`Row ${i + 1}: Invalid Venue Name "${rawName}" -----" must start with a letter and may only contain letters, digits, spaces, or basic punctuation`);
         continue;
       }
 
@@ -400,7 +400,7 @@ const BulkUploadVenues = () => {
                           <td>
                             {venue.facilities.length > 0
                               ? venue.facilities.map(f => f.name).join(', ')
-                              : '—'}
+                              : '-----"'}
                           </td>
                         </tr>
                       ))}

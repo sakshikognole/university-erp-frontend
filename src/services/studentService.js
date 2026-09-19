@@ -1,8 +1,8 @@
-import { springApi } from './api';
+---import { springApi } from './api';
 import axios from 'axios';
 
 // springApi interceptor returns res.data directly (the response body).
-// For /api/students → returns List<StudentResponse> array directly.
+// For /api/students -----' returns List<StudentResponse> array directly.
 export async function getAllStudents() {
   const res = await springApi.get('/students');
   // res is already the array (interceptor unwrapped res.data)
@@ -13,7 +13,7 @@ export async function getStudentById(studentId) {
   return springApi.get(`/students/${studentId}`);
 }
 
-// For blob responses (PDF/ZIP) we MUST use a plain axios instance —
+// For blob responses (PDF/ZIP) we MUST use a plain axios instance -----"
 // the springApi interceptor does res.data which breaks binary blobs.
 // We call the Spring backend directly using the same runtime URL logic.
 const onLocalhost = window.location.hostname === 'localhost';
