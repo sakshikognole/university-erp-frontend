@@ -15,7 +15,7 @@ import { validateStudentFields } from '../utils/studentValidation';
 
 const _IS_PROD = window.location.hostname !== 'localhost';
 const _NODE_URL = _IS_PROD ? 'https://university-erp-node.onrender.com' : 'http://localhost:5000';
-const API_BASE_URL = ${_NODE_URL}/api;
+const API_BASE_URL = `${_NODE_URL}/api`;
 
 // ---------------------------------------------------------------------------
 // BulkUploadStudents
