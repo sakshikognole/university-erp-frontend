@@ -7,7 +7,7 @@ export default function ViewSportTeamModal({ isOpen, team, onClose }) {
 
   return (
     <div className="books-overlay">
-      {/* Defect 2: modal width 100% on mobile, max 520px on desktop â-- no horizontal scroll */}
+      {/* Defect 2: modal width 100% on mobile, max 520px on desktop â€” no horizontal scroll */}
       <div className="books-modal" style={{
         maxWidth: 520,
         width: '95%',
@@ -17,7 +17,7 @@ export default function ViewSportTeamModal({ isOpen, team, onClose }) {
 
         <div className="books-modal-head">
           <h3>Team Details</h3>
-          <button className="books-modal-close" onClick={onClose}>Ã-</button>
+          <button className="books-modal-close" onClick={onClose}>Ã—</button>
         </div>
 
         <div className="books-modal-body">
@@ -40,7 +40,7 @@ export default function ViewSportTeamModal({ isOpen, team, onClose }) {
             {team.teamName}
           </h2>
 
-          {/* Details â-- stacked rows, no horizontal overflow */}
+          {/* Details â€” stacked rows, no horizontal overflow */}
           <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.87rem' }}>
             <tbody>
               {[

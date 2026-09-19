@@ -12,7 +12,7 @@ import {
 
 const _IS_PROD = window.location.hostname !== 'localhost';
 const _NODE_URL = _IS_PROD ? 'https://university-erp-node.onrender.com' : 'http://localhost:5000';
-const API_BASE_URL = `${_NODE_URL}/api`;
+const API_BASE_URL = ${_NODE_URL}/api;
 
 const StaffForm = () => {
   const { id } = useParams();
@@ -57,7 +57,7 @@ const StaffForm = () => {
   const loadStaffDetails = async () => {
     setFetching(true);
     try {
-      // Single staff endpoint â-- no fallback to full list fetch (performance fix)
+      // Single staff endpoint â€” no fallback to full list fetch (performance fix)
       const res = await fetch(`${API_BASE_URL}/super-admin/staff/${id}`, {
         headers: authHeader(),
       });
@@ -271,7 +271,7 @@ const StaffForm = () => {
           </div>
         ) : (
           <form onSubmit={handleSubmit} className="form-layout" noValidate>
-            {/* â--â-- Personal Information â--â-- */}
+            {/* â”€â”€ Personal Information â”€â”€ */}
             <div className="form-section">
               <h3 className="form-section-title">Personal Information</h3>
 
@@ -354,7 +354,7 @@ const StaffForm = () => {
               </div>
 
               <div className="form-row">
-                {/* Date of Joining â-- show a visible text hint on mobile
+                {/* Date of Joining â€” show a visible text hint on mobile
                     because <input type="date"> hides its placeholder on iOS/Android.
                     We use a wrapper with a data-placeholder attribute handled in CSS. */}
                 <div className="form-group">
@@ -390,7 +390,7 @@ const StaffForm = () => {
                     onChange={handleChange}
                     onBlur={handleBlur}
                   >
-                    <option value="">â-- Select Role â--</option>
+                    <option value="">â€” Select Role â€”</option>
                     {VALID_ROLES.map((r) => (
                       <option key={r} value={r}>
                         {r}
@@ -402,7 +402,7 @@ const StaffForm = () => {
               </div>
             </div>
 
-            {/* â--â-- Bank Details â--â-- */}
+            {/* â”€â”€ Bank Details â”€â”€ */}
             <div className="form-section" style={{ marginTop: '2rem' }}>
               <h3 className="form-section-title">Bank Details</h3>
 

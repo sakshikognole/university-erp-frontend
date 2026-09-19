@@ -5,7 +5,7 @@ import PageLoader from '../components/PageLoader';
 import PageError  from '../components/PageError';
 import { getAllStudents } from '../services/studentService';
 
-// Use plain axios for blob requests â-- springApi interceptor breaks binary data
+// Use plain axios for blob requests â€” springApi interceptor breaks binary data
 const onLocalhost = window.location.hostname === 'localhost';
 const SPRING_BASE = onLocalhost
   ? 'http://localhost:8080'
@@ -158,7 +158,7 @@ export default function HandoutPage() {
         {selStudents.length > 0 && selDocs.length > 0 && (
           <p className="stu-handout-summary">
             Will generate <strong>{selStudents.length * selDocs.length} PDF(s)</strong>
-            {' '}â-- {selStudents.length} student{selStudents.length > 1 ? 's' : ''} x{' '}
+            {' '}â€” {selStudents.length} student{selStudents.length > 1 ? 's' : ''} x{' '}
             {selDocs.length} type{selDocs.length > 1 ? 's' : ''}
           </p>
         )}

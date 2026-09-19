@@ -15,13 +15,13 @@ import { validateStudentFields } from '../utils/studentValidation';
 
 const _IS_PROD = window.location.hostname !== 'localhost';
 const _NODE_URL = _IS_PROD ? 'https://university-erp-node.onrender.com' : 'http://localhost:5000';
-const API_BASE_URL = `${_NODE_URL}/api`;
+const API_BASE_URL = ${_NODE_URL}/api;
 
 // ---------------------------------------------------------------------------
 // BulkUploadStudents
 // Flow:
 //  1. User downloads the sample CSV template.
-//  2. User selects a .csv file - parsed immediately in the browser.
+//  2. User selects a .csv file — parsed immediately in the browser.
 //  3. Every row is validated with the same rules as StudentForm (Add/Edit).
 //  4. If ANY row fails validation, all errors are shown; upload button is
 //     disabled until the file is replaced with a corrected version.
@@ -49,7 +49,7 @@ const BulkUploadStudents = () => {
     };
   };
 
-  // -- Sample CSV download -------------------------------------------------
+  // ── Sample CSV download ─────────────────────────────────────────────────
   const downloadSampleCSV = () => {
     const sampleData = [
       ['PRN', 'Name', 'Class', 'Division', 'Degree', 'Year of Enrollment', 'Custom Fields'],
@@ -69,7 +69,7 @@ const BulkUploadStudents = () => {
     URL.revokeObjectURL(url);
   };
 
-  // -- CSV parser ----------------------------------------------------------
+  // ── CSV parser ──────────────────────────────────────────────────────────
   const parseCSVLine = (line) => {
     const result = [];
     let current  = '';
@@ -93,7 +93,7 @@ const BulkUploadStudents = () => {
     return result;
   };
 
-  // -- Full CSV processing: parse + validate ALL rows ---------------------
+  // ── Full CSV processing: parse + validate ALL rows ─────────────────────
   const processCSV = (text) => {
     const lines = text.split(/\r?\n/).filter((l) => l.trim());
     if (lines.length < 2) {
@@ -187,7 +187,7 @@ const BulkUploadStudents = () => {
     return { data, parseErrors: structural, rowErrors: validation };
   };
 
-  // -- File select handler -------------------------------------------------
+  // ── File select handler ─────────────────────────────────────────────────
   const handleFileSelect = (e) => {
     const file = e.target.files[0];
     if (!file) return;
@@ -237,7 +237,7 @@ const BulkUploadStudents = () => {
     reader.readAsText(file);
   };
 
-  // -- Upload --------------------------------------------------------------
+  // ── Upload ──────────────────────────────────────────────────────────────
   const handleUpload = async () => {
     if (parsedData.length === 0) return;
     if (parseErrors.length > 0 || rowErrors.length > 0) return; // belt-and-suspenders guard
@@ -255,7 +255,7 @@ const BulkUploadStudents = () => {
       const result = await res.json();
 
       if (!res.ok) {
-        // Backend returned validation errors - show them (this should rarely
+        // Backend returned validation errors — show them (this should rarely
         // happen since we pre-validate in the browser, but the API is authoritative)
         if (result.validationFailed && result.rowErrors) {
           setRowErrors(
@@ -291,7 +291,7 @@ const BulkUploadStudents = () => {
     }
   };
 
-  // -- Reset ---------------------------------------------------------------
+  // ── Reset ───────────────────────────────────────────────────────────────
   const resetUpload = () => {
     setSelectedFile(null);
     setParsedData([]);
@@ -308,7 +308,7 @@ const BulkUploadStudents = () => {
   const totalRows      = preview.length > 0 ? (parsedData.length || preview.length) : 0;
   const canUpload      = parsedData.length > 0 && !hasErrors && !uploading;
 
-  // -- Render --------------------------------------------------------------
+  // ── Render ──────────────────────────────────────────────────────────────
   return (
     <div className="page-container">
       {/* Page header */}
@@ -336,7 +336,7 @@ const BulkUploadStudents = () => {
       <div className="card" style={{ marginTop: '1.5rem' }}>
         <div style={{ padding: '1.5rem' }}>
 
-          {/* -- Instructions -- */}
+          {/* ── Instructions ── */}
           <div className="info-banner" style={{ marginBottom: '1.5rem' }}>
             <Info size={18} />
             <div>
@@ -363,7 +363,7 @@ const BulkUploadStudents = () => {
             <span>Download Sample CSV Template</span>
           </button>
 
-          {/* -- File drop zone -- */}
+          {/* ── File drop zone ── */}
           <div className="upload-section">
             <div className="upload-area">
               <input
@@ -401,7 +401,7 @@ const BulkUploadStudents = () => {
               </div>
             )}
 
-            {/* -- Structural / header errors -- */}
+            {/* ── Structural / header errors ── */}
             {!loading && parseErrors.length > 0 && (
               <div className="feedback-banner feedback-error" style={{ marginTop: '1rem' }}>
                 <AlertCircle size={18} style={{ flexShrink: 0, marginTop: '2px' }} />
@@ -419,13 +419,13 @@ const BulkUploadStudents = () => {
               </div>
             )}
 
-            {/* -- Row-level validation errors -- */}
+            {/* ── Row-level validation errors ── */}
             {!loading && rowErrors.length > 0 && (
               <div className="feedback-banner feedback-error" style={{ marginTop: '1rem' }}>
                 <AlertCircle size={18} style={{ flexShrink: 0, marginTop: '2px' }} />
                 <div style={{ width: '100%' }}>
                   <strong>
-                    Validation errors in {rowErrors.length} row{rowErrors.length !== 1 ? 's' : ''} -
+                    Validation errors in {rowErrors.length} row{rowErrors.length !== 1 ? 's' : ''} —
                     no records will be uploaded until all errors are fixed:
                   </strong>
                   <div style={{ marginTop: '0.75rem' }}>
@@ -436,7 +436,7 @@ const BulkUploadStudents = () => {
                       >
                         <span className="bulk-row-error-label">
                           Row {re.row}
-                          {re.prn && re.prn !== '(empty)' ? ` � PRN: ${re.prn}` : ''}
+                          {re.prn && re.prn !== '(empty)' ? ` · PRN: ${re.prn}` : ''}
                         </span>
                         <ul style={{ marginTop: '0.25rem', marginLeft: '1.25rem' }}>
                           {re.errors.map((msg, j) => (
@@ -453,7 +453,7 @@ const BulkUploadStudents = () => {
               </div>
             )}
 
-            {/* -- Data preview -- */}
+            {/* ── Data preview ── */}
             {!loading && preview.length > 0 && (
               <div style={{ marginTop: '1.5rem' }}>
                 <div className="preview-header">
@@ -461,7 +461,7 @@ const BulkUploadStudents = () => {
                     Data Preview
                     {hasErrors && (
                       <span style={{ color: '#b91c1c', fontWeight: 400, fontSize: '0.875rem', marginLeft: '0.5rem' }}>
-                        (errors found - upload is disabled)
+                        (errors found — upload is disabled)
                       </span>
                     )}
                   </h3>
@@ -491,19 +491,19 @@ const BulkUploadStudents = () => {
                         <tr key={index}>
                           <td className="text-secondary">{index + 1}</td>
                           <td>
-                            <span className="code-badge">{student.prn || '-'}</span>
+                            <span className="code-badge">{student.prn || '—'}</span>
                           </td>
-                          <td>{student.name || '-'}</td>
-                          <td>{student.class || '-'}</td>
-                          <td>{student.division || '-'}</td>
-                          <td>{student.degree || '-'}</td>
-                          <td>{student.yearOfEnrollment || '-'}</td>
+                          <td>{student.name || '—'}</td>
+                          <td>{student.class || '—'}</td>
+                          <td>{student.division || '—'}</td>
+                          <td>{student.degree || '—'}</td>
+                          <td>{student.yearOfEnrollment || '—'}</td>
                           <td>
                             {student.customFields && student.customFields.length > 0
                               ? student.customFields
                                   .map((cf) => `${cf.key}: ${cf.value}`)
                                   .join('; ')
-                              : '-'}
+                              : '—'}
                           </td>
                         </tr>
                       ))}
@@ -516,7 +516,7 @@ const BulkUploadStudents = () => {
                   )}
                 </div>
 
-                {/* -- Action buttons -- */}
+                {/* ── Action buttons ── */}
                 <div className="form-actions-row" style={{ marginTop: '1.5rem' }}>
                   <button
                     type="button"
@@ -555,7 +555,7 @@ const BulkUploadStudents = () => {
               </div>
             )}
 
-            {/* -- Upload result -- */}
+            {/* ── Upload result ── */}
             {uploadResult && (
               <div
                 className={`feedback-banner ${

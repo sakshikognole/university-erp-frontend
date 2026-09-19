@@ -9,7 +9,7 @@ const DEFAULT_PAGE = {
   totalPages: 0, first: true, last: true,
 };
 
-// â--â-- Add Payment Modal â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--
+// â”€â”€ Add Payment Modal â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 function AddPaymentModal({ isOpen, onClose, onSaved }) {
   const [form,   setForm]   = useState({ title: '', amount: '', discount: '' });
   const [errors, setErrors] = useState({});
@@ -90,7 +90,7 @@ function AddPaymentModal({ isOpen, onClose, onSaved }) {
             </div>
             <div className="club-form-row">
               <div className="books-form-group">
-                <label className="books-form-label">Amount (â-¹) *</label>
+                <label className="books-form-label">Amount (â‚¹) *</label>
                 <input
                   className={`books-form-control ${errors.amount ? 'err' : ''}`}
                   name="amount"
@@ -103,7 +103,7 @@ function AddPaymentModal({ isOpen, onClose, onSaved }) {
                 {errors.amount && <p className="books-form-err">{errors.amount}</p>}
               </div>
               <div className="books-form-group">
-                <label className="books-form-label">Discount (â-¹)</label>
+                <label className="books-form-label">Discount (â‚¹)</label>
                 <input
                   className={`books-form-control ${errors.discount ? 'err' : ''}`}
                   name="discount"
@@ -120,7 +120,7 @@ function AddPaymentModal({ isOpen, onClose, onSaved }) {
               <p style={{ fontSize: 13, color: 'var(--text-secondary)', marginTop: 4 }}>
                 Final amount after discount:{' '}
                 <strong style={{ color: '#16a34a' }}>
-                  â-¹{Math.max(0, Number(form.amount) - Number(form.discount || 0)).toLocaleString('en-IN')}
+                  â‚¹{Math.max(0, Number(form.amount) - Number(form.discount || 0)).toLocaleString('en-IN')}
                 </strong>
               </p>
             )}
@@ -141,32 +141,32 @@ function AddPaymentModal({ isOpen, onClose, onSaved }) {
   );
 }
 
-// â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--
-// PaymentPage â-- Admin payment title + combination management
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+// PaymentPage â€” Admin payment title + combination management
 // Accessible at /payment-management (Super Admin only)
-// â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 export default function PaymentPage() {
 
-  // â--â-- Titles (paginated) â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--
+  // â”€â”€ Titles (paginated) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   const [titles,        setTitles]        = useState([]);
   const [pageData,      setPageData]      = useState(DEFAULT_PAGE);
   const [page,          setPage]          = useState(0);
   const [size,          setSize]          = useState(10);
   const [titlesLoading, setTitlesLoading] = useState(true);
 
-  // â--â-- Modal â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--
+  // â”€â”€ Modal â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   const [modalOpen, setModalOpen] = useState(false);
 
-  // â--â-- Checkbox selection â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--
+  // â”€â”€ Checkbox selection â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   const [selected, setSelected] = useState(new Set());
 
-  // â--â-- Combinations â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--
+  // â”€â”€ Combinations â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   const [combinations, setCombinations] = useState([]);
   const [creating,     setCreating]     = useState(false);
   const [viewCombo,    setViewCombo]    = useState(null);
   const [allTitles,    setAllTitles]    = useState([]);
 
-  // â--â-- Feedback â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--
+  // â”€â”€ Feedback â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   const [success, setSuccess] = useState('');
   const [error,   setError]   = useState('');
 
@@ -176,7 +176,7 @@ export default function PaymentPage() {
     return () => clearTimeout(t);
   }, [success, error]);
 
-  // â--â-- Load titles (paginated) â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--
+  // â”€â”€ Load titles (paginated) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   const loadTitles = useCallback(async () => {
     setTitlesLoading(true);
     try {
@@ -200,7 +200,7 @@ export default function PaymentPage() {
     }
   }, [page, size]);
 
-  // â--â-- Load combinations â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--
+  // â”€â”€ Load combinations â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   const loadCombinations = useCallback(async () => {
     try {
       const res = await axios.get(`${SPRING_API}/payment-combinations`);
@@ -208,7 +208,7 @@ export default function PaymentPage() {
     } catch { /* silently ignore */ }
   }, []);
 
-  // â--â-- Load all titles flat (for breakdown card lookup) â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--
+  // â”€â”€ Load all titles flat (for breakdown card lookup) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   const loadAllTitles = useCallback(async () => {
     try {
       const res = await axios.get(`${SPRING_API}/payment-titles`, {
@@ -222,11 +222,11 @@ export default function PaymentPage() {
   useEffect(() => { loadCombinations(); }, [loadCombinations]);
   useEffect(() => { loadAllTitles(); },    [loadAllTitles]);
 
-  // â--â-- Page / size change â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--
+  // â”€â”€ Page / size change â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   const onPageChange = (p) => { setPage(p); setSelected(new Set()); };
   const onSizeChange = (s) => { setSize(s); setPage(0); setSelected(new Set()); };
 
-  // â--â-- Checkbox handlers â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--
+  // â”€â”€ Checkbox handlers â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   const toggleOne = (titleId) => {
     setSelected((prev) => {
       const next = new Set(prev);
@@ -254,7 +254,7 @@ export default function PaymentPage() {
     }
   };
 
-  // â--â-- Create combination â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--
+  // â”€â”€ Create combination â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   const handleCreate = async () => {
     if (selected.size === 0) return;
     setCreating(true);
@@ -274,9 +274,9 @@ export default function PaymentPage() {
   };
 
   const fmt = (n) =>
-    'â-¹' + Number(n).toLocaleString('en-IN', { maximumFractionDigits: 0 });
+    'â‚¹' + Number(n).toLocaleString('en-IN', { maximumFractionDigits: 0 });
 
-  // â--â-- Render â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--
+  // â”€â”€ Render â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   return (
     <div className="page-container">
 
@@ -300,17 +300,17 @@ export default function PaymentPage() {
       {success && (
         <div className="books-alert books-alert-success">
           <span>{success}</span>
-          <button onClick={() => setSuccess('')}>Ã-</button>
+          <button onClick={() => setSuccess('')}>Ã—</button>
         </div>
       )}
       {error && (
         <div className="books-alert books-alert-error">
           <span>{error}</span>
-          <button onClick={() => setError('')}>Ã-</button>
+          <button onClick={() => setError('')}>Ã—</button>
         </div>
       )}
 
-      {/* â--â-- Payment Titles Table â--â-- */}
+      {/* â”€â”€ Payment Titles Table â”€â”€ */}
       <div className="card" style={{ marginTop: '1.25rem' }}>
         {titlesLoading ? (
           <p className="books-loading">Loading payment titles...</p>
@@ -360,7 +360,7 @@ export default function PaymentPage() {
                     <td style={{ fontWeight: 500 }}>{t.title}</td>
                     <td className="pay-amount">{fmt(t.amount)}</td>
                     <td style={{ color: '#047857' }}>
-                      {t.discount > 0 ? `- ${fmt(t.discount)}` : 'â-¹0'}
+                      {t.discount > 0 ? `- ${fmt(t.discount)}` : 'â‚¹0'}
                     </td>
                     <td className="pay-discount" style={{ fontWeight: 700 }}>
                       {fmt(t.amount - t.discount)}
@@ -379,7 +379,7 @@ export default function PaymentPage() {
         />
       </div>
 
-      {/* â--â-- Create Combination button (shown when rows are selected) â--â-- */}
+      {/* â”€â”€ Create Combination button (shown when rows are selected) â”€â”€ */}
       {selected.size > 0 && (
         <div className="pay-action-row">
           <p className="pay-selected-hint">
@@ -397,7 +397,7 @@ export default function PaymentPage() {
         </div>
       )}
 
-      {/* â--â-- Created Payment Combinations â--â-- */}
+      {/* â”€â”€ Created Payment Combinations â”€â”€ */}
       {combinations.length > 0 && (
         <div style={{ marginTop: '2rem' }}>
           <p className="pay-capsules-title">
@@ -415,7 +415,7 @@ export default function PaymentPage() {
                 <span className="pay-capsule-id">{c.paymentId}</span>
                 {c.paymentTitles.join(' + ')}
                 <span style={{ color: '#16a34a', fontWeight: 600, marginLeft: 6 }}>
-                  â-- {fmt(c.totalAmount)}
+                  â€” {fmt(c.totalAmount)}
                 </span>
               </span>
             ))}
@@ -423,7 +423,7 @@ export default function PaymentPage() {
         </div>
       )}
 
-      {/* â--â-- Combination Breakdown Modal â--â-- */}
+      {/* â”€â”€ Combination Breakdown Modal â”€â”€ */}
       {viewCombo && (
         <div className="books-overlay" onClick={() => setViewCombo(null)}>
           <div
@@ -432,7 +432,7 @@ export default function PaymentPage() {
             onClick={(e) => e.stopPropagation()}
           >
             <div className="books-modal-head">
-              <h3>{viewCombo.paymentId} â-- Fee Breakdown</h3>
+              <h3>{viewCombo.paymentId} â€” Fee Breakdown</h3>
               <button className="books-modal-close" onClick={() => setViewCombo(null)}>
                 x
               </button>
@@ -456,7 +456,7 @@ export default function PaymentPage() {
                           <td>{titleName}</td>
                           <td className="pay-amount">{fmt(t ? t.amount : 0)}</td>
                           <td style={{ color: '#047857' }}>
-                            {t && t.discount > 0 ? `- ${fmt(t.discount)}` : 'â-¹0'}
+                            {t && t.discount > 0 ? `- ${fmt(t.discount)}` : 'â‚¹0'}
                           </td>
                           <td className="pay-discount" style={{ fontWeight: 700 }}>
                             {fmt(t ? t.amount - t.discount : 0)}
@@ -500,7 +500,7 @@ export default function PaymentPage() {
         </div>
       )}
 
-      {/* â--â-- Add Payment Title Modal â--â-- */}
+      {/* â”€â”€ Add Payment Title Modal â”€â”€ */}
       <AddPaymentModal
         isOpen={modalOpen}
         onClose={() => setModalOpen(false)}

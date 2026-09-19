@@ -270,14 +270,14 @@ export const exportStudentsTXT = (students, filename = `students_${new Date().to
     const prn = padRight(s.prn || 'N/A', prnWidth);
     const name = padRight(s.name || 'N/A', nameWidth);
     const cls = padRight(s.class || 'N/A', classWidth);
-    const div = padRight(s.division || 'â--', divWidth);
+    const div = padRight(s.division || 'â€”', divWidth);
     const degree = padRight(s.degree || 'N/A', degreeWidth);
     const year = padRight(s.yearOfEnrollment || 'N/A', yearWidth);
     
     // Format custom fields as "Key1: Value1; Key2: Value2"
     const customFieldsStr = s.customFields && s.customFields.length > 0
       ? s.customFields.map(cf => `${cf.key}: ${cf.value}`).join('; ')
-      : 'â--';
+      : 'â€”';
     const custom = padRight(customFieldsStr, customWidth);
     
     return `${prn}  ${name}  ${cls}  ${div}  ${degree}  ${year}  ${custom}`;
@@ -309,7 +309,7 @@ export const exportStudentsPDF = (students, title = 'University Students Directo
         // Format custom fields as "Key1: Value1; Key2: Value2"
         const customFieldsStr = s.customFields && s.customFields.length > 0
           ? s.customFields.map(cf => `${cf.key}: ${cf.value}`).join('; ')
-          : 'â--';
+          : 'â€”';
         
         return `
       <tr style="border-bottom: 1px solid #e5e7eb;">
@@ -317,7 +317,7 @@ export const exportStudentsPDF = (students, title = 'University Students Directo
         <td style="padding: 10px 12px; font-weight: 600; font-size: 12px; font-family: monospace; color: #000000;">${s.prn || 'N/A'}</td>
         <td style="padding: 10px 12px; font-size: 12px; color: #111827;">${s.name || 'N/A'}</td>
         <td style="padding: 10px 12px; font-size: 12px; color: #111827;">${s.class || 'N/A'}</td>
-        <td style="padding: 10px 12px; font-size: 12px; color: #111827;">${s.division || 'â--'}</td>
+        <td style="padding: 10px 12px; font-size: 12px; color: #111827;">${s.division || 'â€”'}</td>
         <td style="padding: 10px 12px; font-size: 12px; color: #111827;">${s.degree || 'N/A'}</td>
         <td style="padding: 10px 12px; font-size: 12px; color: #111827;">${s.yearOfEnrollment || 'N/A'}</td>
         <td style="padding: 10px 12px; font-size: 11px; color: #6b7280;">${customFieldsStr}</td>
@@ -740,7 +740,7 @@ export const exportVenuesTXT = (venues, filename = `venues_${new Date().toISOStr
     const status = padRight(v.status || 'ACTIVE', statusWidth);
     const facStr = Array.isArray(v.facilities) && v.facilities.length > 0
       ? v.facilities.map(f => typeof f === 'string' ? f : `${f.name}${f.details ? ': ' + f.details : ''}`).join(', ')
-      : 'â--';
+      : 'â€”';
     const fac = padRight(facStr, facWidth);
 
     return `${id}  ${name}  ${cap}  ${status}  ${fac}`;
@@ -771,7 +771,7 @@ export const exportVenuesPDF = (venues, title = 'University Venues Directory') =
       (v, idx) => {
         const facilitiesStr = Array.isArray(v.facilities) && v.facilities.length > 0
           ? v.facilities.map(f => typeof f === 'string' ? f : `${f.name}${f.details ? ': ' + f.details : ''}`).join(', ')
-          : 'â--';
+          : 'â€”';
 
         return `
       <tr style="border-bottom: 1px solid #e5e7eb;">
@@ -1230,10 +1230,10 @@ export const exportFeePaymentsPDF = (feeRecords, title = 'University ERP - Fee P
         <td style="padding: 8px 10px; font-size: 12px; font-family: monospace; font-weight: 600;">${f.prn}</td>
         <td style="padding: 8px 10px; font-size: 12px; font-weight: 500;">${f.studentName}</td>
         <td style="padding: 8px 10px; font-size: 12px; color: #4b5563;">${f.feeType}</td>
-        <td style="padding: 8px 10px; font-size: 12px; font-weight: 600;">â-¹${(f.totalFeeAmount || 0).toLocaleString('en-IN')}</td>
-        <td style="padding: 8px 10px; font-size: 12px; color: #15803d;">â-¹${(f.discountAmount || 0).toLocaleString('en-IN')}</td>
-        <td style="padding: 8px 10px; font-size: 12px; font-weight: 600; color: #047857;">â-¹${(f.paidAmount || 0).toLocaleString('en-IN')}</td>
-        <td style="padding: 8px 10px; font-size: 12px; font-weight: 700; color: #b91c1c;">â-¹${(f.remainingAmount || 0).toLocaleString('en-IN')}</td>
+        <td style="padding: 8px 10px; font-size: 12px; font-weight: 600;">â‚¹${(f.totalFeeAmount || 0).toLocaleString('en-IN')}</td>
+        <td style="padding: 8px 10px; font-size: 12px; color: #15803d;">â‚¹${(f.discountAmount || 0).toLocaleString('en-IN')}</td>
+        <td style="padding: 8px 10px; font-size: 12px; font-weight: 600; color: #047857;">â‚¹${(f.paidAmount || 0).toLocaleString('en-IN')}</td>
+        <td style="padding: 8px 10px; font-size: 12px; font-weight: 700; color: #b91c1c;">â‚¹${(f.remainingAmount || 0).toLocaleString('en-IN')}</td>
         <td style="padding: 8px 10px; font-size: 11px;">
           <span style="display:inline-block; padding: 2px 8px; border-radius: 4px; font-weight: 600; background: ${f.status === 'PAID' ? '#dcfce7; color: #15803d;' : f.status === 'PARTIAL' ? '#fef3c7; color: #b45309;' : '#fee2e2; color: #b91c1c;'}">${f.status}</span>
         </td>
@@ -1266,25 +1266,25 @@ export const exportFeePaymentsPDF = (feeRecords, title = 'University ERP - Fee P
       <body>
         <div class="header">
           <div class="title">${title}</div>
-          <div class="meta">Generated: ${dateStr} â-¢ Total Records: ${feeRecords.length}</div>
+          <div class="meta">Generated: ${dateStr} â€¢ Total Records: ${feeRecords.length}</div>
         </div>
 
         <div class="stats-bar">
           <div class="stat-box">
             <div class="stat-label">Total Fee</div>
-            <div class="stat-val">â-¹${totalFee.toLocaleString('en-IN')}</div>
+            <div class="stat-val">â‚¹${totalFee.toLocaleString('en-IN')}</div>
           </div>
           <div class="stat-box">
             <div class="stat-label">Total Discounted</div>
-            <div class="stat-val">â-¹${totalDiscount.toLocaleString('en-IN')}</div>
+            <div class="stat-val">â‚¹${totalDiscount.toLocaleString('en-IN')}</div>
           </div>
           <div class="stat-box">
             <div class="stat-label">Total Paid</div>
-            <div class="stat-val">â-¹${totalPaid.toLocaleString('en-IN')}</div>
+            <div class="stat-val">â‚¹${totalPaid.toLocaleString('en-IN')}</div>
           </div>
           <div class="stat-box">
             <div class="stat-label">Total Remaining</div>
-            <div class="stat-val">â-¹${totalRemaining.toLocaleString('en-IN')}</div>
+            <div class="stat-val">â‚¹${totalRemaining.toLocaleString('en-IN')}</div>
           </div>
         </div>
 
@@ -1308,7 +1308,7 @@ export const exportFeePaymentsPDF = (feeRecords, title = 'University ERP - Fee P
         </table>
 
         <div class="footer">
-          Official University ERP Report â-¢ System Generated
+          Official University ERP Report â€¢ System Generated
         </div>
 
         <script>
@@ -1565,27 +1565,27 @@ export const downloadFeeReceiptPDF = (receipt) => {
             <tbody>
               <tr>
                 <td><strong>Fee Category:</strong> ${receipt.feeType || 'Tuition & Academic Fee'}</td>
-                <td style="text-align: right; font-weight: 600;">â-¹${(receipt.totalFeeAmount || 0).toLocaleString('en-IN')}</td>
+                <td style="text-align: right; font-weight: 600;">â‚¹${(receipt.totalFeeAmount || 0).toLocaleString('en-IN')}</td>
               </tr>
               <tr>
                 <td>Scholarship / Institutional Discount</td>
-                <td style="text-align: right; color: #15803d;">- â-¹${(receipt.discountAmount || 0).toLocaleString('en-IN')}</td>
+                <td style="text-align: right; color: #15803d;">- â‚¹${(receipt.discountAmount || 0).toLocaleString('en-IN')}</td>
               </tr>
               <tr>
                 <td>Net Payable Amount</td>
-                <td style="text-align: right; font-weight: 600;">â-¹${Math.max(0, (receipt.totalFeeAmount || 0) - (receipt.discountAmount || 0)).toLocaleString('en-IN')}</td>
+                <td style="text-align: right; font-weight: 600;">â‚¹${Math.max(0, (receipt.totalFeeAmount || 0) - (receipt.discountAmount || 0)).toLocaleString('en-IN')}</td>
               </tr>
               <tr class="amount-row-highlight">
                 <td><strong>Amount Paid in This Transaction</strong></td>
-                <td style="text-align: right;">â-¹${(receipt.amountPaidThisTransaction || 0).toLocaleString('en-IN')}</td>
+                <td style="text-align: right;">â‚¹${(receipt.amountPaidThisTransaction || 0).toLocaleString('en-IN')}</td>
               </tr>
               <tr>
                 <td>Total Cumulative Amount Paid</td>
-                <td style="text-align: right; font-weight: 600;">â-¹${(receipt.totalPaidSoFar || 0).toLocaleString('en-IN')}</td>
+                <td style="text-align: right; font-weight: 600;">â‚¹${(receipt.totalPaidSoFar || 0).toLocaleString('en-IN')}</td>
               </tr>
               <tr>
                 <td><strong>Remaining Balance Amount</strong></td>
-                <td style="text-align: right; font-weight: 700; color: ${receipt.remainingBalance === 0 ? '#15803d' : '#b91c1c'};">â-¹${(receipt.remainingBalance || 0).toLocaleString('en-IN')}</td>
+                <td style="text-align: right; font-weight: 700; color: ${receipt.remainingBalance === 0 ? '#15803d' : '#b91c1c'};">â‚¹${(receipt.remainingBalance || 0).toLocaleString('en-IN')}</td>
               </tr>
             </tbody>
           </table>

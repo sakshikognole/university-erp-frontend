@@ -19,7 +19,7 @@ import {
 const API_BASE_URL = 'http://localhost:8080/api';
 const _IS_PROD = window.location.hostname !== 'localhost';
 const _NODE_URL = _IS_PROD ? 'https://university-erp-node.onrender.com' : 'http://localhost:5000';
-const NODE_API_URL = `${_NODE_URL}/api`;
+const NODE_API_URL = ${_NODE_URL}/api;
 
 const EventDetails = () => {
   const { id } = useParams();
@@ -371,8 +371,8 @@ const EventDetails = () => {
                     <div style={{ fontWeight: '500' }}>{venue.name}</div>
                     <div style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', marginTop: '0.125rem' }}>
                       {venue.venueId}
-                      {venue.capacity && ` â-¢ Capacity: ${venue.capacity}`}
-                      {venue.status && ` â-¢ ${venue.status}`}
+                      {venue.capacity && ` â€¢ Capacity: ${venue.capacity}`}
+                      {venue.status && ` â€¢ ${venue.status}`}
                     </div>
                   </div>
                 ) : (
@@ -405,7 +405,7 @@ const EventDetails = () => {
                     <div style={{ fontWeight: '500' }}>{club.clubName}</div>
                     <div style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', marginTop: '0.125rem' }}>
                       {club.clubId}
-                      {club.clubCategory && ` â-¢ ${club.clubCategory}`}
+                      {club.clubCategory && ` â€¢ ${club.clubCategory}`}
                     </div>
                   </div>
                 ) : (

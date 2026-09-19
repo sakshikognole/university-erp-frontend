@@ -16,14 +16,14 @@ import { uploadToCloudinary } from '../utils/cloudinaryUpload';
 
 const _IS_PROD = window.location.hostname !== 'localhost';
 const _NODE_URL = _IS_PROD ? 'https://university-erp-node.onrender.com' : 'http://localhost:5000';
-const API_BASE_URL = `${_NODE_URL}/api`;
+const API_BASE_URL = ${_NODE_URL}/api;
 
 const SystemAnnouncementForm = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const isEdit = Boolean(id);
 
-  // â--â-- auth â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--
+  // â”€â”€ auth â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   const authHeader = (isJson = true) => {
     const token = localStorage.getItem('erp_token');
     const h = { Authorization: `Bearer ${token}` };
@@ -31,7 +31,7 @@ const SystemAnnouncementForm = () => {
     return h;
   };
 
-  // â--â-- form state â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--
+  // â”€â”€ form state â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   const [title, setTitle] = useState('');
   // content mode: 'description' | 'file'
   const [contentMode, setContentMode] = useState('description');
@@ -52,7 +52,7 @@ const SystemAnnouncementForm = () => {
   const [fetching, setFetching] = useState(false);
   const [feedback, setFeedback] = useState({ type: '', message: '' });
 
-  // â--â-- close dept dropdown on outside click â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--
+  // â”€â”€ close dept dropdown on outside click â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   useEffect(() => {
     const handler = (e) => {
       if (deptDropRef.current && !deptDropRef.current.contains(e.target)) {
@@ -63,7 +63,7 @@ const SystemAnnouncementForm = () => {
     return () => document.removeEventListener('mousedown', handler);
   }, []);
 
-  // â--â-- load departments â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--
+  // â”€â”€ load departments â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   useEffect(() => {
     const fetchDepts = async () => {
       try {
@@ -75,13 +75,13 @@ const SystemAnnouncementForm = () => {
         // API returns array directly or { departments: [...] }
         setAllDepartments(Array.isArray(data) ? data : data.departments || []);
       } catch {
-        // non-fatal â-- user can still submit without departments
+        // non-fatal â€” user can still submit without departments
       }
     };
     fetchDepts();
   }, []);
 
-  // â--â-- load existing record in edit mode â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--
+  // â”€â”€ load existing record in edit mode â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   useEffect(() => {
     if (!isEdit) return;
     const loadRecord = async () => {
@@ -142,7 +142,7 @@ const SystemAnnouncementForm = () => {
     }
   };
 
-  // â--â-- file input handler â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--
+  // â”€â”€ file input handler â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   const handleFileChange = (e) => {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -168,7 +168,7 @@ const SystemAnnouncementForm = () => {
     setExistingFileUrl('');
   };
 
-  // â--â-- dept multi-select helpers â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--
+  // â”€â”€ dept multi-select helpers â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   const toggleDept = (deptId) => {
     setSelectedDepts((prev) =>
       prev.includes(deptId) ? prev.filter((d) => d !== deptId) : [...prev, deptId]
@@ -186,7 +186,7 @@ const SystemAnnouncementForm = () => {
       : `${names.slice(0, 2).join(', ')} +${names.length - 2} more`;
   };
 
-  // â--â-- submit â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--
+  // â”€â”€ submit â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   const handleSubmit = async (e) => {
     e.preventDefault();
     setFeedback({ type: '', message: '' });
@@ -265,7 +265,7 @@ const SystemAnnouncementForm = () => {
     }
   };
 
-  // â--â-- render â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--
+  // â”€â”€ render â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   return (
     <div className="page-container">
       {/* Header */}
@@ -321,7 +321,7 @@ const SystemAnnouncementForm = () => {
         ) : (
           <form onSubmit={handleSubmit} className="form-layout">
 
-            {/* â--â-- Title â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â-- */}
+            {/* â”€â”€ Title â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
             <div className="form-section">
               <h3 className="form-section-title">Announcement Details</h3>
               <div className="form-group">
@@ -339,7 +339,7 @@ const SystemAnnouncementForm = () => {
               </div>
             </div>
 
-            {/* â--â-- Department multi-select â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â-- */}
+            {/* â”€â”€ Department multi-select â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
             <div className="form-section" style={{ marginTop: '1.5rem' }}>
               <h3 className="form-section-title">Target Departments</h3>
               <div className="form-group">
@@ -501,7 +501,7 @@ const SystemAnnouncementForm = () => {
               </div>
             </div>
 
-            {/* â--â-- Content: description OR file â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â-- */}
+            {/* â”€â”€ Content: description OR file â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
             <div className="form-section" style={{ marginTop: '1.5rem' }}>
               <h3 className="form-section-title">Content</h3>
 
@@ -614,7 +614,7 @@ const SystemAnnouncementForm = () => {
                         }}
                       >
                         {downloading
-                          ? <><Loader2 size={14} className="spin-animate" /> Downloadingâ-¦</>
+                          ? <><Loader2 size={14} className="spin-animate" /> Downloadingâ€¦</>
                           : 'Download current file'}
                       </button>
                       <button
@@ -656,7 +656,7 @@ const SystemAnnouncementForm = () => {
                         Click or drag &amp; drop to upload
                       </span>
                       <span style={{ fontSize: '0.8125rem', color: 'var(--text-secondary)' }}>
-                        JPG, PNG, PDF, DOC, DOCX â-- max 10 MB
+                        JPG, PNG, PDF, DOC, DOCX â€” max 10 MB
                       </span>
                       <input
                         type="file"
@@ -728,7 +728,7 @@ const SystemAnnouncementForm = () => {
               )}
             </div>
 
-            {/* â--â-- Actions â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â-- */}
+            {/* â”€â”€ Actions â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
             <div className="form-actions-row" style={{ marginTop: '2rem' }}>
               <button
                 type="button"

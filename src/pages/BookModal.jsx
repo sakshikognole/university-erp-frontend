@@ -89,7 +89,7 @@ export default function BookModal({ isOpen, mode, book, onSave, onClose, loading
                 display: 'flex', flexDirection: 'column', gap: 10,
               }}>
                 <div style={{ display: 'flex', gap: 10, alignItems: 'flex-start' }}>
-                  <span style={{ fontSize: '1.2rem' }}>‚-†Ô∏-</span>
+                  <span style={{ fontSize: '1.2rem' }}>‚ö†Ô∏è</span>
                   <p style={{ color: '#dc2626', fontWeight: 600, margin: 0, fontSize: '0.9rem' }}>
                     {dupError}
                   </p>
@@ -104,7 +104,7 @@ export default function BookModal({ isOpen, mode, book, onSave, onClose, loading
               </div>
             )}
 
-            {/* Book ID ‚-- user enters in add mode, read-only in edit */}
+            {/* Book ID ‚Äî user enters in add mode, read-only in edit */}
             <div className="books-form-group">
               <label className="books-form-label">
                 Book ID *

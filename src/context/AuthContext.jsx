@@ -2,11 +2,8 @@ import React, { createContext, useContext, useState, useEffect } from 'react';
 
 const AuthContext = createContext();
 
-// Detect production vs local â-- works on Render without any env vars
 const IS_PROD = window.location.hostname !== 'localhost';
-const NODE_URL = IS_PROD
-  ? 'https://university-erp-node.onrender.com'
-  : 'http://localhost:5000';
+const NODE_URL = IS_PROD ? 'https://university-erp-node.onrender.com' : 'http://localhost:5000';
 const API_BASE_URL = `${NODE_URL}/api`;
 
 export const AuthProvider = ({ children }) => {
@@ -60,7 +57,7 @@ export const AuthProvider = ({ children }) => {
         // Safe fallback on any decoding error
       }
     }
-    // Auth check is complete â-- unblock any gated consumers
+    // Auth check is complete â€” unblock any gated consumers
     setAuthLoading(false);
     return () => { if (timer) clearTimeout(timer); };
   }, [token]);

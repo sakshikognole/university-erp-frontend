@@ -8,7 +8,7 @@ const SuperAdminRoute = ({ children }) => {
 
     // DEF-001 / DEF-002 / DEF-015: Return a centred spinner while the token
     // expiry check is still running. Returning null caused a completely blank
-    // page on browser refresh and on mobile "Desktop View" switches â-- the
+    // page on browser refresh and on mobile "Desktop View" switches â€” the
     // DashboardLayout shell disappeared because its parent ProtectedRoute was
     // also null, producing a fully blank viewport until auth settled.
     if (authLoading) {

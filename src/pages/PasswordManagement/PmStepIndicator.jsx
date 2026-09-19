@@ -5,8 +5,8 @@
  * Matches the existing step-indicator-bar styling used in ForgotPassword.jsx.
  *
  * Props:
- *   steps   â-- string[]  e.g. ['Setup', 'OTP', 'Done']
- *   current â-- number    1-based index of the active step
+ *   steps   â€” string[]  e.g. ['Setup', 'OTP', 'Done']
+ *   current â€” number    1-based index of the active step
  */
 
 import React from 'react';

@@ -1,7 +1,7 @@
 import { springApi } from '../services/api';
 import { useState, useEffect, useRef, useCallback } from 'react';
 
-// â--â-- Constants â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--
+// â”€â”€ Constants â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 const ALLOWED_EXT   = ['pdf', 'jpg', 'jpeg', 'png', 'xls', 'xlsx'];
 const MAX_SIZE_MB   = 20;
 const MAX_SIZE_BYTES = MAX_SIZE_MB * 1024 * 1024;
@@ -10,7 +10,7 @@ const MAX_SIZE_BYTES = MAX_SIZE_MB * 1024 * 1024;
 const TEACHER_ID = 'TCH-001';
 const HEADERS    = { 'X-User-Role': 'TEACHER', 'X-Teacher-Id': TEACHER_ID };
 
-// â--â-- Helpers â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--
+// â”€â”€ Helpers â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 function getExt(filename) {
   const dot = filename.lastIndexOf('.');
   return dot >= 0 ? filename.slice(dot + 1).toLowerCase() : '';
@@ -24,21 +24,21 @@ function formatSize(bytes) {
 
 function fileIcon(ext) {
   switch (ext) {
-    case 'pdf':  return 'ğ---';
+    case 'pdf':  return 'ğŸ“•';
     case 'jpg':
     case 'jpeg':
-    case 'png':  return 'ğ--¼ï¸-';
+    case 'png':  return 'ğŸ–¼ï¸';
     case 'xls':
-    case 'xlsx': return 'ğ---';
-    default:     return 'ğ---';
+    case 'xlsx': return 'ğŸ“Š';
+    default:     return 'ğŸ“„';
   }
 }
 
-// â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 // UploadMaterialsPage
-// â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 export default function UploadMaterialsPage() {
-  // â--â-- Folder state â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--
+  // â”€â”€ Folder state â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   const [folders,          setFolders]          = useState([]);
   const [selectedFolderId, setSelectedFolderId] = useState('');
   const [foldersLoading,   setFoldersLoading]   = useState(true);
@@ -49,13 +49,13 @@ export default function UploadMaterialsPage() {
   const [creatingFolder,   setCreatingFolder]   = useState(false);
   const [folderError,      setFolderError]      = useState('');
 
-  // â--â-- File state â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--
+  // â”€â”€ File state â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   const [pendingFiles,  setPendingFiles]  = useState([]);  // {file, id, progress, status, error}
   const [dragOver,      setDragOver]      = useState(false);
   const [uploading,     setUploading]     = useState(false);
   const fileInputRef = useRef(null);
 
-  // â--â-- Folder contents (Step 3) â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--
+  // â”€â”€ Folder contents (Step 3) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   const [folderFiles,     setFolderFiles]     = useState([]);
   const [filesLoading,    setFilesLoading]    = useState(false);
   const [deletingFileId,  setDeletingFileId]  = useState(null);
@@ -71,7 +71,7 @@ export default function UploadMaterialsPage() {
       });
       setFolderFiles(Array.isArray(res) ? res : []);
     } catch {
-      // silently fail â-- main error shown elsewhere
+      // silently fail â€” main error shown elsewhere
     } finally {
       setFilesLoading(false);
     }
@@ -96,7 +96,7 @@ export default function UploadMaterialsPage() {
     }
   };
 
-  // â--â-- Feedback â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--
+  // â”€â”€ Feedback â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   const [success, setSuccess] = useState('');
   const [error,   setError]   = useState('');
 
@@ -106,7 +106,7 @@ export default function UploadMaterialsPage() {
     return () => clearTimeout(t);
   }, [success, error]);
 
-  // â--â-- Load folders on mount â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--
+  // â”€â”€ Load folders on mount â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   useEffect(() => {
     loadFolders();
   }, []);
@@ -126,7 +126,7 @@ export default function UploadMaterialsPage() {
     }
   };
 
-  // â--â-- Create folder â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--
+  // â”€â”€ Create folder â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   const handleCreateFolder = async () => {
     if (!newFolderName.trim()) { setFolderError('Folder name is required.'); return; }
     setCreatingFolder(true);
@@ -149,7 +149,7 @@ export default function UploadMaterialsPage() {
     }
   };
 
-  // â--â-- Validate and queue files â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--
+  // â”€â”€ Validate and queue files â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   const queueFiles = (rawFiles) => {
     const toAdd = [];
     const skipped = [];
@@ -157,9 +157,9 @@ export default function UploadMaterialsPage() {
     Array.from(rawFiles).forEach((file) => {
       const ext = getExt(file.name);
       if (!ALLOWED_EXT.includes(ext)) {
-        skipped.push(`${file.name} â-- unsupported type (.${ext})`);
+        skipped.push(`${file.name} â€” unsupported type (.${ext})`);
       } else if (file.size > MAX_SIZE_BYTES) {
-        skipped.push(`${file.name} â-- exceeds ${MAX_SIZE_MB} MB`);
+        skipped.push(`${file.name} â€” exceeds ${MAX_SIZE_MB} MB`);
       } else {
         toAdd.push({
           file,
@@ -179,7 +179,7 @@ export default function UploadMaterialsPage() {
     }
   };
 
-  // â--â-- Drag & drop handlers â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--
+  // â”€â”€ Drag & drop handlers â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   const onDragOver  = (e) => { e.preventDefault(); setDragOver(true); };
   const onDragLeave = ()  => setDragOver(false);
   const onDrop      = (e) => {
@@ -188,7 +188,7 @@ export default function UploadMaterialsPage() {
     queueFiles(e.dataTransfer.files);
   };
 
-  // â--â-- Browse handler â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--
+  // â”€â”€ Browse handler â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   const onBrowse = (e) => {
     queueFiles(e.target.files);
     e.target.value = '';
@@ -197,7 +197,7 @@ export default function UploadMaterialsPage() {
   const removeFile = (id) =>
     setPendingFiles((prev) => prev.filter((f) => f.id !== id));
 
-  // â--â-- Upload all pending files â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--
+  // â”€â”€ Upload all pending files â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   const uploadAll = async () => {
     if (!selectedFolderId) { setError('Please select a folder first.'); return; }
     if (!pendingFiles.length) { setError('No files selected.'); return; }
@@ -255,19 +255,19 @@ export default function UploadMaterialsPage() {
 
   const clearAll = () => setPendingFiles([]);
 
-  // â--â-- Derived â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--
+  // â”€â”€ Derived â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   const selectedFolder  = folders.find((f) => f.folderId === selectedFolderId);
   const hasPending      = pendingFiles.some((f) => f.status === 'pending');
   const allDone         = pendingFiles.length > 0 &&
                           pendingFiles.every((f) => f.status === 'done');
 
-  // â--â-- File type badge â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--
+  // â”€â”€ File type badge â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   function TypeBadge({ type }) {
     const t = (type || '').toLowerCase();
-    return <span className={`dm-type-badge dm-type-${t}`}>{type || 'â--'}</span>;
+    return <span className={`dm-type-badge dm-type-${t}`}>{type || 'â€”'}</span>;
   }
 
-  // â--â-- Preview modal â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--
+  // â”€â”€ Preview modal â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   function PreviewModal({ material, onClose }) {
     if (!material) return null;
     const type = (material.fileType || '').toLowerCase();
@@ -280,7 +280,7 @@ export default function UploadMaterialsPage() {
     } else {
       body = (
         <div className="dm-preview-no-preview">
-          <div style={{ fontSize: 40, marginBottom: 10 }}>ğ---</div>
+          <div style={{ fontSize: 40, marginBottom: 10 }}>ğŸ“Š</div>
           <p>Preview not available for {type.toUpperCase()} files.</p>
           <a href={url} download={material.fileName}
              className="books-btn books-btn-primary"
@@ -299,7 +299,7 @@ export default function UploadMaterialsPage() {
             </span>
             <a href={url} download={material.fileName}
                className="books-btn books-btn-sm books-btn-ghost">
-              â¬- Download
+              â¬‡ Download
             </a>
             <button className="books-modal-close" onClick={onClose}>x</button>
           </div>
@@ -309,7 +309,7 @@ export default function UploadMaterialsPage() {
     );
   }
 
-  // â--â-- Render â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--
+  // â”€â”€ Render â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   return (
     <div className="page-container">
 
@@ -337,9 +337,9 @@ export default function UploadMaterialsPage() {
         </div>
       )}
 
-      {/* â--â-- Step 1: Folder Selection â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â-- */}
+      {/* â”€â”€ Step 1: Folder Selection â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
       <div className="vb-form-panel">
-        <p className="vb-form-title">Step 1 â-- Select Folder</p>
+        <p className="vb-form-title">Step 1 â€” Select Folder</p>
 
         {foldersLoading ? (
           <p className="books-loading">Loading folders...</p>
@@ -357,10 +357,10 @@ export default function UploadMaterialsPage() {
                   value={selectedFolderId}
                   onChange={(e) => setSelectedFolderId(e.target.value)}
                 >
-                  <option value="">â-- Select folder â--</option>
+                  <option value="">â€” Select folder â€”</option>
                   {folders.map((f) => (
                     <option key={f.folderId} value={f.folderId}>
-                      ğ--- {f.folderName}
+                      ğŸ“ {f.folderName}
                     </option>
                   ))}
                 </select>
@@ -374,7 +374,7 @@ export default function UploadMaterialsPage() {
                 style={{ marginTop: 6 }}
                 onClick={() => { setShowNewFolder(true); setFolderError(''); }}
               >
-                ğ--- + Create New Folder
+                ğŸ“ + Create New Folder
               </button>
             ) : (
               <div style={{ marginTop: 12, display: 'flex', gap: 8,
@@ -413,16 +413,16 @@ export default function UploadMaterialsPage() {
         {/* Selected folder indicator */}
         {selectedFolder && (
           <p style={{ marginTop: 12, fontSize: 13, color: 'var(--text-secondary)' }}>
-            â-- Uploading to: <strong style={{ color: 'var(--text-primary)' }}>
-              ğ--- {selectedFolder.folderName}
+            âœ… Uploading to: <strong style={{ color: 'var(--text-primary)' }}>
+              ğŸ“ {selectedFolder.folderName}
             </strong>
           </p>
         )}
       </div>
 
-      {/* â--â-- Step 2: Upload Area â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â-- */}
+      {/* â”€â”€ Step 2: Upload Area â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
       <div className="vb-form-panel">
-        <p className="vb-form-title">Step 2 â-- Add Files</p>
+        <p className="vb-form-title">Step 2 â€” Add Files</p>
         <p style={{ fontSize: 13, color: 'var(--text-secondary)', marginBottom: 14 }}>
           Supported: PDF, JPG, JPEG, PNG, XLS, XLSX &nbsp;Â·&nbsp; Max {MAX_SIZE_MB} MB per file
         </p>
@@ -435,7 +435,7 @@ export default function UploadMaterialsPage() {
           onDrop={onDrop}
           onClick={() => fileInputRef.current?.click()}
         >
-          <div className="dm-dropzone-icon">â--ï¸-</div>
+          <div className="dm-dropzone-icon">â˜ï¸</div>
           <p className="dm-dropzone-title">Drag &amp; Drop Files Here</p>
           <p className="dm-dropzone-sub">or click anywhere in this area</p>
           <div className="dm-dropzone-sep">or</div>
@@ -506,12 +506,12 @@ export default function UploadMaterialsPage() {
                     )}
                     {item.status === 'done' && (
                       <span style={{ fontSize: 13, color: '#16a34a', fontWeight: 600 }}>
-                        â-- Done
+                        âœ“ Done
                       </span>
                     )}
                     {item.status === 'error' && (
                       <span style={{ fontSize: 12, color: '#dc2626' }} title={item.error}>
-                        â-- {item.error}
+                        âœ• {item.error}
                       </span>
                     )}
 
@@ -524,7 +524,7 @@ export default function UploadMaterialsPage() {
                         title="Remove"
                         style={{ flexShrink: 0 }}
                       >
-                        â--
+                        âœ•
                       </button>
                     )}
                   </li>
@@ -535,7 +535,7 @@ export default function UploadMaterialsPage() {
         )}
       </div>
 
-      {/* â--â-- Upload button â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â-- */}
+      {/* â”€â”€ Upload button â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
       {pendingFiles.length > 0 && (
         <div style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
           <button
@@ -549,13 +549,13 @@ export default function UploadMaterialsPage() {
           </button>
           {!selectedFolderId && (
             <span style={{ fontSize: 13, color: '#dc2626' }}>
-              â-- Select a folder first
+              â† Select a folder first
             </span>
           )}
         </div>
       )}
 
-      {/* â--â-- Step 3: Folder Contents â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â-- */}
+      {/* â”€â”€ Step 3: Folder Contents â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
       {selectedFolder && (
         <div style={{ marginTop: 28 }}>
           {/* Section header */}
@@ -563,7 +563,7 @@ export default function UploadMaterialsPage() {
                         justifyContent: 'space-between', marginBottom: 10 }}>
             <div>
               <p className="vb-section-title" style={{ marginBottom: 2 }}>
-                ğ--- {selectedFolder.folderName} â-- Contents
+                ğŸ“ {selectedFolder.folderName} â€” Contents
               </p>
               <p style={{ fontSize: 13, color: 'var(--text-secondary)' }}>
                 {folderFiles.length} file(s) uploaded in this folder
@@ -574,7 +574,7 @@ export default function UploadMaterialsPage() {
               onClick={() => loadFolderFiles(selectedFolderId)}
               disabled={filesLoading}
             >
-              {filesLoading ? 'Refreshing...' : 'â-º Refresh'}
+              {filesLoading ? 'Refreshing...' : 'â†º Refresh'}
             </button>
           </div>
 
@@ -606,7 +606,7 @@ export default function UploadMaterialsPage() {
                       >
                         <td>
                           <div className="dm-name-cell">
-                            <span className="dm-item-icon">ğ---</span>
+                            <span className="dm-item-icon">ğŸ“</span>
                             <span className="dm-item-name"
                                   style={{ fontWeight: f.folderId === selectedFolderId ? 700 : 500 }}>
                               {f.folderName}
@@ -640,7 +640,7 @@ export default function UploadMaterialsPage() {
             <p className="books-loading">Loading files...</p>
           ) : folderFiles.length === 0 ? (
             <div className="dm-empty">
-              <div className="dm-empty-icon">ğ---</div>
+              <div className="dm-empty-icon">ğŸ“‚</div>
               <p>No files uploaded to this folder yet.</p>
             </div>
           ) : (
@@ -670,7 +670,7 @@ export default function UploadMaterialsPage() {
                         </td>
                         <td>
                           <span className={`dm-type-badge dm-type-${ext}`}>
-                            {file.fileType || 'â--'}
+                            {file.fileType || 'â€”'}
                           </span>
                         </td>
                         <td style={{ fontSize: 13, color: 'var(--text-secondary)' }}>
@@ -681,7 +681,7 @@ export default function UploadMaterialsPage() {
                             ? new Date(file.uploadedDate).toLocaleDateString('en-IN', {
                                 day: '2-digit', month: 'short', year: 'numeric',
                               })
-                            : 'â--'}
+                            : 'â€”'}
                         </td>
                         <td>
                           <div className="books-actions">
@@ -696,7 +696,7 @@ export default function UploadMaterialsPage() {
                               download={file.fileName}
                               className="books-btn books-btn-sm books-btn-ghost"
                             >
-                              â¬-
+                              â¬‡
                             </a>
                             <button
                               className="books-btn books-btn-sm books-btn-danger"

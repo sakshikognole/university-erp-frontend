@@ -25,7 +25,7 @@ import { getEventImage } from '../utils/eventImageUtils';
 
 const _IS_PROD = window.location.hostname !== 'localhost';
 const _NODE_URL = _IS_PROD ? 'https://university-erp-node.onrender.com' : 'http://localhost:5000';
-const API_BASE_URL = `${_NODE_URL}/api`;
+const API_BASE_URL = ${_NODE_URL}/api;
 
 const EventNoticeView = () => {
   const { id } = useParams();
@@ -327,7 +327,7 @@ const EventNoticeView = () => {
               <div className="detail-subtext">
                 <Clock size={14} style={{ display: 'inline', marginRight: '4px' }} />
                 {event.eventTime}
-                {event.duration && ` â-¢ ${event.duration}`}
+                {event.duration && ` â€¢ ${event.duration}`}
               </div>
             </div>
           </div>
@@ -537,7 +537,7 @@ const EventNoticeView = () => {
               <div>
                 <div className="delete-item-name">{event.title}</div>
                 <div style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', marginTop: '0.2rem' }}>
-                  {event.category} â-¢ {event.venue?.name}
+                  {event.category} â€¢ {event.venue?.name}
                 </div>
               </div>
               <span className="delete-item-code">{event.eventId}</span>

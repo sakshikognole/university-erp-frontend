@@ -7,7 +7,7 @@ export default function ViewSportModal({ isOpen, sport, onClose }) {
     { label: 'Capacity',    value: sport.capacity },
     { label: 'Status',      value: sport.status },
     { label: 'Venue ID',    value: sport.venueId },
-    { label: 'Description', value: sport.description || 'â--' },
+    { label: 'Description', value: sport.description || 'â€”' },
   ];
 
   return (

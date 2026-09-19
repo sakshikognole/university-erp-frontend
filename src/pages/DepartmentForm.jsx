@@ -5,20 +5,20 @@ import { useAuth } from '../context/AuthContext';
 
 const _IS_PROD = window.location.hostname !== 'localhost';
 const _NODE_URL = _IS_PROD ? 'https://university-erp-node.onrender.com' : 'http://localhost:5000';
-const API_BASE_URL = `${_NODE_URL}/api`;
+const API_BASE_URL = ${_NODE_URL}/api;
 
-// â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--
-// Shared validation helpers â-- mirror the backend rules exactly.
+// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// Shared validation helpers â€” mirror the backend rules exactly.
 // Single source of truth for all Department field constraints.
 // Covers DEF-003 through DEF-014.
-// â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--
+// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 /**
  * Validate a Department ID string.
  * Rules:
  *  - Required, non-empty.
  *  - Minimum 2 characters.
- *  - Must NOT be purely numeric (rejects "0", "123", etc. â-- DEF-006, DEF-013).
+ *  - Must NOT be purely numeric (rejects "0", "123", etc. â€” DEF-006, DEF-013).
  *  - Must contain only letters, digits, and hyphens (e.g. CS-101, DEPT01).
  * Returns an error message string or null on success.
  */
@@ -43,9 +43,9 @@ export function validateDepartmentId(raw) {
  *  - Required, non-empty.
  *  - Minimum 5 characters.
  *  - Must start with a letter.
- *  - Must NOT contain any digit (rejects "Computer123", "CSE123" â-- DEF-003, DEF-005, DEF-010, DEF-012).
+ *  - Must NOT contain any digit (rejects "Computer123", "CSE123" â€” DEF-003, DEF-005, DEF-010, DEF-012).
  *  - Must consist only of letters, spaces, and standard punctuation (&, -, (, ), /, ., ', ,).
- *  - Must NOT be a short abbreviation: 1â--4 all-uppercase letters with no spaces (DEF-008, DEF-014).
+ *  - Must NOT be a short abbreviation: 1â€“4 all-uppercase letters with no spaces (DEF-008, DEF-014).
  * Returns an error message string or null on success.
  */
 export function validateDepartmentName(raw) {
@@ -57,7 +57,7 @@ export function validateDepartmentName(raw) {
   if (!/^[A-Za-z]/.test(val)) {
     return 'Please enter a valid department name.';
   }
-  // Reject any digits â-- covers purely numeric and mixed combos (DEF-003, DEF-005)
+  // Reject any digits â€” covers purely numeric and mixed combos (DEF-003, DEF-005)
   if (/\d/.test(val)) {
     return 'Please enter a valid department name in the specified format. Digits are not allowed in department names.';
   }
@@ -65,14 +65,14 @@ export function validateDepartmentName(raw) {
   if (!/^[A-Za-z\s&\-(). /,'\u0026]+$/.test(val)) {
     return 'Please enter a valid department name. Only letters, spaces, and standard punctuation (&, -, /, etc.) are allowed.';
   }
-  // Reject short all-uppercase abbreviations with no spaces â-- CS, IT, EEE, MECH etc. (DEF-008)
+  // Reject short all-uppercase abbreviations with no spaces â€” CS, IT, EEE, MECH etc. (DEF-008)
   if (/^[A-Z]{1,4}$/.test(val)) {
     return 'Please enter the full descriptive department name (e.g. "Computer Science" instead of "CS").';
   }
   return null;
 }
 
-// â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--
+// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 const DepartmentForm = () => {
   const { id } = useParams();
@@ -175,7 +175,7 @@ const DepartmentForm = () => {
     const { name, value } = e.target;
     const processed = name === 'departmentId' ? value.toUpperCase() : value;
     setFormData((prev) => ({ ...prev, [name]: processed }));
-    // Live validation â-- show errors as the user types
+    // Live validation â€” show errors as the user types
     validateField(name, processed);
   };
 
@@ -227,7 +227,7 @@ const DepartmentForm = () => {
       const data = await res.json();
 
       if (!res.ok) {
-        // Surface the exact backend error to the user â-- do NOT fall back to a fake success
+        // Surface the exact backend error to the user â€” do NOT fall back to a fake success
         setFeedback({
           type: 'error',
           message: data.message || 'Failed to save department. Please try again.',
@@ -236,7 +236,7 @@ const DepartmentForm = () => {
         return;
       }
 
-      // Real success â-- update local cache and navigate
+      // Real success â€” update local cache and navigate
       const stored = localStorage.getItem('erp_departments_custom');
       let depts = [];
       try { depts = stored ? JSON.parse(stored) : []; } catch { depts = []; }
@@ -266,7 +266,7 @@ const DepartmentForm = () => {
         navigate('/departments');
       }, 900);
     } catch (err) {
-      // Network / fetch error â-- do NOT show fake success
+      // Network / fetch error â€” do NOT show fake success
       console.error('API submission error:', err);
       setFeedback({
         type: 'error',

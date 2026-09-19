@@ -4,15 +4,15 @@
  * Shared OTP verification screen for both flows.
  *
  * flow = 'firsttime':
- *   â-¢ Appears after PmFirstTimeSetup.
- *   â-¢ Receives `pendingPassword` ({ newPassword, retypePassword }) from parent.
- *   â-¢ After OTP is verified, immediately calls updatePassword â-- one round-trip
+ *   â€¢ Appears after PmFirstTimeSetup.
+ *   â€¢ Receives `pendingPassword` ({ newPassword, retypePassword }) from parent.
+ *   â€¢ After OTP is verified, immediately calls updatePassword â€” one round-trip
  *     instead of two, keeping the UX tight.
  *
  * flow = 'login':
- *   â-¢ Appears first (no current-password step).
- *   â-¢ After OTP is verified, parent transitions to PmNewPasswordScreen.
- *   â-¢ `pendingPassword` is null for this flow.
+ *   â€¢ Appears first (no current-password step).
+ *   â€¢ After OTP is verified, parent transitions to PmNewPasswordScreen.
+ *   â€¢ `pendingPassword` is null for this flow.
  *
  * Test OTP: 000000
  */
@@ -50,7 +50,7 @@ const DEFAULT_PASSWORD = '123456';
  *   steps           string[]
  *   currentStep     number (1-based)
  *   pendingPassword { newPassword, retypePassword } | null
- *   onSuccess       () => void  â-- called when OTP verified (+ password saved for firsttime)
+ *   onSuccess       () => void  â€” called when OTP verified (+ password saved for firsttime)
  *   onBack          () => void
  */
 const PmOtpScreen = ({ flow, steps, currentStep, pendingPassword, onSuccess, onBack }) => {
@@ -116,10 +116,10 @@ const PmOtpScreen = ({ flow, steps, currentStep, pendingPassword, onSuccess, onB
 
     setLoading(true);
     try {
-      // Step 1 â-- verify the OTP on the backend.
+      // Step 1 â€” verify the OTP on the backend.
       await verifyOtp(flow, cleanOtp);
 
-      // Step 2 â-- for 'firsttime', immediately save the password now that OTP
+      // Step 2 â€” for 'firsttime', immediately save the password now that OTP
       // has been confirmed. The password was collected on the previous screen
       // and threaded here via pendingPassword.
       if (flow === 'firsttime' && pendingPassword) {
@@ -162,7 +162,7 @@ const PmOtpScreen = ({ flow, steps, currentStep, pendingPassword, onSuccess, onB
       <div className="auth-alert alert-info" style={{ marginBottom: '1rem' }}>
         <FlaskConical size={16} />
         <span>
-          Test mode â-- use OTP&nbsp;<strong>000000</strong>
+          Test mode â€” use OTP&nbsp;<strong>000000</strong>
         </span>
       </div>
 

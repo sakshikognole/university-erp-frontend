@@ -5,7 +5,7 @@ import PageError  from '../components/PageError';
 import SportTeamModal from './SportTeamModal';
 import ViewSportTeamModal from './ViewSportTeamModal';
 
-// â--â-- Status badge â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--
+// â”€â”€ Status badge â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 function StatusBadge({ status }) {
   const styles = {
     ACTIVE:   { background: '#dcfce7', color: '#166534', border: '1px solid #86efac' },
@@ -20,7 +20,7 @@ function StatusBadge({ status }) {
   );
 }
 
-// â--â-- Defect 1: Mobile accordion card (shown only on â-¤768px) â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--
+// â”€â”€ Defect 1: Mobile accordion card (shown only on â‰¤768px) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 function MobileTeamCard({ team, onView, onEdit, onDelete, deleting }) {
   const [open, setOpen] = useState(false);
   return (
@@ -48,7 +48,7 @@ function MobileTeamCard({ team, onView, onEdit, onDelete, deleting }) {
           </span>
         </div>
         <span style={{ fontSize: '0.65rem', color: '#9ca3af', flexShrink: 0 }}>
-          {open ? 'â-²' : 'â-¼'}
+          {open ? 'â–²' : 'â–¼'}
         </span>
       </button>
 
@@ -60,7 +60,7 @@ function MobileTeamCard({ team, onView, onEdit, onDelete, deleting }) {
             ['Coach',     team.coachName],
             ['Members',   Array.isArray(team.members) ? team.members.length : 0],
             ['Status',    <StatusBadge key="s" status={team.status} />],
-            ['Description', team.description || 'â--'],
+            ['Description', team.description || 'â€”'],
           ].map(([label, val]) => (
             <div key={label} style={{ display: 'flex', justifyContent: 'space-between',
               alignItems: 'flex-start', padding: '5px 0',
@@ -196,13 +196,13 @@ export default function SportTeamsPage() {
       {success && (
         <div className="books-alert books-alert-success">
           <span>{success}</span>
-          <button onClick={() => setSuccess('')}>Ã-</button>
+          <button onClick={() => setSuccess('')}>Ã—</button>
         </div>
       )}
       {error && (
         <div className="books-alert books-alert-error">
           <span>{error}</span>
-          <button onClick={() => setError('')}>Ã-</button>
+          <button onClick={() => setError('')}>Ã—</button>
         </div>
       )}
 
@@ -236,7 +236,7 @@ export default function SportTeamsPage() {
           </div>
         ) : (
           <>
-            {/* â--â-- Defect 1: Mobile accordion (â-¤768px) â--â-- */}
+            {/* â”€â”€ Defect 1: Mobile accordion (â‰¤768px) â”€â”€ */}
             <div className="sport-team-mob">
               {filtered.map((team) => (
                 <MobileTeamCard
@@ -250,7 +250,7 @@ export default function SportTeamsPage() {
               ))}
             </div>
 
-            {/* â--â-- Desktop table (>768px) â--â-- */}
+            {/* â”€â”€ Desktop table (>768px) â”€â”€ */}
             <div className="sport-team-desk">
               <div className="books-table-wrap">
                 <table className="books-table">
@@ -285,7 +285,7 @@ export default function SportTeamsPage() {
                         <td><StatusBadge status={team.status} /></td>
                         <td style={{ maxWidth: 180, overflow: 'hidden',
                           textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                          {team.description || 'â--'}
+                          {team.description || 'â€”'}
                         </td>
                         <td>
                           <div className="books-actions">

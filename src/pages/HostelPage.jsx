@@ -12,7 +12,7 @@ const DEFAULT_PAGE = {
 
 export default function HostelPage() {
   const [searchParams, setSearchParams] = useSearchParams();
-  // ?block=HB001 â-- shows HostelBlockDetails; no param â-- shows list
+  // ?block=HB001 â†’ shows HostelBlockDetails; no param â†’ shows list
   const viewBlockId = searchParams.get('block');
 
   const [blocks,    setBlocks]    = useState([]);
@@ -58,7 +58,7 @@ export default function HostelPage() {
 
   const openAdd  = ()      => { setEditBlock(null);  setModalOpen(true); };
   const openEdit = (block) => { setEditBlock(block); setModalOpen(true); };
-  // Navigate to detail by putting blockId in URL â-- survives refresh
+  // Navigate to detail by putting blockId in URL â€” survives refresh
   const openView = (block) => setSearchParams({ block: block.blockId });
   const goBack   = ()      => { setSearchParams({}); load(true); };
 
@@ -79,7 +79,7 @@ export default function HostelPage() {
     load(true);
   };
 
-  // â--â-- Detail view â-- URL driven so refresh restores the same block â--â--
+  // â”€â”€ Detail view â€” URL driven so refresh restores the same block â”€â”€
   if (viewBlockId) {
     // Find the block in the already-loaded list, or pass just the id
     // HostelBlockDetails fetches the block itself by blockId
@@ -92,7 +92,7 @@ export default function HostelPage() {
     );
   }
 
-  // â--â-- List view â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--
+  // â”€â”€ List view â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   return (
     <div className="page-container">
 

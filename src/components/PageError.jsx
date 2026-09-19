@@ -1,5 +1,5 @@
 /**
- * PageError â-- full-page centered error state with a Retry button.
+ * PageError â€” full-page centered error state with a Retry button.
  * Use when the initial data fetch fails (network error / server down).
  *
  * Usage:
@@ -28,7 +28,7 @@ export default function PageError({ message = 'Something went wrong.', onRetry }
         justifyContent: 'center',
         fontSize: '1.6rem',
       }}>
-        â- ï¸-
+        âš ï¸
       </div>
 
       {/* Message */}
@@ -64,7 +64,7 @@ export default function PageError({ message = 'Something went wrong.', onRetry }
             gap: 8,
           }}
         >
-          ğ--- Retry
+          ğŸ”„ Retry
         </button>
       )}
     </div>

@@ -43,7 +43,7 @@ export default function SportTeamModal({ isOpen, mode, team, onSave, onClose, lo
   const validate = () => {
     const e = {};
 
-    // â--â-- Defects 3, 4, 5: Team ID validation â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--
+    // â”€â”€ Defects 3, 4, 5: Team ID validation â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     // Must contain both letters AND numbers, no special characters
     if (!form.teamId.trim()) {
       e.teamId = 'Team ID is required.';
@@ -61,8 +61,8 @@ export default function SportTeamModal({ isOpen, mode, team, onSave, onClose, lo
     // Sport ID
     if (!form.sportId.trim()) e.sportId = 'Sport ID is required.';
 
-    // â--â-- Defects 7, 8: Coach Name validation â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--
-    // Must contain only letters and spaces â-- no numbers or special characters
+    // â”€â”€ Defects 7, 8: Coach Name validation â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // Must contain only letters and spaces â€” no numbers or special characters
     if (!form.coachName.trim()) {
       e.coachName = 'Coach Name is required.';
     } else if (/\d/.test(form.coachName)) {
@@ -92,13 +92,13 @@ export default function SportTeamModal({ isOpen, mode, team, onSave, onClose, lo
 
         <div className="books-modal-head">
           <h3>{mode === 'add' ? 'Add Sport Team' : 'Edit Sport Team'}</h3>
-          <button className="books-modal-close" onClick={onClose}>Ã-</button>
+          <button className="books-modal-close" onClick={onClose}>Ã—</button>
         </div>
 
         <form onSubmit={submit}>
           <div className="books-modal-body">
 
-            {/* Defect 6: Duplicate Team ID popup â-- visible inside modal */}
+            {/* Defect 6: Duplicate Team ID popup â€” visible inside modal */}
             {dupError && (
               <div style={{
                 background: '#fef2f2', border: '1px solid #fca5a5',
@@ -106,7 +106,7 @@ export default function SportTeamModal({ isOpen, mode, team, onSave, onClose, lo
                 display: 'flex', flexDirection: 'column', gap: 10,
               }}>
                 <div style={{ display: 'flex', gap: 10, alignItems: 'flex-start' }}>
-                  <span style={{ fontSize: '1.3rem' }}>â- ï¸-</span>
+                  <span style={{ fontSize: '1.3rem' }}>âš ï¸</span>
                   <p style={{ color: '#dc2626', fontWeight: 600, margin: 0, fontSize: '0.9rem' }}>
                     {dupError}
                   </p>

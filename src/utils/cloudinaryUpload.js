@@ -11,8 +11,8 @@
  *   const url = await uploadToCloudinary(file, 'system-announcements');
  *
  * Environment variables required (in root .env, prefixed with VITE_):
- *   VITE_CLOUDINARY_CLOUD_NAME    â-- e.g. bhsipfy8
- *   VITE_CLOUDINARY_UPLOAD_PRESET â-- e.g. erp_unsigned
+ *   VITE_CLOUDINARY_CLOUD_NAME    â€” e.g. bhsipfy8
+ *   VITE_CLOUDINARY_UPLOAD_PRESET â€” e.g. erp_unsigned
  */
 
 const CLOUD_NAME = import.meta.env.VITE_CLOUDINARY_CLOUD_NAME;

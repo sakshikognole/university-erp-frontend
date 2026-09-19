@@ -2,7 +2,7 @@
  * pmService.js
  *
  * Isolated API service for the Password Management demo module.
- * All calls go to /api/password-mgmt/* â-- completely separate from
+ * All calls go to /api/password-mgmt/* â€” completely separate from
  * the existing AuthContext and /api/auth/* endpoints.
  *
  * To swap the test OTP for a real email/SMS provider later, only the
@@ -12,7 +12,7 @@
 const API_BASE = 'http://localhost:5000/api/password-mgmt';
 
 /**
- * Generic fetch wrapper â-- throws an Error with the server's message on failure.
+ * Generic fetch wrapper â€” throws an Error with the server's message on failure.
  */
 const apiCall = async (endpoint, body) => {
   const response = await fetch(`${API_BASE}${endpoint}`, {
@@ -31,7 +31,7 @@ const apiCall = async (endpoint, body) => {
 };
 
 /**
- * First-Time Login flow â-- Step 1.
+ * First-Time Login flow â€” Step 1.
  * Sends the default password to the backend for verification,
  * which then issues a test OTP.
  */
@@ -39,8 +39,8 @@ export const initFirstTime = (currentPassword) =>
   apiCall('/firsttime/init', { currentPassword });
 
 /**
- * Normal Login flow â-- Step 1.
- * No credentials needed â-- backend issues a test OTP for the demo account.
+ * Normal Login flow â€” Step 1.
+ * No credentials needed â€” backend issues a test OTP for the demo account.
  */
 export const initLogin = () => apiCall('/login/init', {});
 
@@ -61,7 +61,7 @@ export const updatePassword = (flow, newPassword, retypePassword) =>
   apiCall('/update-password', { flow, newPassword, retypePassword });
 
 /**
- * Test Login â-- verifies the updated password actually works in the database.
+ * Test Login â€” verifies the updated password actually works in the database.
  * @param {string} email
  * @param {string} password
  */

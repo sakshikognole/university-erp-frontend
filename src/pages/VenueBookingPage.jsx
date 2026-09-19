@@ -8,7 +8,7 @@ import {
 import PageLoader from '../components/PageLoader';
 import PageError  from '../components/PageError';
 
-// â--â-- Status badge helper â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--
+// â”€â”€ Status badge helper â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 const STATUS_STYLE = {
   PENDING:   { background: '#fef9c3', color: '#854d0e',  border: '1px solid #fde047' },
   APPROVED:  { background: '#dcfce7', color: '#166534',  border: '1px solid #86efac' },
@@ -32,7 +32,7 @@ function StatusBadge({ status }) {
   );
 }
 
-// â--â-- Empty form state â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--
+// â”€â”€ Empty form state â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 const EMPTY_FORM = {
   bookingId:   '',
   eventId:     '',
@@ -45,7 +45,7 @@ const EMPTY_FORM = {
   status:      'PENDING',
 };
 
-// â--â-- Modal â-- View / Edit â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--
+// â”€â”€ Modal â€” View / Edit â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 function BookingModal({ isOpen, mode, booking, events, venues, onSave, onClose, saving }) {
   const [form,   setForm]   = useState(EMPTY_FORM);
   const [errors, setErrors] = useState({});
@@ -97,19 +97,19 @@ function BookingModal({ isOpen, mode, booking, events, venues, onSave, onClose, 
         <div className="books-modal" style={{ maxWidth: 540 }}>
           <div className="books-modal-head">
             <h3>Booking Details</h3>
-            <button className="books-modal-close" onClick={onClose}>Ã-</button>
+            <button className="books-modal-close" onClick={onClose}>Ã—</button>
           </div>
           <div className="books-modal-body">
             <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.9rem' }}>
               <tbody>
                 {[
                   ['Booking ID',   booking?.bookingId],
-                  ['Event',        ev ? `${ev.eventId} â-- ${ev.eventTitle}` : booking?.eventId],
-                  ['Venue',        vn ? `${vn.venueId} â-- ${vn.name}` : booking?.venueId],
+                  ['Event',        ev ? `${ev.eventId} â€” ${ev.eventTitle}` : booking?.eventId],
+                  ['Venue',        vn ? `${vn.venueId} â€” ${vn.name}` : booking?.venueId],
                   ['Booking Date', booking?.bookingDate],
                   ['Start Time',   booking?.startTime],
                   ['End Time',     booking?.endTime],
-                  ['Purpose',      booking?.purpose || 'â--'],
+                  ['Purpose',      booking?.purpose || 'â€”'],
                   ['Requested By', booking?.requestedBy],
                 ].map(([label, val]) => (
                   <tr key={label} style={{ borderBottom: '1px solid #f1f5f9' }}>
@@ -137,7 +137,7 @@ function BookingModal({ isOpen, mode, booking, events, venues, onSave, onClose, 
       <div className="books-modal" style={{ maxWidth: 560 }}>
         <div className="books-modal-head">
           <h3>Edit Booking</h3>
-          <button className="books-modal-close" onClick={onClose}>Ã-</button>
+          <button className="books-modal-close" onClick={onClose}>Ã—</button>
         </div>
         <form onSubmit={submit}>
           <div className="books-modal-body">
@@ -158,7 +158,7 @@ function BookingModal({ isOpen, mode, booking, events, venues, onSave, onClose, 
                   <option value="">Select event...</option>
                   {events.map((e) => (
                     <option key={e.eventId} value={e.eventId}>
-                      {e.eventId} â-- {e.eventTitle}
+                      {e.eventId} â€” {e.eventTitle}
                     </option>
                   ))}
                 </select>
@@ -172,7 +172,7 @@ function BookingModal({ isOpen, mode, booking, events, venues, onSave, onClose, 
                   <option value="">Select venue...</option>
                   {venues.map((v) => (
                     <option key={v.venueId} value={v.venueId}>
-                      {v.venueId} â-- {v.name}
+                      {v.venueId} â€” {v.name}
                     </option>
                   ))}
                 </select>
@@ -250,7 +250,7 @@ function BookingModal({ isOpen, mode, booking, events, venues, onSave, onClose, 
   );
 }
 
-// â--â-- Main Page â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--
+// â”€â”€ Main Page â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 export default function VenueBookingPage() {
   // Dropdown data
   const [events,   setEvents]   = useState([]);
@@ -276,7 +276,7 @@ export default function VenueBookingPage() {
   const [success,   setSuccess]   = useState('');
   const [error,     setError]     = useState('');
 
-  // â--â-- Load dropdown data + bookings â--â--
+  // â”€â”€ Load dropdown data + bookings â”€â”€
   const loadBookings = useCallback(async (silent = false) => {
     if (!silent) { setLoading(true); setPageError(''); }
     try {
@@ -314,7 +314,7 @@ export default function VenueBookingPage() {
     return () => clearTimeout(t);
   }, [success, error]);
 
-  // â--â-- Form handlers â--â--
+  // â”€â”€ Form handlers â”€â”€
   const changeForm = (e) => {
     const { name, value } = e.target;
     setForm((f) => ({ ...f, [name]: value }));
@@ -353,7 +353,7 @@ export default function VenueBookingPage() {
     }
   };
 
-  // â--â-- Modal handlers â--â--
+  // â”€â”€ Modal handlers â”€â”€
   const openView = (b) => setModal({ open: true, mode: 'view',  booking: b });
   const openEdit = (b) => setModal({ open: true, mode: 'edit',  booking: b });
   const closeModal = () => setModal({ open: false, mode: 'view', booking: null });
@@ -383,21 +383,21 @@ export default function VenueBookingPage() {
     }
   };
 
-  // â--â-- Lookup helpers â--â--
+  // â”€â”€ Lookup helpers â”€â”€
   const eventLabel = (eventId) => {
     const ev = events.find((e) => e.eventId === eventId);
-    return ev ? `${ev.eventId} â-- ${ev.eventTitle}` : eventId;
+    return ev ? `${ev.eventId} â€” ${ev.eventTitle}` : eventId;
   };
   const venueLabel = (venueId) => {
     const vn = venues.find((v) => v.venueId === venueId);
-    return vn ? `${vn.venueId} â-- ${vn.name}` : venueId;
+    return vn ? `${vn.venueId} â€” ${vn.name}` : venueId;
   };
 
-  // â--â-- Render â--â--
+  // â”€â”€ Render â”€â”€
   return (
     <div className="page-container">
 
-      {/* â--â-- Page header â--â-- */}
+      {/* â”€â”€ Page header â”€â”€ */}
       <div className="books-page-header">
         <div>
           <h1 className="page-title">Venue Booking</h1>
@@ -405,23 +405,23 @@ export default function VenueBookingPage() {
         </div>
       </div>
 
-      {/* â--â-- Notifications â--â-- */}
+      {/* â”€â”€ Notifications â”€â”€ */}
       {success && (
         <div className="books-alert books-alert-success">
           <span>{success}</span>
-          <button onClick={() => setSuccess('')}>Ã-</button>
+          <button onClick={() => setSuccess('')}>Ã—</button>
         </div>
       )}
       {error && (
         <div className="books-alert books-alert-error">
           <span>{error}</span>
-          <button onClick={() => setError('')}>Ã-</button>
+          <button onClick={() => setError('')}>Ã—</button>
         </div>
       )}
 
-      {/* â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--
+      {/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
           BOOKING REQUEST FORM
-      â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â-- */}
+      â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */}
       <div className="card" style={{ padding: '1.5rem', marginBottom: '2rem' }}>
         <h2 style={{ fontSize: '1rem', fontWeight: 700, marginBottom: '1.25rem', color: '#111827' }}>
           New Booking Request
@@ -434,7 +434,7 @@ export default function VenueBookingPage() {
         ) : (
           <form onSubmit={handleSubmit}>
 
-            {/* Row 1 â-- Booking ID (auto) */}
+            {/* Row 1 â€” Booking ID (auto) */}
             <div className="books-form-group">
               <label className="books-form-label">Booking ID (auto-generated)</label>
               <input
@@ -445,17 +445,17 @@ export default function VenueBookingPage() {
               />
             </div>
 
-            {/* Row 2 â-- Event + Venue */}
+            {/* Row 2 â€” Event + Venue */}
             <div className="club-form-row">
               <div className="books-form-group">
                 <label className="books-form-label">Event *</label>
                 <select
                   className={`books-form-control ${formErrs.eventId ? 'err' : ''}`}
                   name="eventId" value={form.eventId} onChange={changeForm}>
-                  <option value="">â-- Select an event â--</option>
+                  <option value="">â€” Select an event â€”</option>
                   {events.map((e) => (
                     <option key={e.eventId} value={e.eventId}>
-                      {e.eventId} â-- {e.eventTitle}
+                      {e.eventId} â€” {e.eventTitle}
                     </option>
                   ))}
                 </select>
@@ -466,10 +466,10 @@ export default function VenueBookingPage() {
                 <select
                   className={`books-form-control ${formErrs.venueId ? 'err' : ''}`}
                   name="venueId" value={form.venueId} onChange={changeForm}>
-                  <option value="">â-- Select a venue â--</option>
+                  <option value="">â€” Select a venue â€”</option>
                   {venues.map((v) => (
                     <option key={v.venueId} value={v.venueId}>
-                      {v.venueId} â-- {v.name}
+                      {v.venueId} â€” {v.name}
                     </option>
                   ))}
                 </select>
@@ -477,7 +477,7 @@ export default function VenueBookingPage() {
               </div>
             </div>
 
-            {/* Row 3 â-- Date + Times */}
+            {/* Row 3 â€” Date + Times */}
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '1rem' }}>
               <div className="books-form-group">
                 <label className="books-form-label">Booking Date *</label>
@@ -507,7 +507,7 @@ export default function VenueBookingPage() {
               </div>
             </div>
 
-            {/* Row 4 â-- Purpose + Requested By */}
+            {/* Row 4 â€” Purpose + Requested By */}
             <div className="club-form-row">
               <div className="books-form-group">
                 <label className="books-form-label">Purpose / Description</label>
@@ -543,9 +543,9 @@ export default function VenueBookingPage() {
         )}
       </div>
 
-      {/* â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--
+      {/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
           BOOKING LIST TABLE
-      â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â--â-- */}
+      â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */}
       <div className="card" style={{ padding: '1.5rem' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
           <h2 style={{ fontSize: '1rem', fontWeight: 700, color: '#111827', margin: 0 }}>
@@ -601,7 +601,7 @@ export default function VenueBookingPage() {
                     <td>{b.startTime}</td>
                     <td>{b.endTime}</td>
                     <td style={{ maxWidth: 160, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                      {b.purpose || 'â--'}
+                      {b.purpose || 'â€”'}
                     </td>
                     <td>{b.requestedBy}</td>
                     <td><StatusBadge status={b.status} /></td>
@@ -638,7 +638,7 @@ export default function VenueBookingPage() {
         )}
       </div>
 
-      {/* â--â-- Modal â--â-- */}
+      {/* â”€â”€ Modal â”€â”€ */}
       <BookingModal
         isOpen={modal.open}
         mode={modal.mode}

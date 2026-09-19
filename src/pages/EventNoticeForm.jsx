@@ -18,7 +18,7 @@ import { uploadToCloudinary } from '../utils/cloudinaryUpload';
 
 const _IS_PROD = window.location.hostname !== 'localhost';
 const _NODE_URL = _IS_PROD ? 'https://university-erp-node.onrender.com' : 'http://localhost:5000';
-const API_BASE_URL = `${_NODE_URL}/api`;
+const API_BASE_URL = ${_NODE_URL}/api;
 
 const EventNoticeForm = () => {
   const { id } = useParams();
@@ -309,7 +309,7 @@ const EventNoticeForm = () => {
         }
       }
 
-      // Step 2: send JSON body â-- no multipart needed anymore
+      // Step 2: send JSON body â€” no multipart needed anymore
       const payload = {
         title: formData.title.trim(),
         description: formData.description.trim(),
@@ -651,7 +651,7 @@ const EventNoticeForm = () => {
                   <option value="">-- Choose from Booked Events (Auto-fills details) or enter manually below --</option>
                   {bookedEvents.map((b) => (
                     <option key={b.eventId || b.id} value={b.eventId || b.id}>
-                      {b.eventTitle || b.title} (ID: {b.eventId || b.id}){b.eventType ? ` â-¢ Type: ${b.eventType}` : ''}{b.venueId ? ` â-¢ Venue: ${b.venueId}` : ''}
+                      {b.eventTitle || b.title} (ID: {b.eventId || b.id}){b.eventType ? ` â€¢ Type: ${b.eventType}` : ''}{b.venueId ? ` â€¢ Venue: ${b.venueId}` : ''}
                     </option>
                   ))}
                 </select>

@@ -221,7 +221,7 @@ export default function AddDocumentPage() {
                   <p className="stu-doc-preview">
                     {doc.defaultContent
                       ? doc.defaultContent.slice(0, 120) + (doc.defaultContent.length > 120 ? '...' : '')
-                      : 'No content template set â-- click Edit Content to add one.'}
+                      : 'No content template set â€” click Edit Content to add one.'}
                   </p>
                 )}
               </div>
