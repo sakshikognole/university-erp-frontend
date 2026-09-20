@@ -24,7 +24,7 @@ export default function ClubsPage() {
         if (!silent) setLoading(true);
         try {
             const res = await axios.get(`${SPRING_API}/clubs`);
-            setClubs(res.data);
+            setClubs(Array.isArray(res.data) ? res.data : (res.data?.content ?? []));
         } catch {
             setError('Failed to load clubs.');
         } finally {

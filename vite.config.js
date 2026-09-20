@@ -1,20 +1,21 @@
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 
-// https://vite.dev/config/
 export default defineConfig({
   plugins: [react()],
   envDir: '..',
   server: {
     proxy: {
-      // Clubs and Event Booking → Spring Boot :8080
-      '/api/clubs': {
+      // All Spring Boot API calls
+      '/api': {
         target: 'http://localhost:8080',
         changeOrigin: true,
       },
-      '/api/events': {
-        target: 'http://localhost:8080',
+      // All Node.js API calls (used by api.js NODE_BASE on localhost)
+      '/node-api': {
+        target: 'http://localhost:5000',
         changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/node-api/, '/api'),
       },
     },
   },

@@ -186,7 +186,7 @@ export default function PaymentPage() {
         params: { page, size },
       });
       const pd = res.data;
-      setTitles(pd.content);
+      setTitles(Array.isArray(pd.content) ? pd.content : []);
       setPageData({
         pageNumber:    pd.number       ?? pd.pageNumber    ?? 0,
         pageSize:      pd.size         ?? pd.pageSize      ?? size,
@@ -206,8 +206,10 @@ export default function PaymentPage() {
   const loadCombinations = useCallback(async () => {
     try {
       const res = await axios.get(`${SPRING_API}/payment-combinations`);
-      setCombinations(res.data);
-    } catch { /* silently ignore */ }
+      setCombinations(Array.isArray(res.data) ? res.data : (res.data?.content ?? []));
+    } catch {
+      setError('Failed to load payment combinations.');
+    }
   }, []);
 
   // ── Load all titles flat (for breakdown card lookup) ──────────────────
@@ -216,8 +218,8 @@ export default function PaymentPage() {
       const res = await axios.get(`${SPRING_API}/payment-titles`, {
         params: { page: 0, size: 1000 },
       });
-      setAllTitles(res.data.content ?? []);
-    } catch { /* silently ignore */ }
+      setAllTitles(Array.isArray(res.data?.content) ? res.data.content : []);
+    } catch { /* silently ignore — allTitles is only used for breakdown display */ }
   }, []);
 
   useEffect(() => { loadTitles(); },       [loadTitles]);
