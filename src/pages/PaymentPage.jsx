@@ -2,7 +2,9 @@ import { useState, useEffect, useCallback } from 'react';
 import axios from 'axios';
 import Pagination from '../components/Pagination';
 
-const SPRING_API = 'http://localhost:8080/api';
+const _IS_PROD_SP = window.location.hostname !== 'localhost';
+const _SPRING_URL = _IS_PROD_SP ? 'https://university-erp-spring.onrender.com' : 'http://localhost:8080';
+const SPRING_API = `${_SPRING_URL}/api`;
 
 const DEFAULT_PAGE = {
   pageNumber: 0, pageSize: 10, totalElements: 0,

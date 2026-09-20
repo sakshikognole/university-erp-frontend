@@ -8,7 +8,9 @@ import {
   Loader2,
 } from 'lucide-react';
 
-const API_BASE_URL = 'http://localhost:8080/api';
+const _IS_PROD_SP = window.location.hostname !== 'localhost';
+const _SPRING_URL = _IS_PROD_SP ? 'https://university-erp-spring.onrender.com' : 'http://localhost:8080';
+const API_BASE_URL = `${_SPRING_URL}/api`;
 const _IS_PROD = window.location.hostname !== 'localhost';
 const _NODE_URL = _IS_PROD ? 'https://university-erp-node.onrender.com' : 'http://localhost:5000';
 const NODE_API_URL = `${_NODE_URL}/api`;

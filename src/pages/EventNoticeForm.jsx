@@ -19,6 +19,7 @@ import { uploadToCloudinary } from '../utils/cloudinaryUpload';
 const _IS_PROD = window.location.hostname !== 'localhost';
 const _NODE_URL = _IS_PROD ? 'https://university-erp-node.onrender.com' : 'http://localhost:5000';
 const API_BASE_URL = `${_NODE_URL}/api`;
+const _SPRING_URL = _IS_PROD ? 'https://university-erp-spring.onrender.com' : 'http://localhost:8080';
 
 const EventNoticeForm = () => {
   const { id } = useParams();
@@ -66,7 +67,7 @@ const EventNoticeForm = () => {
 
   const loadBookedEvents = async () => {
     try {
-      const res = await fetch('http://localhost:8080/api/events');
+      const res = await fetch(`${_SPRING_URL}/api/events`);
       if (res.ok) {
         const data = await res.json();
         if (Array.isArray(data)) {
@@ -149,7 +150,7 @@ const EventNoticeForm = () => {
         headers: authHeader(),
       });
       if (!res.ok) {
-        res = await fetch('http://localhost:5000/api/super-admin/venues', {
+        res = await fetch(`${_NODE_URL}/api/super-admin/venues`, {
           headers: authHeader(),
         });
       }

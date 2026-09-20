@@ -3,7 +3,9 @@ import axios from 'axios';
 import ClubModal from './ClubModal';
 import ViewClubModal from './ViewClubModal';
 
-const SPRING_API = 'http://localhost:8080/api';
+const _IS_PROD_SP = window.location.hostname !== 'localhost';
+const _SPRING_URL = _IS_PROD_SP ? 'https://university-erp-spring.onrender.com' : 'http://localhost:8080';
+const SPRING_API = `${_SPRING_URL}/api`;
 
 export default function ClubsPage() {
     const [clubs, setClubs] = useState([]);
