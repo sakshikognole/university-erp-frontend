@@ -13,14 +13,16 @@ const DEFAULT_PAGE = {
 
 // ── Add Payment Modal ─────────────────────────────────────────────────────
 function AddPaymentModal({ isOpen, onClose, onSaved }) {
-  const [form,   setForm]   = useState({ title: '', amount: '', discount: '' });
-  const [errors, setErrors] = useState({});
-  const [saving, setSaving] = useState(false);
-  const [apiErr, setApiErr] = useState('');
+  const [form,         setForm]         = useState({ title: '', amount: '', discount: '' });
+  const [discountType, setDiscountType] = useState('flat'); // 'flat' | 'percent'
+  const [errors,       setErrors]       = useState({});
+  const [saving,       setSaving]       = useState(false);
+  const [apiErr,       setApiErr]       = useState('');
 
   useEffect(() => {
     if (isOpen) {
       setForm({ title: '', amount: '', discount: '' });
+      setDiscountType('flat');
       setErrors({});
       setApiErr('');
     }
@@ -33,14 +35,30 @@ function AddPaymentModal({ isOpen, onClose, onSaved }) {
     setErrors((er) => ({ ...er, [e.target.name]: '' }));
   };
 
+  // Calculate the actual discount rupee value from input
+  const discountRupees = () => {
+    const amt  = Number(form.amount  || 0);
+    const disc = Number(form.discount || 0);
+    if (discountType === 'percent') {
+      return (amt * disc) / 100;
+    }
+    return disc;
+  };
+
+  const finalAmount = () => Math.max(0, Number(form.amount || 0) - discountRupees());
+
   const validate = () => {
     const e = {};
     if (!form.title.trim())
       e.title = 'Title is required.';
     if (!form.amount || isNaN(form.amount) || Number(form.amount) <= 0)
       e.amount = 'Valid amount is required.';
-    if (form.discount !== '' && (isNaN(form.discount) || Number(form.discount) < 0))
-      e.discount = 'Discount must be 0 or more.';
+    if (form.discount !== '') {
+      if (isNaN(form.discount) || Number(form.discount) < 0)
+        e.discount = 'Discount must be 0 or more.';
+      if (discountType === 'percent' && Number(form.discount) > 100)
+        e.discount = 'Percentage cannot exceed 100%.';
+    }
     return e;
   };
 
@@ -54,7 +72,7 @@ function AddPaymentModal({ isOpen, onClose, onSaved }) {
       await axios.post(`${SPRING_API}/payment-titles`, {
         title:    form.title.trim(),
         amount:   Number(form.amount),
-        discount: Number(form.discount || 0),
+        discount: discountRupees(),   // always send rupee value to backend
       });
       onSaved();
       onClose();
@@ -105,26 +123,69 @@ function AddPaymentModal({ isOpen, onClose, onSaved }) {
                 {errors.amount && <p className="books-form-err">{errors.amount}</p>}
               </div>
               <div className="books-form-group">
-                <label className="books-form-label">Discount (₹)</label>
+                <label className="books-form-label">
+                  Discount&nbsp;
+                  {/* Toggle between ₹ flat and % */}
+                  <span style={{
+                    display: 'inline-flex', border: '1px solid #d1d5db',
+                    borderRadius: 6, overflow: 'hidden', fontSize: '0.75rem',
+                    marginLeft: 4, verticalAlign: 'middle',
+                  }}>
+                    <button
+                      type="button"
+                      onClick={() => { setDiscountType('flat'); setErrors((er) => ({ ...er, discount: '' })); }}
+                      style={{
+                        padding: '1px 8px', border: 'none', cursor: 'pointer',
+                        background: discountType === 'flat' ? '#2563eb' : '#f9fafb',
+                        color:      discountType === 'flat' ? '#fff'    : '#374151',
+                        fontWeight: 600,
+                      }}
+                    >₹</button>
+                    <button
+                      type="button"
+                      onClick={() => { setDiscountType('percent'); setErrors((er) => ({ ...er, discount: '' })); }}
+                      style={{
+                        padding: '1px 8px', border: 'none', cursor: 'pointer',
+                        background: discountType === 'percent' ? '#2563eb' : '#f9fafb',
+                        color:      discountType === 'percent' ? '#fff'    : '#374151',
+                        fontWeight: 600,
+                      }}
+                    >%</button>
+                  </span>
+                </label>
                 <input
                   className={`books-form-control ${errors.discount ? 'err' : ''}`}
                   name="discount"
                   type="number"
                   min="0"
+                  max={discountType === 'percent' ? 100 : undefined}
                   value={form.discount}
                   onChange={change}
-                  placeholder="e.g. 100"
+                  placeholder={discountType === 'percent' ? 'e.g. 10' : 'e.g. 100'}
                 />
                 {errors.discount && <p className="books-form-err">{errors.discount}</p>}
               </div>
             </div>
+            {/* Live preview */}
             {form.amount && (
-              <p style={{ fontSize: 13, color: 'var(--text-secondary)', marginTop: 4 }}>
-                Final amount after discount:{' '}
-                <strong style={{ color: '#16a34a' }}>
-                  ₹{Math.max(0, Number(form.amount) - Number(form.discount || 0)).toLocaleString('en-IN')}
-                </strong>
-              </p>
+              <div style={{
+                background: '#f0fdf4', border: '1px solid #bbf7d0',
+                borderRadius: 8, padding: '8px 12px', marginTop: 4, fontSize: 13,
+              }}>
+                {form.discount && discountType === 'percent' && (
+                  <p style={{ margin: '0 0 4px', color: '#374151' }}>
+                    Discount: {form.discount}% of ₹{Number(form.amount).toLocaleString('en-IN')}
+                    {' = '}
+                    <strong>- ₹{discountRupees().toLocaleString('en-IN', { maximumFractionDigits: 2 })}</strong>
+                  </p>
+                )}
+                <p style={{ margin: 0, color: '#374151' }}>
+                  Final amount after discount:{' '}
+                  <strong style={{ color: '#16a34a', fontSize: 14 }}>
+                    ₹{finalAmount().toLocaleString('en-IN', { maximumFractionDigits: 2 })}
+                  </strong>
+                </p>
+              </div>
             )}
           </div>
           <div className="books-modal-foot">
