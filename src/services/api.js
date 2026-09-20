@@ -1,16 +1,15 @@
 import axios from 'axios';
 
-// Runtime URL detection.
-// localhost  → Vite proxy (local dev / Docker).
-// Render/any other host → real backend URLs.
+// Runtime URL detection — same pattern used across all pages.
+// Works without any Vite proxy — direct calls to both backends.
 const onLocalhost = window.location.hostname === 'localhost';
 
 const SPRING_BASE = onLocalhost
-  ? '/api'
+  ? 'http://localhost:8080/api'
   : 'https://university-erp-spring.onrender.com/api';
 
 const NODE_BASE = onLocalhost
-  ? '/node-api'
+  ? 'http://localhost:5000/api'
   : 'https://university-erp-node.onrender.com/api';
 
 // ── Retry helper ─────────────────────────────────────────────────────────────

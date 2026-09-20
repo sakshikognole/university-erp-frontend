@@ -1150,3 +1150,470 @@ export const exportEvents = (events, format = 'csv') => {
   }
 };
 
+// ==========================================
+// FEE PAYMENT EXPORTS & RECEIPT GENERATION
+// ==========================================
+
+export const exportFeePaymentsCSV = (feeRecords, filename = `fee_payments_${new Date().toISOString().slice(0, 10)}.csv`) => {
+  const headers = ['PRN', 'Student Name', 'Class', 'Degree', 'Academic Year', 'Fee Type', 'Total Fee (INR)', 'Discount (INR)', 'Paid (INR)', 'Remaining (INR)', 'Status'];
+  const rows = feeRecords.map((f) => [
+    `"${(f.prn || '').replace(/"/g, '""')}"`,
+    `"${(f.studentName || '').replace(/"/g, '""')}"`,
+    `"${(f.class || '').replace(/"/g, '""')}"`,
+    `"${(f.degree || '').replace(/"/g, '""')}"`,
+    `"${(f.academicYear || '').replace(/"/g, '""')}"`,
+    `"${(f.feeType || '').replace(/"/g, '""')}"`,
+    f.totalFeeAmount || 0,
+    f.discountAmount || 0,
+    f.paidAmount || 0,
+    f.remainingAmount || 0,
+    `"${(f.status || 'PENDING').replace(/"/g, '""')}"`,
+  ]);
+
+  const csvContent = [headers.join(','), ...rows.map((row) => row.join(','))].join('\r\n');
+  triggerDownload(csvContent, filename, 'text/csv;charset=utf-8;');
+};
+
+export const exportFeePaymentsTXT = (feeRecords, filename = `fee_payments_${new Date().toISOString().slice(0, 10)}.txt`) => {
+  const dateStr = new Date().toLocaleString();
+  const padRight = (str, len) => String(str || '').padEnd(len, ' ');
+
+  const totalFee = feeRecords.reduce((acc, f) => acc + (f.totalFeeAmount || 0), 0);
+  const totalDiscount = feeRecords.reduce((acc, f) => acc + (f.discountAmount || 0), 0);
+  const totalPaid = feeRecords.reduce((acc, f) => acc + (f.paidAmount || 0), 0);
+  const totalRemaining = feeRecords.reduce((acc, f) => acc + (f.remainingAmount || 0), 0);
+
+  const header = [
+    '========================================================================================',
+    '                               UNIVERSITY ERP - FEE PAYMENTS REPORT                      ',
+    '========================================================================================',
+    `Generated On: ${dateStr}`,
+    `Total Records: ${feeRecords.length}`,
+    `Summary: Total Fee: INR ${totalFee} | Discounts: INR ${totalDiscount} | Paid: INR ${totalPaid} | Remaining: INR ${totalRemaining}`,
+    '----------------------------------------------------------------------------------------',
+    `${padRight('PRN', 14)} ${padRight('STUDENT NAME', 22)} ${padRight('FEE TYPE', 24)} ${padRight('TOTAL', 10)} ${padRight('PAID', 10)} ${padRight('STATUS', 10)}`,
+    '----------------------------------------------------------------------------------------',
+  ];
+
+  const body = feeRecords.map((f) => {
+    return `${padRight(f.prn, 14)} ${padRight(f.studentName, 22)} ${padRight(f.feeType, 24)} ${padRight(f.totalFeeAmount, 10)} ${padRight(f.paidAmount, 10)} ${padRight(f.status, 10)}`;
+  });
+
+  const footer = [
+    '----------------------------------------------------------------------------------------',
+    'End of Fee Payments Report',
+    '========================================================================================',
+  ];
+
+  const txtContent = [...header, ...body, ...footer].join('\r\n');
+  triggerDownload(txtContent, filename, 'text/plain;charset=utf-8;');
+};
+
+export const exportFeePaymentsPDF = (feeRecords, title = 'University ERP - Fee Payments Summary') => {
+  const dateStr = new Date().toLocaleString();
+  const printWindow = window.open('', '_blank', 'width=950,height=750');
+  if (!printWindow) {
+    alert('Please allow popups to generate the PDF report.');
+    return;
+  }
+
+  const totalFee = feeRecords.reduce((acc, f) => acc + (f.totalFeeAmount || 0), 0);
+  const totalDiscount = feeRecords.reduce((acc, f) => acc + (f.discountAmount || 0), 0);
+  const totalPaid = feeRecords.reduce((acc, f) => acc + (f.paidAmount || 0), 0);
+  const totalRemaining = feeRecords.reduce((acc, f) => acc + (f.remainingAmount || 0), 0);
+
+  const rowsHtml = feeRecords
+    .map(
+      (f, idx) => `
+      <tr style="border-bottom: 1px solid #e5e7eb;">
+        <td style="padding: 8px 10px; font-size: 12px; color: #6b7280;">${idx + 1}</td>
+        <td style="padding: 8px 10px; font-size: 12px; font-family: monospace; font-weight: 600;">${f.prn}</td>
+        <td style="padding: 8px 10px; font-size: 12px; font-weight: 500;">${f.studentName}</td>
+        <td style="padding: 8px 10px; font-size: 12px; color: #4b5563;">${f.feeType}</td>
+        <td style="padding: 8px 10px; font-size: 12px; font-weight: 600;">₹${(f.totalFeeAmount || 0).toLocaleString('en-IN')}</td>
+        <td style="padding: 8px 10px; font-size: 12px; color: #15803d;">₹${(f.discountAmount || 0).toLocaleString('en-IN')}</td>
+        <td style="padding: 8px 10px; font-size: 12px; font-weight: 600; color: #047857;">₹${(f.paidAmount || 0).toLocaleString('en-IN')}</td>
+        <td style="padding: 8px 10px; font-size: 12px; font-weight: 700; color: #b91c1c;">₹${(f.remainingAmount || 0).toLocaleString('en-IN')}</td>
+        <td style="padding: 8px 10px; font-size: 11px;">
+          <span style="display:inline-block; padding: 2px 8px; border-radius: 4px; font-weight: 600; background: ${f.status === 'PAID' ? '#dcfce7; color: #15803d;' : f.status === 'PARTIAL' ? '#fef3c7; color: #b45309;' : '#fee2e2; color: #b91c1c;'}">${f.status}</span>
+        </td>
+      </tr>
+    `
+    )
+    .join('');
+
+  const htmlContent = `
+    <!DOCTYPE html>
+    <html lang="en">
+      <head>
+        <meta charset="UTF-8" />
+        <title>${title}</title>
+        <style>
+          @page { size: A4 landscape; margin: 15mm; }
+          body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; color: #111827; margin: 0; padding: 20px; }
+          .header { border-bottom: 2px solid #000; padding-bottom: 12px; margin-bottom: 16px; }
+          .title { font-size: 20px; font-weight: 800; letter-spacing: -0.5px; }
+          .meta { font-size: 12px; color: #6b7280; margin-top: 4px; }
+          .stats-bar { display: flex; gap: 12px; margin-bottom: 16px; }
+          .stat-box { flex: 1; border: 1px solid #e5e7eb; border-radius: 6px; padding: 10px 14px; background: #f9fafb; }
+          .stat-label { font-size: 11px; color: #6b7280; text-transform: uppercase; font-weight: 600; }
+          .stat-val { font-size: 16px; font-weight: 700; color: #111827; margin-top: 2px; }
+          table { width: 100%; border-collapse: collapse; text-align: left; }
+          th { background: #f3f4f6; padding: 8px 10px; font-size: 11px; font-weight: 700; color: #374151; text-transform: uppercase; border-bottom: 1px solid #d1d5db; }
+          .footer { margin-top: 20px; text-align: center; font-size: 11px; color: #9ca3af; border-top: 1px solid #e5e7eb; padding-top: 10px; }
+        </style>
+      </head>
+      <body>
+        <div class="header">
+          <div class="title">${title}</div>
+          <div class="meta">Generated: ${dateStr} • Total Records: ${feeRecords.length}</div>
+        </div>
+
+        <div class="stats-bar">
+          <div class="stat-box">
+            <div class="stat-label">Total Fee</div>
+            <div class="stat-val">₹${totalFee.toLocaleString('en-IN')}</div>
+          </div>
+          <div class="stat-box">
+            <div class="stat-label">Total Discounted</div>
+            <div class="stat-val">₹${totalDiscount.toLocaleString('en-IN')}</div>
+          </div>
+          <div class="stat-box">
+            <div class="stat-label">Total Paid</div>
+            <div class="stat-val">₹${totalPaid.toLocaleString('en-IN')}</div>
+          </div>
+          <div class="stat-box">
+            <div class="stat-label">Total Remaining</div>
+            <div class="stat-val">₹${totalRemaining.toLocaleString('en-IN')}</div>
+          </div>
+        </div>
+
+        <table>
+          <thead>
+            <tr>
+              <th style="width: 4%;">#</th>
+              <th style="width: 12%;">PRN</th>
+              <th style="width: 18%;">Student Name</th>
+              <th style="width: 18%;">Fee Type</th>
+              <th style="width: 11%;">Total</th>
+              <th style="width: 9%;">Discount</th>
+              <th style="width: 10%;">Paid</th>
+              <th style="width: 10%;">Remaining</th>
+              <th style="width: 8%;">Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${rowsHtml}
+          </tbody>
+        </table>
+
+        <div class="footer">
+          Official University ERP Report • System Generated
+        </div>
+
+        <script>
+          window.onload = function() { window.print(); };
+        </script>
+      </body>
+    </html>
+  `;
+
+  printWindow.document.open();
+  printWindow.document.write(htmlContent);
+  printWindow.document.close();
+};
+
+export const exportFeePayments = (feeRecords, format = 'csv') => {
+  if (!feeRecords || feeRecords.length === 0) {
+    alert('No fee payment data available to export.');
+    return;
+  }
+
+  switch (format.toLowerCase()) {
+    case 'csv':
+      exportFeePaymentsCSV(feeRecords);
+      break;
+    case 'txt':
+      exportFeePaymentsTXT(feeRecords);
+      break;
+    case 'pdf':
+      exportFeePaymentsPDF(feeRecords);
+      break;
+    default:
+      exportFeePaymentsCSV(feeRecords);
+  }
+};
+
+/**
+ * Downloads / Prints official PDF Fee Receipt for a specific transaction
+ */
+export const downloadFeeReceiptPDF = (receipt) => {
+  if (!receipt) {
+    alert('Invalid receipt data');
+    return;
+  }
+
+  const printWindow = window.open('', '_blank', 'width=800,height=750');
+  if (!printWindow) {
+    alert('Please allow popups to download/print the fee receipt.');
+    return;
+  }
+
+  const paidDate = new Date(receipt.paidAt || Date.now()).toLocaleString('en-IN', {
+    dateStyle: 'medium',
+    timeStyle: 'short',
+  });
+
+  const html = `
+    <!DOCTYPE html>
+    <html lang="en">
+      <head>
+        <meta charset="UTF-8" />
+        <title>Fee_Receipt_${receipt.receiptNumber || 'Receipt'}</title>
+        <style>
+          @page { size: A4; margin: 15mm; }
+          body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            color: #111827;
+            margin: 0;
+            padding: 24px;
+            background: #ffffff;
+          }
+          .receipt-card {
+            border: 2px solid #111827;
+            border-radius: 8px;
+            padding: 28px;
+            max-width: 700px;
+            margin: 0 auto;
+          }
+          .receipt-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            border-bottom: 2px solid #e5e7eb;
+            padding-bottom: 18px;
+            margin-bottom: 20px;
+          }
+          .uni-name {
+            font-size: 22px;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+            color: #000000;
+            text-transform: uppercase;
+          }
+          .uni-tagline {
+            font-size: 12px;
+            color: #6b7280;
+            margin-top: 3px;
+          }
+          .receipt-badge {
+            text-align: right;
+          }
+          .receipt-tag {
+            background: #111827;
+            color: #ffffff;
+            font-size: 11px;
+            font-weight: 700;
+            padding: 4px 10px;
+            border-radius: 4px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            display: inline-block;
+          }
+          .receipt-no {
+            font-size: 13px;
+            font-weight: 700;
+            font-family: monospace;
+            margin-top: 6px;
+            color: #111827;
+          }
+          .info-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+            background: #f9fafb;
+            padding: 16px;
+            border-radius: 6px;
+            margin-bottom: 20px;
+            border: 1px solid #e5e7eb;
+          }
+          .info-item {
+            font-size: 13px;
+          }
+          .info-label {
+            font-size: 11px;
+            color: #6b7280;
+            text-transform: uppercase;
+            font-weight: 600;
+            margin-bottom: 2px;
+          }
+          .info-value {
+            font-weight: 600;
+            color: #111827;
+          }
+          .payment-breakdown {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+          }
+          .payment-breakdown th {
+            text-align: left;
+            padding: 10px 12px;
+            background: #f3f4f6;
+            font-size: 12px;
+            text-transform: uppercase;
+            font-weight: 700;
+            border-bottom: 1px solid #d1d5db;
+          }
+          .payment-breakdown td {
+            padding: 12px;
+            font-size: 13px;
+            border-bottom: 1px solid #e5e7eb;
+          }
+          .amount-row-highlight {
+            background: #ecfdf5;
+            font-weight: 700;
+          }
+          .amount-row-highlight td {
+            font-size: 15px;
+            color: #047857;
+            border-top: 2px solid #059669;
+          }
+          .footer-note {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 24px;
+            padding-top: 16px;
+            border-top: 1px dashed #d1d5db;
+            font-size: 11px;
+            color: #6b7280;
+          }
+          .stamp-box {
+            text-align: right;
+            font-size: 12px;
+            font-weight: 600;
+            color: #111827;
+          }
+          .status-paid-pill {
+            display: inline-block;
+            background: #10b981;
+            color: #ffffff;
+            font-weight: 800;
+            padding: 3px 12px;
+            border-radius: 9999px;
+            font-size: 11px;
+            letter-spacing: 0.5px;
+          }
+        </style>
+      </head>
+      <body>
+        <div class="receipt-card">
+          <div class="receipt-header">
+            <div>
+              <div class="uni-name">University ERP</div>
+              <div class="uni-tagline">Official Student E-Fee Payment Receipt</div>
+            </div>
+            <div class="receipt-badge">
+              <span class="receipt-tag">Payment Verified</span>
+              <div class="receipt-no">Receipt #${receipt.receiptNumber || 'N/A'}</div>
+            </div>
+          </div>
+
+          <div class="info-grid">
+            <div class="info-item">
+              <div class="info-label">Student PRN</div>
+              <div class="info-value" style="font-family: monospace;">${receipt.prn || 'N/A'}</div>
+            </div>
+            <div class="info-item">
+              <div class="info-label">Student Name</div>
+              <div class="info-value">${receipt.studentName || 'N/A'}</div>
+            </div>
+            <div class="info-item">
+              <div class="info-label">Program & Class</div>
+              <div class="info-value">${receipt.degree || ''} (${receipt.class || 'N/A'})</div>
+            </div>
+            <div class="info-item">
+              <div class="info-label">Academic Year / Sem</div>
+              <div class="info-value">${receipt.academicYear || '2025-2026'} - ${receipt.semester || 'Semester 1'}</div>
+            </div>
+            <div class="info-item">
+              <div class="info-label">Transaction ID</div>
+              <div class="info-value" style="font-family: monospace; font-size: 12px;">${receipt.transactionId || 'N/A'}</div>
+            </div>
+            <div class="info-item">
+              <div class="info-label">Payment Date & Time</div>
+              <div class="info-value">${paidDate}</div>
+            </div>
+            <div class="info-item">
+              <div class="info-label">Payment Mode</div>
+              <div class="info-value">${receipt.paymentMethod || 'Razorpay (Test Mode)'}</div>
+            </div>
+            <div class="info-item">
+              <div class="info-label">Payment Gateway Reference</div>
+              <div class="info-value" style="font-family: monospace; font-size: 12px;">${receipt.razorpayPaymentId || 'pay_test_verified'}</div>
+            </div>
+          </div>
+
+          <table class="payment-breakdown">
+            <thead>
+              <tr>
+                <th>Description</th>
+                <th style="text-align: right;">Amount (INR)</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>Fee Category:</strong> ${receipt.feeType || 'Tuition & Academic Fee'}</td>
+                <td style="text-align: right; font-weight: 600;">₹${(receipt.totalFeeAmount || 0).toLocaleString('en-IN')}</td>
+              </tr>
+              <tr>
+                <td>Scholarship / Institutional Discount</td>
+                <td style="text-align: right; color: #15803d;">- ₹${(receipt.discountAmount || 0).toLocaleString('en-IN')}</td>
+              </tr>
+              <tr>
+                <td>Net Payable Amount</td>
+                <td style="text-align: right; font-weight: 600;">₹${Math.max(0, (receipt.totalFeeAmount || 0) - (receipt.discountAmount || 0)).toLocaleString('en-IN')}</td>
+              </tr>
+              <tr class="amount-row-highlight">
+                <td><strong>Amount Paid in This Transaction</strong></td>
+                <td style="text-align: right;">₹${(receipt.amountPaidThisTransaction || 0).toLocaleString('en-IN')}</td>
+              </tr>
+              <tr>
+                <td>Total Cumulative Amount Paid</td>
+                <td style="text-align: right; font-weight: 600;">₹${(receipt.totalPaidSoFar || 0).toLocaleString('en-IN')}</td>
+              </tr>
+              <tr>
+                <td><strong>Remaining Balance Amount</strong></td>
+                <td style="text-align: right; font-weight: 700; color: ${receipt.remainingBalance === 0 ? '#15803d' : '#b91c1c'};">₹${(receipt.remainingBalance || 0).toLocaleString('en-IN')}</td>
+              </tr>
+            </tbody>
+          </table>
+
+          <div class="footer-note">
+            <div>
+              <span class="status-paid-pill">PAYMENT SUCCESSFUL</span>
+              <div style="margin-top: 6px;">This is a computer generated electronic receipt. No physical signature required.</div>
+            </div>
+            <div class="stamp-box">
+              <div>Finance & Accounts Office</div>
+              <div style="font-size: 11px; color: #6b7280; font-weight: 400;">University ERP System</div>
+            </div>
+          </div>
+        </div>
+
+        <script>
+          window.onload = function() {
+            window.print();
+          };
+        </script>
+      </body>
+    </html>
+  `;
+
+  printWindow.document.open();
+  printWindow.document.write(html);
+  printWindow.document.close();
+};
+
+

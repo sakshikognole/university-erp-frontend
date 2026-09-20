@@ -82,14 +82,9 @@ const StudentLogin = () => {
           </div>
 
           <div className="form-group">
-            <div className="form-label-row">
-              <label className="form-label" htmlFor="student-password">
-                Password
-              </label>
-              <Link to="/forgot-password" className="forgot-link">
-                Forgot Password?
-              </Link>
-            </div>
+            <label className="form-label" htmlFor="student-password">
+              Password
+            </label>
             <div className="input-wrapper">
               <Lock size={18} className="input-icon" />
               <input
@@ -101,6 +96,11 @@ const StudentLogin = () => {
                 onChange={(e) => setPassword(e.target.value)}
                 required
               />
+            </div>
+            <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '0.35rem' }}>
+              <Link to="/forgot-password" className="forgot-link">
+                Forgot Password?
+              </Link>
             </div>
           </div>
 

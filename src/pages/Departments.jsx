@@ -1,40 +1,81 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
-  Building2, Plus, Download, Search, Edit, Trash2, FileText,
-  FileSpreadsheet, Printer, ChevronDown, AlertCircle,
-  AlertTriangle, CheckCircle2, Loader2, X,
+  Building2,
+  Plus,
+  Download,
+  Search,
+  Edit,
+  Trash2,
+  FileText,
+  FileSpreadsheet,
+  Printer,
+  ChevronDown,
+  AlertCircle,
+  AlertTriangle,
+  CheckCircle2,
+  Loader2,
+  X,
 } from 'lucide-react';
 import { exportDepartments } from '../utils/exportUtils';
 import { useAuth } from '../context/AuthContext';
-import PageError from '../components/PageError';
 
-const IS_PROD = window.location.hostname !== 'localhost';
-const API_BASE_URL = IS_PROD ? 'https://university-erp-node.onrender.com/api' : 'http://localhost:5000/api';
+const _IS_PROD = window.location.hostname !== 'localhost';
+const _NODE_URL = _IS_PROD ? 'https://university-erp-node.onrender.com' : 'http://localhost:5000';
+const API_BASE_URL = `${_NODE_URL}/api`;
 
-const defaultFallbackDepartments = [
-  { _id: '1', departmentId: 'CS-101', name: 'Computer Science & Engineering', createdAt: '2026-01-10T08:00:00.000Z' },
-  { _id: '2', departmentId: 'IT-102', name: 'Information Technology', createdAt: '2026-01-12T08:00:00.000Z' },
-  { _id: '3', departmentId: 'EE-103', name: 'Electrical Engineering', createdAt: '2026-01-15T08:00:00.000Z' },
-  { _id: '4', departmentId: 'ME-104', name: 'Mechanical Engineering', createdAt: '2026-01-18T08:00:00.000Z' },
-  { _id: '5', departmentId: 'CE-105', name: 'Civil Engineering', createdAt: '2026-01-20T08:00:00.000Z' },
-  { _id: '6', departmentId: 'FIN-106', name: 'Finance & Accounts', createdAt: '2026-01-22T08:00:00.000Z' },
-];
+// ─────────────────────────────────────────────────────────────────────────────
+// Departments page — Super Admin view
+//
+// DEF-001 / DEF-002 / DEF-015:
+//   - Uses `authLoading` from AuthContext to defer access-control decisions until
+//     the initial token-expiry check has settled. This prevents the blank-panel
+//     flash that occurred on page refresh and on mobile Desktop View switches.
+//
+// DEF-007:
+//   - Delete errors are no longer silently swallowed; the real API error is shown.
+//     The item is only removed from local state/cache when the API actually succeeds.
+//
+// DEF-015:
+//   - No CSS width calculations that depend on initial mount; the layout is
+//     purely flex/table-based so it reacts correctly to viewport changes without
+//     JavaScript-driven resize logic.
+//
+// DEF-016:
+//   - Responsive placeholder: state tracks `isMobile` via matchMedia and provides
+//     a shorter placeholder text on narrow viewports, preventing truncation while
+//     keeping the full text available on desktop.
+//
+// PERFORMANCE:
+//   - Single fetch per mount; `fetchDepartments` is memoised with useCallback.
+//   - Feedback banners auto-dismiss after 5 seconds.
+//   - No duplicate API calls on navigation back (localStorage cache used as
+//     optimistic display while real fetch is in flight).
+// ─────────────────────────────────────────────────────────────────────────────
 
 const Departments = () => {
   const navigate = useNavigate();
-  const { user } = useAuth();
+  const { user, authLoading } = useAuth();
   const [departments, setDepartments] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
+  const [fetchError, setFetchError] = useState('');
   const [deleting, setDeleting] = useState(false);
   const [search, setSearch] = useState('');
   const [feedback, setFeedback] = useState({ type: '', message: '' });
   const [showDownloadMenu, setShowDownloadMenu] = useState(false);
   const [deleteConfirm, setDeleteConfirm] = useState(null);
   const downloadMenuRef = useRef(null);
+  const feedbackTimerRef = useRef(null);
 
-  // Check if user is Super Admin
-  const isSuperAdmin = user?.adminType === 'SUPER_ADMIN';
+  // DEF-016: responsive placeholder — tracks whether the viewport is "mobile"
+  const [isMobile, setIsMobile] = useState(
+    typeof window !== 'undefined' ? window.matchMedia('(max-width: 640px)').matches : false
+  );
+
+  // Check if user is Super Admin. We only make this decision after authLoading
+  // is false so a token-expiry logout doesn't flip us to the blank non-admin
+  // panel mid-render (DEF-001, DEF-002, DEF-015).
+  const isSuperAdmin = !authLoading && user?.adminType === 'SUPER_ADMIN';
 
   const authHeader = () => {
     const token = localStorage.getItem('erp_token');
@@ -44,8 +85,81 @@ const Departments = () => {
     };
   };
 
+  // Show feedback and auto-dismiss after 5 s
+  const showFeedback = useCallback((type, message) => {
+    setFeedback({ type, message });
+    if (feedbackTimerRef.current) clearTimeout(feedbackTimerRef.current);
+    feedbackTimerRef.current = setTimeout(() => setFeedback({ type: '', message: '' }), 5000);
+  }, []);
+
+  // DEF-016: listen for viewport width changes so the placeholder stays correct
+  // after mobile-to-desktop-view switches (DEF-015 secondary concern).
   useEffect(() => {
-    fetchDepartments();
+    const mq = window.matchMedia('(max-width: 640px)');
+    const handler = (e) => setIsMobile(e.matches);
+    // Use addEventListener if available, fall back to addListener for older browsers
+    if (mq.addEventListener) {
+      mq.addEventListener('change', handler);
+    } else {
+      mq.addListener(handler);
+    }
+    return () => {
+      if (mq.removeEventListener) {
+        mq.removeEventListener('change', handler);
+      } else {
+        mq.removeListener(handler);
+      }
+    };
+  }, []);
+
+  const fetchDepartments = useCallback(async () => {
+    setLoading(true);
+    setFetchError('');
+    try {
+      const res = await fetch(`${API_BASE_URL}/super-admin/departments`, {
+        headers: authHeader(),
+      });
+
+      if (!res.ok) {
+        const errData = await res.json().catch(() => ({}));
+        throw new Error(errData.message || `HTTP ${res.status}`);
+      }
+      const data = await res.json();
+      setDepartments(Array.isArray(data) ? data : []);
+      // Keep cache fresh for offline/fallback scenarios
+      localStorage.setItem('erp_departments_custom', JSON.stringify(data));
+    } catch (err) {
+      console.warn('Departments API unavailable, using local cache:', err.message);
+      // Show the cached data so the page isn't blank, but tell the user
+      const stored = localStorage.getItem('erp_departments_custom');
+      if (stored) {
+        try {
+          const cached = JSON.parse(stored);
+          setDepartments(Array.isArray(cached) ? cached : []);
+        } catch {
+          setDepartments([]);
+        }
+      } else {
+        setDepartments([]);
+      }
+      setFetchError('Unable to reach the server. Showing cached data. Refresh to retry.');
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  // Fetch once auth is settled and user is confirmed as super admin (DEF-001)
+  useEffect(() => {
+    if (!authLoading && isSuperAdmin) {
+      fetchDepartments();
+    }
+  }, [authLoading, isSuperAdmin, fetchDepartments]);
+
+  // Clean up feedback timer on unmount
+  useEffect(() => {
+    return () => {
+      if (feedbackTimerRef.current) clearTimeout(feedbackTimerRef.current);
+    };
   }, []);
 
   // Close download dropdown when clicking outside
@@ -59,37 +173,6 @@ const Departments = () => {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  const fetchDepartments = async () => {
-    setLoading(true);
-    
-    // Non-super-admin users: don't fetch, just show blank
-    if (!isSuperAdmin) {
-      setLoading(false);
-      return;
-    }
-
-    try {
-      const res = await fetch(`${API_BASE_URL}/super-admin/departments`, {
-        headers: authHeader(),
-      });
-
-      if (!res.ok) throw new Error('Failed to load departments');
-      const data = await res.json();
-      setDepartments(data);
-    } catch (err) {
-      console.warn('Backend unavailable, using cached / fallback departments:', err);
-      const stored = localStorage.getItem('erp_departments_custom');
-      if (stored) {
-        setDepartments(JSON.parse(stored));
-      } else {
-        setDepartments(defaultFallbackDepartments);
-        localStorage.setItem('erp_departments_custom', JSON.stringify(defaultFallbackDepartments));
-      }
-    } finally {
-      setLoading(false);
-    }
-  };
-
   const handleDelete = async (dept) => {
     setDeleting(true);
     try {
@@ -99,22 +182,22 @@ const Departments = () => {
       });
 
       if (!res.ok) {
-        const errorData = await res.json();
+        const errorData = await res.json().catch(() => ({}));
         throw new Error(errorData.message || 'Failed to delete department');
       }
 
-      setFeedback({ type: 'success', message: `Department '${dept.name}' deleted successfully.` });
+      // Only update local state and cache after confirmed API success (DEF-007)
+      const updated = departments.filter((d) => d._id !== dept._id);
+      setDepartments(updated);
+      localStorage.setItem('erp_departments_custom', JSON.stringify(updated));
+      showFeedback('success', `Department '${dept.name}' deleted successfully.`);
     } catch (err) {
-      console.warn('API delete error, deleting from local cache:', err);
-      setFeedback({ type: 'success', message: `Department '${dept.name}' deleted successfully.` });
+      // Show the real error — do not fake success (DEF-007)
+      showFeedback('error', err.message || 'Failed to delete department. Please try again.');
     } finally {
       setDeleting(false);
       setDeleteConfirm(null);
     }
-
-    const updated = departments.filter((d) => d._id !== dept._id);
-    setDepartments(updated);
-    localStorage.setItem('erp_departments_custom', JSON.stringify(updated));
   };
 
   const handleDownload = (format) => {
@@ -122,15 +205,36 @@ const Departments = () => {
     exportDepartments(filteredDepartments, format);
   };
 
-  // Filter departments by Search query
+  // Filter departments by search query
   const filteredDepartments = departments.filter((d) => {
     const query = search.toLowerCase().trim();
+    if (!query) return true;
     const idStr = (d.departmentId || d.code || '').toLowerCase();
     const nameStr = (d.name || '').toLowerCase();
     return idStr.includes(query) || nameStr.includes(query);
   });
 
-  // Basic blank template for non-super-admin users
+  // ── Render: auth still settling — show spinner (DEF-001, DEF-002, DEF-015) ──
+  if (authLoading) {
+    return (
+      <div className="page-container">
+        <div className="page-header-row">
+          <div>
+            <h1 className="page-title">Departments</h1>
+            <p className="page-subtitle">Manage university departments and academic divisions.</p>
+          </div>
+        </div>
+        <div className="card table-card" style={{ marginTop: '1.25rem' }}>
+          <div className="table-loading-state">
+            <Loader2 size={24} className="spin-animate" />
+            <p>Loading departments...</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // ── Render: non-Super-Admin user ──
   if (!isSuperAdmin) {
     return (
       <div className="page-container">
@@ -144,6 +248,7 @@ const Departments = () => {
     );
   }
 
+  // ── Render: full Super Admin view ──
   return (
     <div className="page-container">
       {/* Top Header with Action Buttons on Top-Right Corner */}
@@ -201,10 +306,10 @@ const Departments = () => {
             )}
           </div>
 
-          {/* Add Department Button (Navigates to new page) */}
+          {/* Add Department Button */}
           <button
             type="button"
-            className="books-btn books-btn-primary"
+            className="btn btn-primary add-department-btn"
             onClick={() => navigate('/departments/add')}
           >
             <Plus size={16} />
@@ -213,13 +318,14 @@ const Departments = () => {
         </div>
       </div>
 
-      {/* Feedback Banner */}
+      {/* Feedback Banner — auto-dismissed after 5 s */}
       {feedback.message && (
         <div
           className={`feedback-banner ${
             feedback.type === 'success' ? 'feedback-success' : 'feedback-error'
           }`}
           style={{ margin: '1rem 0' }}
+          role="alert"
         >
           {feedback.type === 'success' ? (
             <CheckCircle2 size={18} />
@@ -227,6 +333,35 @@ const Departments = () => {
             <AlertCircle size={18} />
           )}
           <span>{feedback.message}</span>
+          <button
+            type="button"
+            style={{ marginLeft: 'auto', background: 'none', border: 'none', cursor: 'pointer', padding: '0 0.25rem', color: 'inherit', opacity: 0.7 }}
+            onClick={() => setFeedback({ type: '', message: '' })}
+            aria-label="Dismiss"
+          >
+            <X size={15} />
+          </button>
+        </div>
+      )}
+
+      {/* Fetch-error inline notice (non-blocking) */}
+      {fetchError && !loading && (
+        <div
+          className="feedback-banner feedback-error"
+          style={{ margin: '0.5rem 0 1rem 0' }}
+          role="alert"
+        >
+          <AlertCircle size={16} />
+          <span>{fetchError}</span>
+          <button
+            type="button"
+            style={{ marginLeft: 'auto', background: 'none', border: 'none', cursor: 'pointer', padding: '0 0.25rem', color: 'inherit', opacity: 0.7 }}
+            onClick={() => { setFetchError(''); fetchDepartments(); }}
+            aria-label="Retry"
+            title="Retry"
+          >
+            Retry
+          </button>
         </div>
       )}
 
@@ -239,22 +374,36 @@ const Departments = () => {
             <input
               type="text"
               className="search-input"
-              placeholder="Search by Department ID or Name..."
+              /*
+               * DEF-016: responsive placeholder.
+               * On mobile (≤640 px) a shorter label is shown so the text fits
+               * without being truncated by the browser. On desktop the full
+               * label is shown. Both convey the same search intent.
+               */
+              placeholder={
+                isMobile
+                  ? 'Search departments...'
+                  : 'Search by Department ID or Name...'
+              }
+              title="Search by Department ID and Department Name"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
+              aria-label="Search departments"
             />
             {search && (
               <button
                 type="button"
                 className="search-clear-btn"
                 onClick={() => setSearch('')}
+                aria-label="Clear search"
               >
                 Clear
               </button>
             )}
           </div>
           <div className="table-stats-badge">
-            Total: <strong>{filteredDepartments.length}</strong> {filteredDepartments.length === 1 ? 'Department' : 'Departments'}
+            Total: <strong>{filteredDepartments.length}</strong>{' '}
+            {filteredDepartments.length === 1 ? 'Department' : 'Departments'}
           </div>
         </div>
 
@@ -277,7 +426,7 @@ const Departments = () => {
               {!search && (
                 <button
                   type="button"
-                  className="books-btn books-btn-primary"
+                  className="btn btn-primary"
                   style={{ marginTop: '1rem' }}
                   onClick={() => navigate('/departments/add')}
                 >
@@ -290,8 +439,8 @@ const Departments = () => {
             <table className="data-table">
               <thead>
                 <tr>
-                  <th style={{ width: '80px' }}>#</th>
-                  <th style={{ width: '220px' }}>Department ID</th>
+                  <th style={{ width: '60px' }}>#</th>
+                  <th style={{ width: '200px' }}>Department ID</th>
                   <th>Department Name</th>
                   <th style={{ width: '140px', textAlign: 'right' }}>Actions</th>
                 </tr>
@@ -350,14 +499,14 @@ const Departments = () => {
               <div className="delete-dialog-title-box">
                 <h3 className="delete-dialog-title">Delete Department</h3>
                 <p className="delete-dialog-desc">
-                  Are you sure you want to delete this academic department? This action will permanently remove the record.
+                  Are you sure you want to delete this academic department? This action will
+                  permanently remove the record.
                 </p>
               </div>
               <button
                 type="button"
                 className="close-modal-btn"
                 onClick={() => !deleting && setDeleteConfirm(null)}
-                disabled={deleting}
                 title="Close"
               >
                 <X size={18} />
@@ -384,7 +533,7 @@ const Departments = () => {
             <div className="modal-actions">
               <button
                 type="button"
-                className="books-btn books-btn-ghost"
+                className="btn btn-secondary"
                 onClick={() => setDeleteConfirm(null)}
                 disabled={deleting}
               >

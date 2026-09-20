@@ -12,8 +12,13 @@ import {
   Info,
 } from 'lucide-react';
 
-const IS_PROD = window.location.hostname !== 'localhost';
-const API_BASE_URL = IS_PROD ? 'https://university-erp-node.onrender.com/api' : 'http://localhost:5000/api';
+const _IS_PROD = window.location.hostname !== 'localhost';
+const _NODE_URL = _IS_PROD ? 'https://university-erp-node.onrender.com' : 'http://localhost:5000';
+const API_BASE_URL = `${_NODE_URL}/api`;
+
+// Must match backend constants — same rules as Add/Edit Venue
+const VENUE_ID_REGEX = /^[A-Z0-9]{1,10}(-[A-Z0-9]{1,10}){0,4}$/;
+const VENUE_NAME_REGEX = /^[A-Za-z][A-Za-z0-9 ,.\-'()]{1,99}$/;
 
 const BulkUploadVenues = () => {
   const navigate = useNavigate();
@@ -120,9 +125,21 @@ const BulkUploadVenues = () => {
         continue;
       }
 
+      const rawVenueId = row['venue id'].trim().toUpperCase();
+      if (!VENUE_ID_REGEX.test(rawVenueId)) {
+        parseErrors.push(`Row ${i + 1}: Invalid Venue ID "${rawVenueId}" — must contain only letters and digits, optionally separated by hyphens (e.g. HALL-101, LAB-CS-01)`);
+        continue;
+      }
+
+      const rawName = row.name.trim();
+      if (!VENUE_NAME_REGEX.test(rawName)) {
+        parseErrors.push(`Row ${i + 1}: Invalid Venue Name "${rawName}" — must start with a letter and may only contain letters, digits, spaces, or basic punctuation`);
+        continue;
+      }
+
       const venueData = {
-        venueId: row['venue id'].trim(),
-        name: row.name.trim(),
+        venueId: rawVenueId,
+        name: rawName,
         capacity: capacity,
         status: status,
         facilities: [],
@@ -198,18 +215,13 @@ const BulkUploadVenues = () => {
     setUploadResult(null);
 
     try {
-      console.log('Sending request to:', `${API_BASE_URL}/super-admin/venues/bulk`);
-      console.log('Token exists:', !!localStorage.getItem('erp_token'));
-      
       const res = await fetch(`${API_BASE_URL}/super-admin/venues/bulk`, {
         method: 'POST',
         headers: authHeader(),
         body: JSON.stringify({ venues: parsedData }),
       });
 
-      console.log('Response status:', res.status);
       const result = await res.json();
-      console.log('Response data:', result);
 
       if (!res.ok) {
         throw new Error(result.message || 'Bulk upload failed');
@@ -277,6 +289,8 @@ const BulkUploadVenues = () => {
               <ul style={{ marginTop: '0.5rem', marginLeft: '1.5rem' }}>
                 <li>Required columns: Venue ID, Name, Capacity, Status</li>
                 <li>Optional column: Facilities (format: "Name1: Details1; Name2: Details2")</li>
+                <li>Venue ID: letters and digits only, separated by hyphens (e.g. HALL-101, LAB-CS-01, ROOM-201)</li>
+                <li>Venue Name: must start with a letter; letters, digits, spaces, and basic punctuation allowed</li>
                 <li>Status must be one of: ACTIVE, INACTIVE, MAINTENANCE, RESERVED</li>
                 <li>Capacity must be a number greater than 0</li>
                 <li>First row must be headers</li>
@@ -285,15 +299,17 @@ const BulkUploadVenues = () => {
             </div>
           </div>
 
-          <button
-            type="button"
-            className="btn btn-secondary"
-            onClick={downloadSampleCSV}
-            style={{ marginBottom: '1.5rem' }}
-          >
-            <Download size={16} />
-            <span>Download Sample CSV Template</span>
-          </button>
+          <div className="venue-bulk-action-btn">
+            <button
+              type="button"
+              className="btn btn-secondary"
+              onClick={downloadSampleCSV}
+              style={{ marginBottom: '1.5rem' }}
+            >
+              <Download size={16} />
+              <span>Download Sample CSV Template</span>
+            </button>
+          </div>
 
           <div className="upload-section">
             <div className="upload-area">
@@ -384,7 +400,7 @@ const BulkUploadVenues = () => {
                           <td>
                             {venue.facilities.length > 0
                               ? venue.facilities.map(f => f.name).join(', ')
-                              : 'â€”'}
+                              : '—'}
                           </td>
                         </tr>
                       ))}
