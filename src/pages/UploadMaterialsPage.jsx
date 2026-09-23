@@ -2,13 +2,26 @@ import { springApi } from '../services/api';
 import { useState, useEffect, useRef, useCallback } from 'react';
 
 // ── Constants ──────────────────────────────────────────────────────────────
-const ALLOWED_EXT   = ['pdf', 'jpg', 'jpeg', 'png', 'xls', 'xlsx'];
-const MAX_SIZE_MB   = 20;
+const ALLOWED_EXT    = ['pdf', 'jpg', 'jpeg', 'png', 'xls', 'xlsx'];
+const MAX_SIZE_MB    = 20;
 const MAX_SIZE_BYTES = MAX_SIZE_MB * 1024 * 1024;
 
-// Fixed teacher ID since no login system
+// Fixed teacher ID (no auth system)
 const TEACHER_ID = 'TCH-001';
 const HEADERS    = { 'X-User-Role': 'TEACHER', 'X-Teacher-Id': TEACHER_ID };
+
+// Build absolute Spring Boot URL for file preview / download
+// fileUrl from backend is a relative path like /api/materials/{id}/download
+const onLocalhost  = window.location.hostname === 'localhost';
+const SPRING_ORIGIN = onLocalhost
+  ? 'http://localhost:8080'
+  : 'https://university-erp-spring.onrender.com';
+
+function absoluteUrl(relativeUrl) {
+  if (!relativeUrl) return '';
+  if (relativeUrl.startsWith('http')) return relativeUrl;
+  return `${SPRING_ORIGIN}${relativeUrl}`;
+}
 
 // ── Helpers ────────────────────────────────────────────────────────────────
 function getExt(filename) {
@@ -34,69 +47,109 @@ function fileIcon(ext) {
   }
 }
 
+// ── Preview Modal ──────────────────────────────────────────────────────────
+function PreviewModal({ material, onClose }) {
+  if (!material) return null;
+  const type = (material.fileType || '').toLowerCase();
+  const url  = absoluteUrl(material.fileUrl);
+
+  let body;
+  if (type === 'pdf') {
+    // FIX: use absolute Spring URL so browser loads from 8080, not 5173
+    body = (
+      <iframe
+        src={url}
+        title={material.fileName}
+        style={{ width: '100%', height: '100%', border: 'none' }}
+      />
+    );
+  } else if (['jpg', 'jpeg', 'png'].includes(type)) {
+    // FIX: use <img> with absolute URL, not just filename
+    body = (
+      <img
+        src={url}
+        alt={material.fileName}
+        style={{ maxWidth: '100%', maxHeight: '100%', objectFit: 'contain' }}
+      />
+    );
+  } else {
+    // XLS/XLSX — cannot preview in browser, offer download only
+    body = (
+      <div style={{
+        display: 'flex', flexDirection: 'column', alignItems: 'center',
+        justifyContent: 'center', height: '100%', gap: 12,
+      }}>
+        <div style={{ fontSize: 48 }}>📊</div>
+        <p style={{ color: 'var(--text-secondary)', fontSize: 14 }}>
+          Preview not available for {type.toUpperCase()} files.
+        </p>
+        <a
+          href={url}
+          download={material.fileName}
+          className="books-btn books-btn-primary"
+        >
+          ⬇ Download to Open
+        </a>
+      </div>
+    );
+  }
+
+  return (
+    <div className="dm-preview-overlay" onClick={onClose}>
+      <div className="dm-preview-modal" onClick={(e) => e.stopPropagation()}>
+        <div className="dm-preview-head">
+          <span className="dm-preview-title">
+            {fileIcon(type)} {material.fileName}
+          </span>
+          <a
+            href={url}
+            download={material.fileName}
+            className="books-btn books-btn-sm books-btn-ghost"
+            onClick={(e) => e.stopPropagation()}
+          >
+            ⬇ Download
+          </a>
+          <button className="books-modal-close" onClick={onClose}>x</button>
+        </div>
+        <div className="dm-preview-body">{body}</div>
+      </div>
+    </div>
+  );
+}
+
 // ══════════════════════════════════════════════════════════════════════════
 // UploadMaterialsPage
 // ══════════════════════════════════════════════════════════════════════════
 export default function UploadMaterialsPage() {
-  // ── Folder state ─────────────────────────────────────────────────────────
+
+  // ── Folder state ──────────────────────────────────────────────────────
   const [folders,          setFolders]          = useState([]);
   const [selectedFolderId, setSelectedFolderId] = useState('');
   const [foldersLoading,   setFoldersLoading]   = useState(true);
 
-  // new folder form
-  const [showNewFolder,    setShowNewFolder]    = useState(false);
-  const [newFolderName,    setNewFolderName]    = useState('');
-  const [creatingFolder,   setCreatingFolder]   = useState(false);
-  const [folderError,      setFolderError]      = useState('');
+  // Create folder form
+  const [showNewFolder,  setShowNewFolder]  = useState(false);
+  const [newFolderName,  setNewFolderName]  = useState('');
+  const [creatingFolder, setCreatingFolder] = useState(false);
+  const [folderError,    setFolderError]    = useState('');
 
-  // ── File state ────────────────────────────────────────────────────────────
-  const [pendingFiles,  setPendingFiles]  = useState([]);  // {file, id, progress, status, error}
-  const [dragOver,      setDragOver]      = useState(false);
-  const [uploading,     setUploading]     = useState(false);
+  // Delete folder
+  const [deletingFolderId, setDeletingFolderId] = useState(null);
+
+  // ── File state ────────────────────────────────────────────────────────
+  const [pendingFiles, setPendingFiles] = useState([]);
+  const [fileError,    setFileError]    = useState(''); // validation under Step 2
+  const [dragOver,     setDragOver]     = useState(false);
+  const [uploading,    setUploading]    = useState(false);
   const fileInputRef = useRef(null);
 
-  // ── Folder contents (Step 3) ─────────────────────────────────────────────
-  const [folderFiles,     setFolderFiles]     = useState([]);
-  const [filesLoading,    setFilesLoading]    = useState(false);
-  const [deletingFileId,  setDeletingFileId]  = useState(null);
-  const [previewFile,     setPreviewFile]     = useState(null);
+  // ── Folder contents (Step 3) ──────────────────────────────────────────
+  const [folderFiles,    setFolderFiles]    = useState([]);
+  const [filesLoading,   setFilesLoading]   = useState(false);
+  const [deletingFileId, setDeletingFileId] = useState(null);
+  const [previewFile,    setPreviewFile]    = useState(null);
 
-  const loadFolderFiles = useCallback(async (folderId) => {
-    if (!folderId) { setFolderFiles([]); return; }
-    setFilesLoading(true);
-    try {
-      const res = await springApi.get('/materials', {
-        headers: HEADERS,
-        params:  { folderId },
-      });
-      setFolderFiles(Array.isArray(res) ? res : []);
-    } catch {
-      // silently fail — main error shown elsewhere
-    } finally {
-      setFilesLoading(false);
-    }
-  }, []);
-
-  // Reload folder files whenever the selected folder changes
-  useEffect(() => {
-    loadFolderFiles(selectedFolderId);
-  }, [selectedFolderId, loadFolderFiles]);
-
-  const handleDeleteFile = async (material) => {
-    if (!window.confirm(`Delete "${material.fileName}"?`)) return;
-    setDeletingFileId(material.materialId);
-    try {
-      await springApi.delete(`/materials/${material.materialId}`, { headers: HEADERS });
-      setSuccess(`"${material.fileName}" deleted.`);
-      loadFolderFiles(selectedFolderId);
-    } catch (err) {
-      setError(err.message || 'Failed to delete file.');
-    } finally {
-      setDeletingFileId(null);
-    }
-  };
-
-  // ── Feedback ──────────────────────────────────────────────────────────────
+  // ── Feedback ──────────────────────────────────────────────────────────
   const [success, setSuccess] = useState('');
   const [error,   setError]   = useState('');
 
@@ -106,12 +159,8 @@ export default function UploadMaterialsPage() {
     return () => clearTimeout(t);
   }, [success, error]);
 
-  // ── Load folders on mount ─────────────────────────────────────────────────
-  useEffect(() => {
-    loadFolders();
-  }, []);
-
-  const loadFolders = async () => {
+  // ── Load folders ──────────────────────────────────────────────────────
+  const loadFolders = useCallback(async () => {
     setFoldersLoading(true);
     try {
       const res = await springApi.get('/material-folders', {
@@ -124,17 +173,51 @@ export default function UploadMaterialsPage() {
     } finally {
       setFoldersLoading(false);
     }
-  };
+  }, []);
 
-  // ── Create folder ─────────────────────────────────────────────────────────
+  useEffect(() => { loadFolders(); }, [loadFolders]);
+
+  // ── Load folder files ──────────────────────────────────────────────────
+  const loadFolderFiles = useCallback(async (folderId) => {
+    if (!folderId) { setFolderFiles([]); return; }
+    setFilesLoading(true);
+    try {
+      const res = await springApi.get('/materials', {
+        headers: HEADERS,
+        params:  { folderId },
+      });
+      setFolderFiles(Array.isArray(res) ? res : []);
+    } catch {
+      setError('Failed to load files.');
+    } finally {
+      setFilesLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    loadFolderFiles(selectedFolderId);
+  }, [selectedFolderId, loadFolderFiles]);
+
+  // ── Create folder ─────────────────────────────────────────────────────
   const handleCreateFolder = async () => {
-    if (!newFolderName.trim()) { setFolderError('Folder name is required.'); return; }
+    const trimmed = newFolderName.trim();
+    if (!trimmed) { setFolderError('Folder name is required.'); return; }
+
+    // FIX: duplicate folder check (same name, case-insensitive)
+    const exists = folders.some(
+      (f) => f.folderName.trim().toLowerCase() === trimmed.toLowerCase()
+    );
+    if (exists) {
+      setFolderError(`Folder "${trimmed}" already exists.`);
+      return;
+    }
+
     setCreatingFolder(true);
     setFolderError('');
     try {
       const res = await springApi.post(
         '/material-folders',
-        { folderName: newFolderName.trim(), parentFolderId: '' },
+        { folderName: trimmed, parentFolderId: '' },
         { headers: HEADERS },
       );
       setFolders((prev) => [...prev, res]);
@@ -149,37 +232,89 @@ export default function UploadMaterialsPage() {
     }
   };
 
-  // ── Validate and queue files ──────────────────────────────────────────────
+  // ── Delete folder ─────────────────────────────────────────────────────
+  const handleDeleteFolder = async (folder) => {
+    if (!window.confirm(
+      `Delete folder "${folder.folderName}" and all its files?\nThis action cannot be undone.`
+    )) return;
+
+    setDeletingFolderId(folder.folderId);
+    try {
+      await springApi.delete(`/material-folders/${folder.folderId}`, { headers: HEADERS });
+      setFolders((prev) => prev.filter((f) => f.folderId !== folder.folderId));
+      if (selectedFolderId === folder.folderId) {
+        setSelectedFolderId('');
+        setFolderFiles([]);
+      }
+      setSuccess(`Folder "${folder.folderName}" deleted.`);
+    } catch (err) {
+      setError(err.message || 'Failed to delete folder.');
+    } finally {
+      setDeletingFolderId(null);
+    }
+  };
+
+  // ── Validate and queue files ──────────────────────────────────────────
   const queueFiles = (rawFiles) => {
-    const toAdd = [];
+    // FIX: must select folder before adding files
+    if (!selectedFolderId) {
+      setFileError('Please select a folder in Step 1 before adding files.');
+      return;
+    }
+
+    const toAdd   = [];
     const skipped = [];
 
     Array.from(rawFiles).forEach((file) => {
       const ext = getExt(file.name);
+
       if (!ALLOWED_EXT.includes(ext)) {
         skipped.push(`${file.name} — unsupported type (.${ext})`);
-      } else if (file.size > MAX_SIZE_BYTES) {
-        skipped.push(`${file.name} — exceeds ${MAX_SIZE_MB} MB`);
-      } else {
-        toAdd.push({
-          file,
-          id:       Math.random().toString(36).slice(2),
-          progress: 0,
-          status:   'pending', // pending | uploading | done | error
-          error:    '',
-        });
+        return;
       }
+      if (file.size > MAX_SIZE_BYTES) {
+        skipped.push(`${file.name} — exceeds ${MAX_SIZE_MB} MB`);
+        return;
+      }
+
+      // FIX: duplicate check — same file name already in pending list
+      const alreadyPending = pendingFiles.some(
+        (p) => p.file.name.toLowerCase() === file.name.toLowerCase()
+      );
+      if (alreadyPending) {
+        skipped.push(`${file.name} — already in upload queue`);
+        return;
+      }
+
+      // FIX: duplicate check — same file name already uploaded in this folder
+      const alreadyUploaded = folderFiles.some(
+        (f) => f.fileName.toLowerCase() === file.name.toLowerCase()
+      );
+      if (alreadyUploaded) {
+        skipped.push(`${file.name} — file already exists in this folder`);
+        return;
+      }
+
+      toAdd.push({
+        file,
+        id:       Math.random().toString(36).slice(2),
+        progress: 0,
+        status:   'pending',
+        error:    '',
+      });
     });
 
     if (skipped.length) {
-      setError(`Skipped: ${skipped.join(' | ')}`);
+      setFileError(`Skipped: ${skipped.join(' | ')}`);
+    } else {
+      setFileError('');
     }
     if (toAdd.length) {
       setPendingFiles((prev) => [...prev, ...toAdd]);
     }
   };
 
-  // ── Drag & drop handlers ──────────────────────────────────────────────────
+  // ── Drag & drop ───────────────────────────────────────────────────────
   const onDragOver  = (e) => { e.preventDefault(); setDragOver(true); };
   const onDragLeave = ()  => setDragOver(false);
   const onDrop      = (e) => {
@@ -188,27 +323,45 @@ export default function UploadMaterialsPage() {
     queueFiles(e.dataTransfer.files);
   };
 
-  // ── Browse handler ────────────────────────────────────────────────────────
+  // ── Browse ────────────────────────────────────────────────────────────
   const onBrowse = (e) => {
     queueFiles(e.target.files);
-    e.target.value = '';
+    e.target.value = ''; // reset so same file can be re-selected after error
   };
 
-  const removeFile = (id) =>
+  const removeFile = (id) => {
     setPendingFiles((prev) => prev.filter((f) => f.id !== id));
+    setFileError('');
+  };
 
-  // ── Upload all pending files ──────────────────────────────────────────────
+  // FIX: reset failed files back to pending so upload button re-enables
+  const retryFailed = () => {
+    setPendingFiles((prev) =>
+      prev.map((f) => f.status === 'error' ? { ...f, status: 'pending', error: '', progress: 0 } : f)
+    );
+    setFileError('');
+  };
+
+  // ── Upload all pending files ──────────────────────────────────────────
   const uploadAll = async () => {
-    if (!selectedFolderId) { setError('Please select a folder first.'); return; }
-    if (!pendingFiles.length) { setError('No files selected.'); return; }
+    // FIX: validate folder selected before upload
+    if (!selectedFolderId) {
+      setFileError('Please select a folder in Step 1 before uploading.');
+      return;
+    }
+    if (!pendingFiles.length) {
+      setFileError('No files selected.');
+      return;
+    }
 
     setUploading(true);
+    setFileError('');
     let doneCount = 0;
 
     for (const item of pendingFiles) {
       if (item.status === 'done') { doneCount++; continue; }
+      if (item.status !== 'pending') continue;
 
-      // Mark as uploading
       setPendingFiles((prev) =>
         prev.map((f) => f.id === item.id ? { ...f, status: 'uploading' } : f)
       );
@@ -235,6 +388,7 @@ export default function UploadMaterialsPage() {
         doneCount++;
       } catch (err) {
         const msg = err.message || 'Upload failed.';
+        // FIX: mark error but keep status as 'error' so retry button shows
         setPendingFiles((prev) =>
           prev.map((f) =>
             f.id === item.id ? { ...f, status: 'error', error: msg } : f
@@ -253,63 +407,34 @@ export default function UploadMaterialsPage() {
   const clearDone = () =>
     setPendingFiles((prev) => prev.filter((f) => f.status !== 'done'));
 
-  const clearAll = () => setPendingFiles([]);
+  const clearAll = () => {
+    setPendingFiles([]);
+    setFileError('');
+  };
 
-  // ── Derived ───────────────────────────────────────────────────────────────
-  const selectedFolder  = folders.find((f) => f.folderId === selectedFolderId);
-  const hasPending      = pendingFiles.some((f) => f.status === 'pending');
-  const allDone         = pendingFiles.length > 0 &&
-                          pendingFiles.every((f) => f.status === 'done');
-
-  // ── File type badge ───────────────────────────────────────────────────────
-  function TypeBadge({ type }) {
-    const t = (type || '').toLowerCase();
-    return <span className={`dm-type-badge dm-type-${t}`}>{type || '—'}</span>;
-  }
-
-  // ── Preview modal ─────────────────────────────────────────────────────────
-  function PreviewModal({ material, onClose }) {
-    if (!material) return null;
-    const type = (material.fileType || '').toLowerCase();
-    const url  = material.fileUrl;
-    let body;
-    if (type === 'pdf') {
-      body = <iframe src={url} title={material.fileName} />;
-    } else if (['jpg','jpeg','png'].includes(type)) {
-      body = <img src={url} alt={material.fileName} />;
-    } else {
-      body = (
-        <div className="dm-preview-no-preview">
-          <div style={{ fontSize: 40, marginBottom: 10 }}>📊</div>
-          <p>Preview not available for {type.toUpperCase()} files.</p>
-          <a href={url} download={material.fileName}
-             className="books-btn books-btn-primary"
-             style={{ marginTop: 12, display: 'inline-block' }}>
-            Download File
-          </a>
-        </div>
-      );
+  // ── Delete file ───────────────────────────────────────────────────────
+  const handleDeleteFile = async (material) => {
+    if (!window.confirm(`Delete "${material.fileName}"?`)) return;
+    setDeletingFileId(material.materialId);
+    try {
+      await springApi.delete(`/materials/${material.materialId}`, { headers: HEADERS });
+      setSuccess(`"${material.fileName}" deleted.`);
+      loadFolderFiles(selectedFolderId);
+    } catch (err) {
+      setError(err.message || 'Failed to delete file.');
+    } finally {
+      setDeletingFileId(null);
     }
-    return (
-      <div className="dm-preview-overlay" onClick={onClose}>
-        <div className="dm-preview-modal" onClick={(e) => e.stopPropagation()}>
-          <div className="dm-preview-head">
-            <span className="dm-preview-title">
-              {fileIcon(type)} {material.fileName}
-            </span>
-            <a href={url} download={material.fileName}
-               className="books-btn books-btn-sm books-btn-ghost">
-              ⬇ Download
-            </a>
-            <button className="books-modal-close" onClick={onClose}>x</button>
-          </div>
-          <div className="dm-preview-body">{body}</div>
-        </div>
-      </div>
-    );
-  }
+  };
 
-  // ── Render ────────────────────────────────────────────────────────────────
+  // ── Derived ───────────────────────────────────────────────────────────
+  const selectedFolder = folders.find((f) => f.folderId === selectedFolderId);
+  const hasPending     = pendingFiles.some((f) => f.status === 'pending');
+  const hasErrors      = pendingFiles.some((f) => f.status === 'error');
+  const allDone        = pendingFiles.length > 0 &&
+                         pendingFiles.every((f) => f.status === 'done');
+
+  // ── Render ────────────────────────────────────────────────────────────
   return (
     <div className="page-container">
 
@@ -323,7 +448,7 @@ export default function UploadMaterialsPage() {
         </div>
       </div>
 
-      {/* Alerts */}
+      {/* Global alerts */}
       {success && (
         <div className="books-alert books-alert-success">
           <span>{success}</span>
@@ -337,7 +462,7 @@ export default function UploadMaterialsPage() {
         </div>
       )}
 
-      {/* ── Step 1: Folder Selection ─────────────────────────────────────── */}
+      {/* ── Step 1: Folder Selection ──────────────────────────────────── */}
       <div className="vb-form-panel">
         <p className="vb-form-title">Step 1 — Select Folder</p>
 
@@ -355,7 +480,11 @@ export default function UploadMaterialsPage() {
                 <select
                   className="books-form-control"
                   value={selectedFolderId}
-                  onChange={(e) => setSelectedFolderId(e.target.value)}
+                  onChange={(e) => {
+                    setSelectedFolderId(e.target.value);
+                    setPendingFiles([]);
+                    setFileError('');
+                  }}
                 >
                   <option value="">— Select folder —</option>
                   {folders.map((f) => (
@@ -367,7 +496,7 @@ export default function UploadMaterialsPage() {
               </div>
             )}
 
-            {/* Create new folder toggle */}
+            {/* Create new folder */}
             {!showNewFolder ? (
               <button
                 className="books-btn books-btn-ghost"
@@ -389,6 +518,7 @@ export default function UploadMaterialsPage() {
                     autoFocus
                     style={{ width: 260 }}
                   />
+                  {/* FIX: folder error shown right below the input, not above step 1 */}
                   {folderError && <p className="books-form-err">{folderError}</p>}
                 </div>
                 <button
@@ -400,7 +530,11 @@ export default function UploadMaterialsPage() {
                 </button>
                 <button
                   className="books-btn books-btn-ghost"
-                  onClick={() => { setShowNewFolder(false); setNewFolderName(''); setFolderError(''); }}
+                  onClick={() => {
+                    setShowNewFolder(false);
+                    setNewFolderName('');
+                    setFolderError('');
+                  }}
                   disabled={creatingFolder}
                 >
                   Cancel
@@ -413,14 +547,15 @@ export default function UploadMaterialsPage() {
         {/* Selected folder indicator */}
         {selectedFolder && (
           <p style={{ marginTop: 12, fontSize: 13, color: 'var(--text-secondary)' }}>
-            ✅ Uploading to: <strong style={{ color: 'var(--text-primary)' }}>
+            ✅ Uploading to:{' '}
+            <strong style={{ color: 'var(--text-primary)' }}>
               📁 {selectedFolder.folderName}
             </strong>
           </p>
         )}
       </div>
 
-      {/* ── Step 2: Upload Area ───────────────────────────────────────────── */}
+      {/* ── Step 2: Upload Area ───────────────────────────────────────── */}
       <div className="vb-form-panel">
         <p className="vb-form-title">Step 2 — Add Files</p>
         <p style={{ fontSize: 13, color: 'var(--text-secondary)', marginBottom: 14 }}>
@@ -456,15 +591,31 @@ export default function UploadMaterialsPage() {
           />
         </div>
 
+        {/* FIX: file-level validation shown inside Step 2, below the dropzone */}
+        {fileError && (
+          <div className="books-alert books-alert-error"
+               style={{ marginTop: 10, marginBottom: 0 }}>
+            <span>{fileError}</span>
+            <button onClick={() => setFileError('')}>x</button>
+          </div>
+        )}
+
         {/* File queue */}
         {pendingFiles.length > 0 && (
           <div style={{ marginTop: 14 }}>
             <div style={{ display: 'flex', justifyContent: 'space-between',
-                          alignItems: 'center', marginBottom: 8 }}>
+                          alignItems: 'center', marginBottom: 8, flexWrap: 'wrap', gap: 6 }}>
               <p style={{ fontSize: 13, fontWeight: 600, color: 'var(--text-primary)' }}>
                 {pendingFiles.length} file(s) selected
               </p>
               <div style={{ display: 'flex', gap: 6 }}>
+                {/* FIX: Retry button for failed uploads — re-enables upload */}
+                {hasErrors && (
+                  <button className="books-btn books-btn-sm books-btn-warning"
+                          onClick={retryFailed}>
+                    ↺ Retry Failed
+                  </button>
+                )}
                 {allDone && (
                   <button className="books-btn books-btn-sm books-btn-ghost"
                           onClick={clearDone}>
@@ -484,18 +635,26 @@ export default function UploadMaterialsPage() {
                 return (
                   <li key={item.id} className="dm-file-item">
                     <span className="dm-item-icon">{fileIcon(ext)}</span>
-                    <span className="dm-file-item-name">{item.file.name}</span>
-                    <span className="dm-file-item-size">{formatSize(item.file.size)}</span>
+                    <span className="dm-file-item-name"
+                          style={{ flex: 1, minWidth: 0, overflow: 'hidden',
+                                   textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                      {item.file.name}
+                    </span>
+                    <span className="dm-file-item-size"
+                          style={{ flexShrink: 0, whiteSpace: 'nowrap' }}>
+                      {formatSize(item.file.size)}
+                    </span>
 
-                    {/* Status indicators */}
                     {item.status === 'pending' && (
-                      <span style={{ fontSize: 12, color: 'var(--text-secondary)' }}>
+                      <span style={{ fontSize: 12, color: 'var(--text-secondary)',
+                                     flexShrink: 0 }}>
                         Ready
                       </span>
                     )}
                     {item.status === 'uploading' && (
-                      <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                        <div className="dm-progress-wrap" style={{ width: 80 }}>
+                      <div style={{ display: 'flex', alignItems: 'center',
+                                    gap: 6, flexShrink: 0 }}>
+                        <div className="dm-progress-wrap" style={{ width: 60 }}>
                           <div className="dm-progress-bar"
                                style={{ width: item.progress + '%' }} />
                         </div>
@@ -505,17 +664,18 @@ export default function UploadMaterialsPage() {
                       </div>
                     )}
                     {item.status === 'done' && (
-                      <span style={{ fontSize: 13, color: '#16a34a', fontWeight: 600 }}>
+                      <span style={{ fontSize: 13, color: '#16a34a',
+                                     fontWeight: 600, flexShrink: 0 }}>
                         ✓ Done
                       </span>
                     )}
                     {item.status === 'error' && (
-                      <span style={{ fontSize: 12, color: '#dc2626' }} title={item.error}>
-                        ✕ {item.error}
+                      <span style={{ fontSize: 12, color: '#dc2626', flexShrink: 0 }}
+                            title={item.error}>
+                        ✕ Failed
                       </span>
                     )}
 
-                    {/* Remove button (only if not uploading) */}
                     {item.status !== 'uploading' && (
                       <button
                         className="books-btn books-btn-sm books-btn-ghost"
@@ -533,40 +693,42 @@ export default function UploadMaterialsPage() {
             </ul>
           </div>
         )}
+
+        {/* Upload button — always visible when files are queued */}
+        {pendingFiles.length > 0 && (
+          <div style={{ marginTop: 14, display: 'flex', gap: 10, alignItems: 'center',
+                        flexWrap: 'wrap' }}>
+            <button
+              className="books-btn books-btn-primary"
+              onClick={uploadAll}
+              disabled={uploading || (!hasPending && !hasErrors)}
+            >
+              {uploading
+                ? 'Uploading...'
+                : `Upload ${pendingFiles.filter((f) => f.status === 'pending').length} File(s)`}
+            </button>
+            {/* FIX: folder hint shown INSIDE step 2, next to upload button */}
+            {!selectedFolderId && (
+              <span style={{ fontSize: 13, color: '#dc2626' }}>
+                ← Select a folder in Step 1 first
+              </span>
+            )}
+          </div>
+        )}
       </div>
 
-      {/* ── Upload button ─────────────────────────────────────────────────── */}
-      {pendingFiles.length > 0 && (
-        <div style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
-          <button
-            className="books-btn books-btn-primary"
-            onClick={uploadAll}
-            disabled={uploading || !hasPending}
-          >
-            {uploading
-              ? 'Uploading...'
-              : `Upload ${pendingFiles.filter((f) => f.status === 'pending').length} File(s)`}
-          </button>
-          {!selectedFolderId && (
-            <span style={{ fontSize: 13, color: '#dc2626' }}>
-              ← Select a folder first
-            </span>
-          )}
-        </div>
-      )}
-
-      {/* ── Step 3: Folder Contents ───────────────────────────────────────── */}
+      {/* ── Step 3: Folder Contents ───────────────────────────────────── */}
       {selectedFolder && (
         <div style={{ marginTop: 28 }}>
-          {/* Section header */}
           <div style={{ display: 'flex', alignItems: 'center',
-                        justifyContent: 'space-between', marginBottom: 10 }}>
+                        justifyContent: 'space-between', marginBottom: 10,
+                        flexWrap: 'wrap', gap: 8 }}>
             <div>
               <p className="vb-section-title" style={{ marginBottom: 2 }}>
                 📁 {selectedFolder.folderName} — Contents
               </p>
               <p style={{ fontSize: 13, color: 'var(--text-secondary)' }}>
-                {folderFiles.length} file(s) uploaded in this folder
+                {folderFiles.length} file(s) in this folder
               </p>
             </div>
             <button
@@ -578,54 +740,56 @@ export default function UploadMaterialsPage() {
             </button>
           </div>
 
-          {/* All folders list */}
+          {/* All folders list — with delete button */}
           {folders.length > 0 && (
             <div style={{ marginBottom: 14 }}>
               <p style={{ fontSize: 13, fontWeight: 600,
                           color: 'var(--text-secondary)', marginBottom: 8 }}>
                 All Folders
               </p>
-              <div className="dm-table-wrap">
-                <table className="dm-table">
-                  <thead>
-                    <tr>
-                      <th>Folder Name</th>
-                      <th>Folder ID</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {folders.map((f) => (
-                      <tr
-                        key={f.folderId}
-                        style={{
-                          background: f.folderId === selectedFolderId
-                            ? 'var(--bg-secondary)' : undefined,
-                          cursor: 'pointer',
-                        }}
-                        onClick={() => setSelectedFolderId(f.folderId)}
-                      >
-                        <td>
-                          <div className="dm-name-cell">
-                            <span className="dm-item-icon">📁</span>
-                            <span className="dm-item-name"
-                                  style={{ fontWeight: f.folderId === selectedFolderId ? 700 : 500 }}>
-                              {f.folderName}
-                              {f.folderId === selectedFolderId && (
-                                <span style={{ fontSize: 11, color: 'var(--text-secondary)',
-                                               marginLeft: 6, fontWeight: 400 }}>
-                                  (selected)
-                                </span>
-                              )}
+              {/* FIX mobile: card layout instead of table for folder list */}
+              <div className="dm-folder-list">
+                {folders.map((f) => (
+                  <div
+                    key={f.folderId}
+                    className={`dm-folder-row ${f.folderId === selectedFolderId ? 'dm-folder-selected' : ''}`}
+                    onClick={() => setSelectedFolderId(f.folderId)}
+                    style={{ cursor: 'pointer' }}
+                  >
+                    <div style={{ display: 'flex', alignItems: 'center',
+                                  gap: 8, flex: 1, minWidth: 0 }}>
+                      <span style={{ fontSize: 18, flexShrink: 0 }}>📁</span>
+                      <div style={{ minWidth: 0 }}>
+                        <p style={{ margin: 0, fontWeight: f.folderId === selectedFolderId ? 700 : 500,
+                                    fontSize: 14, overflow: 'hidden', textOverflow: 'ellipsis',
+                                    whiteSpace: 'nowrap' }}>
+                          {f.folderName}
+                          {f.folderId === selectedFolderId && (
+                            <span style={{ fontSize: 11, color: 'var(--text-secondary)',
+                                           marginLeft: 6, fontWeight: 400 }}>
+                              (selected)
                             </span>
-                          </div>
-                        </td>
-                        <td style={{ fontSize: 12, color: 'var(--text-secondary)' }}>
+                          )}
+                        </p>
+                        {/* FIX mobile: folder ID shown in full, wraps on small screens */}
+                        <p style={{ margin: 0, fontSize: 11, color: 'var(--text-secondary)',
+                                    wordBreak: 'break-all' }}>
                           {f.folderId}
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
+                        </p>
+                      </div>
+                    </div>
+                    {/* FIX: Delete folder button */}
+                    <button
+                      className="books-btn books-btn-sm books-btn-danger"
+                      style={{ flexShrink: 0 }}
+                      disabled={deletingFolderId === f.folderId}
+                      onClick={(e) => { e.stopPropagation(); handleDeleteFolder(f); }}
+                      title={`Delete folder "${f.folderName}"`}
+                    >
+                      {deletingFolderId === f.folderId ? '...' : 'Delete'}
+                    </button>
+                  </div>
+                ))}
               </div>
             </div>
           )}
@@ -644,74 +808,66 @@ export default function UploadMaterialsPage() {
               <p>No files uploaded to this folder yet.</p>
             </div>
           ) : (
-            <div className="dm-table-wrap">
-              <table className="dm-table">
-                <thead>
-                  <tr>
-                    <th style={{ width: '40%' }}>File Name</th>
-                    <th>Type</th>
-                    <th>Size</th>
-                    <th>Uploaded</th>
-                    <th>Actions</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {folderFiles.map((file) => {
-                    const ext = (file.fileType || '').toLowerCase();
-                    return (
-                      <tr key={file.materialId}>
-                        <td>
-                          <div className="dm-name-cell"
-                               onClick={() => setPreviewFile(file)}
-                               style={{ cursor: 'pointer' }}>
-                            <span className="dm-item-icon">{fileIcon(ext)}</span>
-                            <span className="dm-item-name">{file.fileName}</span>
-                          </div>
-                        </td>
-                        <td>
+            /* FIX mobile: card layout for file list — no horizontal scrolling */
+            <div className="dm-files-list">
+              {folderFiles.map((file) => {
+                const ext = (file.fileType || '').toLowerCase();
+                const absUrl = absoluteUrl(file.fileUrl);
+                return (
+                  <div key={file.materialId} className="dm-file-card">
+                    {/* File name row */}
+                    <div style={{ display: 'flex', alignItems: 'flex-start',
+                                  gap: 8, marginBottom: 6 }}>
+                      <span style={{ fontSize: 20, flexShrink: 0 }}>{fileIcon(ext)}</span>
+                      <div style={{ flex: 1, minWidth: 0 }}>
+                        <p style={{ margin: 0, fontWeight: 600, fontSize: 14,
+                                    wordBreak: 'break-word' }}>
+                          {file.fileName}
+                        </p>
+                        <p style={{ margin: 0, fontSize: 12,
+                                    color: 'var(--text-secondary)' }}>
                           <span className={`dm-type-badge dm-type-${ext}`}>
                             {file.fileType || '—'}
                           </span>
-                        </td>
-                        <td style={{ fontSize: 13, color: 'var(--text-secondary)' }}>
-                          {formatSize(file.fileSize)}
-                        </td>
-                        <td style={{ fontSize: 13, color: 'var(--text-secondary)' }}>
+                          &nbsp;·&nbsp;{formatSize(file.fileSize)}
+                          &nbsp;·&nbsp;
                           {file.uploadedDate
                             ? new Date(file.uploadedDate).toLocaleDateString('en-IN', {
                                 day: '2-digit', month: 'short', year: 'numeric',
                               })
                             : '—'}
-                        </td>
-                        <td>
-                          <div className="books-actions">
-                            <button
-                              className="books-btn books-btn-sm books-btn-ghost"
-                              onClick={() => setPreviewFile(file)}
-                            >
-                              View
-                            </button>
-                            <a
-                              href={file.fileUrl}
-                              download={file.fileName}
-                              className="books-btn books-btn-sm books-btn-ghost"
-                            >
-                              ⬇
-                            </a>
-                            <button
-                              className="books-btn books-btn-sm books-btn-danger"
-                              onClick={() => handleDeleteFile(file)}
-                              disabled={deletingFileId === file.materialId}
-                            >
-                              {deletingFileId === file.materialId ? '...' : 'Delete'}
-                            </button>
-                          </div>
-                        </td>
-                      </tr>
-                    );
-                  })}
-                </tbody>
-              </table>
+                        </p>
+                      </div>
+                    </div>
+                    {/* Actions row */}
+                    <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+                      {/* FIX: View opens inline for PDF/images, download prompt for others */}
+                      <button
+                        className="books-btn books-btn-sm books-btn-ghost"
+                        onClick={() => setPreviewFile(file)}
+                      >
+                        View
+                      </button>
+                      {/* FIX: Download uses absolute Spring URL */}
+                      <a
+                        href={absUrl}
+                        download={file.fileName}
+                        className="books-btn books-btn-sm books-btn-ghost"
+                        onClick={(e) => e.stopPropagation()}
+                      >
+                        ⬇ Download
+                      </a>
+                      <button
+                        className="books-btn books-btn-sm books-btn-danger"
+                        onClick={() => handleDeleteFile(file)}
+                        disabled={deletingFileId === file.materialId}
+                      >
+                        {deletingFileId === file.materialId ? '...' : 'Delete'}
+                      </button>
+                    </div>
+                  </div>
+                );
+              })}
             </div>
           )}
         </div>

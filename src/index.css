@@ -10421,3 +10421,49 @@ input[type='password']::-webkit-inner-spin-button {
     justify-content: center;
   }
 }
+
+/* ── Upload Materials — Folder list (replaces table, mobile-friendly) ── */
+.dm-folder-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.dm-folder-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 10px 14px;
+  border: 1px solid var(--border-primary, #e5e7eb);
+  border-radius: 8px;
+  background: #fff;
+  transition: background 0.15s;
+}
+
+.dm-folder-row:hover {
+  background: var(--bg-secondary, #f9fafb);
+}
+
+.dm-folder-selected {
+  background: var(--bg-secondary, #f0f9ff) !important;
+  border-color: #93c5fd !important;
+}
+
+/* ── Upload Materials — File card list (mobile-friendly, no horizontal scroll) ── */
+.dm-files-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.dm-file-card {
+  padding: 12px 14px;
+  border: 1px solid var(--border-primary, #e5e7eb);
+  border-radius: 8px;
+  background: #fff;
+}
+
+.dm-file-card:hover {
+  background: var(--bg-secondary, #f9fafb);
+}
