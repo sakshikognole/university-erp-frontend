@@ -70,6 +70,9 @@ import ExamMarksPage from './pages/ExamMarksPage';
 // --- Subject Management ---
 import SubjectsPage from './pages/SubjectsPage';
 
+// --- Schedule Management ---
+import SchedulePage from './pages/SchedulePage';
+
 // --- Study Materials ---
 import UploadMaterialsPage from './pages/UploadMaterialsPage';
 import DisplayMaterialsPage from './pages/DisplayMaterialsPage';
@@ -320,6 +323,9 @@ function AppRoutes() {
 
         {/* ==================== SUBJECTS ==================== */}
         <Route path="subjects" element={<SubjectsPage />} />
+
+        {/* ==================== SCHEDULE ==================== */}
+        <Route path="schedule" element={<SchedulePage />} />
 
         {/* ==================== STUDY MATERIALS ==================== */}
         <Route path="upload-materials" element={<UploadMaterialsPage />} />
