@@ -20,6 +20,7 @@ import {
   BookMarked,
   ClipboardList,
   Landmark,
+  BookCopy,
 } from 'lucide-react';
 
 export const navigationConfig = {
@@ -46,6 +47,7 @@ export const navigationConfig = {
     { label: 'Payment Management',    path: '/payment-management',      icon: Wallet },
     { label: 'Hostel',                path: '/hostel',                  icon: Hotel },
     { label: 'Exams',                 path: '/exams',                   icon: ClipboardList },
+    { label: 'Subjects',              path: '/subjects',                icon: BookCopy },
 
     // ── Friend features ────────────────────────────────────────────
     { label: 'Transport',             path: '/transport',               icon: Bus },
@@ -77,6 +79,7 @@ export const navigationConfig = {
     { label: 'Payment Management',    path: '/payment-management',      icon: Wallet },
     { label: 'Hostel',                path: '/hostel',                  icon: Hotel },
     { label: 'Exams',                 path: '/exams',                   icon: ClipboardList },
+    { label: 'Subjects',              path: '/subjects',                icon: BookCopy },
     { label: 'Transport',             path: '/transport',               icon: Bus },
     { label: 'Fee Payment',           path: '/fee-payment',             icon: CreditCard },
     { label: 'Event Notices',         path: '/event-notices',           icon: Megaphone },
@@ -108,6 +111,7 @@ export const navigationConfig = {
     { label: 'Upload Materials',      path: '/upload-materials',        icon: ClipboardList },
     { label: 'Study Materials',       path: '/display-materials',         icon: BookMarked },
     { label: 'Exams',                 path: '/exams',                   icon: ClipboardList },
+    { label: 'Subjects',              path: '/subjects',                icon: BookCopy },
     { label: 'Transport',             path: '/transport',               icon: Bus },
     { label: 'Event Notices',         path: '/event-notices',           icon: Megaphone },
     { label: 'Event Booking',         path: '/events',                  icon: Calendar },
@@ -123,6 +127,7 @@ export const navigationConfig = {
     { label: 'Upload Materials',      path: '/upload-materials',        icon: ClipboardList },
     { label: 'Study Materials',       path: '/display-materials',         icon: BookMarked },
     { label: 'Exams',                 path: '/exams',                   icon: ClipboardList },
+    { label: 'Subjects',              path: '/subjects',                icon: BookCopy },
     { label: 'Transport',             path: '/transport',               icon: Bus },
     { label: 'Event Notices',         path: '/event-notices',           icon: Megaphone },
     { label: 'Event Booking',         path: '/events',                  icon: Calendar },
