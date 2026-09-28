@@ -108,13 +108,20 @@ export default function ExamsPage() {
   return (
     <div className="page-container">
 
-      {/* Header */}
-      <div className="books-page-header">
-        <div>
+      {/* Header — button always visible and right-aligned on mobile */}
+      <div className="books-page-header" style={{
+        display: 'flex', alignItems: 'center',
+        justifyContent: 'space-between', flexWrap: 'nowrap', gap: 12,
+      }}>
+        <div style={{ minWidth: 0 }}>
           <h1 className="page-title">Exam Management</h1>
           <p className="stu-page-sub">Manage exams and student marks</p>
         </div>
-        <button className="books-btn books-btn-primary" onClick={openAdd}>
+        <button
+          className="books-btn books-btn-primary"
+          style={{ flexShrink: 0 }}
+          onClick={openAdd}
+        >
           + Add Exam
         </button>
       </div>

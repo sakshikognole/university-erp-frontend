@@ -121,8 +121,30 @@ export default function HostelBlockDetails({ block: blockProp, onBack }) {
     }, 400);
   };
 
-  const removePrnFromList = (prn) =>
-    setPrnList((prev) => prev.filter((p) => p.prn !== prn));
+  // ── PRN lookup with fallback prefix ──────────────────────────────────
+  const lookupPrnFull = async (raw) => {
+    const trimmed = raw.trim();
+    if (!trimmed) { setNamePreview(''); return; }
+    setNamePreview('...');
+    const tryLookup = async (prn) => {
+      const res = await springApi.get(`/students/by-prn/${encodeURIComponent(prn)}`);
+      return res?.studentName ?? res?.data?.studentName ?? '';
+    };
+    try {
+      const name = await tryLookup(trimmed);
+      setNamePreview(name || 'Not found');
+    } catch {
+      // D2: try with PRN prefix if plain lookup fails
+      if (!trimmed.toUpperCase().startsWith('PRN')) {
+        try {
+          const name2 = await tryLookup('PRN' + trimmed);
+          setNamePreview(name2 || 'Not found');
+          return;
+        } catch { /* fall through */ }
+      }
+      setNamePreview('Not found');
+    }
+  };
 
   // ── Add students to selected room ─────────────────────────────────────
   const handleAddStudents = async () => {
@@ -184,6 +206,7 @@ export default function HostelBlockDetails({ block: blockProp, onBack }) {
         </div>
         <button
           className="books-btn books-btn-primary"
+          style={{ flexShrink: 0 }}
           onClick={() => setRoomModalOpen(true)}
         >
           + Add Room
@@ -212,41 +235,95 @@ export default function HostelBlockDetails({ block: blockProp, onBack }) {
           <p>No rooms yet. Click "+ Add Room" to add the first room.</p>
         </div>
       ) : (
-        <div className="books-table-wrap">
-          <table className="books-table">
-            <thead>
-              <tr>
-                <th>Room No</th>
-                <th>Capacity</th>
-                <th>Occupancy</th>
-                <th>Status</th>
-                <th>Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {rooms.map((room) => {
-                const occupied = room.students?.length ?? 0;
-                const full     = occupied >= room.capacity;
-                const isSelected = selRoom?.roomId === room.roomId;
-                return (
-                  <tr
-                    key={room.roomId}
-                    style={{
-                      cursor: 'pointer',
-                      background: isSelected ? 'var(--bg-secondary)' : undefined,
-                    }}
+        <>
+          {/* Desktop table */}
+          <div className="book-desk-table">
+            <div className="books-table-wrap">
+              <table className="books-table">
+                <thead>
+                  <tr>
+                    <th>Room No</th>
+                    <th>Capacity</th>
+                    <th>Occupancy</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {rooms.map((room) => {
+                    const occupied = room.students?.length ?? 0;
+                    const full     = occupied >= room.capacity;
+                    const isSelected = selRoom?.roomId === room.roomId;
+                    return (
+                      <tr
+                        key={room.roomId}
+                        style={{
+                          cursor: 'pointer',
+                          background: isSelected ? 'var(--bg-secondary)' : undefined,
+                        }}
+                        onClick={() => setSelRoom(isSelected ? null : room)}
+                      >
+                        <td style={{ fontWeight: 600 }}>Room {room.roomNo}</td>
+                        <td>{room.capacity}</td>
+                        <td>{occupied} / {room.capacity}</td>
+                        <td>
+                          <span className={`hst-room-occupancy ${full ? 'full' : 'open'}`}>
+                            {full ? 'Full' : 'Available'}
+                          </span>
+                        </td>
+                        <td onClick={(e) => e.stopPropagation()}>
+                          <div className="books-actions">
+                            <button
+                              className="books-btn books-btn-sm books-btn-danger"
+                              onClick={() => handleDeleteRoom(room)}
+                            >
+                              Delete
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          {/* UI improvement: Mobile room cards — expandable, no horizontal scroll */}
+          <div className="book-mob-list">
+            {rooms.map((room) => {
+              const occupied   = room.students?.length ?? 0;
+              const full       = occupied >= room.capacity;
+              const isSelected = selRoom?.roomId === room.roomId;
+              return (
+                <div key={room.roomId} className="book-mob-card">
+                  <button
+                    type="button"
+                    className="book-mob-header"
                     onClick={() => setSelRoom(isSelected ? null : room)}
+                    aria-expanded={isSelected}
                   >
-                    <td style={{ fontWeight: 600 }}>Room {room.roomNo}</td>
-                    <td>{room.capacity}</td>
-                    <td>{occupied} / {room.capacity}</td>
-                    <td>
-                      <span className={`hst-room-occupancy ${full ? 'full' : 'open'}`}>
+                    <div className="book-mob-summary">
+                      <span className="book-mob-title">Room {room.roomNo}</span>
+                      <span className={`hst-room-occupancy ${full ? 'full' : 'open'}`}
+                            style={{ fontSize: 11, marginTop: 2 }}>
                         {full ? 'Full' : 'Available'}
                       </span>
-                    </td>
-                    <td onClick={(e) => e.stopPropagation()}>
-                      <div className="books-actions">
+                    </div>
+                    <span className="book-mob-chevron">{isSelected ? '▲' : '▼'}</span>
+                  </button>
+                  {isSelected && (
+                    <div className="book-mob-details">
+                      {[
+                        ['Capacity',   room.capacity],
+                        ['Occupancy',  `${occupied} / ${room.capacity}`],
+                      ].map(([label, val]) => (
+                        <div key={label} className="book-mob-row">
+                          <span className="book-mob-label">{label}</span>
+                          <span className="book-mob-value">{val}</span>
+                        </div>
+                      ))}
+                      <div className="book-mob-actions">
                         <button
                           className="books-btn books-btn-sm books-btn-danger"
                           onClick={() => handleDeleteRoom(room)}
@@ -254,13 +331,13 @@ export default function HostelBlockDetails({ block: blockProp, onBack }) {
                           Delete
                         </button>
                       </div>
-                    </td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
-        </div>
+                    </div>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        </>
       )}
 
       {/* ── Room Detail Panel (shown when a row is clicked) ── */}
@@ -353,12 +430,24 @@ export default function HostelBlockDetails({ block: blockProp, onBack }) {
       {/* PRN input */}
       <div className="books-form-group" style={{ maxWidth: 320, marginBottom: 8 }}>
         <label className="books-form-label">PRN</label>
-        <input
-          className="hst-prn-input"
-          placeholder="Enter PRN"
-          value={prnInput}
-          onChange={handlePrnInput}
-        />
+        <div style={{ display: 'flex', gap: 6 }}>
+          <input
+            className="hst-prn-input"
+            style={{ flex: 1 }}
+            placeholder="Enter PRN"
+            value={prnInput}
+            onChange={handlePrnInput}
+          />
+          <button
+            type="button"
+            className="books-btn books-btn-sm books-btn-ghost"
+            onClick={addCurrentPrn}
+            disabled={!namePreview || namePreview === '...' || namePreview === 'Not found'}
+            style={{ flexShrink: 0 }}
+          >
+            Add
+          </button>
+        </div>
       </div>
 
       {/* Name preview */}
@@ -375,7 +464,9 @@ export default function HostelBlockDetails({ block: blockProp, onBack }) {
           placeholder="Name will appear here"
           style={{
             background: 'var(--bg-secondary)',
-            color: namePreview === 'Not found' ? '#dc2626' : 'var(--text-primary)',
+            color: namePreview === 'Not found' ? '#dc2626'
+                 : namePreview && namePreview !== '...' ? '#16a34a'
+                 : 'var(--text-primary)',
             cursor: 'default',
           }}
         />

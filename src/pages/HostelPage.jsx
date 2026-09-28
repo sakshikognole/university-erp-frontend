@@ -96,12 +96,18 @@ export default function HostelPage() {
   return (
     <div className="page-container">
 
-      <div className="books-page-header">
-        <div>
+      {/* UI improvement: button always right-aligned on mobile */}
+      <div className="books-page-header" style={{
+        display: 'flex', alignItems: 'center',
+        justifyContent: 'space-between', flexWrap: 'nowrap', gap: 12,
+      }}>
+        <div style={{ minWidth: 0 }}>
           <h1 className="page-title">Hostel Management</h1>
           <p className="hst-page-sub">Manage hostel blocks, rooms and student allotments</p>
         </div>
-        <button className="books-btn books-btn-primary" onClick={openAdd}>
+        <button className="books-btn books-btn-primary"
+                style={{ flexShrink: 0 }}
+                onClick={openAdd}>
           + Add Hostel Block
         </button>
       </div>
@@ -120,7 +126,22 @@ export default function HostelPage() {
       )}
 
       {loading ? (
-        <p className="books-loading">Loading hostel blocks...</p>
+        /* Skeleton loader — no blank screen while loading */
+        <div className="hst-grid">
+          {Array.from({ length: 6 }).map((_, i) => (
+            <div key={i} className="hst-card" style={{ opacity: 0.6 }}>
+              <div style={{ height: 12, width: '40%', borderRadius: 4, marginBottom: 10,
+                background: 'linear-gradient(90deg,#f3f4f6 25%,#e5e7eb 50%,#f3f4f6 75%)',
+                backgroundSize: '200% 100%', animation: 'books-shimmer 1.4s infinite' }} />
+              <div style={{ height: 14, width: '60%', borderRadius: 4, marginBottom: 8,
+                background: 'linear-gradient(90deg,#f3f4f6 25%,#e5e7eb 50%,#f3f4f6 75%)',
+                backgroundSize: '200% 100%', animation: 'books-shimmer 1.4s infinite' }} />
+              <div style={{ height: 12, width: '80%', borderRadius: 4,
+                background: 'linear-gradient(90deg,#f3f4f6 25%,#e5e7eb 50%,#f3f4f6 75%)',
+                backgroundSize: '200% 100%', animation: 'books-shimmer 1.4s infinite' }} />
+            </div>
+          ))}
+        </div>
       ) : blocks.length === 0 ? (
         <div className="hst-empty">
           <p>No hostel blocks yet. Click "+ Add Hostel Block" to get started.</p>

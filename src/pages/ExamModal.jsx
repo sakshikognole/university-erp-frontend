@@ -76,8 +76,9 @@ export default function ExamModal({
           <button className="books-modal-close" onClick={onClose}>x</button>
         </div>
 
-        <form onSubmit={submit}>
-          <div className="books-modal-body">
+        <form onSubmit={submit} style={{ display: 'flex', flexDirection: 'column',
+                                        maxHeight: '85vh', overflow: 'hidden' }}>
+          <div className="books-modal-body" style={{ overflowY: 'auto', flex: 1 }}>
 
             {/* Duplicate error popup */}
             {dupError && (

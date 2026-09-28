@@ -3,6 +3,18 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { springApi } from '../services/api';
 import StudentInformation from '../components/student/StudentInformation';
 
+// D2/D3: fix known spelling errors stored in MongoDB document names
+function fixSpelling(name) {
+  if (!name) return name;
+  return name
+    .replace(/\bbonfide\b/gi, 'Bonafide')
+    .replace(/\bbonafide\b/gi, 'Bonafide')
+    .replace(/\bcertifiate\b/gi, 'Certificate')
+    .replace(/\bcertifcate\b/gi, 'Certificate')
+    .replace(/\bLeaving certifiate\b/gi, 'Leaving Certificate')
+    .replace(/\bLeaving Certifiate\b/gi, 'Leaving Certificate');
+}
+
 export default function StudentDetails() {
   const location = useLocation();
   const navigate = useNavigate();
@@ -22,8 +34,12 @@ export default function StudentDetails() {
 
     springApi.get('/document-types')
       .then((res) => {
-        // springApi interceptor unwraps res.data — res IS the array directly
-        const list = Array.isArray(res) ? res : (res.data ?? []);
+        const raw  = Array.isArray(res) ? res : (res.data ?? []);
+        // D2/D3: fix known spelling errors in document names for display
+        const list = raw.map(d => ({
+          ...d,
+          documentName: fixSpelling(d.documentName),
+        }));
         setDocTypes(list);
         if (list.length > 0) setDocType(list[0].documentName);
       })
@@ -40,6 +56,16 @@ export default function StudentDetails() {
   function handleGenerate() {
     if (!docType) return;
     const selected = docTypes.find((d) => d.documentName === docType);
+
+    // D9: warn if no content template set — prevents "bonafide content for all"
+    if (!selected?.defaultContent?.trim()) {
+      if (!window.confirm(
+        `"${docType}" has no content template set.\n\n` +
+        `A default Bonafide Certificate text will be used.\n\n` +
+        `Click OK to continue, or Cancel and go to Add Document to set content first.`
+      )) return;
+    }
+
     navigate('/certificate-preview', {
       state: {
         student,
@@ -79,10 +105,15 @@ export default function StudentDetails() {
                 onClick={() => setDocType(d.documentName)}
               >
                 <span className="stu-doctype-name">{d.documentName}</span>
-                {d.defaultContent && (
+                {d.defaultContent ? (
                   <span className="stu-doctype-desc">
                     {d.defaultContent.slice(0, 60)}
                     {d.defaultContent.length > 60 ? '...' : ''}
+                  </span>
+                ) : (
+                  // D9: warn user that no content is set for this type
+                  <span className="stu-doctype-desc" style={{ color: '#f59e0b' }}>
+                    ⚠ No content template set
                   </span>
                 )}
               </button>

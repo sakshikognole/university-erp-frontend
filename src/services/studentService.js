@@ -2,11 +2,28 @@ import { springApi } from './api';
 import axios from 'axios';
 
 // springApi interceptor returns res.data directly (the response body).
-// For /api/students → returns List<StudentResponse> array directly.
+// Spring /api/students returns a Page object: { content: [...], totalElements: N, ... }
+// We need to handle both paginated and raw array responses, and fetch ALL pages.
 export async function getAllStudents() {
-  const res = await springApi.get('/students');
-  // res is already the array (interceptor unwrapped res.data)
-  return Array.isArray(res) ? res : (res.data ?? []);
+  // First request to get total count
+  const firstRes = await springApi.get('/students', { params: { page: 0, size: 200 } });
+  // Handle both paginated { content:[], totalElements:N } and raw array
+  if (Array.isArray(firstRes)) return firstRes;
+  if (firstRes && Array.isArray(firstRes.content)) {
+    const total = firstRes.totalElements ?? firstRes.content.length;
+    const pageSize = 200;
+    const totalPages = Math.ceil(total / pageSize);
+    if (totalPages <= 1) return firstRes.content;
+    // Fetch remaining pages in parallel
+    const rest = await Promise.all(
+      Array.from({ length: totalPages - 1 }, (_, i) =>
+        springApi.get('/students', { params: { page: i + 1, size: pageSize } })
+          .then(r => (Array.isArray(r) ? r : r.content ?? []))
+      )
+    );
+    return [...firstRes.content, ...rest.flat()];
+  }
+  return firstRes.data ?? [];
 }
 
 export async function getStudentById(studentId) {

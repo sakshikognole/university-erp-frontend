@@ -3,6 +3,22 @@ import { useState, useEffect } from 'react';
 
 const EMPTY = { hostelName: '', type: 'BOYS', active: true };
 
+// D1/D3: validate hostel name
+function validateHostelName(name) {
+  const trimmed = name.trim();
+  if (!trimmed)
+    return 'Hostel name is required.';
+  if (!/^[A-Za-z\s]+$/.test(trimmed))
+    return 'Hostel name must contain only letters and spaces. No numbers or special characters.';
+  if (/\s{2,}/.test(trimmed))
+    return 'Hostel name must not contain double spaces.';
+  if (trimmed.length < 2)
+    return 'Hostel name must be at least 2 characters.';
+  if (trimmed.length > 50)
+    return 'Hostel name must not exceed 50 characters.';
+  return '';
+}
+
 export default function HostelBlockModal({ isOpen, block, onClose, onSaved }) {
   const [form,   setForm]   = useState(EMPTY);
   const [errors, setErrors] = useState({});
@@ -17,7 +33,8 @@ export default function HostelBlockModal({ isOpen, block, onClose, onSaved }) {
       setForm({
         hostelName: block.hostelName ?? '',
         type:       block.type       ?? 'BOYS',
-        active:     block.active     ?? true,
+        // D4: read active value correctly (may come as boolean or string)
+        active:     block.active === true || block.active === 'true',
       });
     } else {
       setForm(EMPTY);
@@ -30,13 +47,16 @@ export default function HostelBlockModal({ isOpen, block, onClose, onSaved }) {
 
   const change = (e) => {
     const { name, value, type, checked } = e.target;
-    setForm((f) => ({ ...f, [name]: type === 'checkbox' ? checked : value }));
+    // D4: ensure checkbox value is stored as boolean
+    const newVal = type === 'checkbox' ? checked : value;
+    setForm((f) => ({ ...f, [name]: newVal }));
     setErrors((er) => ({ ...er, [name]: '' }));
   };
 
   const validate = () => {
     const e = {};
-    if (!form.hostelName.trim()) e.hostelName = 'Hostel name is required.';
+    const nameErr = validateHostelName(form.hostelName);
+    if (nameErr) e.hostelName = nameErr;
     return e;
   };
 
@@ -47,11 +67,16 @@ export default function HostelBlockModal({ isOpen, block, onClose, onSaved }) {
     setSaving(true);
     setApiErr('');
     try {
+      const payload = {
+        hostelName: form.hostelName.trim(),
+        type:       form.type,
+        active:     form.active,  // D4: always send actual boolean
+      };
       if (isEdit) {
-        await springApi.put(`/hostel-blocks/${block.blockId}`, form);
+        await springApi.put(`/hostel-blocks/${block.blockId}`, payload);
         onSaved('Hostel block updated successfully.');
       } else {
-        await springApi.post('/hostel-blocks', form);
+        await springApi.post('/hostel-blocks', payload);
         onSaved('Hostel block added successfully.');
       }
     } catch (err) {
@@ -79,15 +104,18 @@ export default function HostelBlockModal({ isOpen, block, onClose, onSaved }) {
               </div>
             )}
 
-            {/* Hostel Name */}
+            {/* D1/D3: Hostel Name with validation */}
             <div className="books-form-group">
-              <label className="books-form-label">Hostel Name *</label>
+              <label className="books-form-label">
+                Hostel Name <span style={{ color: '#dc2626' }}>*</span>
+              </label>
               <input
                 className={`books-form-control ${errors.hostelName ? 'err' : ''}`}
                 name="hostelName"
                 value={form.hostelName}
                 onChange={change}
                 placeholder="e.g. Shivaji Block"
+                maxLength={50}
               />
               {errors.hostelName && (
                 <p className="books-form-err">{errors.hostelName}</p>
@@ -108,7 +136,7 @@ export default function HostelBlockModal({ isOpen, block, onClose, onSaved }) {
               </select>
             </div>
 
-            {/* Active checkbox */}
+            {/* D4: Active checkbox — correctly bound to boolean */}
             <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginTop: 4 }}>
               <input
                 type="checkbox"
@@ -118,11 +146,20 @@ export default function HostelBlockModal({ isOpen, block, onClose, onSaved }) {
                 onChange={change}
                 className="pay-checkbox"
               />
-              <label htmlFor="hst-active" style={{ fontSize: 14, cursor: 'pointer',
-                                                    color: 'var(--text-primary)' }}>
+              <label htmlFor="hst-active" style={{
+                fontSize: 14, cursor: 'pointer', color: 'var(--text-primary)'
+              }}>
                 Active
               </label>
             </div>
+
+            {/* Show current status for clarity */}
+            <p style={{ fontSize: 12, color: 'var(--text-secondary)', marginTop: 6 }}>
+              This hostel block will be created as{' '}
+              <strong style={{ color: form.active ? '#16a34a' : '#6b7280' }}>
+                {form.active ? 'Active' : 'Inactive'}
+              </strong>
+            </p>
 
           </div>
 

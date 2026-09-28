@@ -34,11 +34,12 @@ const DEFAULT_PAGE = {
 };
 
 const EMPTY_FORM = {
-  department: '', semester:    '',
-  subjectId:  '', subjectName: '',
-  facultyId:  '', facultyName: '',
-  venueId:    '', venueName:   '',
-  daySlots:   [],   // [{ day, startTime, endTime }]
+  department:   '', semester:    '',
+  subjectId:    '', subjectName: '',
+  facultyId:    '', facultyName: '',
+  venueId:      '', venueName:   '',
+  scheduleDate: '',
+  daySlots:     [],   // [{ day, startTime, endTime }]
 };
 
 // ── Schedule Add/Edit Modal ────────────────────────────────────────────────
@@ -77,15 +78,16 @@ function ScheduleModal({ isOpen, mode, schedule, onSave, onClose, saving }) {
     if (!isOpen) return;
     if (mode === 'edit' && schedule) {
       setForm({
-        department: schedule.department  ?? '',
-        semester:   schedule.semester    ?? '',
-        subjectId:  schedule.subjectId   ?? '',
-        subjectName:schedule.subjectName ?? '',
-        facultyId:  schedule.facultyId   ?? '',
-        facultyName:schedule.facultyName ?? '',
-        venueId:    schedule.venueId     ?? '',
-        venueName:  schedule.venueName   ?? '',
-        daySlots:   schedule.daySlots    ?? [],
+        department:   schedule.department    ?? '',
+        semester:     schedule.semester      ?? '',
+        subjectId:    schedule.subjectId     ?? '',
+        subjectName:  schedule.subjectName   ?? '',
+        facultyId:    schedule.facultyId     ?? '',
+        facultyName:  schedule.facultyName   ?? '',
+        venueId:      schedule.venueId       ?? '',
+        venueName:    schedule.venueName     ?? '',
+        scheduleDate: schedule.scheduleDate  ?? '',
+        daySlots:     schedule.daySlots      ?? [],
       });
     } else {
       setForm(EMPTY_FORM);
@@ -150,12 +152,13 @@ function ScheduleModal({ isOpen, mode, schedule, onSave, onClose, saving }) {
   // ── Validate ─────────────────────────────────────────────────────────
   const validate = () => {
     const e = {};
-    if (!form.department.trim())  e.department = 'Department is required.';
-    if (!form.semester.trim())    e.semester   = 'Semester is required.';
-    if (!form.subjectId)          e.subjectId  = 'Subject is required.';
-    if (!form.facultyId)          e.facultyId  = 'Faculty is required.';
-    if (!form.venueId)            e.venueId    = 'Venue is required.';
-    if (!form.daySlots.length)    e.daySlots   = 'Select at least one day.';
+    if (!form.department.trim())  e.department   = 'Department is required.';
+    if (!form.semester.trim())    e.semester     = 'Semester is required.';
+    if (!form.subjectId)          e.subjectId    = 'Subject is required.';
+    if (!form.facultyId)          e.facultyId    = 'Faculty is required.';
+    if (!form.venueId)            e.venueId      = 'Venue is required.';
+    if (!form.scheduleDate)       e.scheduleDate = 'Date is required.';
+    if (!form.daySlots.length)    e.daySlots     = 'Select at least one day.';
     else {
       for (const slot of form.daySlots) {
         if (!slot.startTime || !slot.endTime) {
@@ -281,6 +284,20 @@ function ScheduleModal({ isOpen, mode, schedule, onSave, onClose, saving }) {
                 {errors.venueId && <p className="books-form-err">{errors.venueId}</p>}
               </div>
 
+              {/* Date — shown BEFORE day selection */}
+              <div className="books-form-group" style={{ maxWidth: 220 }}>
+                <label className="books-form-label">Date *</label>
+                <input
+                  type="date"
+                  className={`books-form-control ${errors.scheduleDate ? 'err' : ''}`}
+                  value={form.scheduleDate}
+                  onChange={e => set('scheduleDate', e.target.value)}
+                />
+                {errors.scheduleDate && (
+                  <p className="books-form-err">{errors.scheduleDate}</p>
+                )}
+              </div>
+
               {/* Days + Time picker */}
               <div className="books-form-group">
                 <label className="books-form-label">Days &amp; Times *</label>
@@ -393,6 +410,11 @@ function ViewScheduleModal({ isOpen, schedule, onClose }) {
             ['Subject',      schedule.subjectName],
             ['Faculty',      schedule.facultyName],
             ['Venue',        schedule.venueName || schedule.venueId],
+            ['Date',         schedule.scheduleDate
+                               ? new Date(schedule.scheduleDate).toLocaleDateString('en-IN', {
+                                   day: '2-digit', month: 'short', year: 'numeric'
+                                 })
+                               : '—'],
           ].map(([label, value]) => (
             <div key={label} style={{
               display: 'flex', gap: 12, padding: '7px 0',
@@ -607,13 +629,13 @@ export default function SchedulePage() {
                 <tr>
                   <th>#</th><th>Schedule ID</th><th>Department</th>
                   <th>Semester</th><th>Subject</th><th>Faculty</th>
-                  <th>Days</th><th>Venue</th><th>Actions</th>
+                  <th>Date</th><th>Days</th><th>Venue</th><th>Actions</th>
                 </tr>
               </thead>
               <tbody>
                 {Array.from({ length: 5 }).map((_, i) => (
                   <tr key={i}>
-                    {Array.from({ length: 9 }).map((__, j) => (
+                    {Array.from({ length: 10 }).map((__, j) => (
                       <td key={j}>
                         <div style={{
                           height: 13, width: '70%', borderRadius: 4,
@@ -656,7 +678,8 @@ export default function SchedulePage() {
                         <th>Semester</th>
                         <th>Subject</th>
                         <th>Faculty</th>
-                        <th style={{ width: 100 }}>Days</th>
+                        <th style={{ width: 95 }}>Date</th>
+                        <th style={{ width: 90 }}>Days</th>
                         <th>Venue</th>
                         <th style={{ width: 155 }}>Actions</th>
                       </tr>
@@ -682,6 +705,14 @@ export default function SchedulePage() {
                           <td style={{ fontSize: 13 }}>{sch.semester}</td>
                           <td style={{ fontSize: 13 }}>{sch.subjectName}</td>
                           <td style={{ fontSize: 13 }}>{sch.facultyName}</td>
+                          <td style={{ fontSize: 13, whiteSpace: 'nowrap',
+                                       color: 'var(--text-secondary)' }}>
+                            {sch.scheduleDate
+                              ? new Date(sch.scheduleDate).toLocaleDateString('en-IN', {
+                                  day: '2-digit', month: 'short', year: 'numeric'
+                                })
+                              : '—'}
+                          </td>
                           <td>
                             <div style={{ display: 'flex', gap: 3, flexWrap: 'wrap' }}>
                               {(sch.daySlots || []).map(s => (
@@ -750,6 +781,11 @@ export default function SchedulePage() {
                         ['Department', sch.department],
                         ['Semester',   sch.semester],
                         ['Faculty',    sch.facultyName],
+                        ['Date',       sch.scheduleDate
+                          ? new Date(sch.scheduleDate).toLocaleDateString('en-IN', {
+                              day: '2-digit', month: 'short', year: 'numeric'
+                            })
+                          : '—'],
                         ['Venue',      sch.venueName || sch.venueId],
                         ['Days',       slotSummary(sch.daySlots)],
                       ].map(([label, val]) => (
