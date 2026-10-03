@@ -81,9 +81,11 @@ export default function HostelPage() {
 
   // ── Detail view — URL driven so refresh restores the same block ──
   if (viewBlockId) {
-    // Find the block in the already-loaded list, or pass just the id
-    // HostelBlockDetails fetches the block itself by blockId
-    const blockObj = blocks.find(b => b.blockId === viewBlockId) || { blockId: viewBlockId };
+    // Try to find block in loaded list first
+    // If blocks haven't loaded yet (page refresh), pass just { blockId }
+    // HostelBlockDetails will fetch the full block from the API itself
+    const blockObj = blocks.find(b => b.blockId === viewBlockId)
+                  || { blockId: viewBlockId };
     return (
       <HostelBlockDetails
         block={blockObj}

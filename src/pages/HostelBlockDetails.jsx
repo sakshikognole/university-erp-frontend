@@ -176,8 +176,21 @@ export default function HostelBlockDetails({ block: blockProp, onBack }) {
   };
 
   // ── Render ────────────────────────────────────────────────────────────
-  if (loading) return <p className="books-loading">Loading block details...</p>;
-  if (!block)  return <p className="hst-empty">Block not found.</p>;
+  // Guard: show loading if still fetching OR block has no hostelName yet
+  // (block may be a skeleton { blockId } passed from HostelPage before API call completes)
+  if (loading || !block?.hostelName) {
+    return (
+      <div className="page-container">
+        <button className="hst-back-link" onClick={onBack}>
+          ← Back to Hostel Management
+        </button>
+        <p className="books-loading" style={{ marginTop: 24 }}>
+          Loading hostel details...
+        </p>
+      </div>
+    );
+  }
+  if (!block) return <p className="hst-empty">Block not found.</p>;
 
   return (
     <div className="page-container">
