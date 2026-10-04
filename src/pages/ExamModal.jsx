@@ -6,8 +6,8 @@ const EMPTY = {
   academicYear:    '',
   description:     '',
   displayMode:     'PERCENTAGE',
-  percentageScale: '100',   // custom max for PERCENTAGE (e.g. 50 means show out of 50%)
-  fractionScale:   '10',    // custom denominator for FRACTION (e.g. 5 means /5)
+  percentageScale: '100',
+  fractionScale:   '10',
 };
 
 export default function ExamModal({
@@ -44,16 +44,46 @@ export default function ExamModal({
 
   const validate = () => {
     const e = {};
-    if (!form.examId.trim()) {
-      e.examId = 'Exam ID is required';
-    } else if (/[^A-Za-z0-9\-]/.test(form.examId.trim())) {
-      e.examId = 'Exam ID must not contain special characters.';
-    } else if (!/[A-Za-z]/.test(form.examId.trim())) {
+    const id = form.examId.trim();
+
+    // D6: no negative values (starts with -)
+    // D7: max 20 chars
+    if (!id) {
+      e.examId = 'Exam ID is required.';
+    } else if (id.startsWith('-')) {
+      e.examId = 'Exam ID must not start with a negative sign (-).';
+    } else if (id.length > 20) {
+      e.examId = 'Exam ID must not exceed 20 characters.';
+    } else if (/[^A-Za-z0-9\-]/.test(id)) {
+      e.examId = 'Exam ID must contain only letters, numbers, and hyphens.';
+    } else if (!/[A-Za-z]/.test(id)) {
       e.examId = 'Exam ID must contain at least one letter (e.g. EX001).';
-    } else if (!/[0-9]/.test(form.examId.trim())) {
+    } else if (!/[0-9]/.test(id)) {
       e.examId = 'Exam ID must contain at least one number (e.g. EX001).';
     }
-    if (!form.subject.trim()) e.subject = 'Subject is required';
+
+    // D8: Subject — letters and spaces only
+    const subj = form.subject.trim();
+    if (!subj) {
+      e.subject = 'Subject is required.';
+    } else if (/^\d+$/.test(subj)) {
+      e.subject = 'Subject cannot be numbers only.';
+    } else if (/^[-]/.test(subj)) {
+      e.subject = 'Subject must not start with a negative sign.';
+    } else if (!/[A-Za-z]/.test(subj)) {
+      e.subject = 'Subject must contain at least one letter.';
+    } else if (/^[^A-Za-z0-9\s]+$/.test(subj)) {
+      e.subject = 'Subject must contain letters.';
+    }
+
+    // D9: Academic Year — format YYYY-YY only (Obs1: mandatory)
+    const ay = form.academicYear.trim();
+    if (!ay) {
+      e.academicYear = 'Academic Year is required (e.g. 2026-27).';
+    } else if (!/^\d{4}-\d{2}$/.test(ay)) {
+      e.academicYear = 'Academic Year must be in YYYY-YY format (e.g. 2026-27).';
+    }
+
     return e;
   };
 
@@ -68,6 +98,9 @@ export default function ExamModal({
     });
   };
 
+  const pctScale  = Number(form.percentageScale) || 100;
+  const fracScale = Number(form.fractionScale) || 10;
+
   return (
     <div className="books-overlay">
       <div className="books-modal" style={{ maxWidth: 480 }}>
@@ -80,7 +113,7 @@ export default function ExamModal({
                                         maxHeight: '85vh', overflow: 'hidden' }}>
           <div className="books-modal-body" style={{ overflowY: 'auto', flex: 1 }}>
 
-            {/* Duplicate error popup */}
+            {/* Duplicate error */}
             {dupError && (
               <div style={{
                 background: '#fef2f2', border: '1px solid #fca5a5',
@@ -101,44 +134,61 @@ export default function ExamModal({
               </div>
             )}
 
-            {/* Exam ID */}
+            {/* Exam ID — D6/D7: no negative, max 20 chars */}
             <div className="books-form-group">
-              <label className="books-form-label">Exam ID *</label>
+              <label className="books-form-label">
+                Exam ID <span style={{ color: '#dc2626' }}>*</span>
+              </label>
               <input
                 className={`books-form-control ${errors.examId ? 'err' : ''}`}
                 name="examId" value={form.examId} onChange={change}
-                placeholder="e.g. EX001"
+                placeholder="e.g. EX001" maxLength={20}
                 disabled={mode === 'edit'}
                 autoFocus
               />
+              <span style={{ fontSize: 11, color: '#9ca3af' }}>
+                Letters + numbers + hyphens only · max 20 chars · e.g. EX001
+              </span>
               {errors.examId && <p className="books-form-err">{errors.examId}</p>}
             </div>
 
-            {/* Subject */}
+            {/* Subject — D8: letters only */}
             <div className="books-form-group">
-              <label className="books-form-label">Subject *</label>
+              <label className="books-form-label">
+                Subject <span style={{ color: '#dc2626' }}>*</span>
+              </label>
               <input
                 className={`books-form-control ${errors.subject ? 'err' : ''}`}
                 name="subject" value={form.subject} onChange={change}
                 placeholder="e.g. Data Structures and Algorithms"
               />
+              <span style={{ fontSize: 11, color: '#9ca3af' }}>
+                Subject name must contain letters
+              </span>
               {errors.subject && <p className="books-form-err">{errors.subject}</p>}
             </div>
 
-            {/* Academic Year */}
+            {/* Academic Year — D9 + Obs1: mandatory, YYYY-YY format */}
             <div className="books-form-group">
-              <label className="books-form-label">Academic Year</label>
+              <label className="books-form-label">
+                Academic Year <span style={{ color: '#dc2626' }}>*</span>
+              </label>
               <input
-                className="books-form-control"
+                className={`books-form-control ${errors.academicYear ? 'err' : ''}`}
                 name="academicYear" value={form.academicYear} onChange={change}
                 placeholder="e.g. 2026-27"
+                style={{ maxWidth: 160 }}
               />
+              <span style={{ fontSize: 11, color: '#9ca3af' }}>
+                Format: YYYY-YY (e.g. 2026-27)
+              </span>
+              {errors.academicYear && <p className="books-form-err">{errors.academicYear}</p>}
             </div>
 
-            {/* Display Mode toggle — only one selectable at a time */}
+            {/* Display Mode */}
             <div className="books-form-group">
               <label className="books-form-label">Display Marks As</label>
-              <div style={{ display: 'flex', gap: 10, marginTop: 4 }}>
+              <div style={{ display: 'flex', gap: 10, marginTop: 4, flexWrap: 'wrap' }}>
                 {[
                   { value: 'PERCENTAGE', label: '% Percentage', example: 'e.g. 75%' },
                   { value: 'FRACTION',   label: '⅟ Fraction',   example: 'e.g. 7.5 / scale' },
@@ -150,7 +200,7 @@ export default function ExamModal({
                       type="button"
                       onClick={() => setForm((f) => ({ ...f, displayMode: opt.value }))}
                       style={{
-                        flex: 1,
+                        flex: 1, minWidth: 130,
                         padding: '10px 12px',
                         border: `2px solid ${isSelected ? '#111827' : '#e5e7eb'}`,
                         borderRadius: 8,
@@ -160,9 +210,7 @@ export default function ExamModal({
                         fontSize: '0.875rem',
                         cursor: 'pointer',
                         textAlign: 'left',
-                        display: 'flex',
-                        flexDirection: 'column',
-                        gap: 2,
+                        display: 'flex', flexDirection: 'column', gap: 2,
                         transition: 'all 0.15s',
                       }}
                     >
@@ -176,49 +224,50 @@ export default function ExamModal({
                 })}
               </div>
 
-              {/* Percentage scale input — shown when PERCENTAGE selected */}
+              {/* Obs2/3: conversion message — compact single line on mobile */}
               {form.displayMode === 'PERCENTAGE' && (
-                <div style={{ marginTop: 10, display: 'flex', alignItems: 'center', gap: 10 }}>
-                  <label style={{ fontSize: '0.85rem', color: '#374151', fontWeight: 500, whiteSpace: 'nowrap' }}>
-                    Convert to percentage out of
-                  </label>
-                  <input
-                    type="number"
-                    min="1"
-                    max="100"
-                    className="books-form-control"
-                    name="percentageScale"
-                    value={form.percentageScale}
-                    onChange={change}
-                    style={{ width: 80, padding: '6px 10px' }}
-                    placeholder="100"
-                  />
-                  <span style={{ fontSize: '0.85rem', color: '#6b7280' }}>
-                    e.g. 50 → shows as 40% out of 50
-                  </span>
+                <div style={{ marginTop: 10 }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
+                    <label style={{ fontSize: '0.85rem', color: '#374151',
+                                    fontWeight: 500, whiteSpace: 'nowrap' }}>
+                      Convert to % out of
+                    </label>
+                    <input
+                      type="number" min="1" max="100"
+                      className="books-form-control"
+                      name="percentageScale" value={form.percentageScale}
+                      onChange={change}
+                      style={{ width: 70, padding: '6px 10px' }}
+                      placeholder="100"
+                    />
+                  </div>
+                  {/* Obs2: single line conversion hint */}
+                  <p style={{ fontSize: '0.78rem', color: '#6b7280', marginTop: 4, marginBottom: 0 }}>
+                    e.g. 50 shows as {+((15/20)*pctScale).toFixed(0)}% out of {pctScale}
+                  </p>
                 </div>
               )}
 
-              {/* Fraction scale input — shown when FRACTION selected */}
               {form.displayMode === 'FRACTION' && (
-                <div style={{ marginTop: 10, display: 'flex', alignItems: 'center', gap: 10 }}>
-                  <label style={{ fontSize: '0.85rem', color: '#374151', fontWeight: 500, whiteSpace: 'nowrap' }}>
-                    Convert marks to scale of
-                  </label>
-                  <input
-                    type="number"
-                    min="1"
-                    max="100"
-                    className="books-form-control"
-                    name="fractionScale"
-                    value={form.fractionScale}
-                    onChange={change}
-                    style={{ width: 80, padding: '6px 10px' }}
-                    placeholder="10"
-                  />
-                  <span style={{ fontSize: '0.85rem', color: '#6b7280' }}>
-                    e.g. scale = 5 → 20 marks become /5
-                  </span>
+                <div style={{ marginTop: 10 }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
+                    <label style={{ fontSize: '0.85rem', color: '#374151',
+                                    fontWeight: 500, whiteSpace: 'nowrap' }}>
+                      Convert to scale of
+                    </label>
+                    <input
+                      type="number" min="1" max="100"
+                      className="books-form-control"
+                      name="fractionScale" value={form.fractionScale}
+                      onChange={change}
+                      style={{ width: 70, padding: '6px 10px' }}
+                      placeholder="10"
+                    />
+                  </div>
+                  {/* Obs3: single line conversion hint */}
+                  <p style={{ fontSize: '0.78rem', color: '#6b7280', marginTop: 4, marginBottom: 0 }}>
+                    e.g. scale={fracScale} → 15/20 becomes {+((15/20)*fracScale).toFixed(2)}/{fracScale}
+                  </p>
                 </div>
               )}
             </div>
@@ -242,12 +291,7 @@ export default function ExamModal({
               fontSize: '0.83rem', color: '#1d4ed8', display: 'flex', gap: 6,
             }}>
               <span>ℹ️</span>
-              <span>
-                T1/T2 max = <strong>20</strong> marks. SEE max = <strong>50</strong> marks.
-                {form.displayMode === 'PERCENTAGE'
-                  ? ` Marks shown as % out of ${form.percentageScale || 100} (e.g. 15/20 → ${((15/20)*(Number(form.percentageScale)||100)).toFixed(0)}%).`
-                  : ` Marks shown as fractions out of ${form.fractionScale || 10} (e.g. 15/20 → ${((15/20)*(Number(form.fractionScale)||10)).toFixed(2)}/${form.fractionScale || 10}).`}
-              </span>
+              <span>T1/T2 max = <strong>20</strong> marks · SEE max = <strong>50</strong> marks.</span>
             </div>
 
           </div>

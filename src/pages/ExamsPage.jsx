@@ -23,7 +23,10 @@ export default function ExamsPage() {
     if (!silent) { setLoading(true); setPageError(''); }
     try {
       const res = await springGet('/exams');
-      setExams(Array.isArray(res) ? res : (res.data ?? res ?? []));
+      const list = Array.isArray(res) ? res : (res.data ?? res ?? []);
+      // D11: sort alphabetically by examId for predictable order
+      list.sort((a, b) => a.examId.localeCompare(b.examId));
+      setExams(list);
     } catch (err) {
       if (!silent) setPageError(err.message || 'Failed to load exams.');
     } finally {
@@ -59,13 +62,11 @@ export default function ExamsPage() {
           return;
         }
         await springApi.post('/exams', form);
-        clearTimeout(slowTimer);
-        setError('');
+        clearTimeout(slowTimer); setError('');
         setSuccess('Exam added successfully.');
       } else {
         await springApi.put(`/exams/${selExam.examId}`, form);
-        clearTimeout(slowTimer);
-        setError('');
+        clearTimeout(slowTimer); setError('');
         setSuccess('Exam updated successfully.');
       }
       setModalOpen(false);
@@ -97,25 +98,25 @@ export default function ExamsPage() {
       || (e.academicYear || '').toLowerCase().includes(q);
   });
 
-  // Total students = unique students across all sections (use T1 as base if available, else max)
+  // D13-D15: count only rows that have PRN or studentName entered
   const totalStudents = (exam) => {
-    const t1  = (exam.t1Marks  ?? []).length;
-    const t2  = (exam.t2Marks  ?? []).length;
-    const see = (exam.seeMarks ?? []).length;
-    return Math.max(t1, t2, see);
+    const count = (arr) => (arr ?? []).filter(r => r.prn?.trim() || r.studentName?.trim()).length;
+    return Math.max(count(exam.t1Marks), count(exam.t2Marks), count(exam.seeMarks));
   };
 
   return (
     <div className="page-container">
 
-      {/* Header — button always visible and right-aligned on mobile */}
+      {/* D1/D2/D5: title + description left-aligned, button right-aligned on mobile */}
       <div className="books-page-header" style={{
         display: 'flex', alignItems: 'center',
         justifyContent: 'space-between', flexWrap: 'nowrap', gap: 12,
       }}>
         <div style={{ minWidth: 0 }}>
-          <h1 className="page-title">Exam Management</h1>
-          <p className="stu-page-sub">Manage exams and student marks</p>
+          <h1 className="page-title" style={{ textAlign: 'left' }}>Exam Management</h1>
+          <p className="stu-page-sub" style={{ textAlign: 'left' }}>
+            Manage exams and student marks
+          </p>
         </div>
         <button
           className="books-btn books-btn-primary"
@@ -140,15 +141,32 @@ export default function ExamsPage() {
         </div>
       )}
 
-      {/* Search */}
-      <div style={{ marginBottom: 16 }}>
+      {/* D3: Search with Clear button */}
+      <div style={{ marginBottom: 16, position: 'relative', maxWidth: 380 }}>
         <input
           className="books-form-control"
-          style={{ maxWidth: 360 }}
+          style={{ paddingRight: search ? 36 : 12 }}
           placeholder="Search by Exam ID, subject, or year..."
           value={search}
           onChange={(e) => setSearch(e.target.value)}
         />
+        {/* D3: Clear (×) button */}
+        {search && (
+          <button
+            type="button"
+            onClick={() => setSearch('')}
+            title="Clear search"
+            style={{
+              position: 'absolute', right: 8, top: '50%',
+              transform: 'translateY(-50%)',
+              background: 'none', border: 'none',
+              cursor: 'pointer', color: '#9ca3af',
+              fontSize: 18, lineHeight: 1, padding: '2px 4px',
+            }}
+          >
+            ×
+          </button>
+        )}
       </div>
 
       {/* Table */}
@@ -173,9 +191,7 @@ export default function ExamsPage() {
       ) : filtered.length === 0 ? (
         <div className="card" style={{ padding: '40px', textAlign: 'center' }}>
           <p className="stu-info-text">
-            {search
-              ? 'No exams matched your search.'
-              : 'No exams added yet. Click "+ Add Exam" to get started.'}
+            {search ? 'No exams matched your search.' : 'No exams added yet. Click "+ Add Exam" to get started.'}
           </p>
         </div>
       ) : (
@@ -186,65 +202,140 @@ export default function ExamsPage() {
               Total: {filtered.length} exam{filtered.length !== 1 ? 's' : ''}
             </span>
           </div>
-          <div className="books-table-wrap">
-            <table className="books-table">
-              <thead>
-                <tr>
-                  <th style={{ width: 48 }}>#</th>
-                  <th>Exam ID</th>
-                  <th>Subject</th>
-                  <th>Academic Year</th>
-                  <th style={{ textAlign: 'center' }}>Students</th>
-                  <th>Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                {filtered.map((exam, i) => (
-                  <tr key={exam.examId}>
-                    <td style={{ color: '#9ca3af' }}>{i + 1}</td>
-                    <td>
+
+          {/* Desktop table */}
+          <div className="book-desk-table">
+            <div className="books-table-wrap">
+              <table className="books-table">
+                <thead>
+                  <tr>
+                    {/* D4: all headers left-aligned, data aligned with headers */}
+                    <th style={{ width: 48 }}>#</th>
+                    <th>Exam ID</th>
+                    <th>Subject</th>
+                    <th>Academic Year</th>
+                    <th style={{ textAlign: 'center' }}>Students</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {filtered.map((exam, i) => (
+                    <tr key={exam.examId}>
+                      <td style={{ color: '#9ca3af', verticalAlign: 'middle' }}>{i + 1}</td>
+                      {/* D4: each data cell aligned to match its header */}
+                      <td style={{ verticalAlign: 'middle' }}>
+                        <span style={{ fontFamily: 'monospace', fontSize: '0.82rem',
+                          fontWeight: 700, color: '#1e3a5f' }}>
+                          {exam.examId}
+                        </span>
+                      </td>
+                      <td style={{ fontWeight: 500, verticalAlign: 'middle' }}>
+                        {exam.subject}
+                      </td>
+                      <td style={{ color: '#6b7280', verticalAlign: 'middle' }}>
+                        {exam.academicYear || '—'}
+                      </td>
+                      <td style={{ textAlign: 'center', verticalAlign: 'middle' }}>
+                        <span style={{
+                          background: '#f1f5f9', color: '#374151',
+                          borderRadius: 9999, padding: '2px 12px',
+                          fontSize: '0.82rem', fontWeight: 600,
+                        }}>
+                          {totalStudents(exam)}
+                        </span>
+                      </td>
+                      <td style={{ verticalAlign: 'middle' }}>
+                        <div className="books-actions">
+                          <button
+                            className="books-btn books-btn-sm books-btn-primary"
+                            onClick={() => navigate(`/exam-marks?examId=${exam.examId}`)}
+                          >
+                            Marks
+                          </button>
+                          <button
+                            className="books-btn books-btn-sm books-btn-ghost"
+                            onClick={() => openEdit(exam)}
+                          >
+                            Edit
+                          </button>
+                          <button
+                            className="books-btn books-btn-sm books-btn-danger"
+                            onClick={() => handleDelete(exam)}
+                          >
+                            Delete
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          {/* Mobile cards */}
+          <div className="book-mob-list">
+            {filtered.map((exam, i) => (
+              <div key={exam.examId} className="book-mob-card">
+                <div style={{ padding: '10px 14px' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between',
+                                alignItems: 'flex-start', marginBottom: 6 }}>
+                    <div>
                       <span style={{ fontFamily: 'monospace', fontSize: '0.82rem',
-                        fontWeight: 700, color: '#1e3a5f' }}>
+                                     fontWeight: 700, color: '#1e3a5f' }}>
                         {exam.examId}
                       </span>
-                    </td>
-                    <td style={{ fontWeight: 500 }}>{exam.subject}</td>
-                    <td style={{ color: '#6b7280' }}>{exam.academicYear || '—'}</td>
-                    <td style={{ textAlign: 'center' }}>
-                      <span style={{
-                        background: '#f1f5f9', color: '#374151',
-                        borderRadius: 9999, padding: '2px 12px',
-                        fontSize: '0.82rem', fontWeight: 600,
-                      }}>
-                        {totalStudents(exam)}
+                      <span style={{ marginLeft: 8, fontSize: 12, color: '#9ca3af' }}>
+                        #{i + 1}
                       </span>
-                    </td>
-                    <td>
-                      <div className="books-actions">
-                        <button
-                          className="books-btn books-btn-sm books-btn-primary"
-                          onClick={() => navigate(`/exam-marks?examId=${exam.examId}`)}
-                        >
-                          Marks
-                        </button>
-                        <button
-                          className="books-btn books-btn-sm books-btn-ghost"
-                          onClick={() => openEdit(exam)}
-                        >
-                          Edit
-                        </button>
-                        <button
-                          className="books-btn books-btn-sm books-btn-danger"
-                          onClick={() => handleDelete(exam)}
-                        >
-                          Delete
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+                    </div>
+                    <span style={{
+                      background: '#f1f5f9', color: '#374151',
+                      borderRadius: 9999, padding: '2px 10px',
+                      fontSize: '0.78rem', fontWeight: 600,
+                    }}>
+                      {totalStudents(exam)} students
+                    </span>
+                  </div>
+                  {[
+                    ['Subject',   exam.subject],
+                    ['Acad. Year', exam.academicYear || '—'],
+                  ].map(([label, val]) => (
+                    <div key={label} style={{ display: 'flex', gap: 8,
+                                              fontSize: 13, marginBottom: 3 }}>
+                      <span style={{ fontWeight: 600, color: '#6b7280',
+                                     minWidth: 80, flexShrink: 0 }}>
+                        {label}
+                      </span>
+                      <span style={{ color: '#111827' }}>{val}</span>
+                    </div>
+                  ))}
+                  <div style={{ display: 'flex', gap: 8, marginTop: 10 }}>
+                    <button
+                      className="books-btn books-btn-sm books-btn-primary"
+                      style={{ flex: 1 }}
+                      onClick={() => navigate(`/exam-marks?examId=${exam.examId}`)}
+                    >
+                      Marks
+                    </button>
+                    <button
+                      className="books-btn books-btn-sm books-btn-ghost"
+                      style={{ flex: 1 }}
+                      onClick={() => openEdit(exam)}
+                    >
+                      Edit
+                    </button>
+                    <button
+                      className="books-btn books-btn-sm books-btn-danger"
+                      style={{ flex: 1 }}
+                      onClick={() => handleDelete(exam)}
+                    >
+                      Delete
+                    </button>
+                  </div>
+                </div>
+              </div>
+            ))}
           </div>
         </div>
       )}
@@ -259,7 +350,6 @@ export default function ExamsPage() {
         dupError={dupError}
         onDupOk={() => setDupError('')}
       />
-
     </div>
   );
 }
