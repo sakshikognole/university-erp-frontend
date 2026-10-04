@@ -3,13 +3,15 @@ import { useState, useEffect, useCallback, useRef } from 'react';
 import HostelRoomModal from './HostelRoomModal';
 
 export default function HostelBlockDetails({ block: blockProp, onBack }) {
-  const [block,        setBlock]        = useState(blockProp);
-  const [rooms,        setRooms]        = useState([]);
-  const [loading,      setLoading]      = useState(true);
-  const [roomModalOpen, setRoomModalOpen] = useState(false);
+  // Use blockId from prop — the key used to fetch full data
+  const blockId = blockProp?.blockId || blockProp?.id || blockProp?._id || '';
 
-  // selected room for detail panel (click a row)
-  const [selRoom,      setSelRoom]      = useState(null);
+  const [block,         setBlock]         = useState(null);
+  const [rooms,         setRooms]         = useState([]);
+  const [loading,       setLoading]       = useState(true);
+  const [loadError,     setLoadError]     = useState('');
+  const [roomModalOpen, setRoomModalOpen] = useState(false);
+  const [selRoom,       setSelRoom]       = useState(null);
 
   // PRN input state
   const [prnInput,    setPrnInput]    = useState('');
@@ -29,31 +31,33 @@ export default function HostelBlockDetails({ block: blockProp, onBack }) {
     return () => clearTimeout(t);
   }, [success, error]);
 
-  // Use blockId field if available, otherwise fall back to MongoDB _id
-  const lookupKey = block?.blockId || block?.id || block?._id || '';
-
   // ── Load rooms ────────────────────────────────────────────────────────
   const loadAll = useCallback(async (silent = false) => {
-    if (!silent) setLoading(true);
+    if (!blockId) {
+      setLoadError('Invalid hostel block ID. Please go back and select a hostel.');
+      setLoading(false);
+      return;
+    }
+    if (!silent) { setLoading(true); setLoadError(''); }
     try {
       const [blkRes, roomRes] = await Promise.all([
-        springApi.get(`/hostel-blocks/${lookupKey}`),
-        springApi.get('/hostel-rooms', { params: { blockId: lookupKey } }),
+        springApi.get(`/hostel-blocks/${blockId}`),
+        springApi.get('/hostel-rooms', { params: { blockId } }),
       ]);
       setBlock(blkRes);
       const fetchedRooms = Array.isArray(roomRes) ? roomRes : [];
       setRooms(fetchedRooms);
-      // keep selRoom in sync
       if (selRoom) {
         const updated = fetchedRooms.find(r => r.roomId === selRoom.roomId);
         setSelRoom(updated || null);
       }
-    } catch {
-      setError('Failed to load block details.');
+    } catch (err) {
+      if (!silent) setLoadError(err.message || 'Failed to load hostel details. Please try again.');
+      else setError('Failed to refresh. Please try again.');
     } finally {
       if (!silent) setLoading(false);
     }
-  }, [lookupKey]); // eslint-disable-line
+  }, [blockId]); // eslint-disable-line
 
   useEffect(() => { loadAll(); }, [loadAll]);
 
@@ -146,6 +150,19 @@ export default function HostelBlockDetails({ block: blockProp, onBack }) {
     }
   };
 
+  // ── Add button handler ───────────────────────────────────────────────
+  const addCurrentPrn = () => {
+    const typed = prnInput.trim();
+    if (typed && namePreview && namePreview !== '...' && namePreview !== 'Not found'
+        && !prnList.some(p => p.prn === typed)) {
+      setPrnList(prev => [...prev, { prn: typed, name: namePreview }]);
+      setPrnInput(''); setNamePreview('');
+    }
+  };
+
+  const removePrnFromList = (prn) =>
+    setPrnList(prev => prev.filter(p => p.prn !== prn));
+
   // ── Add students to selected room ─────────────────────────────────────
   const handleAddStudents = async () => {
     if (!selRoomId) { setError('Please select a room first.'); return; }
@@ -176,9 +193,8 @@ export default function HostelBlockDetails({ block: blockProp, onBack }) {
   };
 
   // ── Render ────────────────────────────────────────────────────────────
-  // Guard: show loading if still fetching OR block has no hostelName yet
-  // (block may be a skeleton { blockId } passed from HostelPage before API call completes)
-  if (loading || !block?.hostelName) {
+  // State 1: loading
+  if (loading) {
     return (
       <div className="page-container">
         <button className="hst-back-link" onClick={onBack}>
@@ -190,7 +206,41 @@ export default function HostelBlockDetails({ block: blockProp, onBack }) {
       </div>
     );
   }
-  if (!block) return <p className="hst-empty">Block not found.</p>;
+
+  // State 2: API failed (load error)
+  if (loadError) {
+    return (
+      <div className="page-container">
+        <button className="hst-back-link" onClick={onBack}>
+          ← Back to Hostel Management
+        </button>
+        <div className="books-alert books-alert-error" style={{ marginTop: 20 }}>
+          <span>{loadError}</span>
+        </div>
+        <button
+          className="books-btn books-btn-primary"
+          style={{ marginTop: 12 }}
+          onClick={() => loadAll()}
+        >
+          ↺ Retry
+        </button>
+      </div>
+    );
+  }
+
+  // State 3: loaded but block has no data (should not happen but guard anyway)
+  if (!block?.hostelName) {
+    return (
+      <div className="page-container">
+        <button className="hst-back-link" onClick={onBack}>
+          ← Back to Hostel Management
+        </button>
+        <p className="hst-empty" style={{ marginTop: 24 }}>
+          Hostel block not found. Please go back and try again.
+        </p>
+      </div>
+    );
+  }
 
   return (
     <div className="page-container">
@@ -539,7 +589,7 @@ export default function HostelBlockDetails({ block: blockProp, onBack }) {
       {/* Add Room modal */}
       <HostelRoomModal
         isOpen={roomModalOpen}
-        blockId={lookupKey}
+        blockId={blockId}
         onClose={() => setRoomModalOpen(false)}
         onSaved={handleRoomSaved}
       />
