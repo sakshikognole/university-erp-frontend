@@ -794,9 +794,6 @@ export default function SchedulePage() {
   const [success, setSuccess] = useState('');
   const [error,   setError]   = useState('');
 
-  // Filter: 'all' | 'exam' | 'schedule'
-  const [filter, setFilter] = useState('all');
-
   useEffect(() => {
     if (!success && !error) return;
     const t = setTimeout(() => { setSuccess(''); setError(''); }, 4000);
@@ -913,13 +910,6 @@ export default function SchedulePage() {
     return daySlots.map(s => s.day).join(', ');
   };
 
-  // ── Filter schedules based on selected tab ────────────────────────────
-  const filteredSchedules = schedules.filter(s => {
-    if (filter === 'exam')     return s.examId;
-    if (filter === 'schedule') return !s.examId;
-    return true; // 'all'
-  });
-
   // ── Render ────────────────────────────────────────────────────────────
   return (
     <div className="page-container">
@@ -931,7 +921,7 @@ export default function SchedulePage() {
       }}>
         <div style={{ minWidth: 0 }}>
           <h1 className="page-title">Schedule</h1>
-          <p className="books-page-sub">Manage class schedules by department and semester</p>
+          <p className="books-page-sub">Manage class schedules and exam schedules</p>
         </div>
         <div style={{ display: 'flex', gap: 8, flexShrink: 0 }}>
           <button
@@ -947,34 +937,6 @@ export default function SchedulePage() {
             + Add Exam Schedule
           </button>
         </div>
-      </div>
-
-      {/* Filter Tabs: All / Exam / Schedule */}
-      <div style={{ display: 'flex', gap: 8, marginBottom: 16, flexWrap: 'wrap' }}>
-        {[
-          { key: 'all',      label: 'All' },
-          { key: 'exam',     label: 'Exam Schedules' },
-          { key: 'schedule', label: 'Class Schedules' },
-        ].map(({ key, label }) => (
-          <button
-            key={key}
-            type="button"
-            onClick={() => setFilter(key)}
-            style={{
-              padding: '8px 20px',
-              border: `2px solid ${filter === key ? '#111827' : '#e5e7eb'}`,
-              borderRadius: 8,
-              background: filter === key ? '#111827' : '#fff',
-              color: filter === key ? '#fff' : '#374151',
-              fontWeight: filter === key ? 700 : 500,
-              fontSize: '0.9rem',
-              cursor: 'pointer',
-              transition: 'all 0.15s',
-            }}
-          >
-            {label}
-          </button>
-        ))}
       </div>
 
       {/* Alerts */}
@@ -1026,22 +988,13 @@ export default function SchedulePage() {
         <PageError message={pageError} onRetry={load} />
       ) : (
         <div className="card">
-          {filteredSchedules.length === 0 ? (
+          {schedules.length === 0 ? (
             <div style={{ textAlign: 'center', padding: '48px 24px',
                           color: 'var(--text-secondary)' }}>
               <div style={{ fontSize: 48, marginBottom: 12 }}>🗓️</div>
-              <p style={{ fontSize: 15, marginBottom: 16 }}>
-                {filter === 'exam'
-                  ? 'No exam schedules found.'
-                  : filter === 'schedule'
-                  ? 'No class schedules found.'
-                  : 'No schedules added yet.'}
-              </p>
-              <button
-                className="books-btn books-btn-primary"
-                onClick={filter === 'exam' ? openExamSch : openAdd}
-              >
-                {filter === 'exam' ? '+ Add Exam Schedule' : '+ Add First Schedule'}
+              <p style={{ fontSize: 15, marginBottom: 16 }}>No schedules added yet.</p>
+              <button className="books-btn books-btn-primary" onClick={openAdd}>
+                + Add First Schedule
               </button>
             </div>
           ) : (
@@ -1065,26 +1018,47 @@ export default function SchedulePage() {
                       </tr>
                     </thead>
                     <tbody>
-                      {filteredSchedules.map((sch, i) => (
+                      {schedules.map((sch, i) => {
+                        const isExam = sch.examId;  // Check if it's an exam schedule
+                        return (
                         <tr key={sch.scheduleId} style={{ cursor: 'pointer' }}
                             onClick={() => openView(sch)}>
                           <td style={{ color: 'var(--text-secondary)', fontSize: 13 }}>
                             {page * size + i + 1}
                           </td>
                           <td>
-                            <span style={{
-                              fontFamily: 'monospace', fontSize: '0.78rem',
-                              background: 'var(--bg-secondary,#f9fafb)',
-                              padding: '2px 8px', borderRadius: 6,
-                              color: 'var(--text-secondary)',
-                            }}>
-                              {sch.scheduleId}
-                            </span>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                              <span style={{
+                                fontFamily: 'monospace', fontSize: '0.78rem',
+                                background: 'var(--bg-secondary,#f9fafb)',
+                                padding: '2px 8px', borderRadius: 6,
+                                color: 'var(--text-secondary)',
+                              }}>
+                                {sch.scheduleId}
+                              </span>
+                              {isExam && (
+                                <span style={{
+                                  background: '#fef3c7', color: '#92400e',
+                                  padding: '2px 8px', borderRadius: 6,
+                                  fontSize: '0.7rem', fontWeight: 700,
+                                }}>
+                                  EXAM
+                                </span>
+                              )}
+                            </div>
                           </td>
-                          <td style={{ fontWeight: 500 }}>{sch.department}</td>
-                          <td style={{ fontSize: 13 }}>{sch.semester}</td>
-                          <td style={{ fontSize: 13 }}>{sch.subjectName}</td>
-                          <td style={{ fontSize: 13 }}>{sch.facultyName}</td>
+                          <td style={{ fontWeight: 500 }}>
+                            {isExam ? (sch.examName || sch.subjectName) : sch.department}
+                          </td>
+                          <td style={{ fontSize: 13 }}>
+                            {isExam ? '—' : sch.semester}
+                          </td>
+                          <td style={{ fontSize: 13 }}>
+                            {isExam ? (sch.examId || '—') : sch.subjectName}
+                          </td>
+                          <td style={{ fontSize: 13 }}>
+                            {isExam ? 'Exam' : sch.facultyName}
+                          </td>
                           <td style={{ fontSize: 13, whiteSpace: 'nowrap',
                                        color: 'var(--text-secondary)' }}>
                             {sch.scheduleDate
@@ -1110,7 +1084,7 @@ export default function SchedulePage() {
                             </div>
                           </td>
                           <td style={{ fontSize: 13, color: 'var(--text-secondary)' }}>
-                            {sch.venueName || sch.venueId || '—'}
+                            {isExam ? (sch.classroom || sch.venueName || 'TBA') : (sch.venueName || sch.venueId || '—')}
                           </td>
                           <td onClick={e => e.stopPropagation()}>
                             <div className="books-actions">
@@ -1132,7 +1106,8 @@ export default function SchedulePage() {
                             </div>
                           </td>
                         </tr>
-                      ))}
+                        );
+                      })}
                     </tbody>
                   </table>
                 </div>
@@ -1140,14 +1115,29 @@ export default function SchedulePage() {
 
               {/* Mobile cards */}
               <div className="book-mob-list">
-                {filteredSchedules.map((sch, i) => (
+                {schedules.map((sch, i) => {
+                  const isExam = sch.examId;
+                  return (
                   <div key={sch.scheduleId} className="book-mob-card">
                     <button type="button" className="book-mob-header"
                             onClick={() => openView(sch)}>
                       <div className="book-mob-summary">
                         <span className="book-mob-num">{page * size + i + 1}</span>
                         <div className="book-mob-title-wrap">
-                          <span className="book-mob-title">{sch.subjectName}</span>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                            <span className="book-mob-title">
+                              {isExam ? (sch.examName || sch.subjectName) : sch.subjectName}
+                            </span>
+                            {isExam && (
+                              <span style={{
+                                background: '#fef3c7', color: '#92400e',
+                                padding: '2px 6px', borderRadius: 4,
+                                fontSize: '0.65rem', fontWeight: 700,
+                              }}>
+                                EXAM
+                              </span>
+                            )}
+                          </div>
                           <span className="book-mob-author"
                                 style={{ fontFamily: 'monospace', fontSize: '0.75rem' }}>
                             {sch.scheduleId}
@@ -1158,15 +1148,17 @@ export default function SchedulePage() {
                     </button>
                     <div className="book-mob-details">
                       {[
-                        ['Department', sch.department],
-                        ['Semester',   sch.semester],
-                        ['Faculty',    sch.facultyName],
+                        ['Type',       isExam ? 'Exam Schedule' : 'Class Schedule'],
+                        ['Department', isExam ? (sch.examName || '—') : sch.department],
+                        ['Semester',   isExam ? '—' : sch.semester],
+                        ['Subject/Exam', isExam ? (sch.examId || '—') : sch.subjectName],
+                        ['Faculty',    isExam ? 'Exam' : sch.facultyName],
                         ['Date',       sch.scheduleDate
                           ? new Date(sch.scheduleDate).toLocaleDateString('en-IN', {
                               day: '2-digit', month: 'short', year: 'numeric'
                             })
                           : '—'],
-                        ['Venue',      sch.venueName || sch.venueId],
+                        ['Venue',      isExam ? (sch.classroom || sch.venueName || 'TBA') : (sch.venueName || sch.venueId)],
                         ['Days',       slotSummary(sch.daySlots)],
                       ].map(([label, val]) => (
                         <div key={label} className="book-mob-row">
@@ -1189,7 +1181,8 @@ export default function SchedulePage() {
                       </div>
                     </div>
                   </div>
-                ))}
+                  );
+                })}
               </div>
 
               {/* Pagination */}
