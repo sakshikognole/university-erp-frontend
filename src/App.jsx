@@ -72,6 +72,8 @@ import SubjectsPage from './pages/SubjectsPage';
 
 // --- Schedule Management ---
 import SchedulePage from './pages/SchedulePage';
+import ExamSchedulePage from './pages/ExamSchedulePage';
+import ClassSchedulePage from './pages/ClassSchedulePage';
 
 // --- Study Materials ---
 import UploadMaterialsPage from './pages/UploadMaterialsPage';
@@ -325,7 +327,9 @@ function AppRoutes() {
         <Route path="subjects" element={<SubjectsPage />} />
 
         {/* ==================== SCHEDULE ==================== */}
-        <Route path="schedule" element={<SchedulePage />} />
+        <Route path="schedules" element={<SchedulePage />} />
+        <Route path="exam-schedules" element={<ExamSchedulePage />} />
+        <Route path="class-schedules" element={<ClassSchedulePage />} />
 
         {/* ==================== STUDY MATERIALS ==================== */}
         <Route path="upload-materials" element={<UploadMaterialsPage />} />
