@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { springGet } from '../services/api';
 
 const EMPTY = {
   examId:          '',
@@ -13,8 +14,17 @@ const EMPTY = {
 export default function ExamModal({
   isOpen, mode, exam, onSave, onClose, loading, dupError, onDupOk,
 }) {
-  const [form,   setForm]   = useState(EMPTY);
-  const [errors, setErrors] = useState({});
+  const [form,     setForm]     = useState(EMPTY);
+  const [errors,   setErrors]   = useState({});
+  const [subjects, setSubjects] = useState([]);
+
+  // Load subjects from Subject feature for dropdown
+  useEffect(() => {
+    if (!isOpen) return;
+    springGet('/subjects')
+      .then(res => setSubjects(Array.isArray(res) ? res : []))
+      .catch(() => setSubjects([]));
+  }, [isOpen]);
 
   useEffect(() => {
     if (!isOpen) return;
@@ -62,18 +72,10 @@ export default function ExamModal({
       e.examId = 'Exam ID must contain at least one number (e.g. EX001).';
     }
 
-    // D8: Subject — letters and spaces only
+    // Subject — required (selected from dropdown)
     const subj = form.subject.trim();
     if (!subj) {
       e.subject = 'Subject is required.';
-    } else if (/^\d+$/.test(subj)) {
-      e.subject = 'Subject cannot be numbers only.';
-    } else if (/^[-]/.test(subj)) {
-      e.subject = 'Subject must not start with a negative sign.';
-    } else if (!/[A-Za-z]/.test(subj)) {
-      e.subject = 'Subject must contain at least one letter.';
-    } else if (/^[^A-Za-z0-9\s]+$/.test(subj)) {
-      e.subject = 'Subject must contain letters.';
     }
 
     // D9: Academic Year — format YYYY-YY only (Obs1: mandatory)
@@ -152,19 +154,24 @@ export default function ExamModal({
               {errors.examId && <p className="books-form-err">{errors.examId}</p>}
             </div>
 
-            {/* Subject — D8: letters only */}
+            {/* Subject — dropdown from Subject feature */}
             <div className="books-form-group">
               <label className="books-form-label">
                 Subject <span style={{ color: '#dc2626' }}>*</span>
               </label>
-              <input
+              <select
                 className={`books-form-control ${errors.subject ? 'err' : ''}`}
-                name="subject" value={form.subject} onChange={change}
-                placeholder="e.g. Data Structures and Algorithms"
-              />
-              <span style={{ fontSize: 11, color: '#9ca3af' }}>
-                Subject name must contain letters
-              </span>
+                name="subject"
+                value={form.subject}
+                onChange={change}
+              >
+                <option value="">— Select Subject —</option>
+                {subjects.map(s => (
+                  <option key={s.subjectId} value={s.subjectName}>
+                    {s.subjectName}
+                  </option>
+                ))}
+              </select>
               {errors.subject && <p className="books-form-err">{errors.subject}</p>}
             </div>
 
