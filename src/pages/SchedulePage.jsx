@@ -867,7 +867,19 @@ export default function SchedulePage() {
     const slowTimer = setTimeout(() =>
       setError('Server is waking up (free tier). Please wait...'), 4000);
     try {
-      await springApi.post('/schedules', form);
+      // Backend requires these fields — send placeholders for exam schedule
+      const payload = {
+        ...form,
+        department:  form.department  || 'Exam',      // placeholder
+        semester:    form.semester    || 'All',       // placeholder
+        subjectId:   form.examId,                     // use examId as subjectId
+        subjectName: form.examName,
+        facultyId:   'EXAM',                          // placeholder
+        facultyName: 'Exam Schedule',
+        venueId:     form.classroom || 'TBA',         // use classroom or TBA
+        venueName:   form.classroom || 'To Be Announced',
+      };
+      await springApi.post('/schedules', payload);
       clearTimeout(slowTimer); setError('');
       setSuccess('Exam schedule added successfully.');
       setExamSchOpen(false);
@@ -1025,8 +1037,11 @@ export default function SchedulePage() {
                   ? 'No class schedules found.'
                   : 'No schedules added yet.'}
               </p>
-              <button className="books-btn books-btn-primary" onClick={openAdd}>
-                + Add First Schedule
+              <button
+                className="books-btn books-btn-primary"
+                onClick={filter === 'exam' ? openExamSch : openAdd}
+              >
+                {filter === 'exam' ? '+ Add Exam Schedule' : '+ Add First Schedule'}
               </button>
             </div>
           ) : (
