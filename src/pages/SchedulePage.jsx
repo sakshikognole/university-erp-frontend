@@ -478,6 +478,297 @@ function ViewScheduleModal({ isOpen, schedule, onClose }) {
 }
 
 // ══════════════════════════════════════════════════════════════════════════
+// ExamScheduleModal — Add Exam Schedule
+// ══════════════════════════════════════════════════════════════════════════
+const EMPTY_EXAM_SCH = {
+  examId:       '',
+  examName:     '',
+  scheduleDate: '',
+  classroom:    '',
+  multiDay:     false,   // checkbox: allow multiple days
+  daySlots:     [],      // [{ day, startTime, endTime }]
+};
+
+function ExamScheduleModal({ isOpen, onSave, onClose, saving }) {
+  const [form,    setForm]    = useState(EMPTY_EXAM_SCH);
+  const [errors,  setErrors]  = useState({});
+  const [exams,   setExams]   = useState([]);
+  const [loading, setLoading] = useState(false);
+
+  // Load exams from Exam feature
+  useEffect(() => {
+    if (!isOpen) return;
+    setForm(EMPTY_EXAM_SCH);
+    setErrors({});
+    setLoading(true);
+    springGet('/exams')
+      .then(res => {
+        const list = Array.isArray(res) ? res : (res.data ?? []);
+        list.sort((a, b) => a.examId.localeCompare(b.examId));
+        setExams(list);
+      })
+      .catch(() => setExams([]))
+      .finally(() => setLoading(false));
+  }, [isOpen]);
+
+  if (!isOpen) return null;
+
+  const handleExamChange = (e) => {
+    const eid = e.target.value;
+    const ex  = exams.find(x => x.examId === eid);
+    setForm(f => ({ ...f, examId: eid, examName: ex?.subject ?? '' }));
+    setErrors(er => ({ ...er, examId: '' }));
+  };
+
+  // Day toggle — respects multiDay checkbox
+  const toggleDay = (dayKey) => {
+    const exists = form.daySlots.find(s => s.day === dayKey);
+    if (exists) {
+      setForm(f => ({ ...f, daySlots: f.daySlots.filter(s => s.day !== dayKey) }));
+    } else {
+      if (!form.multiDay) {
+        // Single day mode — replace existing selection
+        setForm(f => ({ ...f, daySlots: [{ day: dayKey, startTime: '', endTime: '' }] }));
+      } else {
+        // Multiple day mode — append
+        setForm(f => ({
+          ...f,
+          daySlots: [...f.daySlots, { day: dayKey, startTime: '', endTime: '' }],
+        }));
+      }
+    }
+    setErrors(er => ({ ...er, daySlots: '' }));
+  };
+
+  const updateSlotTime = (dayKey, field, value) => {
+    setForm(f => ({
+      ...f,
+      daySlots: f.daySlots.map(s => s.day === dayKey ? { ...s, [field]: value } : s),
+    }));
+  };
+
+  const validate = () => {
+    const e = {};
+    if (!form.examId)         e.examId       = 'Please select an exam.';
+    if (!form.scheduleDate)   e.scheduleDate = 'Date is required.';
+    if (!form.daySlots.length) e.daySlots    = 'Select at least one day.';
+    else {
+      for (const slot of form.daySlots) {
+        if (!slot.startTime || !slot.endTime) {
+          e.daySlots = 'Enter start and end time for all selected days.'; break;
+        }
+        if (slot.startTime >= slot.endTime) {
+          e.daySlots = 'End time must be after start time.'; break;
+        }
+      }
+    }
+    return e;
+  };
+
+  const submit = (ev) => {
+    ev.preventDefault();
+    const errs = validate();
+    if (Object.keys(errs).length) { setErrors(errs); return; }
+    onSave(form);
+  };
+
+  const selectedDayKeys = new Set(form.daySlots.map(s => s.day));
+
+  return (
+    <div className="books-overlay">
+      <div className="books-modal" style={{ maxWidth: 520, width: '100%' }}>
+        <div className="books-modal-head">
+          <h3>Add Exam Schedule</h3>
+          <button className="books-modal-close" onClick={onClose} disabled={saving}>x</button>
+        </div>
+
+        {loading ? (
+          <div className="books-modal-body" style={{ textAlign: 'center', padding: 32 }}>
+            <p className="books-loading">Loading exams...</p>
+          </div>
+        ) : (
+          <form onSubmit={submit}>
+            <div className="books-modal-body" style={{ maxHeight: '70vh', overflowY: 'auto' }}>
+
+              {/* Exam dropdown */}
+              <div className="books-form-group">
+                <label className="books-form-label">
+                  Exam <span style={{ color: '#dc2626' }}>*</span>
+                </label>
+                <select
+                  className={`books-form-control ${errors.examId ? 'err' : ''}`}
+                  value={form.examId}
+                  onChange={handleExamChange}
+                >
+                  <option value="">— Select Exam —</option>
+                  {exams.map(ex => (
+                    <option key={ex.examId} value={ex.examId}>
+                      {ex.examId} — {ex.subject}
+                      {ex.academicYear ? ` (${ex.academicYear})` : ''}
+                    </option>
+                  ))}
+                </select>
+                {errors.examId && <p className="books-form-err">{errors.examId}</p>}
+              </div>
+
+              {/* Date */}
+              <div className="books-form-group" style={{ maxWidth: 220 }}>
+                <label className="books-form-label">
+                  Date <span style={{ color: '#dc2626' }}>*</span>
+                </label>
+                <input
+                  type="date"
+                  className={`books-form-control ${errors.scheduleDate ? 'err' : ''}`}
+                  value={form.scheduleDate}
+                  onChange={e => {
+                    setForm(f => ({ ...f, scheduleDate: e.target.value }));
+                    setErrors(er => ({ ...er, scheduleDate: '' }));
+                  }}
+                />
+                {errors.scheduleDate && <p className="books-form-err">{errors.scheduleDate}</p>}
+              </div>
+
+              {/* Classroom (placeholder for future feature) */}
+              <div className="books-form-group" style={{ maxWidth: 280 }}>
+                <label className="books-form-label">Classroom</label>
+                <input
+                  className="books-form-control"
+                  value={form.classroom}
+                  onChange={e => setForm(f => ({ ...f, classroom: e.target.value }))}
+                  placeholder="e.g. Room 101 (coming soon)"
+                />
+              </div>
+
+              {/* Multiple days checkbox */}
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8,
+                            marginBottom: 10 }}>
+                <input
+                  type="checkbox"
+                  id="multiDay"
+                  checked={form.multiDay}
+                  onChange={e => {
+                    // When switching to single mode, keep only first selected day
+                    const isMulti = e.target.checked;
+                    setForm(f => ({
+                      ...f,
+                      multiDay: isMulti,
+                      daySlots: !isMulti && f.daySlots.length > 1
+                        ? [f.daySlots[0]]
+                        : f.daySlots,
+                    }));
+                  }}
+                  className="pay-checkbox"
+                />
+                <label htmlFor="multiDay" style={{
+                  fontSize: 14, cursor: 'pointer',
+                  color: 'var(--text-primary)', fontWeight: 500,
+                }}>
+                  Multiple Days
+                </label>
+                <span style={{ fontSize: 12, color: 'var(--text-secondary)' }}>
+                  {form.multiDay
+                    ? '(Select multiple days below)'
+                    : '(Only one day can be selected)'}
+                </span>
+              </div>
+
+              {/* Days + Time picker */}
+              <div className="books-form-group">
+                <label className="books-form-label">
+                  Day{form.multiDay ? 's' : ''} &amp; Time{form.multiDay ? 's' : ''}{' '}
+                  <span style={{ color: '#dc2626' }}>*</span>
+                </label>
+                {errors.daySlots && <p className="books-form-err">{errors.daySlots}</p>}
+
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 8, marginTop: 6 }}>
+                  {DAYS.map(({ key, label }) => {
+                    const isSelected = selectedDayKeys.has(key);
+                    const slot = form.daySlots.find(s => s.day === key);
+                    return (
+                      <div key={key} style={{
+                        display: 'flex', alignItems: 'center',
+                        gap: 10, flexWrap: 'wrap',
+                      }}>
+                        {/* Day circle */}
+                        <button
+                          type="button"
+                          title={label}
+                          onClick={() => toggleDay(key)}
+                          style={{
+                            width: 38, height: 38, borderRadius: '50%',
+                            border: isSelected ? '2px solid #2563eb' : '2px solid #d1d5db',
+                            background: isSelected ? '#2563eb' : '#f9fafb',
+                            color:      isSelected ? '#fff'    : '#374151',
+                            fontWeight: 700, fontSize: 13, cursor: 'pointer',
+                            flexShrink: 0, display: 'flex',
+                            alignItems: 'center', justifyContent: 'center',
+                          }}
+                        >
+                          {key}
+                        </button>
+
+                        {/* Time inputs — only when day selected */}
+                        {isSelected && slot && (
+                          <>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                              <label style={{ fontSize: 12,
+                                             color: 'var(--text-secondary)',
+                                             whiteSpace: 'nowrap' }}>
+                                Start
+                              </label>
+                              <input
+                                type="time"
+                                className="books-form-control"
+                                style={{ width: 120, padding: '4px 8px' }}
+                                value={slot.startTime}
+                                onChange={e => updateSlotTime(key, 'startTime', e.target.value)}
+                              />
+                            </div>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                              <label style={{ fontSize: 12,
+                                             color: 'var(--text-secondary)',
+                                             whiteSpace: 'nowrap' }}>
+                                End
+                              </label>
+                              <input
+                                type="time"
+                                className="books-form-control"
+                                style={{ width: 120, padding: '4px 8px' }}
+                                value={slot.endTime}
+                                onChange={e => updateSlotTime(key, 'endTime', e.target.value)}
+                              />
+                            </div>
+                            <span style={{ fontSize: 12, color: '#6b7280' }}>{label}</span>
+                          </>
+                        )}
+                        {!isSelected && (
+                          <span style={{ fontSize: 12, color: '#9ca3af' }}>{label}</span>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+
+            </div>
+            <div className="books-modal-foot">
+              <button type="button" className="books-btn books-btn-ghost"
+                      onClick={onClose} disabled={saving}>
+                Cancel
+              </button>
+              <button type="submit" className="books-btn books-btn-primary"
+                      disabled={saving}>
+                {saving ? 'Saving...' : 'Add Exam Schedule'}
+              </button>
+            </div>
+          </form>
+        )}
+      </div>
+    </div>
+  );
+}
+
+// ══════════════════════════════════════════════════════════════════════════
 // SchedulePage
 // ══════════════════════════════════════════════════════════════════════════
 export default function SchedulePage() {
@@ -497,8 +788,14 @@ export default function SchedulePage() {
   const [viewOpen,   setViewOpen]   = useState(false);
   const [viewSch,    setViewSch]    = useState(null);
 
+  // Exam Schedule modal state
+  const [examSchOpen, setExamSchOpen] = useState(false);
+
   const [success, setSuccess] = useState('');
   const [error,   setError]   = useState('');
+
+  // Filter: 'all' | 'exam' | 'schedule'
+  const [filter, setFilter] = useState('all');
 
   useEffect(() => {
     if (!success && !error) return;
@@ -537,6 +834,7 @@ export default function SchedulePage() {
   const openAdd  = ()  => { setSelSch(null); setModalMode('add');  setModalOpen(true); };
   const openEdit = (s) => { setSelSch(s);    setModalMode('edit'); setModalOpen(true); };
   const openView = (s) => { setViewSch(s);   setViewOpen(true); };
+  const openExamSch = () => { setExamSchOpen(true); };
 
   // ── Save ──────────────────────────────────────────────────────────────
   const handleSave = async (form) => {
@@ -563,6 +861,25 @@ export default function SchedulePage() {
     }
   };
 
+  // ── Save Exam Schedule ────────────────────────────────────────────────
+  const handleExamSchSave = async (form) => {
+    setSaving(true);
+    const slowTimer = setTimeout(() =>
+      setError('Server is waking up (free tier). Please wait...'), 4000);
+    try {
+      await springApi.post('/schedules', form);
+      clearTimeout(slowTimer); setError('');
+      setSuccess('Exam schedule added successfully.');
+      setExamSchOpen(false);
+      load(true);
+    } catch (err) {
+      clearTimeout(slowTimer);
+      setError(err.message || 'Failed to save exam schedule.');
+    } finally {
+      setSaving(false);
+    }
+  };
+
   // ── Delete ────────────────────────────────────────────────────────────
   const handleDelete = async (sch) => {
     if (!window.confirm(`Delete schedule "${sch.scheduleId}"?`)) return;
@@ -584,6 +901,13 @@ export default function SchedulePage() {
     return daySlots.map(s => s.day).join(', ');
   };
 
+  // ── Filter schedules based on selected tab ────────────────────────────
+  const filteredSchedules = schedules.filter(s => {
+    if (filter === 'exam')     return s.examId;
+    if (filter === 'schedule') return !s.examId;
+    return true; // 'all'
+  });
+
   // ── Render ────────────────────────────────────────────────────────────
   return (
     <div className="page-container">
@@ -591,19 +915,54 @@ export default function SchedulePage() {
       {/* Header */}
       <div className="books-page-header" style={{
         display: 'flex', alignItems: 'center',
-        justifyContent: 'space-between', flexWrap: 'nowrap', gap: 12,
+        justifyContent: 'space-between', flexWrap: 'wrap', gap: 12,
       }}>
         <div style={{ minWidth: 0 }}>
           <h1 className="page-title">Schedule</h1>
           <p className="books-page-sub">Manage class schedules by department and semester</p>
         </div>
-        <button
-          className="books-btn books-btn-primary"
-          style={{ flexShrink: 0 }}
-          onClick={openAdd}
-        >
-          + Add Schedule
-        </button>
+        <div style={{ display: 'flex', gap: 8, flexShrink: 0 }}>
+          <button
+            className="books-btn books-btn-primary"
+            onClick={openAdd}
+          >
+            + Add Schedule
+          </button>
+          <button
+            className="books-btn books-btn-primary"
+            onClick={openExamSch}
+          >
+            + Add Exam Schedule
+          </button>
+        </div>
+      </div>
+
+      {/* Filter Tabs: All / Exam / Schedule */}
+      <div style={{ display: 'flex', gap: 8, marginBottom: 16, flexWrap: 'wrap' }}>
+        {[
+          { key: 'all',      label: 'All' },
+          { key: 'exam',     label: 'Exam Schedules' },
+          { key: 'schedule', label: 'Class Schedules' },
+        ].map(({ key, label }) => (
+          <button
+            key={key}
+            type="button"
+            onClick={() => setFilter(key)}
+            style={{
+              padding: '8px 20px',
+              border: `2px solid ${filter === key ? '#111827' : '#e5e7eb'}`,
+              borderRadius: 8,
+              background: filter === key ? '#111827' : '#fff',
+              color: filter === key ? '#fff' : '#374151',
+              fontWeight: filter === key ? 700 : 500,
+              fontSize: '0.9rem',
+              cursor: 'pointer',
+              transition: 'all 0.15s',
+            }}
+          >
+            {label}
+          </button>
+        ))}
       </div>
 
       {/* Alerts */}
@@ -655,11 +1014,17 @@ export default function SchedulePage() {
         <PageError message={pageError} onRetry={load} />
       ) : (
         <div className="card">
-          {schedules.length === 0 ? (
+          {filteredSchedules.length === 0 ? (
             <div style={{ textAlign: 'center', padding: '48px 24px',
                           color: 'var(--text-secondary)' }}>
               <div style={{ fontSize: 48, marginBottom: 12 }}>🗓️</div>
-              <p style={{ fontSize: 15, marginBottom: 16 }}>No schedules added yet.</p>
+              <p style={{ fontSize: 15, marginBottom: 16 }}>
+                {filter === 'exam'
+                  ? 'No exam schedules found.'
+                  : filter === 'schedule'
+                  ? 'No class schedules found.'
+                  : 'No schedules added yet.'}
+              </p>
               <button className="books-btn books-btn-primary" onClick={openAdd}>
                 + Add First Schedule
               </button>
@@ -685,7 +1050,7 @@ export default function SchedulePage() {
                       </tr>
                     </thead>
                     <tbody>
-                      {schedules.map((sch, i) => (
+                      {filteredSchedules.map((sch, i) => (
                         <tr key={sch.scheduleId} style={{ cursor: 'pointer' }}
                             onClick={() => openView(sch)}>
                           <td style={{ color: 'var(--text-secondary)', fontSize: 13 }}>
@@ -760,7 +1125,7 @@ export default function SchedulePage() {
 
               {/* Mobile cards */}
               <div className="book-mob-list">
-                {schedules.map((sch, i) => (
+                {filteredSchedules.map((sch, i) => (
                   <div key={sch.scheduleId} className="book-mob-card">
                     <button type="button" className="book-mob-header"
                             onClick={() => openView(sch)}>
@@ -836,6 +1201,12 @@ export default function SchedulePage() {
         isOpen={viewOpen}
         schedule={viewSch}
         onClose={() => setViewOpen(false)}
+      />
+      <ExamScheduleModal
+        isOpen={examSchOpen}
+        onSave={handleExamSchSave}
+        onClose={() => setExamSchOpen(false)}
+        saving={saving}
       />
     </div>
   );
