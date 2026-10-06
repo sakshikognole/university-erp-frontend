@@ -484,6 +484,8 @@ export default function SchedulePage() {
     try {
       const payload = {
         ...form,
+        examId: form.examId,          // ✅ Keep examId to identify as exam schedule
+        examName: form.examName,      // ✅ Keep examName for display
         department: 'Exam',
         semester: 'All',
         subjectId: form.examId,
