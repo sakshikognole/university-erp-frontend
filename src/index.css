@@ -10370,12 +10370,13 @@ input[type='password']::-webkit-inner-spin-button {
    ========================================== */
 
 .page-subtitle {
-  font-size: 0.875rem;  /* 14px - optimal readability */
+  font-size: 0.9375rem;  /* 15px - improved readability */
   font-weight: 400;
-  color: var(--text-secondary, #6b7280);
-  margin: 0 0 1rem 0;
-  line-height: 1.5;
+  color: #4b5563;  /* Slightly darker gray for better contrast */
+  margin: 0 0 1.25rem 0;
+  line-height: 1.6;
   max-width: 600px;  /* Prevent overly long lines */
+  letter-spacing: 0.01em;  /* Slight letter spacing for clarity */
 }
 
 /* Mobile responsive adjustment */
