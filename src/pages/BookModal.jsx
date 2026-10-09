@@ -12,7 +12,7 @@ const EMPTY = {
   bookLocation: '', department: '',
 };
 
-export default function BookModal({ isOpen, mode, book, onSave, onClose, loading, dupError, onDupOk }) {
+export default function BookModal({ isOpen, mode, book, onSave, onClose, loading }) {
   const [form,   setForm]   = useState(EMPTY);
   const [errors, setErrors] = useState({});
 
@@ -37,16 +37,72 @@ export default function BookModal({ isOpen, mode, book, onSave, onClose, loading
 
   const validate = () => {
     const e = {};
-    if (mode === 'add' && !form.bookId.trim())
+    
+    // Book ID validation (Defect #2)
+    if (mode === 'add' && !form.bookId.trim()) {
       e.bookId = 'Book ID is required';
-    else if (mode === 'add' && !/^[A-Za-z0-9\-_]+$/.test(form.bookId.trim()))
-      e.bookId = 'Only letters, numbers, hyphens and underscores allowed';
-    if (!form.bookTitle.trim())   e.bookTitle    = 'Required';
-    if (!form.authorName.trim())  e.authorName   = 'Required';
+    } else if (mode === 'add') {
+      const bookIdTrimmed = form.bookId.trim();
+      
+      // Must contain both letters AND numbers (like BK-101, CS-001)
+      const hasLetters = /[A-Za-z]/.test(bookIdTrimmed);
+      const hasNumbers = /[0-9]/.test(bookIdTrimmed);
+      
+      if (!hasLetters || !hasNumbers) {
+        e.bookId = 'Invalid ID. Please enter valid ID e.g. BK-101, CS-001';
+      }
+      // No special characters except hyphen and underscore
+      else if (!/^[A-Za-z0-9\-_]+$/.test(bookIdTrimmed)) {
+        e.bookId = 'Invalid ID. Please enter valid ID e.g. BK-101, CS-001';
+      }
+    }
+    
+    // Book Title validation (Defect #4)
+    if (!form.bookTitle.trim()) {
+      e.bookTitle = 'Required';
+    } else {
+      const titleTrimmed = form.bookTitle.trim();
+      // Should not be only numbers or only special characters
+      const isOnlyNumbers = /^[0-9]+$/.test(titleTrimmed);
+      const isOnlySpecialChars = /^[^A-Za-z0-9]+$/.test(titleTrimmed);
+      
+      if (isOnlyNumbers || isOnlySpecialChars) {
+        e.bookTitle = 'Invalid Book Name. Please enter a valid book name';
+      }
+    }
+    
+    // Author Name validation (Defect #4)
+    if (!form.authorName.trim()) {
+      e.authorName = 'Required';
+    } else {
+      const authorTrimmed = form.authorName.trim();
+      // Should not be only numbers or only special characters
+      const isOnlyNumbers = /^[0-9]+$/.test(authorTrimmed);
+      const isOnlySpecialChars = /^[^A-Za-z0-9]+$/.test(authorTrimmed);
+      
+      if (isOnlyNumbers || isOnlySpecialChars) {
+        e.authorName = 'Invalid Author Name. Please enter a valid author name';
+      }
+    }
+    
     if (form.totalCopies === '')  e.totalCopies  = 'Required';
     else if (Number(form.totalCopies) < 0) e.totalCopies = 'Cannot be negative';
-    if (!form.bookLocation.trim()) e.bookLocation = 'Required';
-    if (!form.department)          e.department   = 'Select a department';
+    
+    // Location validation (Defect #4)
+    if (!form.bookLocation.trim()) {
+      e.bookLocation = 'Required';
+    } else {
+      const locationTrimmed = form.bookLocation.trim();
+      // Should not be only numbers or only special characters
+      const isOnlyNumbers = /^[0-9]+$/.test(locationTrimmed);
+      const isOnlySpecialChars = /^[^A-Za-z0-9]+$/.test(locationTrimmed);
+      
+      if (isOnlyNumbers || isOnlySpecialChars) {
+        e.bookLocation = 'Invalid Location. Please enter a valid location';
+      }
+    }
+    
+    if (!form.department) e.department = 'Select a department';
     return e;
   };
 
@@ -80,29 +136,6 @@ export default function BookModal({ isOpen, mode, book, onSave, onClose, loading
 
         <form onSubmit={submit} onKeyDown={handleKeyDown}>
           <div className="books-modal-body">
-
-            {/* Duplicate warning */}
-            {dupError && (
-              <div style={{
-                background: '#fef2f2', border: '1px solid #fca5a5',
-                borderRadius: 8, padding: '12px 16px', marginBottom: 16,
-                display: 'flex', flexDirection: 'column', gap: 10,
-              }}>
-                <div style={{ display: 'flex', gap: 10, alignItems: 'flex-start' }}>
-                  <span style={{ fontSize: '1.2rem' }}>⚠️</span>
-                  <p style={{ color: '#dc2626', fontWeight: 600, margin: 0, fontSize: '0.9rem' }}>
-                    {dupError}
-                  </p>
-                </div>
-                <button type="button" onClick={onDupOk} style={{
-                  alignSelf: 'flex-end', padding: '6px 20px',
-                  background: '#dc2626', color: '#fff', border: 'none',
-                  borderRadius: 6, fontWeight: 600, cursor: 'pointer', fontSize: '0.85rem',
-                }}>
-                  OK
-                </button>
-              </div>
-            )}
 
             {/* Book ID — user enters in add mode, read-only in edit */}
             <div className="books-form-group">

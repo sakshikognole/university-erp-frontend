@@ -75,7 +75,6 @@ export default function BooksPage() {
   const [loading,  setLoading]  = useState(true);
   const [pageError,setPageError]= useState('');
   const [saving,   setSaving]   = useState(false);
-  const [dupError, setDupError] = useState('');  // shown inside BookModal
   const [deleting, setDeleting] = useState(false);
 
   const [modalOpen, setModalOpen] = useState(false);
@@ -132,8 +131,8 @@ export default function BooksPage() {
 
   const onSizeChange = (s) => { setSize(s); setPage(0); };
 
-  const openAdd  = ()  => { setSelBook(null); setModalMode('add');  setDupError(''); setModalOpen(true); };
-  const openEdit = (b) => { setSelBook(b);    setModalMode('edit'); setDupError(''); setModalOpen(true); };
+  const openAdd  = ()  => { setSelBook(null); setModalMode('add'); setModalOpen(true); };
+  const openEdit = (b) => { setSelBook(b);    setModalMode('edit'); setModalOpen(true); };
   const openView = (b) => { setViewBook(b);   setViewOpen(true); };
   const openDel  = (b) => { setDelBook(b);    setDelOpen(true); };
 
@@ -153,16 +152,16 @@ export default function BooksPage() {
             b.authorName.trim().toLowerCase() === form.authorName.trim().toLowerCase()
         );
         if (isDuplicate) {
-          setDupError(`Book "${form.bookTitle}" by ${form.authorName} already exists.`);
+          notify('error', `Book "${form.bookTitle}" by ${form.authorName} already exists.`);
           setSaving(false);
           return;
         }
-        // Also check bookId uniqueness on frontend before hitting API
+        // Defect #3: Check bookId uniqueness and show alert popup
         const idTaken = books.some(
           (b) => b.bookId && b.bookId.trim().toLowerCase() === form.bookId.trim().toLowerCase()
         );
         if (idTaken) {
-          setDupError(`Book ID "${form.bookId}" is already in use. Please enter a different ID.`);
+          notify('error', `Book ID ${form.bookId} already exists`);
           setSaving(false);
           return;
         }
@@ -283,8 +282,8 @@ export default function BooksPage() {
                 <table className="books-table">
                   <thead>
                     <tr>
-                      <th>Book ID</th>
                       <th>#</th>
+                      <th>Book ID</th>
                       <th>Book Title</th>
                       <th>Author</th>
                       <th>Copies</th>
@@ -302,8 +301,8 @@ export default function BooksPage() {
                       </tr>
                     ) : books.map((b, i) => (
                       <tr key={b.id}>
-                        <td><span style={{fontFamily:'monospace',fontSize:'0.78rem',color:'#6b7280'}}>{b.bookId || '—'}</span></td>
                         <td>{page * size + i + 1}</td>
+                        <td><span style={{fontFamily:'monospace',fontSize:'0.78rem',color:'#6b7280'}}>{b.bookId || '—'}</span></td>
                         <td>{b.bookTitle}</td>
                         <td>{b.authorName}</td>
                         <td>{b.totalCopies}</td>
@@ -339,10 +338,8 @@ export default function BooksPage() {
         mode={modalMode}
         book={selBook}
         onSave={handleSave}
-        onClose={() => { setModalOpen(false); setDupError(''); }}
+        onClose={() => setModalOpen(false)}
         loading={saving}
-        dupError={dupError}
-        onDupOk={() => setDupError('')}
       />
       <ViewBookModal
         isOpen={viewOpen}
