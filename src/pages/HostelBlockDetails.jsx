@@ -254,7 +254,7 @@ export default function HostelBlockDetails({ block: blockProp, onBack }) {
       <div className="books-page-header">
         <div>
           <h1 className="page-title">{block.hostelName}</h1>
-          <p className="hst-page-sub">
+          <p className="page-subtitle">
             {block.blockId} &nbsp;·&nbsp;
             <span className={`hst-badge hst-badge-${block.type?.toLowerCase()}`}
                   style={{ fontSize: 11 }}>

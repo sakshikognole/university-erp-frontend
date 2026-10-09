@@ -114,7 +114,7 @@ export default function ExamsPage() {
       }}>
         <div style={{ minWidth: 0 }}>
           <h1 className="page-title" style={{ textAlign: 'left' }}>Exam Management</h1>
-          <p className="stu-page-sub" style={{ textAlign: 'left' }}>
+          <p className="page-subtitle" style={{ textAlign: 'left' }}>
             Manage exams and student marks
           </p>
         </div>

@@ -448,7 +448,7 @@ th{background:#1e3a5f;color:#fff;padding:7px 10px;text-align:left;border:1px sol
       }}>
         <div style={{ minWidth:0 }}>
           <h1 className="page-title" style={{ textAlign:'left' }}>{exam.subject}</h1>
-          <p className="stu-page-sub" style={{ textAlign:'left' }}>
+          <p className="page-subtitle" style={{ textAlign:'left' }}>
             <span style={{ fontFamily:'monospace', fontWeight:700 }}>{exam.examId}</span>
             {exam.academicYear && <>&nbsp;·&nbsp;{exam.academicYear}</>}
           </p>

@@ -41,7 +41,7 @@ export default function CertificatePreviewPage() {
   return (
     <div className="page-container">
       <h1 className="page-title">Certificate Preview</h1>
-      <p className="stu-page-sub">
+      <p className="page-subtitle">
         {student.studentName}{docType ? ` — ${docType}` : ''}
       </p>
 

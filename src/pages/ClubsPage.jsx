@@ -4,7 +4,7 @@ import ClubModal from './ClubModal';
 import ViewClubModal from './ViewClubModal';
 
 const _IS_PROD_SP = window.location.hostname !== 'localhost';
-const _SPRING_URL = _IS_PROD_SP ? 'https://university-erp-spring.onrender.com' : 'http://localhost:8080';
+const _SPRING_URL = _IS_PROD_SP ? 'https://university-erp-spring.onrender.com' : 'http://localhost:9090';
 const SPRING_API = `${_SPRING_URL}/api`;
 
 export default function ClubsPage() {
@@ -113,7 +113,7 @@ export default function ClubsPage() {
             <div className="books-page-header">
                 <div>
                     <h1 className="page-title">Clubs</h1>
-                    <p className="stu-page-sub">Manage clubs and sub-clubs</p>
+                    <p className="page-subtitle">Manage clubs and sub-clubs</p>
                 </div>
                 <button className="books-btn books-btn-primary" onClick={openAdd}>
                     + Add Club

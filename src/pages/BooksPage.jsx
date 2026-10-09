@@ -202,7 +202,7 @@ export default function BooksPage() {
       <div className="books-page-header">
         <div>
           <h1 className="page-title">Books</h1>
-          <p className="books-page-sub">Manage all library books</p>
+          <p className="page-subtitle">Manage all library books</p>
         </div>
         <button className="books-btn books-btn-primary" onClick={openAdd}>
           + Add Book

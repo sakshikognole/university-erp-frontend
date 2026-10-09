@@ -10467,3 +10467,31 @@ input[type='password']::-webkit-inner-spin-button {
 .dm-file-card:hover {
   background: var(--bg-secondary, #f9fafb);
 }
+
+
+/* ==========================================
+   UI CONSISTENCY FIX - STANDARDIZED PAGE SUBTITLE
+   Added: January 2025
+   Purpose: Provide consistent subtitle styling across all modules
+   ========================================== */
+
+.page-subtitle {
+  font-size: 0.875rem;  /* 14px - optimal readability */
+  font-weight: 400;
+  color: var(--text-secondary, #6b7280);
+  margin: 0 0 1rem 0;
+  line-height: 1.5;
+  max-width: 600px;  /* Prevent overly long lines */
+}
+
+/* Mobile responsive adjustment */
+@media (max-width: 768px) {
+  .page-subtitle {
+    font-size: 0.813rem;  /* 13px on mobile */
+  }
+}
+
+/* Override old page-title margin for better title-subtitle spacing */
+.page-title + .page-subtitle {
+  margin-top: 0.5rem;
+}

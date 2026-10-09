@@ -105,7 +105,7 @@ export default function HostelPage() {
       }}>
         <div style={{ minWidth: 0 }}>
           <h1 className="page-title">Hostel Management</h1>
-          <p className="hst-page-sub">Manage hostel blocks, rooms and student allotments</p>
+          <p className="page-subtitle">Manage hostel blocks, rooms and student allotments</p>
         </div>
         <button className="books-btn books-btn-primary"
                 style={{ flexShrink: 0 }}

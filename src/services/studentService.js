@@ -35,7 +35,7 @@ export async function getStudentById(studentId) {
 // We call the Spring backend directly using the same runtime URL logic.
 const onLocalhost = window.location.hostname === 'localhost';
 const SPRING_BASE = onLocalhost
-  ? 'http://localhost:8080'
+  ? 'http://localhost:9090'
   : 'https://university-erp-spring.onrender.com';
 
 export async function getCertificatePdfUrl(studentId, customContent, docType) {

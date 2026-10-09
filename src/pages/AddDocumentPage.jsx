@@ -148,7 +148,7 @@ export default function AddDocumentPage() {
   return (
     <div className="page-container">
       <h1 className="page-title">Add Document Type</h1>
-      <p className="stu-page-sub">
+      <p className="page-subtitle">
         Add certificate types and write their default content template.
       </p>
 

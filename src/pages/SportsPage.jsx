@@ -110,7 +110,7 @@ export default function SportsPage() {
       <div className="books-page-header">
         <div>
           <h1 className="page-title">Sports</h1>
-          <p className="stu-page-sub">Manage all university sports</p>
+          <p className="page-subtitle">Manage all university sports</p>
         </div>
         <button className="books-btn books-btn-primary" onClick={openAdd}>
           + Add Sport

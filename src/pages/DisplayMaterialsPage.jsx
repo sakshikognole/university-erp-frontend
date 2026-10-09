@@ -5,7 +5,7 @@ import { useSearchParams } from 'react-router-dom';
 // FIX D1: absolute Spring Boot URL so downloads/previews work correctly
 const onLocalhost   = window.location.hostname === 'localhost';
 const SPRING_ORIGIN = onLocalhost
-  ? 'http://localhost:8080'
+  ? 'http://localhost:9090'
   : 'https://university-erp-spring.onrender.com';
 
 function absoluteUrl(relativeUrl) {
@@ -193,7 +193,7 @@ export default function DisplayMaterialsPage() {
       <div className="st-page-header">
         <div>
           <h1 className="page-title">Study Materials</h1>
-          <p className="st-page-sub">Select a subject to view its study materials</p>
+          <p className="page-subtitle">Select a subject to view its study materials</p>
         </div>
       </div>
 

@@ -7,7 +7,7 @@ import { getAllStudents } from '../services/studentService';
 
 const onLocalhost = window.location.hostname === 'localhost';
 const SPRING_BASE = onLocalhost
-  ? 'http://localhost:8080'
+  ? 'http://localhost:9090'
   : 'https://university-erp-spring.onrender.com';
 
 export default function HandoutPage() {
@@ -101,7 +101,7 @@ export default function HandoutPage() {
       }}>
         <div style={{ minWidth: 0 }}>
           <h1 className="page-title">Handout</h1>
-          <p className="stu-page-sub">
+          <p className="page-subtitle">
             Select students and certificate types, then download all as a ZIP.
           </p>
         </div>

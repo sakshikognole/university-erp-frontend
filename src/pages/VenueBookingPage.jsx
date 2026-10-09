@@ -430,7 +430,7 @@ export default function VenueBookingPage() {
         <div style={{ minWidth: 0 }}>
           {/* D1: page-title is left-aligned */}
           <h1 className="page-title" style={{ textAlign: 'left' }}>Venue Booking</h1>
-          <p className="stu-page-sub" style={{ textAlign: 'left' }}>
+          <p className="page-subtitle" style={{ textAlign: 'left' }}>
             Submit and manage venue booking requests
           </p>
         </div>

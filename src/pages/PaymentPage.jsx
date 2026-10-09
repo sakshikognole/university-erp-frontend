@@ -3,7 +3,7 @@ import axios from 'axios';
 import Pagination from '../components/Pagination';
 
 const _IS_PROD_SP = window.location.hostname !== 'localhost';
-const _SPRING_URL = _IS_PROD_SP ? 'https://university-erp-spring.onrender.com' : 'http://localhost:8080';
+const _SPRING_URL = _IS_PROD_SP ? 'https://university-erp-spring.onrender.com' : 'http://localhost:9090';
 const SPRING_API = `${_SPRING_URL}/api`;
 
 const DEFAULT_PAGE = {
@@ -396,7 +396,7 @@ export default function PaymentPage() {
       }}>
         <div style={{ minWidth: 0 }}>
           <h1 className="page-title">Payment Management</h1>
-          <p className="stu-page-sub">
+          <p className="page-subtitle">
             Manage fee titles and create payment combinations for students
           </p>
         </div>

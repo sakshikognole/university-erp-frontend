@@ -32,26 +32,68 @@ const EMPTY_CLASS_FORM = {
 };
 
 // Exam Schedule Modal
-function ExamScheduleModal({ isOpen, onSave, onClose, saving }) {
+function ExamScheduleModal({ isOpen, mode, schedule, onSave, onClose, saving }) {
   const [form, setForm] = useState(EMPTY_EXAM_FORM);
   const [errors, setErrors] = useState({});
   const [exams, setExams] = useState([]);
+  const [classrooms, setClassrooms] = useState([]);
+  const [bunches, setBunches] = useState([]);
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     if (!isOpen) return;
-    setForm(EMPTY_EXAM_FORM);
     setErrors({});
     setLoading(true);
-    springGet('/exams')
-      .then(res => {
-        const list = Array.isArray(res) ? res : (res.data ?? []);
-        list.sort((a, b) => a.examId.localeCompare(b.examId));
-        setExams(list);
+    Promise.all([
+      springGet('/exams'),
+      springGet('/classrooms'),
+      springGet('/classroom-bunches'),
+    ])
+      .then(([examRes, classroomRes, bunchRes]) => {
+        const examList = Array.isArray(examRes) ? examRes : (examRes.data ?? []);
+        examList.sort((a, b) => a.examId.localeCompare(b.examId));
+        setExams(examList);
+        
+        // Get all classrooms
+        const allClassrooms = Array.isArray(classroomRes?.content) ? classroomRes.content : [];
+        const allBunches = Array.isArray(bunchRes) ? bunchRes : [];
+        
+        // Get classroom IDs that are in bunches
+        const classroomIdsInBunches = new Set();
+        allBunches.forEach(bunch => {
+          bunch.classroomIds?.forEach(id => classroomIdsInBunches.add(id));
+        });
+        
+        // Filter classrooms - only show those NOT in any bunch
+        const availableClassrooms = allClassrooms.filter(c => !classroomIdsInBunches.has(c.classroomId));
+        
+        setClassrooms(availableClassrooms);
+        setBunches(allBunches);
       })
-      .catch(() => setExams([]))
+      .catch(() => {
+        setExams([]);
+        setClassrooms([]);
+        setBunches([]);
+      })
       .finally(() => setLoading(false));
   }, [isOpen]);
+
+  // Populate form for edit mode
+  useEffect(() => {
+    if (!isOpen) return;
+    if (mode === 'edit' && schedule) {
+      setForm({
+        examId: schedule.examId || schedule.subjectId || '',
+        examName: schedule.examName || schedule.subjectName || '',
+        scheduleDate: schedule.scheduleDate || '',
+        classroom: schedule.classroom || schedule.venueName || '',
+        multiDay: (schedule.daySlots?.length || 0) > 1,
+        daySlots: schedule.daySlots || [],
+      });
+    } else {
+      setForm(EMPTY_EXAM_FORM);
+    }
+  }, [isOpen, mode, schedule]);
 
   if (!isOpen) return null;
 
@@ -107,7 +149,7 @@ function ExamScheduleModal({ isOpen, onSave, onClose, saving }) {
     <div className="books-overlay">
       <div className="books-modal" style={{ maxWidth: 520 }}>
         <div className="books-modal-head">
-          <h3>Add Exam Schedule</h3>
+          <h3>{mode === 'edit' ? 'Edit Exam Schedule' : 'Add Exam Schedule'}</h3>
           <button className="books-modal-close" onClick={onClose} disabled={saving}>×</button>
         </div>
         {loading ? (
@@ -146,8 +188,32 @@ function ExamScheduleModal({ isOpen, onSave, onClose, saving }) {
 
               <div className="books-form-group" style={{ maxWidth: 280 }}>
                 <label className="books-form-label">Classroom</label>
-                <input className="books-form-control" value={form.classroom}
-                  onChange={e => setForm(f => ({ ...f, classroom: e.target.value }))} placeholder="e.g. Room 101" />
+                <select className="books-form-control" value={form.classroom}
+                  onChange={e => setForm(f => ({ ...f, classroom: e.target.value }))}>
+                  <option value="">— Select Classroom —</option>
+                  
+                  {/* Classroom Bunches */}
+                  {bunches.length > 0 && (
+                    <optgroup label="Classroom Bunches">
+                      {bunches.map(bunch => (
+                        <option key={bunch.bunchId} value={bunch.bunchName}>
+                          {bunch.bunchName} ({bunch.totalClassrooms} rooms, {bunch.totalCapacity} capacity)
+                        </option>
+                      ))}
+                    </optgroup>
+                  )}
+                  
+                  {/* Individual Classrooms (not in any bunch) */}
+                  {classrooms.length > 0 && (
+                    <optgroup label="Individual Classrooms">
+                      {classrooms.map(c => (
+                        <option key={c.classroomId} value={c.classroomName}>
+                          {c.classroomName} (Capacity: {c.capacity})
+                        </option>
+                      ))}
+                    </optgroup>
+                  )}
+                </select>
               </div>
 
               <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 10 }}>
@@ -204,7 +270,7 @@ function ExamScheduleModal({ isOpen, onSave, onClose, saving }) {
             <div className="books-modal-foot">
               <button type="button" className="books-btn books-btn-ghost" onClick={onClose} disabled={saving}>Cancel</button>
               <button type="submit" className="books-btn books-btn-primary" disabled={saving}>
-                {saving ? 'Saving...' : 'Add Exam Schedule'}
+                {saving ? 'Saving...' : mode === 'edit' ? 'Update Exam Schedule' : 'Add Exam Schedule'}
               </button>
             </div>
           </form>
@@ -454,6 +520,8 @@ export default function SchedulePage() {
   const [saving, setSaving] = useState(false);
   const [deleting, setDeleting] = useState(null);
   const [examModalOpen, setExamModalOpen] = useState(false);
+  const [examModalMode, setExamModalMode] = useState('add');
+  const [selectedSchedule, setSelectedSchedule] = useState(null);
   const [classModalOpen, setClassModalOpen] = useState(false);
   const [success, setSuccess] = useState('');
   const [error, setError] = useState('');
@@ -479,13 +547,25 @@ export default function SchedulePage() {
 
   useEffect(() => { load(); }, [load]);
 
+  const openExamAdd = () => {
+    setSelectedSchedule(null);
+    setExamModalMode('add');
+    setExamModalOpen(true);
+  };
+
+  const openExamEdit = (schedule) => {
+    setSelectedSchedule(schedule);
+    setExamModalMode('edit');
+    setExamModalOpen(true);
+  };
+
   const handleExamSave = async (form) => {
     setSaving(true);
     try {
       const payload = {
         ...form,
-        examId: form.examId,          // ✅ Keep examId to identify as exam schedule
-        examName: form.examName,      // ✅ Keep examName for display
+        examId: form.examId,
+        examName: form.examName,
         department: 'Exam',
         semester: 'All',
         subjectId: form.examId,
@@ -495,8 +575,15 @@ export default function SchedulePage() {
         venueId: form.classroom || 'TBA',
         venueName: form.classroom || 'To Be Announced',
       };
-      await springApi.post('/schedules', payload);
-      setSuccess('Exam schedule added successfully.');
+      
+      if (examModalMode === 'edit' && selectedSchedule) {
+        await springApi.put(`/schedules/${selectedSchedule.scheduleId}`, payload);
+        setSuccess('Exam schedule updated successfully.');
+      } else {
+        await springApi.post('/schedules', payload);
+        setSuccess('Exam schedule added successfully.');
+      }
+      
       setExamModalOpen(false);
       load(true);
     } catch (err) {
@@ -546,10 +633,10 @@ export default function SchedulePage() {
       <div className="books-page-header" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12, flexWrap: 'wrap' }}>
         <div style={{ minWidth: 0 }}>
           <h1 className="page-title">Schedule</h1>
-          <p className="books-page-sub">Manage exam and class schedules</p>
+          <p className="page-subtitle">Manage exam and class schedules</p>
         </div>
         <div style={{ display: 'flex', gap: 8, flexShrink: 0 }}>
-          <button className="books-btn books-btn-primary" onClick={() => setExamModalOpen(true)}>
+          <button className="books-btn books-btn-primary" onClick={openExamAdd}>
             + Add Exam Schedule
           </button>
           <button className="books-btn books-btn-primary" onClick={() => setClassModalOpen(true)}>
@@ -623,7 +710,7 @@ export default function SchedulePage() {
           </p>
           <button
             className="books-btn books-btn-primary"
-            onClick={() => activeTab === 'exam' ? setExamModalOpen(true) : setClassModalOpen(true)}
+            onClick={() => activeTab === 'exam' ? openExamAdd() : setClassModalOpen(true)}
           >
             + Add {activeTab === 'exam' ? 'Exam Schedule' : 'Schedule'}
           </button>
@@ -729,13 +816,23 @@ export default function SchedulePage() {
                       </>
                     )}
                     <td>
-                      <button
-                        className="books-btn books-btn-sm books-btn-danger"
-                        onClick={() => handleDelete(sch)}
-                        disabled={deleting === sch.scheduleId}
-                      >
-                        {deleting === sch.scheduleId ? '...' : 'Delete'}
-                      </button>
+                      <div className="books-actions">
+                        {activeTab === 'exam' && (
+                          <button
+                            className="books-btn books-btn-sm books-btn-warning"
+                            onClick={() => openExamEdit(sch)}
+                          >
+                            Edit
+                          </button>
+                        )}
+                        <button
+                          className="books-btn books-btn-sm books-btn-danger"
+                          onClick={() => handleDelete(sch)}
+                          disabled={deleting === sch.scheduleId}
+                        >
+                          {deleting === sch.scheduleId ? '...' : 'Delete'}
+                        </button>
+                      </div>
                     </td>
                   </tr>
                 ))}
@@ -745,7 +842,14 @@ export default function SchedulePage() {
         </div>
       )}
 
-      <ExamScheduleModal isOpen={examModalOpen} onSave={handleExamSave} onClose={() => setExamModalOpen(false)} saving={saving} />
+      <ExamScheduleModal 
+        isOpen={examModalOpen} 
+        mode={examModalMode}
+        schedule={selectedSchedule}
+        onSave={handleExamSave} 
+        onClose={() => setExamModalOpen(false)} 
+        saving={saving} 
+      />
       <ClassScheduleModal isOpen={classModalOpen} onSave={handleClassSave} onClose={() => setClassModalOpen(false)} saving={saving} />
     </div>
   );

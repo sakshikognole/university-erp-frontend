@@ -5,7 +5,7 @@ import axios from 'axios';
 const onLocalhost = window.location.hostname === 'localhost';
 
 const SPRING_BASE = onLocalhost
-  ? 'http://localhost:8080/api'
+  ? 'http://localhost:9090/api'
   : 'https://university-erp-spring.onrender.com/api';
 
 const NODE_BASE = onLocalhost

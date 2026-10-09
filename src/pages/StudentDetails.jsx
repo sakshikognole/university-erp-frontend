@@ -78,7 +78,7 @@ export default function StudentDetails() {
   return (
     <div className="page-container">
       <h1 className="page-title">Student Details</h1>
-      <p className="stu-page-sub">Review student information and select a certificate type.</p>
+      <p className="page-subtitle">Review student information and select a certificate type.</p>
 
       <div className="card stu-form-card">
         <StudentInformation student={student} />

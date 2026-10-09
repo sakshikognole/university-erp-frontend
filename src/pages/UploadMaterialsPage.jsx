@@ -14,7 +14,7 @@ const HEADERS    = { 'X-User-Role': 'TEACHER', 'X-Teacher-Id': TEACHER_ID };
 // fileUrl from backend is a relative path like /api/materials/{id}/download
 const onLocalhost  = window.location.hostname === 'localhost';
 const SPRING_ORIGIN = onLocalhost
-  ? 'http://localhost:8080'
+  ? 'http://localhost:9090'
   : 'https://university-erp-spring.onrender.com';
 
 function absoluteUrl(relativeUrl) {
@@ -442,7 +442,7 @@ export default function UploadMaterialsPage() {
       <div className="dm-page-header">
         <div>
           <h1 className="page-title">Upload Materials</h1>
-          <p className="dm-page-sub">
+          <p className="page-subtitle">
             Select a folder and upload study materials for students
           </p>
         </div>

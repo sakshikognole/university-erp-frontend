@@ -285,7 +285,7 @@ export default function SubjectsPage() {
       <div className="books-page-header">
         <div>
           <h1 className="page-title">Subjects</h1>
-          <p className="books-page-sub">Manage university subjects</p>
+          <p className="page-subtitle">Manage university subjects</p>
         </div>
         <button className="books-btn books-btn-primary" onClick={openAdd}>
           + Add Subject

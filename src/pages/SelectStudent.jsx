@@ -99,7 +99,7 @@ export default function SelectStudent() {
   return (
     <div className="page-container">
       <h1 className="page-title">Generate Certificate</h1>
-      <p className="stu-page-sub">
+      <p className="page-subtitle">
         Search and select a student, then click Continue.
       </p>
 

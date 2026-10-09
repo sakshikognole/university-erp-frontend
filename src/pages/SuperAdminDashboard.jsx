@@ -8,7 +8,7 @@ const _NODE_URL = _IS_PROD ? 'https://university-erp-node.onrender.com' : 'http:
 const API_BASE_URL = `${_NODE_URL}/api`;
 // Clubs → Spring Boot backend
 const _IS_PROD_SP = window.location.hostname !== 'localhost';
-const _SPRING_URL = _IS_PROD_SP ? 'https://university-erp-spring.onrender.com' : 'http://localhost:8080';
+const _SPRING_URL = _IS_PROD_SP ? 'https://university-erp-spring.onrender.com' : 'http://localhost:9090';
 const SPRING_API_URL = `${_SPRING_URL}/api`;
 
 const SuperAdminDashboard = () => {
