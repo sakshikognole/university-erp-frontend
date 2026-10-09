@@ -3544,12 +3544,6 @@ button {
   margin-bottom: 20px;
 }
 
-.books-page-sub {
-  font-size: 13px;
-  color: var(--text-secondary);
-  margin-top: 2px;
-}
-
 /* ── Buttons ── */
 .books-btn {
   display: inline-flex;
@@ -5764,6 +5758,24 @@ button {
   flex: 1;
   justify-content: center;
 }
+
+/* ── Books Modal Mobile Responsive ── */
+@media (max-width: 768px) {
+  .books-modal {
+    width: 95% !important;
+    max-height: 90vh;
+    overflow-y: auto;
+  }
+  
+  .books-modal-body {
+    padding: 16px !important;
+  }
+  
+  .books-form-control {
+    font-size: 16px; /* Prevents zoom on iOS */
+  }
+}
+
 /* ==========================================
    SPORT TEAMS — MOBILE / DESKTOP TOGGLE
    ========================================== */
@@ -5776,13 +5788,6 @@ button {
 @media (max-width: 768px) {
   .sport-team-mob  { display: block; }
   .sport-team-desk { display: none; }
-
-  /* Ensure modal doesn't overflow on mobile */
-  .books-modal {
-    width: 95% !important;
-    max-height: 90vh;
-    overflow-y: auto;
-  }
 }
 
 /* ==========================================================
@@ -9316,112 +9321,6 @@ input[type='password']::-webkit-inner-spin-button {
   background-color: #fef2f2;
   color: #991b1b;
   border: 1px solid #fecaca;
-}
-
-/* ── Modal Overlay ── */
-.books-overlay {
-  position: fixed;
-  inset: 0;
-  z-index: 1000;
-  background-color: rgba(0, 0, 0, 0.5);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 1.25rem;
-  animation: modalOverlayFade 0.15s ease-out;
-}
-.books-modal {
-  background: #ffffff;
-  border-radius: 0.75rem;
-  width: 100%;
-  box-shadow: 0 20px 40px -8px rgba(0, 0, 0, 0.2);
-  display: flex;
-  flex-direction: column;
-  max-height: 90vh;
-  animation: modalPop 0.18s cubic-bezier(0.16, 1, 0.3, 1);
-}
-.books-modal-head {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 1.125rem 1.25rem;
-  border-bottom: 1px solid #e5e7eb;
-}
-.books-modal-head h3 {
-  font-size: 1rem;
-  font-weight: 700;
-  color: #111827;
-  margin: 0;
-}
-.books-modal-close {
-  background: none;
-  border: none;
-  cursor: pointer;
-  font-size: 1.1rem;
-  color: #6b7280;
-  padding: 0.25rem 0.5rem;
-  border-radius: 0.25rem;
-  line-height: 1;
-}
-.books-modal-close:hover { background: #f3f4f6; color: #111827; }
-.books-modal-body {
-  padding: 1.25rem;
-  overflow-y: auto;
-  flex: 1;
-}
-.books-modal-foot {
-  display: flex;
-  align-items: center;
-  justify-content: flex-end;
-  gap: 0.75rem;
-  padding: 1rem 1.25rem;
-  border-top: 1px solid #e5e7eb;
-}
-
-/* ── Form Controls ── */
-.books-form-group {
-  display: flex;
-  flex-direction: column;
-  gap: 0.35rem;
-  margin-bottom: 1rem;
-}
-.books-form-label {
-  font-size: 0.8125rem;
-  font-weight: 600;
-  color: #374151;
-  display: flex;
-  align-items: center;
-  gap: 0.375rem;
-}
-.books-form-control {
-  width: 100%;
-  padding: 0.5rem 0.75rem;
-  font-size: 0.875rem;
-  border: 1px solid #d1d5db;
-  border-radius: 0.375rem;
-  background: #ffffff;
-  color: #111827;
-  font-family: inherit;
-  transition: border-color 0.2s, box-shadow 0.2s;
-  box-sizing: border-box;
-}
-.books-form-control:focus {
-  outline: none;
-  border-color: #111827;
-  box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.06);
-}
-.books-form-control.err {
-  border-color: #dc2626;
-}
-.books-form-control:disabled {
-  background: #f9fafb;
-  color: #6b7280;
-  cursor: not-allowed;
-}
-.books-form-err {
-  font-size: 0.75rem;
-  color: #dc2626;
-  margin: 0;
 }
 
 
