@@ -232,7 +232,7 @@ export default function SportTeamPage() {
       <div className="st-page-header">
         <div>
           <h1 className="page-title">Sport Teams</h1>
-          <p className="st-page-sub">Manage university sport teams and rosters</p>
+          <p className="page-subtitle">Manage university sport teams and rosters</p>
         </div>
         <button className="books-btn books-btn-primary" onClick={openAdd}>
           + Add Team

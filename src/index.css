@@ -4668,11 +4668,6 @@ button {
   margin-bottom: 20px;
 }
 
-.st-page-sub {
-  font-size: 13px;
-  color: var(--text-secondary);
-  margin-top: 2px;
-}
 
 /* ── Back link ── */
 .st-back-link {

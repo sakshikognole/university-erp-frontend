@@ -139,7 +139,7 @@ export default function TeamDetails({ teamId, onBack }) {
       <div className="st-page-header">
         <div>
           <h1 className="page-title">{team.teamId}</h1>
-          <p className="st-page-sub">{team.sportName} Team</p>
+          <p className="page-subtitle">{team.sportName} Team</p>
         </div>
       </div>
 
