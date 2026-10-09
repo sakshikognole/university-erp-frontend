@@ -38,7 +38,7 @@ export default function BookModal({ isOpen, mode, book, onSave, onClose, loading
   const validate = () => {
     const e = {};
     
-    // Book ID validation (Defect #2)
+    // Book ID validation - must contain both letters AND numbers (e.g., BK-101, CS-001)
     if (mode === 'add' && !form.bookId.trim()) {
       e.bookId = 'Book ID is required';
     } else if (mode === 'add') {
@@ -57,7 +57,7 @@ export default function BookModal({ isOpen, mode, book, onSave, onClose, loading
       }
     }
     
-    // Book Title validation (Defect #4)
+    // Book Title validation - rejects only numbers or only special characters
     if (!form.bookTitle.trim()) {
       e.bookTitle = 'Required';
     } else {
@@ -71,7 +71,7 @@ export default function BookModal({ isOpen, mode, book, onSave, onClose, loading
       }
     }
     
-    // Author Name validation (Defect #4)
+    // Author Name validation - rejects only numbers or only special characters
     if (!form.authorName.trim()) {
       e.authorName = 'Required';
     } else {
@@ -88,7 +88,7 @@ export default function BookModal({ isOpen, mode, book, onSave, onClose, loading
     if (form.totalCopies === '')  e.totalCopies  = 'Required';
     else if (Number(form.totalCopies) < 0) e.totalCopies = 'Cannot be negative';
     
-    // Location validation (Defect #4)
+    // Location validation - rejects only numbers or only special characters
     if (!form.bookLocation.trim()) {
       e.bookLocation = 'Required';
     } else {
