@@ -14,7 +14,7 @@ const EMPTY = {
     status: 'Active',
 };
 
-export default function ClubModal({ isOpen, mode, club, parentClubs, onSave, onClose, loading }) {
+export default function ClubModal({ isOpen, mode, club, parentClubs, onSave, onClose, loading, existingClubs }) {
     const [form, setForm] = useState(EMPTY);
     const [errors, setErrors] = useState({});
 
@@ -50,9 +50,42 @@ export default function ClubModal({ isOpen, mode, club, parentClubs, onSave, onC
 
     const validate = () => {
         const e = {};
-        if (!form.clubId.trim()) e.clubId = 'Required';
-        if (!form.clubName.trim()) e.clubName = 'Required';
+        
+        // Club ID validation
+        if (!form.clubId.trim()) {
+            e.clubId = 'Required';
+        } else {
+            const clubIdTrimmed = form.clubId.trim();
+            
+            // Defect #2: Check for special characters (only alphanumeric and hyphen/underscore allowed)
+            if (!/^[A-Za-z0-9\-_]+$/.test(clubIdTrimmed)) {
+                e.clubId = 'Only letters, numbers, hyphens, and underscores allowed';
+            }
+            // Defect #3: Must contain both letters AND numbers (not just one type)
+            else if (!/[A-Za-z]/.test(clubIdTrimmed) || !/[0-9]/.test(clubIdTrimmed)) {
+                e.clubId = 'Must contain both letters and numbers (e.g., CLB001)';
+            }
+            // Defect #4: Check for duplicate Club ID (only in add mode)
+            else if (mode === 'add' && existingClubs) {
+                const isDuplicate = existingClubs.some(
+                    (c) => c.clubId.trim().toLowerCase() === clubIdTrimmed.toLowerCase()
+                );
+                if (isDuplicate) {
+                    e.clubId = `Club ID "${clubIdTrimmed}" already exists. Please use a different ID.`;
+                }
+            }
+        }
+        
+        // Club Name validation
+        // Defect #1 & #5: Club Name should only contain letters and spaces
+        if (!form.clubName.trim()) {
+            e.clubName = 'Required';
+        } else if (!/^[A-Za-z\s]+$/.test(form.clubName.trim())) {
+            e.clubName = 'Only letters and spaces allowed (no numbers or special characters)';
+        }
+        
         if (!form.status) e.status = 'Required';
+        
         return e;
     };
 
@@ -82,17 +115,33 @@ export default function ClubModal({ isOpen, mode, club, parentClubs, onSave, onC
                         {/* Row 1 — Club ID + Club Name */}
                         <div className="club-form-row">
                             <div className="books-form-group">
-                                <label className="books-form-label">Club ID *</label>
+                                <label className="books-form-label">
+                                    Club ID *
+                                    {mode === 'add' && (
+                                        <span style={{ fontWeight: 400, color: '#9ca3af', fontSize: '0.78rem', marginLeft: 6 }}>
+                                            e.g. CLB001, TECH-01
+                                        </span>
+                                    )}
+                                </label>
                                 <input
                                     className={`books-form-control ${errors.clubId ? 'err' : ''}`}
                                     name="clubId" value={form.clubId} onChange={change}
-                                    placeholder="e.g. CLB001"
+                                    placeholder="Must contain letters & numbers"
                                     disabled={mode === 'edit'}
+                                    style={mode === 'edit' ? {
+                                        background: '#f9fafb', color: '#6b7280',
+                                        cursor: 'not-allowed', fontFamily: 'monospace',
+                                    } : {}}
                                 />
                                 {errors.clubId && <p className="books-form-err">{errors.clubId}</p>}
                             </div>
                             <div className="books-form-group">
-                                <label className="books-form-label">Club Name *</label>
+                                <label className="books-form-label">
+                                    Club Name *
+                                    <span style={{ fontWeight: 400, color: '#9ca3af', fontSize: '0.78rem', marginLeft: 6 }}>
+                                        letters only
+                                    </span>
+                                </label>
                                 <input
                                     className={`books-form-control ${errors.clubName ? 'err' : ''}`}
                                     name="clubName" value={form.clubName} onChange={change}

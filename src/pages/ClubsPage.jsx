@@ -243,6 +243,7 @@ export default function ClubsPage() {
                 mode={modalMode}
                 club={selClub}
                 parentClubs={parentClubs}
+                existingClubs={clubs}
                 onSave={handleSave}
                 onClose={() => setModalOpen(false)}
                 loading={saving}
