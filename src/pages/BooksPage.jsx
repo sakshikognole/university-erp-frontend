@@ -84,6 +84,7 @@ export default function BooksPage() {
   const [viewBook,  setViewBook]  = useState(null);
   const [delOpen,   setDelOpen]   = useState(false);
   const [delBook,   setDelBook]   = useState(null);
+  const [duplicateIdError, setDuplicateIdError] = useState(''); // For showing duplicate ID error in modal
 
   const [alert, setAlert] = useState({ type: '', message: '' });
   const notify  = (type, message) => setAlert({ type, message });
@@ -131,8 +132,8 @@ export default function BooksPage() {
 
   const onSizeChange = (s) => { setSize(s); setPage(0); };
 
-  const openAdd  = ()  => { setSelBook(null); setModalMode('add'); setModalOpen(true); };
-  const openEdit = (b) => { setSelBook(b);    setModalMode('edit'); setModalOpen(true); };
+  const openAdd  = ()  => { setSelBook(null); setModalMode('add'); setDuplicateIdError(''); setModalOpen(true); };
+  const openEdit = (b) => { setSelBook(b);    setModalMode('edit'); setDuplicateIdError(''); setModalOpen(true); };
   const openView = (b) => { setViewBook(b);   setViewOpen(true); };
   const openDel  = (b) => { setDelBook(b);    setDelOpen(true); };
 
@@ -156,12 +157,12 @@ export default function BooksPage() {
           setSaving(false);
           return;
         }
-        // Defect #3: Check bookId uniqueness and show alert popup
+        // Defect #3: Check bookId uniqueness and show error in modal below Book ID field
         const idTaken = books.some(
           (b) => b.bookId && b.bookId.trim().toLowerCase() === form.bookId.trim().toLowerCase()
         );
         if (idTaken) {
-          notify('error', `Book ID ${form.bookId} already exists`);
+          setDuplicateIdError('Book ID already exists');
           setSaving(false);
           return;
         }
@@ -340,6 +341,8 @@ export default function BooksPage() {
         onSave={handleSave}
         onClose={() => setModalOpen(false)}
         loading={saving}
+        duplicateIdError={duplicateIdError}
+        onDuplicateIdErrorClear={() => setDuplicateIdError('')}
       />
       <ViewBookModal
         isOpen={viewOpen}

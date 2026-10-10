@@ -12,7 +12,7 @@ const EMPTY = {
   bookLocation: '', department: '',
 };
 
-export default function BookModal({ isOpen, mode, book, onSave, onClose, loading }) {
+export default function BookModal({ isOpen, mode, book, onSave, onClose, loading, duplicateIdError, onDuplicateIdErrorClear }) {
   const [form,   setForm]   = useState(EMPTY);
   const [errors, setErrors] = useState({});
 
@@ -110,6 +110,10 @@ export default function BookModal({ isOpen, mode, book, onSave, onClose, loading
     const { name, value } = e.target;
     setForm(f  => ({ ...f,  [name]: value }));
     setErrors(er => ({ ...er, [name]: '' }));
+    // Clear duplicate ID error when user types in Book ID field
+    if (name === 'bookId' && onDuplicateIdErrorClear) {
+      onDuplicateIdErrorClear();
+    }
   };
 
   const submit = (e) => {
@@ -148,7 +152,7 @@ export default function BookModal({ isOpen, mode, book, onSave, onClose, loading
                 )}
               </label>
               <input
-                className={`books-form-control ${errors.bookId ? 'err' : ''}`}
+                className={`books-form-control ${errors.bookId || duplicateIdError ? 'err' : ''}`}
                 name="bookId"
                 value={form.bookId}
                 onChange={change}
@@ -160,7 +164,9 @@ export default function BookModal({ isOpen, mode, book, onSave, onClose, loading
                 } : {}}
                 autoFocus={mode === 'add'}
               />
-              {errors.bookId && <p className="books-form-err">{errors.bookId}</p>}
+              {(errors.bookId || duplicateIdError) && (
+                <p className="books-form-err">{errors.bookId || duplicateIdError}</p>
+              )}
             </div>
 
             <div className="books-form-group">

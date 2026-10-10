@@ -5607,9 +5607,17 @@ button {
   }
 
   .books-page-header {
-    flex-direction: column;
+    flex-direction: row;
     align-items: flex-start;
     gap: 10px;
+  }
+  
+  .books-page-header > div {
+    flex: 1;
+  }
+  
+  .books-page-header .books-btn {
+    flex-shrink: 0;
   }
 }
 /* ==========================================
