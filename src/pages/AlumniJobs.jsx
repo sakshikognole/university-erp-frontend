@@ -222,14 +222,14 @@ const AlumniJobs = () => {
                 <thead>
                   <tr>
                     <th style={{ width: '50px' }}>#</th>
-                    <th style={{ width: '110px' }}>Job ID</th>
-                    <th style={{ width: '110px' }}>Alumni ID</th>
+                    <th style={{ width: '110px' }}>Job id</th>
+                    <th style={{ width: '110px' }}>Alumni id</th>
                     <th>Company</th>
                     <th>Role</th>
                     <th style={{ width: '100px' }}>Status</th>
                     <th style={{ width: '120px' }}>Posted</th>
                     <th style={{ width: '120px' }}>Expiry</th>
-                    <th style={{ width: '160px' }}>Application Link</th>
+                    <th style={{ width: '160px' }}>Application link</th>
                     <th style={{ width: '100px', textAlign: 'right' }}>Actions</th>
                   </tr>
                 </thead>

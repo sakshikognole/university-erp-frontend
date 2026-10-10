@@ -260,12 +260,12 @@ const Alumni = () => {
                 <thead>
                   <tr>
                     <th style={{ width: '60px' }}>#</th>
-                    <th style={{ width: '120px' }}>Alumni ID</th>
+                    <th style={{ width: '120px' }}>Alumni id</th>
                     <th>Name</th>
-                    <th style={{ width: '110px' }}>Grad. Year</th>
-                    <th>Job Title</th>
+                    <th style={{ width: '110px' }}>Grad. year</th>
+                    <th>Job title</th>
                     <th>Company</th>
-                    <th style={{ width: '200px' }}>Profile Links</th>
+                    <th style={{ width: '200px' }}>Profile links</th>
                     <th style={{ width: '110px', textAlign: 'right' }}>Actions</th>
                   </tr>
                 </thead>

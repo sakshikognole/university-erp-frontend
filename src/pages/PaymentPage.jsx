@@ -468,12 +468,12 @@ export default function PaymentPage() {
                       title="Select all on this page"
                     />
                   </th>
-                  <th>Title ID</th>
-                  <th>Payment Title</th>
-                  <th>Year / Course</th>
+                  <th>Title id</th>
+                  <th>Payment title</th>
+                  <th>Year / course</th>
                   <th>Amount</th>
                   <th>Discount</th>
-                  <th>Net Payable</th>
+                  <th>Net payable</th>
                 </tr>
               </thead>
               <tbody>
@@ -586,7 +586,7 @@ export default function PaymentPage() {
                 <table className="books-table">
                   <thead>
                     <tr>
-                      <th>Payment Title</th>
+                      <th>Payment title</th>
                       <th>Amount</th>
                       <th>Discount</th>
                       <th>Net</th>

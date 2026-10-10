@@ -1259,7 +1259,7 @@ export const exportFeePaymentsPDF = (feeRecords, title = 'University ERP - Fee P
           .stat-label { font-size: 11px; color: #6b7280; text-transform: uppercase; font-weight: 600; }
           .stat-val { font-size: 16px; font-weight: 700; color: #111827; margin-top: 2px; }
           table { width: 100%; border-collapse: collapse; text-align: left; }
-          th { background: #f3f4f6; padding: 8px 10px; font-size: 11px; font-weight: 700; color: #374151; text-transform: uppercase; border-bottom: 1px solid #d1d5db; }
+          th { background: #f3f4f6; padding: 8px 10px; font-size: 11px; font-weight: 700; color: #374151; text-transform: none; border-bottom: 1px solid #d1d5db; }
           .footer { margin-top: 20px; text-align: center; font-size: 11px; color: #9ca3af; border-top: 1px solid #e5e7eb; padding-top: 10px; }
         </style>
       </head>

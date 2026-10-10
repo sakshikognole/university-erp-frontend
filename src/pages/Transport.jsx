@@ -496,10 +496,10 @@ const Transport = () => {
                   <thead>
                     <tr>
                       <th style={{ width: '60px' }}>#</th>
-                      <th style={{ width: '120px' }}>Route ID</th>
-                      <th style={{ width: '180px' }}>Route Name</th>
-                      <th style={{ width: '160px' }}>Driver Name</th>
-                      <th style={{ width: '160px' }}>Vehicle Name</th>
+                      <th style={{ width: '120px' }}>Route id</th>
+                      <th style={{ width: '180px' }}>Route name</th>
+                      <th style={{ width: '160px' }}>Driver name</th>
+                      <th style={{ width: '160px' }}>Vehicle name</th>
                       <th>Stops</th>
                       <th style={{ width: '140px', textAlign: 'right' }}>Actions</th>
                     </tr>
@@ -660,9 +660,9 @@ const Transport = () => {
                   <thead>
                     <tr>
                       <th style={{ width: '60px' }}>#</th>
-                      <th style={{ width: '130px' }}>Vehicle ID</th>
-                      <th>Vehicle Name</th>
-                      <th>Registration / Plate</th>
+                      <th style={{ width: '130px' }}>Vehicle id</th>
+                      <th>Vehicle name</th>
+                      <th>Registration / plate</th>
                       <th>Capacity</th>
                       <th style={{ width: '120px' }}>Status</th>
                       <th style={{ width: '140px', textAlign: 'right' }}>Actions</th>
@@ -730,13 +730,13 @@ const Transport = () => {
                   <thead>
                     <tr>
                       <th style={{ width: '60px' }}>#</th>
-                      <th style={{ width: '120px' }}>Pass ID</th>
-                      <th style={{ width: '140px' }}>Student ID</th>
-                      <th>Student Name</th>
-                      <th style={{ width: '110px' }}>Route ID</th>
-                      <th>Stops (From → To)</th>
+                      <th style={{ width: '120px' }}>Pass id</th>
+                      <th style={{ width: '140px' }}>Student id</th>
+                      <th>Student name</th>
+                      <th style={{ width: '110px' }}>Route id</th>
+                      <th>Stops (from → to)</th>
                       <th style={{ width: '120px' }}>Payment</th>
-                      <th style={{ width: '120px' }}>Valid Till</th>
+                      <th style={{ width: '120px' }}>Valid till</th>
                       <th style={{ width: '140px', textAlign: 'right' }}>Actions</th>
                     </tr>
                   </thead>

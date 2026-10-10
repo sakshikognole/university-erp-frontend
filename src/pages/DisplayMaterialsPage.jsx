@@ -260,8 +260,8 @@ export default function DisplayMaterialsPage() {
               <table className="books-table">
                 <thead>
                   <tr>
-                    <th>Material Name</th>
-                    <th>File Type</th>
+                    <th>Material name</th>
+                    <th>File type</th>
                     <th>Size</th>
                     <th>Actions</th>
                   </tr>
@@ -286,8 +286,8 @@ export default function DisplayMaterialsPage() {
                   <table className="books-table">
                     <thead>
                       <tr>
-                        <th style={{ width: '45%' }}>Material Name</th>
-                        <th>File Type</th>
+                        <th style={{ width: '45%' }}>Material name</th>
+                        <th>File type</th>
                         <th>Size</th>
                         <th>Actions</th>
                       </tr>

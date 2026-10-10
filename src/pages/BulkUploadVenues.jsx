@@ -378,7 +378,7 @@ const BulkUploadVenues = () => {
                     <thead>
                       <tr>
                         <th style={{ width: '60px' }}>#</th>
-                        <th style={{ width: '140px' }}>Venue ID</th>
+                        <th style={{ width: '140px' }}>Venue id</th>
                         <th>Name</th>
                         <th style={{ width: '100px' }}>Capacity</th>
                         <th style={{ width: '120px' }}>Status</th>

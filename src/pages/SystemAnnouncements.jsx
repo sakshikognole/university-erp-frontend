@@ -252,7 +252,7 @@ const SystemAnnouncements = () => {
                 <thead>
                   <tr>
                     <th style={{ width: '60px' }}>#</th>
-                    <th style={{ width: '130px' }}>ID</th>
+                    <th style={{ width: '130px' }}>Id</th>
                     <th>Title</th>
                     <th style={{ width: '130px' }}>Date</th>
                     <th style={{ width: '140px', textAlign: 'right' }}>Actions</th>

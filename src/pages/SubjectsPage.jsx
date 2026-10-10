@@ -365,8 +365,8 @@ export default function SubjectsPage() {
                     <thead>
                       <tr>
                         <th style={{ width: 45 }}>#</th>
-                        <th style={{ width: 110 }}>Subject ID</th>
-                        <th>Subject Name</th>
+                        <th style={{ width: 110 }}>Subject id</th>
+                        <th>Subject name</th>
                         <th>Description</th>
                         <th style={{ width: 160 }}>Actions</th>
                       </tr>

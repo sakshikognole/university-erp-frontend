@@ -477,13 +477,13 @@ const BulkUploadStudents = () => {
                     <thead>
                       <tr>
                         <th style={{ width: '60px' }}>#</th>
-                        <th>PRN</th>
+                        <th>Prn</th>
                         <th>Name</th>
                         <th>Class</th>
                         <th style={{ width: '100px' }}>Division</th>
                         <th>Degree</th>
                         <th style={{ width: '100px' }}>Year</th>
-                        <th>Custom Fields</th>
+                        <th>Custom fields</th>
                       </tr>
                     </thead>
                     <tbody>

@@ -257,9 +257,9 @@ export default function SportTeamsPage() {
                   <thead>
                     <tr>
                       <th>#</th>
-                      <th>Team ID</th>
-                      <th>Team Name</th>
-                      <th>Sport ID</th>
+                      <th>Team id</th>
+                      <th>Team name</th>
+                      <th>Sport id</th>
                       <th>Coach</th>
                       <th>Members</th>
                       <th>Status</th>

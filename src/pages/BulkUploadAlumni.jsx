@@ -196,10 +196,10 @@ const BulkUploadAlumni = () => {
                     <thead>
                       <tr>
                         <th style={{ width: '50px' }}>#</th>
-                        <th>Alumni ID</th>
+                        <th>Alumni id</th>
                         <th>Name</th>
-                        <th>Grad. Year</th>
-                        <th>Job Title</th>
+                        <th>Grad. year</th>
+                        <th>Job title</th>
                         <th>Company</th>
                         <th>Email</th>
                       </tr>

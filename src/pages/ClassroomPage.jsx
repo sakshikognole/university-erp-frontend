@@ -447,7 +447,7 @@ export default function ClassroomPage() {
                       />
                     </th>
                     <th style={{ width: 42 }}>#</th>
-                    <th>Classroom ID</th>
+                    <th>Classroom id</th>
                     <th>Name</th>
                     <th style={{ width: 80 }}>Rows</th>
                     <th style={{ width: 100 }}>Columns</th>

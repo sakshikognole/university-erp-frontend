@@ -312,7 +312,7 @@ export default function HostelRoomModal({ isOpen, blockId, onClose, onSaved }) {
               <div className="books-table-wrap" style={{ marginTop: 4 }}>
                 <table className="books-table">
                   <thead>
-                    <tr><th>PRN</th><th>Name</th><th></th></tr>
+                    <tr><th>Prn</th><th>Name</th><th></th></tr>
                   </thead>
                   <tbody>
                     {prnList.map((p) => (

@@ -1151,7 +1151,7 @@ button {
   color: var(--text-secondary);
   font-weight: 600;
   font-size: 0.75rem;
-  text-transform: uppercase;
+  text-transform: none;
   border-bottom: 1px solid var(--border-color);
 }
 
@@ -1994,7 +1994,7 @@ button {
   color: var(--text-secondary);
   font-weight: 600;
   font-size: 0.75rem;
-  text-transform: uppercase;
+  text-transform: none;
   letter-spacing: 0.05em;
   padding: 0.75rem 1.25rem;
   border-bottom: 1px solid var(--border-color);
@@ -5012,7 +5012,7 @@ button {
   font-size: 12px;
   font-weight: 600;
   color: var(--text-secondary);
-  text-transform: uppercase;
+  text-transform: none;
   letter-spacing: 0.04em;
   border-bottom: 1px solid var(--border-color);
   white-space: nowrap;
@@ -6943,7 +6943,7 @@ input[type='password']::-webkit-inner-spin-button {
   color: var(--text-secondary);
   font-weight: 600;
   font-size: 0.75rem;
-  text-transform: uppercase;
+  text-transform: none;
   border-bottom: 1px solid var(--border-color);
 }
 
@@ -7786,7 +7786,7 @@ input[type='password']::-webkit-inner-spin-button {
   color: var(--text-secondary);
   font-weight: 600;
   font-size: 0.75rem;
-  text-transform: uppercase;
+  text-transform: none;
   letter-spacing: 0.05em;
   padding: 0.75rem 1.25rem;
   border-bottom: 1px solid var(--border-color);
@@ -9402,7 +9402,7 @@ input[type='password']::-webkit-inner-spin-button {
   font-size: 0.78rem;
   font-weight: 700;
   color: var(--text-secondary, #6b7280);
-  text-transform: uppercase;
+  text-transform: none;
   letter-spacing: 0.04em;
   background: var(--bg-secondary, #f9fafb);
   border-bottom: 1px solid var(--border-primary, #e5e7eb);
@@ -10373,7 +10373,7 @@ input[type='password']::-webkit-inner-spin-button {
   font-size: 0.9375rem;  /* 15px - improved readability */
   font-weight: 400;
   color: #4b5563;  /* Slightly darker gray for better contrast */
-  margin: 0 0 1.25rem 0;
+  margin: 0 0 1.20rem 0;
   line-height: 1.6;
   max-width: 600px;  /* Prevent overly long lines */
   letter-spacing: 0.01em;  /* Slight letter spacing for clarity */

@@ -440,8 +440,8 @@ const Departments = () => {
               <thead>
                 <tr>
                   <th style={{ width: '60px' }}>#</th>
-                  <th style={{ width: '200px' }}>Department ID</th>
-                  <th>Department Name</th>
+                  <th style={{ width: '200px' }}>Department id</th>
+                  <th>Department name</th>
                   <th style={{ width: '140px', textAlign: 'right' }}>Actions</th>
                 </tr>
               </thead>

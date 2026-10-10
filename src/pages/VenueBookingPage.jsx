@@ -587,7 +587,7 @@ export default function VenueBookingPage() {
                   <thead>
                     <tr>
                       {/* Improvement: center-aligned headers */}
-                      {['#','Booking ID','Event','Venue','Date','Start','Status','Actions']
+                      {['#','Booking id','Event','Venue','Date','Start','Status','Actions']
                         .map(h => (
                           <th key={h} style={{ textAlign: 'center' }}>{h}</th>
                         ))}

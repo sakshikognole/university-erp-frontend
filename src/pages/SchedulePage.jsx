@@ -722,11 +722,11 @@ export default function SchedulePage() {
               <thead>
                 <tr>
                   <th style={{ width: 42 }}>#</th>
-                  <th>Schedule ID</th>
+                  <th>Schedule id</th>
                   {activeTab === 'exam' ? (
                     <>
                       <th>Exam</th>
-                      <th>Exam ID</th>
+                      <th>Exam id</th>
                       <th>Date</th>
                       <th>Days</th>
                       <th>Classroom</th>

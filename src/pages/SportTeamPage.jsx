@@ -95,7 +95,7 @@ function AddRosterModal({ isOpen, teamId, onClose, onSuccess }) {
           {prnList.length > 0 && (
             <div className="books-table-wrap" style={{ marginTop: 8 }}>
               <table className="books-table">
-                <thead><tr><th>PRN</th><th>Student Name</th><th style={{width:60}}>Del</th></tr></thead>
+                <thead><tr><th>Prn</th><th>Student name</th><th style={{width:60}}>Del</th></tr></thead>
                 <tbody>
                   {prnList.map((p) => (
                     <tr key={p.prn}>
@@ -258,8 +258,8 @@ export default function SportTeamPage() {
           <table className="books-table">
             <thead>
               <tr>
-                <th>Team ID</th><th>Sport Name</th><th>Coach Name</th>
-                <th>Captain Name</th><th>Roster</th><th>Actions</th>
+                <th>Team id</th><th>Sport name</th><th>Coach name</th>
+                <th>Captain name</th><th>Roster</th><th>Actions</th>
               </tr>
             </thead>
             <tbody>
@@ -287,10 +287,10 @@ export default function SportTeamPage() {
           <table className="books-table">
             <thead>
               <tr>
-                <th>Team ID</th>
-                <th>Sport Name</th>
-                <th>Coach Name</th>
-                <th>Captain Name</th>
+                <th>Team id</th>
+                <th>Sport name</th>
+                <th>Coach name</th>
+                <th>Captain name</th>
                 <th>Roster</th>
                 <th>Actions</th>
               </tr>

@@ -455,7 +455,7 @@ const Students = () => {
                 <thead>
                   <tr>
                     <th style={{ width: '52px' }}>#</th>
-                    <th style={{ width: '160px' }}>PRN</th>
+                    <th style={{ width: '160px' }}>Prn</th>
                     <th>Name</th>
                     <th style={{ width: '130px' }}>Class</th>
                     <th style={{ width: '90px' }}>Division</th>
