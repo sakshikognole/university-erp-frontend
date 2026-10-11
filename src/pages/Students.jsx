@@ -21,9 +21,7 @@ import {
 } from 'lucide-react';
 import { exportStudents } from '../utils/exportUtils';
 
-const _IS_PROD = window.location.hostname !== 'localhost';
-const _NODE_URL = _IS_PROD ? 'https://university-erp-node.onrender.com' : 'http://localhost:5000';
-const API_BASE_URL = `${_NODE_URL}/api`;
+const API_BASE_URL = 'http://localhost:5000/api';
 
 // ---------------------------------------------------------------------------
 // Helpers
@@ -195,7 +193,7 @@ const Students = () => {
 
   // ── Render ────────────────────────────────────────────────────────────────
   return (
-    <div className="page-container">
+    <div className="page-container students-page">
 
       {/* ── Page header ── */}
       <div className="page-header-row">
@@ -455,7 +453,7 @@ const Students = () => {
                 <thead>
                   <tr>
                     <th style={{ width: '52px' }}>#</th>
-                    <th style={{ width: '160px' }}>Prn</th>
+                    <th style={{ width: '160px' }}>PRN</th>
                     <th>Name</th>
                     <th style={{ width: '130px' }}>Class</th>
                     <th style={{ width: '90px' }}>Division</th>

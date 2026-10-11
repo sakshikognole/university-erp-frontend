@@ -23,9 +23,6 @@ import {
   BookCopy,
   CalendarDays,
   School,
-  Newspaper,
-  Upload,
-  LibraryBig,
 } from 'lucide-react';
 
 export const navigationConfig = {
@@ -64,8 +61,7 @@ export const navigationConfig = {
     { label: 'Alumni Profiles',       path: '/alumni',                  icon: UserCheck },
     { label: 'Alumni Jobs',           path: '/alumni-jobs',             icon: Briefcase },
     { label: 'System Announcements',  path: '/system-announcements',    icon: BellRing },
-    { label: 'Announcements',         path: '/announcements',           icon: Newspaper },
-    { label: 'Academic Resources',    path: '/academic-resources',      icon: LibraryBig },
+    { label: 'Attendance',            path: '/attendance',              icon: ClipboardList },
   ],
 
   SUB_ADMIN: [
@@ -98,8 +94,7 @@ export const navigationConfig = {
     { label: 'Alumni Profiles',       path: '/alumni',                  icon: UserCheck },
     { label: 'Alumni Jobs',           path: '/alumni-jobs',             icon: Briefcase },
     { label: 'System Announcements',  path: '/system-announcements',    icon: BellRing },
-    { label: 'Announcements',         path: '/announcements',           icon: Newspaper },
-    { label: 'Academic Resources',    path: '/academic-resources',      icon: LibraryBig },
+    { label: 'Attendance',            path: '/attendance',              icon: ClipboardList },
   ],
 
   FINANCE: [
@@ -113,8 +108,7 @@ export const navigationConfig = {
     { label: 'Transport',             path: '/transport',               icon: Bus },
     { label: 'Event Notices',         path: '/event-notices',           icon: Megaphone },
     { label: 'System Announcements',  path: '/system-announcements',    icon: BellRing },
-    { label: 'Announcements',         path: '/announcements',           icon: Newspaper },
-    { label: 'Academic Resources',    path: '/academic-resources',      icon: LibraryBig },
+    { label: 'Attendance',            path: '/attendance',              icon: ClipboardList },
   ],
 
   FACULTY: [
@@ -133,8 +127,7 @@ export const navigationConfig = {
     { label: 'Event Notices',         path: '/event-notices',           icon: Megaphone },
     { label: 'Event Booking',         path: '/events',                  icon: Calendar },
     { label: 'System Announcements',  path: '/system-announcements',    icon: BellRing },
-    { label: 'Announcements',         path: '/announcements',           icon: Newspaper },
-    { label: 'Academic Resources',    path: '/academic-resources',      icon: LibraryBig },
+    { label: 'Attendance',            path: '/attendance',              icon: ClipboardList },
   ],
 
   TEACHER: [
@@ -153,8 +146,7 @@ export const navigationConfig = {
     { label: 'Event Notices',         path: '/event-notices',           icon: Megaphone },
     { label: 'Event Booking',         path: '/events',                  icon: Calendar },
     { label: 'System Announcements',  path: '/system-announcements',    icon: BellRing },
-    { label: 'Announcements',         path: '/announcements',           icon: Newspaper },
-    { label: 'Academic Resources',    path: '/academic-resources',      icon: LibraryBig },
+    { label: 'Attendance',            path: '/attendance',              icon: ClipboardList },
   ],
 
   STUDENT: [
@@ -172,7 +164,5 @@ export const navigationConfig = {
     { label: 'Event Notices',         path: '/event-notices',           icon: Megaphone },
     { label: 'Event Booking',         path: '/events',                  icon: Calendar },
     { label: 'System Announcements',  path: '/system-announcements',    icon: BellRing },
-    { label: 'Announcements',         path: '/announcements',           icon: Newspaper },
-    { label: 'Academic Resources',    path: '/academic-resources',      icon: LibraryBig },
   ],
 };

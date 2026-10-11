@@ -22,9 +22,7 @@ import {
 } from 'lucide-react';
 import { exportVenues } from '../utils/exportUtils';
 
-const _IS_PROD = window.location.hostname !== 'localhost';
-const _NODE_URL = _IS_PROD ? 'https://university-erp-node.onrender.com' : 'http://localhost:5000';
-const API_BASE_URL = `${_NODE_URL}/api`;
+const API_BASE_URL = 'http://localhost:5000/api';
 
 const Venues = () => {
   const navigate = useNavigate();
@@ -309,7 +307,7 @@ const Venues = () => {
                 <thead>
                   <tr>
                     <th style={{ width: '80px' }}>#</th>
-                    <th style={{ width: '140px' }}>Venue id</th>
+                    <th style={{ width: '140px' }}>Venue ID</th>
                     <th>Name</th>
                     <th style={{ width: '100px' }}>Capacity</th>
                     <th>Facilities</th>

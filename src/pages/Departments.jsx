@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useCallback } from 'react';
+﻿import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   Building2,
@@ -20,9 +20,7 @@ import {
 import { exportDepartments } from '../utils/exportUtils';
 import { useAuth } from '../context/AuthContext';
 
-const _IS_PROD = window.location.hostname !== 'localhost';
-const _NODE_URL = _IS_PROD ? 'https://university-erp-node.onrender.com' : 'http://localhost:5000';
-const API_BASE_URL = `${_NODE_URL}/api`;
+const API_BASE_URL = 'http://localhost:5000/api';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Departments page — Super Admin view
@@ -440,8 +438,8 @@ const Departments = () => {
               <thead>
                 <tr>
                   <th style={{ width: '60px' }}>#</th>
-                  <th style={{ width: '200px' }}>Department id</th>
-                  <th>Department name</th>
+                  <th style={{ width: '200px' }}>Department ID</th>
+                  <th>Department Name</th>
                   <th style={{ width: '140px', textAlign: 'right' }}>Actions</th>
                 </tr>
               </thead>

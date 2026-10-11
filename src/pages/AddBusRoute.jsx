@@ -1,10 +1,9 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { ArrowLeft, Save, AlertCircle, CheckCircle2, Loader2, Plus, X, MapPin, Bus, User, Navigation } from 'lucide-react';
+import { ArrowLeft, Save, AlertCircle, CheckCircle2, Loader2, Plus, X, MapPin } from 'lucide-react';
+import { validateRouteName } from '../utils/transportValidation';
 
-const _IS_PROD = window.location.hostname !== 'localhost';
-const _NODE_URL = _IS_PROD ? 'https://university-erp-node.onrender.com' : 'http://localhost:5000';
-const API_BASE_URL = `${_NODE_URL}/api`;
+const API_BASE_URL = 'http://localhost:5000/api';
 
 const AddBusRoute = () => {
   const { id } = useParams();
@@ -14,6 +13,20 @@ const AddBusRoute = () => {
   const [loading, setLoading] = useState(false);
   const [fetching, setFetching] = useState(false);
   const [feedback, setFeedback] = useState({ type: '', message: '' });
+  const [routeNameError, setRouteNameError] = useState('');
+  const feedbackTimerRef = useRef(null);
+
+  const showFeedback = (type, message) => {
+    if (feedbackTimerRef.current) clearTimeout(feedbackTimerRef.current);
+    setFeedback({ type, message });
+    if (type === 'success') {
+      feedbackTimerRef.current = setTimeout(() => setFeedback({ type: '', message: '' }), 2000);
+    }
+  };
+
+  useEffect(() => {
+    return () => { if (feedbackTimerRef.current) clearTimeout(feedbackTimerRef.current); };
+  }, []);
 
   const [drivers, setDrivers] = useState([]);
   const [vehicles, setVehicles] = useState([]);
@@ -43,12 +56,10 @@ const AddBusRoute = () => {
 
   useEffect(() => {
     fetchDriversAndVehicles();
-    if (isEditMode) {
-      loadRouteDetails();
-    } else {
-      fetchNextRouteId();
-    }
-  }, [id]);
+    if (isEditMode) loadRouteDetails();
+    else            fetchNextRouteId();
+    return () => { if (feedbackTimerRef.current) clearTimeout(feedbackTimerRef.current); };
+  }, [id]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const fetchDriversAndVehicles = async () => {
     try {
@@ -232,6 +243,17 @@ const AddBusRoute = () => {
       return;
     }
 
+    // D2: validate route name format
+    if (formData.hasCustomName) {
+      const nameErr = validateRouteName(formData.routeName);
+      if (nameErr) {
+        setRouteNameError(nameErr);
+        setFeedback({ type: 'error', message: nameErr });
+        return;
+      }
+    }
+    setRouteNameError('');
+
     setLoading(true);
 
     const payload = {
@@ -265,10 +287,7 @@ const AddBusRoute = () => {
         return;
       }
 
-      setFeedback({
-        type: 'success',
-        message: isEditMode ? 'Bus route updated successfully!' : 'Bus route created successfully!',
-      });
+      showFeedback('success', isEditMode ? 'Bus route updated successfully!' : 'Bus route created successfully!');
       setTimeout(() => navigate('/transport'), 1200);
     } catch (err) {
       console.error('Error submitting bus route:', err);
@@ -369,22 +388,25 @@ const AddBusRoute = () => {
                 </div>
               </div>
 
-              {/* Conditional Route Name field */}
               {formData.hasCustomName && (
                 <div className="form-group" style={{ marginTop: '0.75rem' }}>
                   <label htmlFor="routeName" className="form-label">
-                    Route Name (Letters & Numbers) <span style={{ color: '#ef4444' }}>*</span>
+                    Route Name (Letters &amp; Numbers) <span style={{ color: '#ef4444' }}>*</span>
                   </label>
                   <input
                     type="text"
                     id="routeName"
                     name="routeName"
-                    className="form-input"
+                    className={`form-input${routeNameError ? ' input-error' : ''}`}
                     placeholder="e.g. North City Express - Route 1A"
                     value={formData.routeName}
-                    onChange={handleInputChange}
+                    onChange={(e) => {
+                      handleInputChange(e);
+                      if (routeNameError) setRouteNameError(validateRouteName(e.target.value) || '');
+                    }}
                     required={formData.hasCustomName}
                   />
+                  {routeNameError && <p className="form-field-error" style={{ marginTop: '0.25rem' }}>{routeNameError}</p>}
                 </div>
               )}
             </div>
