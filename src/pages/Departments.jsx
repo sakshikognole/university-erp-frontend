@@ -24,7 +24,7 @@ const _IS_PROD = window.location.hostname !== 'localhost';
 const API_BASE_URL = _IS_PROD ? 'https://university-erp-node.onrender.com/api' : 'http://localhost:5000/api';
 
 // -----------------------------------------------------------------------------
-// Departments page — Super Admin view
+// Departments page ï¿½ Super Admin view
 //
 // DEF-001 / DEF-002 / DEF-015:
 //   - Uses `authLoading` from AuthContext to defer access-control decisions until
@@ -66,7 +66,7 @@ const Departments = () => {
   const downloadMenuRef = useRef(null);
   const feedbackTimerRef = useRef(null);
 
-  // DEF-016: responsive placeholder — tracks whether the viewport is "mobile"
+  // DEF-016: responsive placeholder ï¿½ tracks whether the viewport is "mobile"
   const [isMobile, setIsMobile] = useState(
     typeof window !== 'undefined' ? window.matchMedia('(max-width: 640px)').matches : false
   );
@@ -191,7 +191,7 @@ const Departments = () => {
       localStorage.setItem('erp_departments_custom', JSON.stringify(updated));
       showFeedback('success', `Department '${dept.name}' deleted successfully.`);
     } catch (err) {
-      // Show the real error — do not fake success (DEF-007)
+      // Show the real error ï¿½ do not fake success (DEF-007)
       showFeedback('error', err.message || 'Failed to delete department. Please try again.');
     } finally {
       setDeleting(false);
@@ -213,7 +213,7 @@ const Departments = () => {
     return idStr.includes(query) || nameStr.includes(query);
   });
 
-  // -- Render: auth still settling — show spinner (DEF-001, DEF-002, DEF-015) --
+  // -- Render: auth still settling ï¿½ show spinner (DEF-001, DEF-002, DEF-015) --
   if (authLoading) {
     return (
       <div className="page-container">
@@ -317,7 +317,7 @@ const Departments = () => {
         </div>
       </div>
 
-      {/* Feedback Banner — auto-dismissed after 5 s */}
+      {/* Feedback Banner ï¿½ auto-dismissed after 5 s */}
       {feedback.message && (
         <div
           className={`feedback-banner ${

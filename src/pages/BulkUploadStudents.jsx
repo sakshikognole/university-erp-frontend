@@ -20,7 +20,7 @@ const API_BASE_URL = _IS_PROD ? 'https://university-erp-node.onrender.com/api' :
 // BulkUploadStudents
 // Flow:
 //  1. User downloads the sample CSV template.
-//  2. User selects a .csv file — parsed immediately in the browser.
+//  2. User selects a .csv file ï¿½ parsed immediately in the browser.
 //  3. Every row is validated with the same rules as StudentForm (Add/Edit).
 //  4. If ANY row fails validation, all errors are shown; upload button is
 //     disabled until the file is replaced with a corrected version.
@@ -258,7 +258,7 @@ const BulkUploadStudents = () => {
       const result = await res.json();
 
       if (!res.ok) {
-        // Backend returned validation errors — show them (this should rarely
+        // Backend returned validation errors ï¿½ show them (this should rarely
         // happen since we pre-validate in the browser, but the API is authoritative)
         if (result.validationFailed && result.rowErrors) {
           setRowErrors(
@@ -430,7 +430,7 @@ const BulkUploadStudents = () => {
                 <AlertCircle size={18} style={{ flexShrink: 0, marginTop: '2px' }} />
                 <div style={{ width: '100%' }}>
                   <strong>
-                    Validation errors in {rowErrors.length} row{rowErrors.length !== 1 ? 's' : ''} —
+                    Validation errors in {rowErrors.length} row{rowErrors.length !== 1 ? 's' : ''} ï¿½
                     no records will be uploaded until all errors are fixed:
                   </strong>
                   <div style={{ marginTop: '0.75rem' }}>
@@ -441,7 +441,7 @@ const BulkUploadStudents = () => {
                       >
                         <span className="bulk-row-error-label">
                           Row {re.row}
-                          {re.prn && re.prn !== '(empty)' ? ` · PRN: ${re.prn}` : ''}
+                          {re.prn && re.prn !== '(empty)' ? ` ï¿½ PRN: ${re.prn}` : ''}
                         </span>
                         <ul style={{ marginTop: '0.25rem', marginLeft: '1.25rem' }}>
                           {re.errors.map((msg, j) => (
@@ -466,7 +466,7 @@ const BulkUploadStudents = () => {
                     Data Preview
                     {hasErrors && (
                       <span style={{ color: '#b91c1c', fontWeight: 400, fontSize: '0.875rem', marginLeft: '0.5rem' }}>
-                        (errors found — upload is disabled)
+                        (errors found ï¿½ upload is disabled)
                       </span>
                     )}
                   </h3>
@@ -496,19 +496,19 @@ const BulkUploadStudents = () => {
                         <tr key={index}>
                           <td className="text-secondary">{index + 1}</td>
                           <td>
-                            <span className="code-badge">{student.prn || '—'}</span>
+                            <span className="code-badge">{student.prn || 'ï¿½'}</span>
                           </td>
-                          <td>{student.name || '—'}</td>
-                          <td>{student.class || '—'}</td>
-                          <td>{student.division || '—'}</td>
-                          <td>{student.degree || '—'}</td>
-                          <td>{student.yearOfEnrollment || '—'}</td>
+                          <td>{student.name || 'ï¿½'}</td>
+                          <td>{student.class || 'ï¿½'}</td>
+                          <td>{student.division || 'ï¿½'}</td>
+                          <td>{student.degree || 'ï¿½'}</td>
+                          <td>{student.yearOfEnrollment || 'ï¿½'}</td>
                           <td>
                             {student.customFields && student.customFields.length > 0
                               ? student.customFields
                                   .map((cf) => `${cf.key}: ${cf.value}`)
                                   .join('; ')
-                              : '—'}
+                              : 'ï¿½'}
                           </td>
                         </tr>
                       ))}
