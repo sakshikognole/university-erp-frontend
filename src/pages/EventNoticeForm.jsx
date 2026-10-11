@@ -15,7 +15,9 @@ import {
 import { getEventImage } from '../utils/eventImageUtils';
 import { uploadToCloudinary } from '../utils/cloudinaryUpload';
 
-const API_BASE_URL = 'http://localhost:5000/api';
+const _IS_PROD_ENF = window.location.hostname !== 'localhost';
+const NODE_API_URL = _IS_PROD_ENF ? 'https://university-erp-node.onrender.com/api' : 'http://localhost:5000/api';
+const API_BASE_URL = NODE_API_URL;
 
 // ─── Validation helpers ────────────────────────────────────────────────────────
 

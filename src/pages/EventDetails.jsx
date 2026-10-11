@@ -18,7 +18,7 @@ import {
 
 const _IS_PROD_ED = window.location.hostname !== 'localhost';
 const API_BASE_URL = _IS_PROD_ED ? 'https://university-erp-spring.onrender.com/api' : 'http://localhost:9090/api';
-const NODE_API_URL = 'http://localhost:5000/api';
+const NODE_API_URL = _IS_PROD_ED ? 'https://university-erp-node.onrender.com/api' : 'http://localhost:5000/api';
 
 const EventDetails = () => {
   const { id } = useParams();
@@ -81,7 +81,9 @@ const EventDetails = () => {
 
   const fetchVenueDetails = async (venueId) => {
     try {
-      const res = await fetch(`${NODE_API_URL}/venues`);
+      const res = await fetch(`${NODE_API_URL}/venues`, {
+        headers: { Authorization: `Bearer ${localStorage.getItem('erp_token')}` },
+      });
       if (res.ok) {
         const data = await res.json();
         const venues = Array.isArray(data) ? data : (data.venues || []);

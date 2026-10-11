@@ -42,7 +42,7 @@ import EventForm from './EventForm';
 
 const _IS_PROD_EV = window.location.hostname !== 'localhost';
 const API_BASE_URL  = _IS_PROD_EV ? 'https://university-erp-spring.onrender.com/api' : 'http://localhost:9090/api';
-const NODE_API_URL  = 'http://localhost:5000/api';
+const NODE_API_URL  = _IS_PROD_EV ? 'https://university-erp-node.onrender.com/api' : 'http://localhost:5000/api';
 
 // ─── View Event Details dialog (inline, reusing existing modal CSS) ───────────
 const EventDetailsDialog = ({ eventId, onClose, onEdit, onDeleted }) => {
@@ -263,7 +263,9 @@ const Events = () => {
   const fetchEvents = async () => {
     setLoading(true);
     try {
-      const res = await fetch(`${API_BASE_URL}/events`);
+      const res = await fetch(`${API_BASE_URL}/events`, {
+        headers: { Authorization: `Bearer ${localStorage.getItem('erp_token')}` },
+      });
       if (!res.ok) throw new Error('Failed to load events');
       setEvents(await res.json());
       setFeedback({ type: '', message: '' });
@@ -276,7 +278,10 @@ const Events = () => {
   const handleDelete = async (eventId, eventTitle) => {
     setDeleting(true);
     try {
-      const res = await fetch(`${API_BASE_URL}/events/${eventId}`, { method: 'DELETE' });
+      const res = await fetch(`${API_BASE_URL}/events/${eventId}`, {
+        method: 'DELETE',
+        headers: { Authorization: `Bearer ${localStorage.getItem('erp_token')}` },
+      });
       if (!res.ok) { const d = await res.json().catch(()=>({})); throw new Error(d.error || 'Failed to delete event'); }
       const d = await res.json();
       setFeedback({ type: 'success', message: d.message || `Event '${eventTitle}' deleted successfully.` });

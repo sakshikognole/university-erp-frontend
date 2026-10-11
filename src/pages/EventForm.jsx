@@ -22,6 +22,7 @@ import {
 
 const _IS_PROD_EF = window.location.hostname !== 'localhost';
 const API_BASE_URL  = _IS_PROD_EF ? 'https://university-erp-spring.onrender.com/api' : 'http://localhost:9090/api';
+const NODE_API_URL  = _IS_PROD_EF ? 'https://university-erp-node.onrender.com/api' : 'http://localhost:5000/api';
 const NODE_API_URL  = 'http://localhost:5000/api';
 
 // ─── Validation helpers ────────────────────────────────────────────────────────
