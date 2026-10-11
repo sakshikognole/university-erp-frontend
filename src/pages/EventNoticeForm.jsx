@@ -156,7 +156,8 @@ const EventNoticeForm = () => {
 
   const loadBookedEvents = async () => {
     try {
-      const res = await fetch('http://localhost:8080/api/events');
+      const _IS_PROD_ENF = window.location.hostname !== 'localhost';
+      const res = await fetch(`${_IS_PROD_ENF ? 'https://university-erp-spring.onrender.com' : 'http://localhost:9090'}/api/events`);
       if (res.ok) {
         const data = await res.json();
         if (Array.isArray(data)) setBookedEvents(data);

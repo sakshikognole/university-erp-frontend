@@ -22,7 +22,8 @@ import {
 // Node/Express backend — auth, create-order, verify
 const API_BASE_URL = 'http://localhost:5000/api';
 // Spring Boot backend — fee payment combinations
-const SPRING_API_URL = 'http://localhost:8080/api';
+const _IS_PROD_FP = window.location.hostname !== 'localhost';
+const SPRING_API_URL = _IS_PROD_FP ? 'https://university-erp-spring.onrender.com/api' : 'http://localhost:9090/api';
 
 /**
  * Map a PaymentCombination + its resolved titles to the fee record shape

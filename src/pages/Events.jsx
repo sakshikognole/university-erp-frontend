@@ -40,7 +40,8 @@ import { exportEvents } from '../utils/exportUtils';
 import { getEventImage } from '../utils/eventImageUtils';
 import EventForm from './EventForm';
 
-const API_BASE_URL  = 'http://localhost:8080/api';
+const _IS_PROD_EV = window.location.hostname !== 'localhost';
+const API_BASE_URL  = _IS_PROD_EV ? 'https://university-erp-spring.onrender.com/api' : 'http://localhost:9090/api';
 const NODE_API_URL  = 'http://localhost:5000/api';
 
 // ─── View Event Details dialog (inline, reusing existing modal CSS) ───────────

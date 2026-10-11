@@ -5,7 +5,8 @@ import { Users, GraduationCap, Building2, UserPlus, ChevronDown, Loader2, Trophy
 // Students, staff, departments → Node/Express backend
 const API_BASE_URL = 'http://localhost:5000/api';
 // Clubs → Spring Boot backend
-const SPRING_API_URL = 'http://localhost:8080/api';
+const _IS_PROD_SA = window.location.hostname !== 'localhost';
+const SPRING_API_URL = _IS_PROD_SA ? 'https://university-erp-spring.onrender.com/api' : 'http://localhost:9090/api';
 
 const SuperAdminDashboard = () => {
   const navigate = useNavigate();
