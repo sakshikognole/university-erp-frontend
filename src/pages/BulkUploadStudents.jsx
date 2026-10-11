@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+﻿import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   Upload,
@@ -13,9 +13,7 @@ import {
 } from 'lucide-react';
 import { validateStudentFields } from '../utils/studentValidation';
 
-const _IS_PROD = window.location.hostname !== 'localhost';
-const _NODE_URL = _IS_PROD ? 'https://university-erp-node.onrender.com' : 'http://localhost:5000';
-const API_BASE_URL = `${_NODE_URL}/api`;
+const API_BASE_URL = 'http://localhost:5000/api';
 
 // ---------------------------------------------------------------------------
 // BulkUploadStudents
@@ -65,8 +63,12 @@ const BulkUploadStudents = () => {
     const link = document.createElement('a');
     link.href  = url;
     link.download = 'sample_students_upload.csv';
+    document.body.appendChild(link);
     link.click();
-    URL.revokeObjectURL(url);
+    setTimeout(() => {
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+    }, 150);
   };
 
   // ── CSV parser ──────────────────────────────────────────────────────────
@@ -333,7 +335,7 @@ const BulkUploadStudents = () => {
         </div>
       </div>
 
-      <div className="card" style={{ marginTop: '1.5rem' }}>
+      <div className="card student-bulk-card" style={{ marginTop: '1.5rem' }}>
         <div style={{ padding: '1.5rem' }}>
 
           {/* ── Instructions ── */}
@@ -353,15 +355,17 @@ const BulkUploadStudents = () => {
             </div>
           </div>
 
-          <button
-            type="button"
-            className="btn btn-secondary"
-            onClick={downloadSampleCSV}
-            style={{ marginBottom: '1.5rem' }}
-          >
-            <Download size={16} />
-            <span>Download Sample CSV Template</span>
-          </button>
+          {/* alumni-bulk-template-btn prevents the button from overflowing on mobile */}
+          <div className="alumni-bulk-template-btn" style={{ marginBottom: '1.5rem' }}>
+            <button
+              type="button"
+              className="btn btn-secondary"
+              onClick={downloadSampleCSV}
+            >
+              <Download size={16} />
+              <span>Download Sample CSV Template</span>
+            </button>
+          </div>
 
           {/* ── File drop zone ── */}
           <div className="upload-section">
@@ -477,13 +481,13 @@ const BulkUploadStudents = () => {
                     <thead>
                       <tr>
                         <th style={{ width: '60px' }}>#</th>
-                        <th>Prn</th>
+                        <th>PRN</th>
                         <th>Name</th>
                         <th>Class</th>
                         <th style={{ width: '100px' }}>Division</th>
                         <th>Degree</th>
                         <th style={{ width: '100px' }}>Year</th>
-                        <th>Custom fields</th>
+                        <th>Custom Fields</th>
                       </tr>
                     </thead>
                     <tbody>

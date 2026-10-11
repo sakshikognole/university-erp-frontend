@@ -1,31 +1,33 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import {
-  ArrowLeft,
-  Save,
-  AlertCircle,
-  CheckCircle2,
-  Loader2,
-  CreditCard,
-  Ticket,
-  Navigation,
-  Calendar,
-  UserCheck,
-  Search,
+  ArrowLeft, Save, AlertCircle, CheckCircle2, Loader2, UserCheck, Search,
 } from 'lucide-react';
+import { validateBusPassId, validateValidTill } from '../utils/transportValidation';
 
-const _IS_PROD = window.location.hostname !== 'localhost';
-const _NODE_URL = _IS_PROD ? 'https://university-erp-node.onrender.com' : 'http://localhost:5000';
-const API_BASE_URL = `${_NODE_URL}/api`;
+const API_BASE_URL = 'http://localhost:5000/api';
 
 const AddBusPass = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const isEditMode = Boolean(id);
 
-  const [loading, setLoading] = useState(false);
+  const [loading,  setLoading]  = useState(false);
   const [fetching, setFetching] = useState(false);
   const [feedback, setFeedback] = useState({ type: '', message: '' });
+  const [fieldErrors, setFieldErrors] = useState({});
+  const feedbackTimerRef = useRef(null);
+
+  const showFeedback = (type, message) => {
+    if (feedbackTimerRef.current) clearTimeout(feedbackTimerRef.current);
+    setFeedback({ type, message });
+    if (type === 'success')
+      feedbackTimerRef.current = setTimeout(() => setFeedback({ type: '', message: '' }), 2000);
+  };
+
+  useEffect(() => {
+    return () => { if (feedbackTimerRef.current) clearTimeout(feedbackTimerRef.current); };
+  }, []);
 
   const [routes, setRoutes] = useState([]);
   const [availableFromStops, setAvailableFromStops] = useState([]);
@@ -56,16 +58,15 @@ const AddBusPass = () => {
 
   useEffect(() => {
     fetchRoutes();
-    if (isEditMode) {
-      loadPassDetails();
-    } else {
+    if (isEditMode) loadPassDetails();
+    else {
       fetchNextPassId();
       const sixMonthsLater = new Date();
       sixMonthsLater.setMonth(sixMonthsLater.getMonth() + 6);
-      const dateStr = sixMonthsLater.toISOString().split('T')[0];
-      setFormData((prev) => ({ ...prev, validTill: dateStr }));
+      setFormData((prev) => ({ ...prev, validTill: sixMonthsLater.toISOString().split('T')[0] }));
     }
-  }, [id]);
+    return () => { if (feedbackTimerRef.current) clearTimeout(feedbackTimerRef.current); };
+  }, [id]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const fetchRoutes = async () => {
     try {
@@ -223,6 +224,14 @@ const AddBusPass = () => {
     e.preventDefault();
     setFeedback({ type: '', message: '' });
 
+    // D18/D19: Bus Pass ID format BP-XXXX
+    const passIdErr = validateBusPassId(formData.passId);
+    if (passIdErr) {
+      setFieldErrors(prev => ({ ...prev, passId: passIdErr }));
+      showFeedback('error', passIdErr);
+      return;
+    }
+
     if (!formData.passId.trim()) {
       setFeedback({ type: 'error', message: 'Pass ID is required.' });
       return;
@@ -267,6 +276,14 @@ const AddBusPass = () => {
       return;
     }
 
+    // D20: reject past dates
+    const dateErr = validateValidTill(formData.validTill);
+    if (dateErr) {
+      setFieldErrors(prev => ({ ...prev, validTill: dateErr }));
+      showFeedback('error', dateErr);
+      return;
+    }
+
     setLoading(true);
 
     try {
@@ -297,10 +314,7 @@ const AddBusPass = () => {
         return;
       }
 
-      setFeedback({
-        type: 'success',
-        message: isEditMode ? 'Bus Pass updated successfully!' : 'Bus Pass issued successfully!',
-      });
+      showFeedback('success', isEditMode ? 'Bus Pass updated successfully!' : 'Bus Pass issued successfully!');
       setTimeout(() => navigate('/transport'), 1200);
     } catch (err) {
       console.error('Error saving bus pass:', err);
@@ -308,6 +322,11 @@ const AddBusPass = () => {
       setLoading(false);
     }
   };
+
+  const FieldError = ({ name }) =>
+    fieldErrors[name]
+      ? <p className="form-field-error" style={{ marginTop: '0.25rem' }}>{fieldErrors[name]}</p>
+      : null;
 
   return (
     <div className="page-container">
@@ -370,12 +389,14 @@ const AddBusPass = () => {
                     type="text"
                     id="passId"
                     name="passId"
-                    className="form-input"
+                    className={`form-input${fieldErrors.passId ? ' input-error' : ''}`}
                     placeholder="e.g. BP-1001"
                     value={formData.passId}
-                    onChange={handleInputChange}
+                    onChange={(e) => { handleInputChange(e); if (fieldErrors.passId) setFieldErrors(p => ({ ...p, passId: undefined })); }}
                     required
                   />
+                  <small className="form-field-hint">Format: BP- followed by 4 digits (e.g. BP-1001)</small>
+                  <FieldError name="passId" />
                 </div>
 
                 <div className="form-group">
@@ -601,16 +622,18 @@ const AddBusPass = () => {
                     type="date"
                     id="validTill"
                     name="validTill"
-                    className="form-input"
+                    className={`form-input${fieldErrors.validTill ? ' input-error' : ''}`}
                     value={formData.validTill}
-                    onChange={handleInputChange}
+                    min={new Date().toISOString().split('T')[0]}
+                    onChange={(e) => { handleInputChange(e); if (fieldErrors.validTill) setFieldErrors(p => ({ ...p, validTill: undefined })); }}
                     required
                   />
+                  <FieldError name="validTill" />
                 </div>
               </div>
             </div>
 
-            <div className="form-actions-row" style={{ marginTop: '2rem' }}>
+            <div className="form-actions-row transport-form-actions" style={{ marginTop: '2rem' }}>
               <button
                 type="button"
                 className="books-btn books-btn-ghost"

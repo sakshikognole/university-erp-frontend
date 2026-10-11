@@ -2,9 +2,7 @@ import { useState, useEffect, useCallback } from 'react';
 import axios from 'axios';
 import Pagination from '../components/Pagination';
 
-const _IS_PROD_SP = window.location.hostname !== 'localhost';
-const _SPRING_URL = _IS_PROD_SP ? 'https://university-erp-spring.onrender.com' : 'http://localhost:9090';
-const SPRING_API = `${_SPRING_URL}/api`;
+const SPRING_API = 'http://localhost:8080/api';
 
 const DEFAULT_PAGE = {
   pageNumber: 0, pageSize: 10, totalElements: 0,
@@ -13,16 +11,14 @@ const DEFAULT_PAGE = {
 
 // ── Add Payment Modal ─────────────────────────────────────────────────────
 function AddPaymentModal({ isOpen, onClose, onSaved }) {
-  const [form,         setForm]         = useState({ title: '', amount: '', discount: '', yearCourse: '' });
-  const [discountType, setDiscountType] = useState('flat'); // 'flat' | 'percent'
-  const [errors,       setErrors]       = useState({});
-  const [saving,       setSaving]       = useState(false);
-  const [apiErr,       setApiErr]       = useState('');
+  const [form,   setForm]   = useState({ title: '', amount: '', discount: '' });
+  const [errors, setErrors] = useState({});
+  const [saving, setSaving] = useState(false);
+  const [apiErr, setApiErr] = useState('');
 
   useEffect(() => {
     if (isOpen) {
-      setForm({ title: '', amount: '', discount: '', yearCourse: '' });
-      setDiscountType('flat');
+      setForm({ title: '', amount: '', discount: '' });
       setErrors({});
       setApiErr('');
     }
@@ -35,48 +31,14 @@ function AddPaymentModal({ isOpen, onClose, onSaved }) {
     setErrors((er) => ({ ...er, [e.target.name]: '' }));
   };
 
-  // Calculate the actual discount rupee value from input
-  const discountRupees = () => {
-    const amt  = Number(form.amount  || 0);
-    const disc = Number(form.discount || 0);
-    if (discountType === 'percent') return (amt * disc) / 100;
-    return disc;
-  };
-
-  const finalAmount = () => Math.max(0, Number(form.amount || 0) - discountRupees());
-
   const validate = () => {
     const e = {};
-
-    // ── D1: Title validation ──────────────────────────────────────────────
-    const t = form.title.trim();
-    if (!t) {
+    if (!form.title.trim())
       e.title = 'Title is required.';
-    } else if (!/^[A-Za-z\s]+$/.test(t)) {
-      e.title = 'Title must contain only letters and spaces. No numbers or special characters.';
-    } else if (/\s{2,}/.test(t)) {
-      e.title = 'Title must not contain double spaces.';
-    } else if (t.length < 2) {
-      e.title = 'Title must be at least 2 characters.';
-    }
-
-    // ── Amount ────────────────────────────────────────────────────────────
     if (!form.amount || isNaN(form.amount) || Number(form.amount) <= 0)
       e.amount = 'Valid amount is required.';
-
-    // ── D2: Discount validation ───────────────────────────────────────────
-    if (form.discount !== '') {
-      if (isNaN(form.discount) || Number(form.discount) < 0) {
-        e.discount = 'Discount must be 0 or more.';
-      } else if (discountType === 'percent' && Number(form.discount) > 100) {
-        e.discount = 'Percentage cannot exceed 100%.';
-      } else if (discountType === 'flat' && form.amount &&
-                 Number(form.discount) > Number(form.amount)) {
-        // D2: flat discount cannot exceed the amount
-        e.discount = 'Discount cannot be greater than the Amount.';
-      }
-    }
-
+    if (form.discount !== '' && (isNaN(form.discount) || Number(form.discount) < 0))
+      e.discount = 'Discount must be 0 or more.';
     return e;
   };
 
@@ -88,10 +50,9 @@ function AddPaymentModal({ isOpen, onClose, onSaved }) {
     setApiErr('');
     try {
       await axios.post(`${SPRING_API}/payment-titles`, {
-        title:      form.title.trim(),
-        amount:     Number(form.amount),
-        discount:   discountRupees(),
-        yearCourse: form.yearCourse.trim() || null,
+        title:    form.title.trim(),
+        amount:   Number(form.amount),
+        discount: Number(form.discount || 0),
       });
       onSaved();
       onClose();
@@ -102,20 +63,12 @@ function AddPaymentModal({ isOpen, onClose, onSaved }) {
     }
   };
 
-  const amt      = Number(form.amount  || 0);
-  const discVal  = Number(form.discount || 0);
-  // D2: show preview only when discount is valid (not exceeding amount in flat mode)
-  const discOk   = discountType === 'percent'
-    ? discVal >= 0 && discVal <= 100
-    : discVal >= 0 && discVal <= amt;
-
   return (
     <div className="books-overlay">
-      {/* UI fix: centered modal, not shifted right */}
-      <div className="books-modal" style={{ maxWidth: 460, width: '100%' }}>
+      <div className="books-modal" style={{ maxWidth: 420 }}>
         <div className="books-modal-head">
           <h3>Add Payment Title</h3>
-          <button className="books-modal-close" onClick={onClose} disabled={saving}>x</button>
+          <button className="books-modal-close" onClick={onClose}>x</button>
         </div>
         <form onSubmit={submit}>
           <div className="books-modal-body">
@@ -124,8 +77,6 @@ function AddPaymentModal({ isOpen, onClose, onSaved }) {
                 <span>{apiErr}</span>
               </div>
             )}
-
-            {/* Title */}
             <div className="books-form-group">
               <label className="books-form-label">Title *</label>
               <input
@@ -134,30 +85,9 @@ function AddPaymentModal({ isOpen, onClose, onSaved }) {
                 value={form.title}
                 onChange={change}
                 placeholder="e.g. Exam Fee"
-                autoFocus
               />
               {errors.title && <p className="books-form-err">{errors.title}</p>}
             </div>
-
-            {/* Year / Course — Improvement */}
-            <div className="books-form-group">
-              <label className="books-form-label">
-                Applicable Year / Course
-                <span style={{ fontSize: 11, color: 'var(--text-secondary)',
-                               marginLeft: 6, fontWeight: 400 }}>
-                  (optional — helps identify duplicates)
-                </span>
-              </label>
-              <input
-                className="books-form-control"
-                name="yearCourse"
-                value={form.yearCourse}
-                onChange={change}
-                placeholder="e.g. First Year, Second Year, B.Tech CSE"
-              />
-            </div>
-
-            {/* Amount + Discount */}
             <div className="club-form-row">
               <div className="books-form-group">
                 <label className="books-form-label">Amount (₹) *</label>
@@ -173,70 +103,33 @@ function AddPaymentModal({ isOpen, onClose, onSaved }) {
                 {errors.amount && <p className="books-form-err">{errors.amount}</p>}
               </div>
               <div className="books-form-group">
-                <label className="books-form-label">
-                  Discount&nbsp;
-                  <span style={{
-                    display: 'inline-flex', border: '1px solid #d1d5db',
-                    borderRadius: 6, overflow: 'hidden', fontSize: '0.75rem',
-                    marginLeft: 4, verticalAlign: 'middle',
-                  }}>
-                    <button type="button"
-                      onClick={() => { setDiscountType('flat'); setErrors((er) => ({ ...er, discount: '' })); }}
-                      style={{
-                        padding: '1px 8px', border: 'none', cursor: 'pointer',
-                        background: discountType === 'flat' ? '#2563eb' : '#f9fafb',
-                        color:      discountType === 'flat' ? '#fff'    : '#374151',
-                        fontWeight: 600,
-                      }}>₹</button>
-                    <button type="button"
-                      onClick={() => { setDiscountType('percent'); setErrors((er) => ({ ...er, discount: '' })); }}
-                      style={{
-                        padding: '1px 8px', border: 'none', cursor: 'pointer',
-                        background: discountType === 'percent' ? '#2563eb' : '#f9fafb',
-                        color:      discountType === 'percent' ? '#fff'    : '#374151',
-                        fontWeight: 600,
-                      }}>%</button>
-                  </span>
-                </label>
+                <label className="books-form-label">Discount (₹)</label>
                 <input
                   className={`books-form-control ${errors.discount ? 'err' : ''}`}
                   name="discount"
                   type="number"
                   min="0"
-                  max={discountType === 'percent' ? 100 : (form.amount || undefined)}
                   value={form.discount}
                   onChange={change}
-                  placeholder={discountType === 'percent' ? 'e.g. 10' : 'e.g. 100'}
+                  placeholder="e.g. 100"
                 />
                 {errors.discount && <p className="books-form-err">{errors.discount}</p>}
               </div>
             </div>
-
-            {/* Live preview — only when values are valid (D2: no negative shown) */}
-            {form.amount && discOk && (
-              <div style={{
-                background: '#f0fdf4', border: '1px solid #bbf7d0',
-                borderRadius: 8, padding: '8px 12px', marginTop: 4, fontSize: 13,
-              }}>
-                {form.discount && discountType === 'percent' && (
-                  <p style={{ margin: '0 0 4px', color: '#374151' }}>
-                    Discount: {form.discount}% of ₹{Number(form.amount).toLocaleString('en-IN')}
-                    {' = '}
-                    <strong>- ₹{discountRupees().toLocaleString('en-IN', { maximumFractionDigits: 2 })}</strong>
-                  </p>
-                )}
-                <p style={{ margin: 0, color: '#374151' }}>
-                  Final amount after discount:{' '}
-                  <strong style={{ color: '#16a34a', fontSize: 14 }}>
-                    ₹{finalAmount().toLocaleString('en-IN', { maximumFractionDigits: 2 })}
-                  </strong>
-                </p>
-              </div>
+            {form.amount && (
+              <p style={{ fontSize: 13, color: 'var(--text-secondary)', marginTop: 4 }}>
+                Final amount after discount:{' '}
+                <strong style={{ color: '#16a34a' }}>
+                  ₹{Math.max(0, Number(form.amount) - Number(form.discount || 0)).toLocaleString('en-IN')}
+                </strong>
+              </p>
             )}
           </div>
           <div className="books-modal-foot">
             <button type="button" className="books-btn books-btn-ghost"
-                    onClick={onClose} disabled={saving}>Cancel</button>
+                    onClick={onClose} disabled={saving}>
+              Cancel
+            </button>
             <button type="submit" className="books-btn books-btn-primary"
                     disabled={saving}>
               {saving ? 'Saving...' : 'Save'}
@@ -291,7 +184,7 @@ export default function PaymentPage() {
         params: { page, size },
       });
       const pd = res.data;
-      setTitles(Array.isArray(pd.content) ? pd.content : []);
+      setTitles(pd.content);
       setPageData({
         pageNumber:    pd.number       ?? pd.pageNumber    ?? 0,
         pageSize:      pd.size         ?? pd.pageSize      ?? size,
@@ -311,10 +204,8 @@ export default function PaymentPage() {
   const loadCombinations = useCallback(async () => {
     try {
       const res = await axios.get(`${SPRING_API}/payment-combinations`);
-      setCombinations(Array.isArray(res.data) ? res.data : (res.data?.content ?? []));
-    } catch {
-      setError('Failed to load payment combinations.');
-    }
+      setCombinations(res.data);
+    } catch { /* silently ignore */ }
   }, []);
 
   // ── Load all titles flat (for breakdown card lookup) ──────────────────
@@ -323,8 +214,8 @@ export default function PaymentPage() {
       const res = await axios.get(`${SPRING_API}/payment-titles`, {
         params: { page: 0, size: 1000 },
       });
-      setAllTitles(Array.isArray(res.data?.content) ? res.data.content : []);
-    } catch { /* silently ignore — allTitles is only used for breakdown display */ }
+      setAllTitles(res.data.content ?? []);
+    } catch { /* silently ignore */ }
   }, []);
 
   useEffect(() => { loadTitles(); },       [loadTitles]);
@@ -389,20 +280,16 @@ export default function PaymentPage() {
   return (
     <div className="page-container">
 
-      {/* Header — UI fix: button always right-aligned, even on mobile */}
-      <div className="books-page-header" style={{
-        display: 'flex', alignItems: 'center',
-        justifyContent: 'space-between', flexWrap: 'nowrap', gap: 12,
-      }}>
-        <div style={{ minWidth: 0 }}>
+      {/* Header */}
+      <div className="books-page-header">
+        <div>
           <h1 className="page-title">Payment Management</h1>
-          <p className="page-subtitle">
+          <p className="stu-page-sub">
             Manage fee titles and create payment combinations for students
           </p>
         </div>
         <button
           className="books-btn books-btn-primary"
-          style={{ flexShrink: 0 }}
           onClick={() => setModalOpen(true)}
         >
           + Add Payment Title
@@ -426,34 +313,7 @@ export default function PaymentPage() {
       {/* ── Payment Titles Table ── */}
       <div className="card" style={{ marginTop: '1.25rem' }}>
         {titlesLoading ? (
-          /* Skeleton loader — no blank screen while loading */
-          <div className="books-table-wrap">
-            <table className="books-table">
-              <thead>
-                <tr>
-                  <th style={{ width: 40 }}></th>
-                  <th>Title ID</th><th>Payment Title</th><th>Year / Course</th>
-                  <th>Amount</th><th>Discount</th><th>Net Payable</th>
-                </tr>
-              </thead>
-              <tbody>
-                {Array.from({ length: 5 }).map((_, i) => (
-                  <tr key={i}>
-                    {[5, 12, 25, 20, 12, 12, 12].map((w, j) => (
-                      <td key={j}>
-                        <div style={{
-                          height: 13, width: `${w + 10}%`, borderRadius: 4,
-                          background: 'linear-gradient(90deg,#f3f4f6 25%,#e5e7eb 50%,#f3f4f6 75%)',
-                          backgroundSize: '200% 100%',
-                          animation: 'books-shimmer 1.4s infinite',
-                        }} />
-                      </td>
-                    ))}
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+          <p className="books-loading">Loading payment titles...</p>
         ) : (
           <div className="books-table-wrap">
             <table className="books-table">
@@ -468,18 +328,17 @@ export default function PaymentPage() {
                       title="Select all on this page"
                     />
                   </th>
-                  <th>Title id</th>
-                  <th>Payment title</th>
-                  <th>Year / course</th>
+                  <th>Title ID</th>
+                  <th>Payment Title</th>
                   <th>Amount</th>
                   <th>Discount</th>
-                  <th>Net payable</th>
+                  <th>Net Payable</th>
                 </tr>
               </thead>
               <tbody>
                 {titles.length === 0 ? (
                   <tr>
-                    <td colSpan={7}>
+                    <td colSpan={6}>
                       <div className="books-empty">No payment titles found.</div>
                     </td>
                   </tr>
@@ -499,9 +358,6 @@ export default function PaymentPage() {
                     </td>
                     <td><span className="code-badge">{t.titleId}</span></td>
                     <td style={{ fontWeight: 500 }}>{t.title}</td>
-                    <td style={{ fontSize: 13, color: 'var(--text-secondary)' }}>
-                      {t.yearCourse || '—'}
-                    </td>
                     <td className="pay-amount">{fmt(t.amount)}</td>
                     <td style={{ color: '#047857' }}>
                       {t.discount > 0 ? `- ${fmt(t.discount)}` : '₹0'}
@@ -586,7 +442,7 @@ export default function PaymentPage() {
                 <table className="books-table">
                   <thead>
                     <tr>
-                      <th>Payment title</th>
+                      <th>Payment Title</th>
                       <th>Amount</th>
                       <th>Discount</th>
                       <th>Net</th>

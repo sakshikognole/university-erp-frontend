@@ -60,28 +60,28 @@ export function validateName(raw) {
 
   // Reject leading/trailing quotes
   if (/^["']|["']$/.test(name)) {
-    return 'Name must not be enclosed in quotes.';
+    return 'Invalid Name. Please enter a valid full name. (e.g., Neha More)';
   }
 
   // Reject numeric-only
   if (/^\d+$/.test(name)) {
-    return 'Name must contain letters only.';
+    return 'Invalid Name. Please enter a valid full name. (e.g., Neha More)';
   }
 
   // Reject alphanumeric (letters mixed with digits)
   if (/\d/.test(name)) {
-    return 'Name must not contain numbers.';
+    return 'Invalid Name. Please enter a valid full name. (e.g., Neha More)';
   }
 
   // Reject invalid special characters
   if (!NAME_VALID_CHARS_REGEX.test(name)) {
-    return "Name must contain only letters, spaces, hyphens, apostrophes, or dots.";
+    return 'Invalid Name. Please enter a valid full name. (e.g., Neha More)';
   }
 
   // Require at least two words (first + last name)
   const words = name.split(/\s+/).filter((w) => w.length > 0);
   if (words.length < 2) {
-    return 'Enter your first name and last name.';
+    return 'Invalid Name. Please enter a valid full name. (e.g., Neha More)';
   }
 
   return '';
@@ -97,7 +97,7 @@ export function validatePRN(raw) {
   const prn = raw.trim().toUpperCase();
 
   if (!PRN_REGEX.test(prn)) {
-    return 'Invalid PRN format. Expected format: PRN followed by 4-digit year and 3-digit number (e.g. PRN2024001).';
+    return 'Invalid PRN. Please enter a valid PRN. (e.g., PRN2024001)';
   }
   return '';
 }
@@ -113,11 +113,11 @@ export function validateClass(raw) {
 
   // Must contain at least one letter
   if (!/[A-Za-z]/.test(cls)) {
-    return 'Class must contain letters (e.g. First Year, Second Year).';
+    return 'Invalid Class. Please enter a valid class. (e.g., First Year, Second Year)';
   }
 
   if (!CLASS_VALID_REGEX.test(cls)) {
-    return 'Class contains invalid characters. Use letters, numbers, spaces, dots, or hyphens.';
+    return 'Invalid Class. Please enter a valid class. (e.g., First Year, Second Year)';
   }
 
   return '';
@@ -134,7 +134,7 @@ export function validateDegree(raw) {
 
   // Must start with a letter and contain letters
   if (!DEGREE_VALID_REGEX.test(deg)) {
-    return 'Degree must start with a letter and contain only letters, numbers, spaces, dots, hyphens, or parentheses (e.g. B.Tech Computer Science).';
+    return 'Invalid Degree. Please enter a valid degree. (e.g., B.Tech, B.Sc, M.Sc, MBA)';
   }
 
   return '';
@@ -167,12 +167,12 @@ export function validateYearOfEnrollment(raw) {
 // ---------------------------------------------------------------------------
 export function validateDivision(raw) {
   if (!raw || raw.trim().length === 0) {
-    return 'Division is required (e.g. A, B, C).';
+    return 'Division is required.';
   }
   const div = raw.trim();
 
   if (!DIVISION_VALID_REGEX.test(div)) {
-    return 'Division must start with a letter and contain only letters, numbers, spaces, or hyphens (e.g. A, B Division).';
+    return 'Invalid Division. Please enter a valid division. (e.g., A, B, C)';
   }
 
   return '';
