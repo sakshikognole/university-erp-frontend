@@ -14,7 +14,8 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { ArrowLeft, Save, AlertCircle, CheckCircle2, Loader2 } from 'lucide-react';
 import { validateVehicleId, validateVehicleName, validateRegistration } from '../utils/transportValidation';
 
-const API_BASE_URL = 'http://localhost:5000/api';
+const _IS_PROD = window.location.hostname !== 'localhost';
+const API_BASE_URL = _IS_PROD ? 'https://university-erp-node.onrender.com/api' : 'http://localhost:5000/api';
 
 const AddVehicle = () => {
   const { id }    = useParams();

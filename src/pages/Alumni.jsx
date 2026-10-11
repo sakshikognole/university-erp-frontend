@@ -23,7 +23,8 @@ import {
   Upload, Edit, Trash2, X, AlertTriangle, RefreshCw,
 } from 'lucide-react';
 
-const API_BASE_URL = 'http://localhost:5000/api';
+const _IS_PROD = window.location.hostname !== 'localhost';
+const API_BASE_URL = _IS_PROD ? 'https://university-erp-node.onrender.com/api' : 'http://localhost:5000/api';
 const NO_RECORDS_MSG = 'No Alumni records available to download.';
 
 // ── Export helpers ────────────────────────────────────────────────────────────

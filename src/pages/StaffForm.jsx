@@ -10,7 +10,8 @@ import {
   VALID_ROLES,
 } from '../utils/staffValidation';
 
-const API_BASE_URL = 'http://localhost:5000/api';
+const _IS_PROD = window.location.hostname !== 'localhost';
+const API_BASE_URL = _IS_PROD ? 'https://university-erp-node.onrender.com/api' : 'http://localhost:5000/api';
 
 const StaffForm = () => {
   const { id } = useParams();

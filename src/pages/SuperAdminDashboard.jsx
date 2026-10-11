@@ -3,9 +3,9 @@ import { useNavigate } from 'react-router-dom';
 import { Users, GraduationCap, Building2, UserPlus, ChevronDown, Loader2, Trophy } from 'lucide-react';
 
 // Students, staff, departments → Node/Express backend
-const API_BASE_URL = 'http://localhost:5000/api';
-// Clubs → Spring Boot backend
 const _IS_PROD_SA = window.location.hostname !== 'localhost';
+const API_BASE_URL = _IS_PROD_SA ? 'https://university-erp-node.onrender.com/api' : 'http://localhost:5000/api';
+// Clubs → Spring Boot backend
 const SPRING_API_URL = _IS_PROD_SA ? 'https://university-erp-spring.onrender.com/api' : 'http://localhost:9090/api';
 
 const SuperAdminDashboard = () => {

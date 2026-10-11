@@ -173,7 +173,7 @@ const EventNoticeForm = () => {
     try {
       let res = await fetch(`${API_BASE_URL}/venues`, { headers: authHeader() });
       if (!res.ok) {
-        res = await fetch('http://localhost:5000/api/super-admin/venues', {
+        res = await fetch(`${API_BASE_URL}/super-admin/venues`, {
           headers: authHeader(),
         });
       }

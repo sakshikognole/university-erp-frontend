@@ -1,6 +1,9 @@
 
 import React, { useEffect, useState } from 'react';
 
+const _IS_PROD_AR = window.location.hostname !== 'localhost';
+const NODE_URL = _IS_PROD_AR ? 'https://university-erp-node.onrender.com/api' : 'http://localhost:5000/api';
+
 const AcademicResources = () => {
   const [showForm, setShowForm] = useState(false);
 
@@ -25,7 +28,7 @@ const AcademicResources = () => {
       setFetching(true);
 
       const response = await fetch(
-        'http://localhost:5000/api/resources'
+        `${NODE_URL}/resources`
       );
 
       const data = await response.json();
@@ -65,7 +68,7 @@ const AcademicResources = () => {
       formData.append('file', file);
 
       const response = await fetch(
-        'http://localhost:5000/api/resources',
+        `${NODE_URL}/resources`,
         {
           method: 'POST',
           body: formData,
@@ -126,7 +129,7 @@ const AcademicResources = () => {
 
     try {
       const response = await fetch(
-        `http://localhost:5000/api/resources/${id}`,
+        `${NODE_URL}/resources/${id}`,
         {
           method: 'DELETE',
         }

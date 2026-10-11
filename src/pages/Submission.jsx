@@ -2,6 +2,9 @@
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 
+const _IS_PROD_SUB = window.location.hostname !== 'localhost';
+const NODE_URL = _IS_PROD_SUB ? 'https://university-erp-node.onrender.com/api' : 'http://localhost:5000/api';
+
 const Submission = () => {
   const { announcementId } = useParams();
 
@@ -29,7 +32,7 @@ const Submission = () => {
     const fetchAnnouncement = async () => {
       try {
         const response = await fetch(
-          `http://localhost:5000/api/announcements/single/${announcementId}`
+          `/announcements/single/${announcementId}`
         );
 
         const data = await response.json();
@@ -61,7 +64,7 @@ const Submission = () => {
     const fetchStudentSubmission = async () => {
       try {
         const response = await fetch(
-          `http://localhost:5000/api/submissions/${announcementId}/student/student123`
+          `/submissions/${announcementId}/student/student123`
         );
 
         const data = await response.json();
@@ -131,7 +134,7 @@ const Submission = () => {
       formData.append('file', file);
 
       const response = await fetch(
-        `http://localhost:5000/api/submissions/${announcementId}/submit`,
+        `/submissions/${announcementId}/submit`,
         {
           method: 'POST',
           body: formData,

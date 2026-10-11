@@ -30,7 +30,8 @@ import {
 import { uploadToCloudinary } from '../utils/cloudinaryUpload';
 import { validateAnnouncementTitle } from '../utils/announcementValidation';
 
-const API_BASE_URL = 'http://localhost:5000/api';
+const _IS_PROD = window.location.hostname !== 'localhost';
+const API_BASE_URL = _IS_PROD ? 'https://university-erp-node.onrender.com/api' : 'http://localhost:5000/api';
 
 const MAX_FILE_BYTES = 10 * 1024 * 1024; // 10 MB
 

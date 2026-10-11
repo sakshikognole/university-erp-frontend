@@ -1,6 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 
+const _IS_PROD_ANN = window.location.hostname !== 'localhost';
+const NODE_URL = _IS_PROD_ANN ? 'https://university-erp-node.onrender.com/api' : 'http://localhost:5000/api';
+
 const Announcements = () => {
   const [showForm, setShowForm] = useState(false);
   const navigate = useNavigate();
@@ -19,7 +22,7 @@ const Announcements = () => {
   // Announcements fetched from backend
   const [announcements, setAnnouncements] = useState([]);
   useEffect(() => {
-    fetch('http://localhost:5000/api/announcements')
+    fetch(${NODE_URL}/announcements')
       .then((res) => res.json())
       .then((data) => {
         setAnnouncements(data.announcements);
@@ -53,7 +56,7 @@ const Announcements = () => {
 
     try {
       const response = await fetch(
-        'http://localhost:5000/api/announcements',
+        ${NODE_URL}/announcements',
         {
           method: 'POST',
           headers: {
@@ -131,7 +134,7 @@ const Announcements = () => {
 
     try {
       const response = await fetch(
-        `http://localhost:5000/api/announcements/${editingDeadlineId}/deadline`,
+        `/announcements/${editingDeadlineId}/deadline`,
         {
           method: 'PUT',
           headers: {
@@ -187,7 +190,7 @@ const Announcements = () => {
 
     try {
       const response = await fetch(
-        `http://localhost:5000/api/submissions/${announcementId}`
+        `/submissions/${announcementId}`
       );
 
       const data = await response.json();
@@ -242,7 +245,7 @@ const Announcements = () => {
 
     try {
       const response = await fetch(
-        `http://localhost:5000/api/submissions/${submissionId}/marks`,
+        `/submissions/${submissionId}/marks`,
         {
           method: 'PUT',
           headers: {
@@ -286,7 +289,7 @@ const Announcements = () => {
   const handleDelete = async (id) => {
     try {
       const response = await fetch(
-        `http://localhost:5000/api/announcements/${id}`,
+        `/announcements/${id}`,
         {
           method: 'DELETE',
         }
