@@ -110,6 +110,11 @@ import SystemAnnouncements from './pages/SystemAnnouncements';
 import SystemAnnouncementForm from './pages/SystemAnnouncementForm';
 import SystemAnnouncementView from './pages/SystemAnnouncementView';
 
+// --- Announcements, Submissions, Academic Resources ---
+import Announcements from './pages/Announcements';
+import Submission from './pages/Submission';
+import AcademicResources from './pages/AcademicResources';
+
 // --- Password Management ---
 import PasswordManagementPage from './pages/PasswordManagement/PasswordManagementPage';
 import PmOtpPage from './pages/PasswordManagement/PmOtpPage';
@@ -614,6 +619,13 @@ function AppRoutes() {
           path="system-announcements/edit/:id"
           element={<SystemAnnouncementForm />}
         />
+
+        {/* ==================== ANNOUNCEMENTS ==================== */}
+        <Route path="announcements" element={<Announcements />} />
+        <Route path="submission/:announcementId" element={<Submission />} />
+
+        {/* ==================== ACADEMIC RESOURCES ==================== */}
+        <Route path="academic-resources" element={<AcademicResources />} />
       </Route>
 
       {/* Catch-all fallback */}

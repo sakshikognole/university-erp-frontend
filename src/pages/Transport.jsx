@@ -590,10 +590,10 @@ const Transport = () => {
                   <thead>
                     <tr>
                       <th style={{ width: '60px' }}>#</th>
-                      <th style={{ width: '120px' }}>Driver ID</th>
-                      <th>Driver Name</th>
+                      <th style={{ width: '120px' }}>Driver id</th>
+                      <th>Driver name</th>
                       <th>Phone</th>
-                      <th>License Number</th>
+                      <th>License number</th>
                       <th style={{ width: '120px' }}>Status</th>
                       <th style={{ width: '140px', textAlign: 'right' }}>Actions</th>
                     </tr>

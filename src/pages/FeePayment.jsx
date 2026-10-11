@@ -428,11 +428,11 @@ const FeePayment = () => {
                 <thead>
                   <tr>
                     <th style={{ width: '60px' }}>#</th>
-                    <th>Payment Title</th>
-                    <th>Total Fee Amount</th>
+                    <th>Payment title</th>
+                    <th>Total fee amount</th>
                     <th>Discount</th>
-                    <th>Paid Amount</th>
-                    <th>Remaining Amount</th>
+                    <th>Paid amount</th>
+                    <th>Remaining amount</th>
                     <th style={{ width: '120px' }}>Status</th>
                     <th style={{ width: '130px', textAlign: 'right' }}>Action</th>
                   </tr>

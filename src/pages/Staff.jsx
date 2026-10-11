@@ -262,12 +262,12 @@ const Staff = () => {
                 <thead>
                   <tr>
                     <th style={{ width: '60px' }}>#</th>
-                    <th style={{ width: '150px' }}>Staff ID</th>
+                    <th style={{ width: '150px' }}>Staff id</th>
                     <th>Name</th>
                     <th>Email</th>
                     <th style={{ width: '140px' }}>Phone</th>
                     <th style={{ width: '140px' }}>Role</th>
-                    <th style={{ width: '120px' }}>Join Date</th>
+                    <th style={{ width: '120px' }}>Join date</th>
                     <th style={{ width: '100px', textAlign: 'right' }}>Actions</th>
                   </tr>
                 </thead>

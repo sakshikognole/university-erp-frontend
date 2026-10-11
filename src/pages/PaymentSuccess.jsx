@@ -325,7 +325,7 @@ const PaymentSuccess = () => {
         <table className="data-table" style={{ marginBottom: '1.75rem', width: '100%' }}>
           <thead>
             <tr>
-              <th>Fee Breakdown / Item Description</th>
+              <th>Fee breakdown / item description</th>
               <th style={{ width: '180px', textAlign: 'right' }}>Amount (INR)</th>
             </tr>
           </thead>

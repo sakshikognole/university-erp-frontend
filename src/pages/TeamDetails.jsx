@@ -162,10 +162,10 @@ export default function TeamDetails({ teamId, onBack }) {
         <table className="books-table">
           <thead>
             <tr>
-              <th>Team ID</th>
-              <th>Sport Name</th>
-              <th>Coach Name</th>
-              <th>Captain Name</th>
+              <th>Team id</th>
+              <th>Sport name</th>
+              <th>Coach name</th>
+              <th>Captain name</th>
             </tr>
           </thead>
           <tbody>
@@ -230,8 +230,8 @@ export default function TeamDetails({ teamId, onBack }) {
             <table className="books-table">
               <thead>
                 <tr>
-                  <th>PRN</th>
-                  <th>Student Name</th>
+                  <th>Prn</th>
+                  <th>Student name</th>
                   <th>Action</th>
                 </tr>
               </thead>
@@ -299,8 +299,8 @@ export default function TeamDetails({ teamId, onBack }) {
           <table className="books-table">
             <thead>
               <tr>
-                <th>PRN</th>
-                <th>Student Name</th>
+                <th>Prn</th>
+                <th>Student name</th>
                 <th>Action</th>
               </tr>
             </thead>
@@ -334,8 +334,8 @@ export default function TeamDetails({ teamId, onBack }) {
           <table className="books-table">
             <thead>
               <tr>
-                <th>Student Name</th>
-                <th>PRN</th>
+                <th>Prn</th>
+                <th>Student name</th>
                 <th>Status</th>
                 <th>Action</th>
               </tr>

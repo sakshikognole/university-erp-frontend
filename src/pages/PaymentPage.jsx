@@ -432,8 +432,8 @@ export default function PaymentPage() {
               <thead>
                 <tr>
                   <th style={{ width: 40 }}></th>
-                  <th>Title ID</th><th>Payment Title</th><th>Year / Course</th>
-                  <th>Amount</th><th>Discount</th><th>Net Payable</th>
+                  <th>Title id</th><th>Payment title</th><th>Year / course</th>
+                  <th>Amount</th><th>Discount</th><th>Net payable</th>
                 </tr>
               </thead>
               <tbody>

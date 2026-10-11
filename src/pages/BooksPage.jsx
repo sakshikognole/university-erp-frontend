@@ -227,7 +227,7 @@ export default function BooksPage() {
             <table className="books-table">
               <thead>
                 <tr>
-                  <th>#</th><th>Book title</th><th>Author</th>
+                  <th>#</th><th>Book id</th><th>Book title</th><th>Author</th>
                   <th>Copies</th><th>Location</th><th>Department</th><th>Actions</th>
                 </tr>
               </thead>
@@ -284,8 +284,8 @@ export default function BooksPage() {
                   <thead>
                     <tr>
                       <th>#</th>
-                      <th>Book ID</th>
-                      <th>Book Title</th>
+                      <th>Book id</th>
+                      <th>Book title</th>
                       <th>Author</th>
                       <th>Copies</th>
                       <th>Location</th>

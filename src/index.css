@@ -1992,12 +1992,13 @@ button {
 .data-table th {
   background-color: var(--bg-secondary);
   color: var(--text-secondary);
-  font-weight: 700;
-  font-size: 0.875rem;
+  font-weight: 600;
+  font-size: 14px;
   text-transform: none;
-  letter-spacing: 0.05em;
-  padding: 0.75rem 1.25rem;
-  border-bottom: 1px solid var(--border-color);
+  letter-spacing: 0;
+  padding: 11px 14px;
+  border-bottom: 2px solid var(--border-color);
+  white-space: nowrap;
 }
 
 .data-table td {
@@ -3608,6 +3609,7 @@ button {
   background: var(--bg-secondary);
   padding: 11px 14px;
   text-align: left;
+  font-size: 14px;
   font-weight: 600;
   color: var(--text-secondary);
   border-bottom: 2px solid var(--border-color);
@@ -7792,12 +7794,13 @@ input[type='password']::-webkit-inner-spin-button {
 .data-table th {
   background-color: var(--bg-secondary);
   color: var(--text-secondary);
-  font-weight: 700;
-  font-size: 0.875rem;
+  font-weight: 600;
+  font-size: 14px;
   text-transform: none;
-  letter-spacing: 0.05em;
-  padding: 0.75rem 1.25rem;
-  border-bottom: 1px solid var(--border-color);
+  letter-spacing: 0;
+  padding: 11px 14px;
+  border-bottom: 2px solid var(--border-color);
+  white-space: nowrap;
 }
 
 .data-table td {
@@ -9406,14 +9409,14 @@ input[type='password']::-webkit-inner-spin-button {
 }
 .books-table th {
   text-align: left;
-  padding: 0.65rem 0.85rem;
-  font-size: 0.875rem;
-  font-weight: 700;
-  color: var(--text-secondary, #6b7280);
+  padding: 11px 14px;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-secondary);
   text-transform: none;
-  letter-spacing: 0.04em;
-  background: var(--bg-secondary, #f9fafb);
-  border-bottom: 1px solid var(--border-primary, #e5e7eb);
+  letter-spacing: 0;
+  background: var(--bg-secondary);
+  border-bottom: 2px solid var(--border-color);
   white-space: nowrap;
 }
 .books-table td {

@@ -150,12 +150,12 @@ export default function SelectStudent() {
                   <thead>
                     <tr>
                       <th style={{ width: 42 }}>#</th>
-                      <th>Student ID</th>
+                      <th>Student id</th>
                       <th>Name</th>
                       <th>Gender</th>
                       <th>Year</th>
-                      <th>Degree Program</th>
-                      <th>Academic Year</th>
+                      <th>Degree program</th>
+                      <th>Academic year</th>
                     </tr>
                   </thead>
                   <tbody>
