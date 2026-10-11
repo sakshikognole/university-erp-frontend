@@ -61,6 +61,7 @@ export const navigationConfig = {
     { label: 'Alumni Profiles',       path: '/alumni',                  icon: UserCheck },
     { label: 'Alumni Jobs',           path: '/alumni-jobs',             icon: Briefcase },
     { label: 'System Announcements',  path: '/system-announcements',    icon: BellRing },
+    { label: 'Attendance',            path: '/attendance',              icon: ClipboardList },
   ],
 
   SUB_ADMIN: [
@@ -93,6 +94,7 @@ export const navigationConfig = {
     { label: 'Alumni Profiles',       path: '/alumni',                  icon: UserCheck },
     { label: 'Alumni Jobs',           path: '/alumni-jobs',             icon: Briefcase },
     { label: 'System Announcements',  path: '/system-announcements',    icon: BellRing },
+    { label: 'Attendance',            path: '/attendance',              icon: ClipboardList },
   ],
 
   FINANCE: [
@@ -106,6 +108,7 @@ export const navigationConfig = {
     { label: 'Transport',             path: '/transport',               icon: Bus },
     { label: 'Event Notices',         path: '/event-notices',           icon: Megaphone },
     { label: 'System Announcements',  path: '/system-announcements',    icon: BellRing },
+    { label: 'Attendance',            path: '/attendance',              icon: ClipboardList },
   ],
 
   FACULTY: [
@@ -124,6 +127,7 @@ export const navigationConfig = {
     { label: 'Event Notices',         path: '/event-notices',           icon: Megaphone },
     { label: 'Event Booking',         path: '/events',                  icon: Calendar },
     { label: 'System Announcements',  path: '/system-announcements',    icon: BellRing },
+    { label: 'Attendance',            path: '/attendance',              icon: ClipboardList },
   ],
 
   TEACHER: [
@@ -142,6 +146,7 @@ export const navigationConfig = {
     { label: 'Event Notices',         path: '/event-notices',           icon: Megaphone },
     { label: 'Event Booking',         path: '/events',                  icon: Calendar },
     { label: 'System Announcements',  path: '/system-announcements',    icon: BellRing },
+    { label: 'Attendance',            path: '/attendance',              icon: ClipboardList },
   ],
 
   STUDENT: [

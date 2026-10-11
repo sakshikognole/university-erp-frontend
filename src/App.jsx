@@ -110,6 +110,10 @@ import SystemAnnouncements from './pages/SystemAnnouncements';
 import SystemAnnouncementForm from './pages/SystemAnnouncementForm';
 import SystemAnnouncementView from './pages/SystemAnnouncementView';
 
+// --- Attendance ---
+import Attendance from './pages/Attendance';
+import AttendanceReview from './pages/AttendanceReview';
+
 // --- Password Management ---
 import PasswordManagementPage from './pages/PasswordManagement/PasswordManagementPage';
 import PmOtpPage from './pages/PasswordManagement/PmOtpPage';
@@ -614,6 +618,10 @@ function AppRoutes() {
           path="system-announcements/edit/:id"
           element={<SystemAnnouncementForm />}
         />
+
+        {/* ==================== ATTENDANCE ==================== */}
+        <Route path="attendance" element={<Attendance />} />
+        <Route path="attendance/review" element={<AttendanceReview />} />
       </Route>
 
       {/* Catch-all fallback */}
