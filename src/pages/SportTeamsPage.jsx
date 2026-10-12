@@ -219,9 +219,10 @@ export default function SportTeamsPage() {
             value={search}
             onChange={(e) => setSearch(e.target.value)}
           />
-          <span style={{ fontSize: '0.82rem', color: '#6b7280', whiteSpace: 'nowrap' }}>
-            Total: {filtered.length} team{filtered.length !== 1 ? 's' : ''}
-          </span>
+          <div className="table-stats-badge">
+            Total: <strong>{filtered.length}</strong>{' '}
+            {filtered.length === 1 ? 'Team' : 'Teams'}
+          </div>
         </div>
 
         {loading ? (
