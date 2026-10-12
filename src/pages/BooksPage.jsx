@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
+import { Search } from 'lucide-react';
 import bookService from '../services/bookService';
 import PageLoader from '../components/PageLoader';
 import PageError  from '../components/PageError';
@@ -213,11 +214,14 @@ export default function BooksPage() {
 
       <div className="card">
         <div className="books-toolbar">
-          <input
-            className="books-search-input"
-            placeholder="Search by title, author, or ID..."
-            onChange={onSearch}
-          />
+          <div className="search-box-wrapper">
+            <Search size={16} className="search-icon" />
+            <input
+              className="search-input"
+              placeholder="Search by Title, Author, or ID..."
+              onChange={onSearch}
+            />
+          </div>
         </div>
 
         {loading ? (

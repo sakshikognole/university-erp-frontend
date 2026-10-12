@@ -565,9 +565,10 @@ export default function VenueBookingPage() {
           <h2 style={{ fontSize: '1rem', fontWeight: 700, color: '#111827', margin: 0 }}>
             All Booking Requests
           </h2>
-          <span style={{ fontSize: '0.82rem', color: '#6b7280' }}>
-            Total: {bookings.length}
-          </span>
+          <div className="table-stats-badge">
+            Total: <strong>{bookings.length}</strong>{' '}
+            {bookings.length === 1 ? 'Booking' : 'Bookings'}
+          </div>
         </div>
 
         {loading ? (

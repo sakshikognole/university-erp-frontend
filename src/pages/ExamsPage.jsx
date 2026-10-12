@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { Search } from 'lucide-react';
 import { springApi, springGet } from '../services/api';
 import PageError from '../components/PageError';
 import ExamModal from './ExamModal';
@@ -141,32 +142,30 @@ export default function ExamsPage() {
         </div>
       )}
 
-      {/* D3: Search with Clear button */}
-      <div style={{ marginBottom: 16, position: 'relative', maxWidth: 380 }}>
-        <input
-          className="books-form-control"
-          style={{ paddingRight: search ? 36 : 12 }}
-          placeholder="Search by Exam ID, subject, or year..."
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-        />
-        {/* D3: Clear (×) button */}
-        {search && (
-          <button
-            type="button"
-            onClick={() => setSearch('')}
-            title="Clear search"
-            style={{
-              position: 'absolute', right: 8, top: '50%',
-              transform: 'translateY(-50%)',
-              background: 'none', border: 'none',
-              cursor: 'pointer', color: '#9ca3af',
-              fontSize: 18, lineHeight: 1, padding: '2px 4px',
-            }}
-          >
-            ×
-          </button>
-        )}
+      {/* Search + count row */}
+      <div style={{ marginBottom: 16, display: 'flex', alignItems: 'center',
+        justifyContent: 'space-between', gap: 12, flexWrap: 'wrap' }}>
+        <div style={{ position: 'relative', maxWidth: 380, flex: 1 }}>
+          <div className="search-box-wrapper">
+            <Search size={16} className="search-icon" />
+            <input
+              className="search-input"
+              placeholder="Search by Exam ID, Subject, or Year..."
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+            />
+            {search && (
+              <button type="button" onClick={() => setSearch('')} title="Clear search"
+                style={{ position: 'absolute', right: 8, top: '50%', transform: 'translateY(-50%)',
+                  background: 'none', border: 'none', cursor: 'pointer', color: '#9ca3af',
+                  fontSize: 18, lineHeight: 1, padding: '2px 4px' }}>×</button>
+            )}
+          </div>
+        </div>
+        <div className="table-stats-badge">
+          Total: <strong>{filtered.length}</strong>{' '}
+          {filtered.length === 1 ? 'Exam' : 'Exams'}
+        </div>
       </div>
 
       {/* Table */}
@@ -198,9 +197,7 @@ export default function ExamsPage() {
         <div className="card" style={{ padding: '1rem' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between',
             alignItems: 'center', marginBottom: 10 }}>
-            <span style={{ fontSize: '0.82rem', color: '#6b7280' }}>
-              Total: {filtered.length} exam{filtered.length !== 1 ? 's' : ''}
-            </span>
+            <div>{/* search bar is above */}</div>
           </div>
 
           {/* Desktop table */}

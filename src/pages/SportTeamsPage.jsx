@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
+import { Search } from 'lucide-react';
 import { springApi, springGet } from '../services/api';
 import PageLoader from '../components/PageLoader';
 import PageError  from '../components/PageError';
@@ -212,16 +213,19 @@ export default function SportTeamsPage() {
         {/* Search + count */}
         <div style={{ display: 'flex', justifyContent: 'space-between',
           alignItems: 'center', marginBottom: '1rem', gap: '1rem', flexWrap: 'wrap' }}>
-          <input
-            className="books-form-control"
-            style={{ maxWidth: 340 }}
-            placeholder="Search by team name, sport ID, or coach..."
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-          />
-          <span style={{ fontSize: '0.82rem', color: '#6b7280', whiteSpace: 'nowrap' }}>
-            Total: {filtered.length} team{filtered.length !== 1 ? 's' : ''}
-          </span>
+          <div className="search-box-wrapper" style={{ maxWidth: 380 }}>
+            <Search size={16} className="search-icon" />
+            <input
+              className="search-input"
+              placeholder="Search by Team Name, Sport ID, or Coach..."
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+            />
+          </div>
+          <div className="table-stats-badge">
+            Total: <strong>{filtered.length}</strong>{' '}
+            {filtered.length === 1 ? 'Team' : 'Teams'}
+          </div>
         </div>
 
         {loading ? (
