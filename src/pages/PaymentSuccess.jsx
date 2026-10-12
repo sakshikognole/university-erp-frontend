@@ -16,8 +16,7 @@ import {
 import { downloadFeeReceiptPDF } from '../utils/exportUtils';
 
 const _IS_PROD = window.location.hostname !== 'localhost';
-const _NODE_URL = _IS_PROD ? 'https://university-erp-node.onrender.com' : 'http://localhost:5000';
-const API_BASE_URL = `${_NODE_URL}/api`;
+const API_BASE_URL = _IS_PROD ? 'https://university-erp-node.onrender.com/api' : 'http://localhost:5000/api';
 
 const PaymentSuccess = () => {
   const location = useLocation();
@@ -325,7 +324,7 @@ const PaymentSuccess = () => {
         <table className="data-table" style={{ marginBottom: '1.75rem', width: '100%' }}>
           <thead>
             <tr>
-              <th>Fee Breakdown / Item Description</th>
+              <th>Fee breakdown / item description</th>
               <th style={{ width: '180px', textAlign: 'right' }}>Amount (INR)</th>
             </tr>
           </thead>

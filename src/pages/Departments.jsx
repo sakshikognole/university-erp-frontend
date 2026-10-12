@@ -21,11 +21,10 @@ import { exportDepartments } from '../utils/exportUtils';
 import { useAuth } from '../context/AuthContext';
 
 const _IS_PROD = window.location.hostname !== 'localhost';
-const _NODE_URL = _IS_PROD ? 'https://university-erp-node.onrender.com' : 'http://localhost:5000';
-const API_BASE_URL = `${_NODE_URL}/api`;
+const API_BASE_URL = _IS_PROD ? 'https://university-erp-node.onrender.com/api' : 'http://localhost:5000/api';
 
-// ─────────────────────────────────────────────────────────────────────────────
-// Departments page — Super Admin view
+// -----------------------------------------------------------------------------
+// Departments page � Super Admin view
 //
 // DEF-001 / DEF-002 / DEF-015:
 //   - Uses `authLoading` from AuthContext to defer access-control decisions until
@@ -51,7 +50,7 @@ const API_BASE_URL = `${_NODE_URL}/api`;
 //   - Feedback banners auto-dismiss after 5 seconds.
 //   - No duplicate API calls on navigation back (localStorage cache used as
 //     optimistic display while real fetch is in flight).
-// ─────────────────────────────────────────────────────────────────────────────
+// -----------------------------------------------------------------------------
 
 const Departments = () => {
   const navigate = useNavigate();
@@ -67,7 +66,7 @@ const Departments = () => {
   const downloadMenuRef = useRef(null);
   const feedbackTimerRef = useRef(null);
 
-  // DEF-016: responsive placeholder — tracks whether the viewport is "mobile"
+  // DEF-016: responsive placeholder � tracks whether the viewport is "mobile"
   const [isMobile, setIsMobile] = useState(
     typeof window !== 'undefined' ? window.matchMedia('(max-width: 640px)').matches : false
   );
@@ -192,7 +191,7 @@ const Departments = () => {
       localStorage.setItem('erp_departments_custom', JSON.stringify(updated));
       showFeedback('success', `Department '${dept.name}' deleted successfully.`);
     } catch (err) {
-      // Show the real error — do not fake success (DEF-007)
+      // Show the real error � do not fake success (DEF-007)
       showFeedback('error', err.message || 'Failed to delete department. Please try again.');
     } finally {
       setDeleting(false);
@@ -214,7 +213,7 @@ const Departments = () => {
     return idStr.includes(query) || nameStr.includes(query);
   });
 
-  // ── Render: auth still settling — show spinner (DEF-001, DEF-002, DEF-015) ──
+  // -- Render: auth still settling � show spinner (DEF-001, DEF-002, DEF-015) --
   if (authLoading) {
     return (
       <div className="page-container">
@@ -234,7 +233,7 @@ const Departments = () => {
     );
   }
 
-  // ── Render: non-Super-Admin user ──
+  // -- Render: non-Super-Admin user --
   if (!isSuperAdmin) {
     return (
       <div className="page-container">
@@ -248,7 +247,7 @@ const Departments = () => {
     );
   }
 
-  // ── Render: full Super Admin view ──
+  // -- Render: full Super Admin view --
   return (
     <div className="page-container">
       {/* Top Header with Action Buttons on Top-Right Corner */}
@@ -318,7 +317,7 @@ const Departments = () => {
         </div>
       </div>
 
-      {/* Feedback Banner — auto-dismissed after 5 s */}
+      {/* Feedback Banner � auto-dismissed after 5 s */}
       {feedback.message && (
         <div
           className={`feedback-banner ${
@@ -376,7 +375,7 @@ const Departments = () => {
               className="search-input"
               /*
                * DEF-016: responsive placeholder.
-               * On mobile (≤640 px) a shorter label is shown so the text fits
+               * On mobile (=640 px) a shorter label is shown so the text fits
                * without being truncated by the browser. On desktop the full
                * label is shown. Both convey the same search intent.
                */
@@ -440,8 +439,8 @@ const Departments = () => {
               <thead>
                 <tr>
                   <th style={{ width: '60px' }}>#</th>
-                  <th style={{ width: '200px' }}>Department id</th>
-                  <th>Department name</th>
+                  <th style={{ width: '200px' }}>Department ID</th>
+                  <th>Department Name</th>
                   <th style={{ width: '140px', textAlign: 'right' }}>Actions</th>
                 </tr>
               </thead>

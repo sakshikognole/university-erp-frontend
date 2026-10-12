@@ -1993,11 +1993,12 @@ button {
   background-color: var(--bg-secondary);
   color: var(--text-secondary);
   font-weight: 600;
-  font-size: 0.75rem;
+  font-size: 14px;
   text-transform: none;
-  letter-spacing: 0.05em;
-  padding: 0.75rem 1.25rem;
-  border-bottom: 1px solid var(--border-color);
+  letter-spacing: 0;
+  padding: 11px 14px;
+  border-bottom: 2px solid var(--border-color);
+  white-space: nowrap;
 }
 
 .data-table td {
@@ -3608,6 +3609,7 @@ button {
   background: var(--bg-secondary);
   padding: 11px 14px;
   text-align: left;
+  font-size: 14px;
   font-weight: 600;
   color: var(--text-secondary);
   border-bottom: 2px solid var(--border-color);
@@ -5607,9 +5609,17 @@ button {
   }
 
   .books-page-header {
-    flex-direction: column;
+    flex-direction: row;
     align-items: flex-start;
     gap: 10px;
+  }
+  
+  .books-page-header > div {
+    flex: 1;
+  }
+  
+  .books-page-header .books-btn {
+    flex-shrink: 0;
   }
 }
 /* ==========================================
@@ -7785,11 +7795,12 @@ input[type='password']::-webkit-inner-spin-button {
   background-color: var(--bg-secondary);
   color: var(--text-secondary);
   font-weight: 600;
-  font-size: 0.75rem;
+  font-size: 14px;
   text-transform: none;
-  letter-spacing: 0.05em;
-  padding: 0.75rem 1.25rem;
-  border-bottom: 1px solid var(--border-color);
+  letter-spacing: 0;
+  padding: 11px 14px;
+  border-bottom: 2px solid var(--border-color);
+  white-space: nowrap;
 }
 
 .data-table td {
@@ -9398,14 +9409,14 @@ input[type='password']::-webkit-inner-spin-button {
 }
 .books-table th {
   text-align: left;
-  padding: 0.65rem 0.85rem;
-  font-size: 0.78rem;
-  font-weight: 700;
-  color: var(--text-secondary, #6b7280);
+  padding: 11px 14px;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-secondary);
   text-transform: none;
-  letter-spacing: 0.04em;
-  background: var(--bg-secondary, #f9fafb);
-  border-bottom: 1px solid var(--border-primary, #e5e7eb);
+  letter-spacing: 0;
+  background: var(--bg-secondary);
+  border-bottom: 2px solid var(--border-color);
   white-space: nowrap;
 }
 .books-table td {
@@ -10389,4 +10400,418 @@ input[type='password']::-webkit-inner-spin-button {
 /* Override old page-title margin for better title-subtitle spacing */
 .page-title + .page-subtitle {
   margin-top: 0.5rem;
+}
+
+
+/* ==========================================
+   ATTENDANCE PAGE
+   ========================================== */
+
+/* ── Summary chips ── */
+.attendance-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  padding: 0.375rem 0.875rem;
+  border-radius: 9999px;
+  font-size: 0.8125rem;
+  border: 1px solid var(--border-color);
+  background-color: var(--bg-primary);
+  color: var(--text-secondary);
+}
+
+.attendance-chip--total {
+  border-color: var(--border-color);
+  color: var(--text-primary);
+}
+
+.attendance-chip--present {
+  border-color: #bbf7d0;
+  background-color: #f0fdf4;
+  color: #15803d;
+}
+
+.attendance-chip--absent {
+  border-color: #fecaca;
+  background-color: #fff1f2;
+  color: #b91c1c;
+}
+
+/* ── Bulk action buttons ── */
+.attendance-bulk-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  padding: 0.375rem 0.875rem;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  border-radius: 0.375rem;
+  border: 1px solid var(--color-black);
+  background-color: var(--color-black);
+  color: var(--color-white);
+  cursor: pointer;
+  transition: opacity 0.2s;
+}
+
+.attendance-bulk-btn:hover {
+  opacity: 0.82;
+}
+
+.attendance-bulk-btn--ghost {
+  background-color: transparent;
+  color: var(--text-primary);
+  border-color: var(--border-color);
+}
+
+.attendance-bulk-btn--ghost:hover {
+  background-color: var(--bg-active);
+  opacity: 1;
+}
+
+/* ── Student list table ── */
+.attendance-table-header {
+  display: flex;
+  align-items: center;
+  padding: 0.75rem 1.5rem;
+  background-color: var(--bg-secondary);
+  border-bottom: 1px solid var(--border-color);
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-secondary);
+}
+
+.attendance-row {
+  display: flex;
+  align-items: center;
+  padding: 0.875rem 1.5rem;
+  border-bottom: 1px solid var(--border-color);
+  transition: background-color 0.15s;
+  gap: 1rem;
+}
+
+.attendance-row:last-child {
+  border-bottom: none;
+}
+
+.attendance-row--even {
+  background-color: var(--bg-primary);
+}
+
+.attendance-row:not(.attendance-row--even) {
+  background-color: var(--bg-secondary);
+}
+
+.attendance-row--present {
+  background-color: #f0fdf4 !important;
+}
+
+.attendance-roll {
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+}
+
+/* ── Toggle button (Present / Absent) ── */
+.attendance-toggle-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.375rem;
+  min-width: 110px;
+  padding: 0.4rem 0.875rem;
+  border-radius: 0.375rem;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  cursor: pointer;
+  border: 1px solid var(--border-color);
+  background-color: var(--bg-primary);
+  color: var(--text-secondary);
+  transition: all 0.15s ease;
+  user-select: none;
+}
+
+.attendance-toggle-btn:hover:not(:disabled) {
+  border-color: var(--color-black);
+  color: var(--text-primary);
+  background-color: var(--bg-active);
+}
+
+.attendance-toggle-btn--present {
+  background-color: var(--color-black);
+  color: var(--color-white);
+  border-color: var(--color-black);
+}
+
+.attendance-toggle-btn--present:hover:not(:disabled) {
+  opacity: 0.82;
+  background-color: var(--color-black);
+  color: var(--color-white);
+}
+
+.attendance-toggle-btn--absent {
+  background-color: var(--bg-primary);
+  color: var(--text-secondary);
+  border-color: var(--border-color);
+}
+
+.attendance-toggle-btn:disabled {
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+
+/* ── Bottom action buttons ── */
+.attendance-submit-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.625rem 1.5rem;
+  background-color: var(--color-black);
+  color: var(--color-white);
+  font-weight: 600;
+  font-size: 0.9rem;
+  border-radius: 0.5rem;
+  border: 1px solid var(--color-black);
+  cursor: pointer;
+  transition: opacity 0.2s;
+}
+
+.attendance-submit-btn:hover:not(:disabled) {
+  opacity: 0.82;
+}
+
+.attendance-submit-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.attendance-export-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.625rem 1.25rem;
+  background-color: transparent;
+  color: var(--text-primary);
+  font-weight: 600;
+  font-size: 0.875rem;
+  border-radius: 0.5rem;
+  border: 1px solid var(--border-color);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.attendance-export-btn:hover {
+  background-color: var(--bg-active);
+  border-color: var(--color-black);
+}
+
+.attendance-reset-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.625rem 1.25rem;
+  background-color: transparent;
+  color: var(--text-primary);
+  font-weight: 600;
+  font-size: 0.875rem;
+  border-radius: 0.5rem;
+  border: 1px solid var(--border-color);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.attendance-reset-btn:hover {
+  background-color: var(--bg-active);
+  border-color: var(--color-black);
+}
+
+
+/* ==========================================
+   ATTENDANCE — SESSION CARD (improved header)
+   ========================================== */
+
+/* Outer card gets no extra padding; we control it via inner sections */
+.att-session-card {
+  padding: 0;
+  overflow: hidden;
+}
+
+/* Title bar */
+.att-session-titlebar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.875rem 1.5rem;
+  border-bottom: 1px solid var(--border-color);
+  background-color: var(--bg-secondary);
+}
+
+.att-session-titlebar-left {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  letter-spacing: -0.01em;
+}
+
+.att-session-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background-color: var(--color-black);
+  flex-shrink: 0;
+}
+
+.att-submitted-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #15803d;
+  background-color: #f0fdf4;
+  border: 1px solid #bbf7d0;
+  border-radius: 9999px;
+  padding: 0.2rem 0.625rem;
+}
+
+/* 4-column grid of info tiles */
+.att-session-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 0;
+}
+
+/* Each tile */
+.att-session-tile {
+  padding: 1rem 1.5rem 1.25rem;
+  border-right: 1px solid var(--border-color);
+  border-bottom: 1px solid var(--border-color);
+  transition: background-color 0.15s;
+}
+
+.att-session-tile:nth-child(even) {
+  border-right: none;
+}
+
+/* Remove bottom border on last row of tiles */
+.att-session-tile:nth-last-child(-n+2) {
+  border-bottom: none;
+}
+
+@media (min-width: 900px) {
+  .att-session-grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+
+  .att-session-tile {
+    border-bottom: none;
+  }
+
+  /* Only the last column loses right border */
+  .att-session-tile:last-child {
+    border-right: none;
+  }
+
+  .att-session-tile:nth-child(even) {
+    border-right: 1px solid var(--border-color);
+  }
+
+  .att-session-tile:last-child {
+    border-right: none;
+  }
+}
+
+.att-session-tile:hover:not(.att-session-tile--locked) {
+  background-color: var(--bg-secondary);
+}
+
+.att-session-tile--locked {
+  background-color: var(--bg-secondary);
+  opacity: 0.8;
+}
+
+/* Icon + label row inside a tile */
+.att-session-tile-header {
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-secondary);
+  margin-bottom: 0.5rem;
+}
+
+/* Editable value (looks like a styled input, matches card aesthetic) */
+.att-session-tile-input {
+  width: 100%;
+  background: transparent;
+  border: none;
+  outline: none;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  font-family: inherit;
+  padding: 0;
+  border-bottom: 1.5px solid transparent;
+  transition: border-color 0.2s;
+  cursor: text;
+}
+
+.att-session-tile-input:focus {
+  border-bottom-color: var(--color-black);
+}
+
+.att-session-tile-input:disabled {
+  cursor: default;
+  color: var(--text-secondary);
+  border-bottom-color: transparent;
+}
+
+.att-session-tile-input::placeholder {
+  font-weight: 400;
+  color: #9ca3af;
+  font-size: 0.875rem;
+}
+
+/* Toolbar row: chips on left, bulk buttons on right */
+.att-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+/* ── AttendanceReview — read-only tile value ── */
+.att-review-value {
+  font-size: 0.9375rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0;
+  line-height: 1.4;
+}
+
+/* ── AttendanceReview — present pill badge in the list ── */
+.att-present-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #15803d;
+  background-color: #f0fdf4;
+  border: 1px solid #bbf7d0;
+  border-radius: 9999px;
+  padding: 0.25rem 0.625rem;
+  white-space: nowrap;
 }

@@ -16,12 +16,9 @@ import {
   X,
 } from 'lucide-react';
 
-const _IS_PROD_SP = window.location.hostname !== 'localhost';
-const _SPRING_URL = _IS_PROD_SP ? 'https://university-erp-spring.onrender.com' : 'http://localhost:9090';
-const API_BASE_URL = `${_SPRING_URL}/api`;
-const _IS_PROD = window.location.hostname !== 'localhost';
-const _NODE_URL = _IS_PROD ? 'https://university-erp-node.onrender.com' : 'http://localhost:5000';
-const NODE_API_URL = `${_NODE_URL}/api`;
+const _IS_PROD_ED = window.location.hostname !== 'localhost';
+const API_BASE_URL = _IS_PROD_ED ? 'https://university-erp-spring.onrender.com/api' : 'http://localhost:9090/api';
+const NODE_API_URL = _IS_PROD_ED ? 'https://university-erp-node.onrender.com/api' : 'http://localhost:5000/api';
 
 const EventDetails = () => {
   const { id } = useParams();
@@ -84,7 +81,9 @@ const EventDetails = () => {
 
   const fetchVenueDetails = async (venueId) => {
     try {
-      const res = await fetch(`${NODE_API_URL}/venues`);
+      const res = await fetch(`${NODE_API_URL}/venues`, {
+        headers: { Authorization: `Bearer ${localStorage.getItem('erp_token')}` },
+      });
       if (res.ok) {
         const data = await res.json();
         const venues = Array.isArray(data) ? data : (data.venues || []);

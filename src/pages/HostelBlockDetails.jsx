@@ -305,7 +305,7 @@ export default function HostelBlockDetails({ block: blockProp, onBack }) {
               <table className="books-table">
                 <thead>
                   <tr>
-                    <th>Room No</th>
+                    <th>Room no</th>
                     <th>Capacity</th>
                     <th>Occupancy</th>
                     <th>Status</th>
@@ -439,8 +439,8 @@ export default function HostelBlockDetails({ block: blockProp, onBack }) {
               <table className="books-table">
                 <thead>
                   <tr>
-                    <th>PRN</th>
-                    <th>Student Name</th>
+                    <th>Prn</th>
+                    <th>Student name</th>
                     <th>Action</th>
                   </tr>
                 </thead>
@@ -545,8 +545,8 @@ export default function HostelBlockDetails({ block: blockProp, onBack }) {
           <table className="books-table">
             <thead>
               <tr>
-                <th>PRN</th>
-                <th>Student Name</th>
+                <th>Prn</th>
+                <th>Student name</th>
                 <th>Action</th>
               </tr>
             </thead>

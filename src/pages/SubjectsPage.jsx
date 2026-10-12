@@ -314,7 +314,7 @@ export default function SubjectsPage() {
             <table className="books-table">
               <thead>
                 <tr>
-                  <th>#</th><th>Subject ID</th><th>Subject Name</th>
+                  <th>#</th><th>Subject id</th><th>Subject name</th>
                   <th>Description</th><th>Actions</th>
                 </tr>
               </thead>

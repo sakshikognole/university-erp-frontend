@@ -21,12 +21,10 @@ import {
 
 // Node/Express backend — auth, create-order, verify
 const _IS_PROD = window.location.hostname !== 'localhost';
-const _NODE_URL = _IS_PROD ? 'https://university-erp-node.onrender.com' : 'http://localhost:5000';
-const API_BASE_URL = `${_NODE_URL}/api`;
+const API_BASE_URL = _IS_PROD ? 'https://university-erp-node.onrender.com/api' : 'http://localhost:5000/api';
 // Spring Boot backend — fee payment combinations
-const _IS_PROD_SP = window.location.hostname !== 'localhost';
-const _SPRING_URL = _IS_PROD_SP ? 'https://university-erp-spring.onrender.com' : 'http://localhost:9090';
-const SPRING_API_URL = `${_SPRING_URL}/api`;
+const _IS_PROD_FP = window.location.hostname !== 'localhost';
+const SPRING_API_URL = _IS_PROD_FP ? 'https://university-erp-spring.onrender.com/api' : 'http://localhost:9090/api';
 
 /**
  * Map a PaymentCombination + its resolved titles to the fee record shape
@@ -428,11 +426,11 @@ const FeePayment = () => {
                 <thead>
                   <tr>
                     <th style={{ width: '60px' }}>#</th>
-                    <th>Payment Title</th>
-                    <th>Total Fee Amount</th>
+                    <th>Payment title</th>
+                    <th>Total fee amount</th>
                     <th>Discount</th>
-                    <th>Paid Amount</th>
-                    <th>Remaining Amount</th>
+                    <th>Paid amount</th>
+                    <th>Remaining amount</th>
                     <th style={{ width: '120px' }}>Status</th>
                     <th style={{ width: '130px', textAlign: 'right' }}>Action</th>
                   </tr>

@@ -211,9 +211,9 @@ export default function ExamsPage() {
                   <tr>
                     {/* D4: all headers left-aligned, data aligned with headers */}
                     <th style={{ width: 48 }}>#</th>
-                    <th>Exam ID</th>
+                    <th>Exam id</th>
                     <th>Subject</th>
-                    <th>Academic Year</th>
+                    <th>Academic year</th>
                     <th style={{ textAlign: 'center' }}>Students</th>
                     <th>Actions</th>
                   </tr>

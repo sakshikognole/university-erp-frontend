@@ -19,8 +19,7 @@ import {
 import { exportStaff } from '../utils/exportUtils';
 
 const _IS_PROD = window.location.hostname !== 'localhost';
-const _NODE_URL = _IS_PROD ? 'https://university-erp-node.onrender.com' : 'http://localhost:5000';
-const API_BASE_URL = `${_NODE_URL}/api`;
+const API_BASE_URL = _IS_PROD ? 'https://university-erp-node.onrender.com/api' : 'http://localhost:5000/api';
 
 const Staff = () => {
   const navigate = useNavigate();
@@ -262,12 +261,12 @@ const Staff = () => {
                 <thead>
                   <tr>
                     <th style={{ width: '60px' }}>#</th>
-                    <th style={{ width: '150px' }}>Staff ID</th>
+                    <th style={{ width: '150px' }}>Staff id</th>
                     <th>Name</th>
                     <th>Email</th>
                     <th style={{ width: '140px' }}>Phone</th>
                     <th style={{ width: '140px' }}>Role</th>
-                    <th style={{ width: '120px' }}>Join Date</th>
+                    <th style={{ width: '120px' }}>Join date</th>
                     <th style={{ width: '100px', textAlign: 'right' }}>Actions</th>
                   </tr>
                 </thead>

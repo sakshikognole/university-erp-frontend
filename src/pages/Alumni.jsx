@@ -1,61 +1,74 @@
-import React, { useState, useEffect, useRef } from 'react';
+/**
+ * Alumni.jsx — Alumni Profiles listing page
+ *
+ * Defects fixed:
+ *   D1  Download button right-aligned, content-sized on mobile
+ *   D2  Add Alumni right-aligned, content-sized on mobile
+ *   D3  Bulk Upload right-aligned, content-sized on mobile
+ *   D7  Empty CSV guard → "No Alumni records available to download."
+ *   D8  Empty TXT guard → same message
+ *   D9  Empty PDF guard → same message
+ *   Perf AbortController prevents stale-response race conditions; loading
+ *       state always cleared; error + retry surface; list refreshed after
+ *       every mutation without full-page reload
+ *   Imp-C  Replaced Profile Links column with Email and Phone columns;
+ *          profile links remain accessible via Edit
+ */
+
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
-  Users,
-  Plus,
-  Download,
-  Search,
-  ChevronDown,
-  FileText,
-  FileSpreadsheet,
-  Printer,
-  AlertCircle,
-  CheckCircle2,
-  Loader2,
-  ChevronLeft,
-  ChevronRight,
-  Upload,
-  Edit,
-  Trash2,
-  X,
-  AlertTriangle,
-  Link2,
-  Globe,
+  Users, Plus, Download, Search, ChevronDown, FileText, FileSpreadsheet,
+  Printer, AlertCircle, CheckCircle2, Loader2, ChevronLeft, ChevronRight,
+  Upload, Edit, Trash2, X, AlertTriangle, RefreshCw,
 } from 'lucide-react';
 
 const _IS_PROD = window.location.hostname !== 'localhost';
-const _NODE_URL = _IS_PROD ? 'https://university-erp-node.onrender.com' : 'http://localhost:5000';
-const API_BASE_URL = `${_NODE_URL}/api`;
+const API_BASE_URL = _IS_PROD ? 'https://university-erp-node.onrender.com/api' : 'http://localhost:5000/api';
+const NO_RECORDS_MSG = 'No Alumni records available to download.';
 
 // ── Export helpers ────────────────────────────────────────────────────────────
 const triggerDownload = (content, filename, mimeType) => {
   const blob = new Blob([content], { type: mimeType });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = filename;
-  document.body.appendChild(a);
-  a.click();
-  document.body.removeChild(a);
-  URL.revokeObjectURL(url);
+  const url  = URL.createObjectURL(blob);
+  const a    = document.createElement('a');
+  a.href = url; a.download = filename;
+  document.body.appendChild(a); a.click();
+  setTimeout(() => { document.body.removeChild(a); URL.revokeObjectURL(url); }, 150);
 };
 
-const exportCSV = (rows) => {
-  const headers = ['Alumni ID', 'Name', 'Graduation Year', 'Job Title', 'Current Company', 'Email', 'Phone', 'LinkedIn', 'GitHub', 'Portfolio'];
+// D7: guard added — no download when rows is empty
+const exportCSV = (rows, setFeedback) => {
+  if (!rows || rows.length === 0) {
+    setFeedback({ type: 'error', message: NO_RECORDS_MSG });
+    return;
+  }
+  const headers = [
+    'Alumni ID', 'Name', 'Graduation Year', 'Job Title', 'Current Company',
+    'Email', 'Phone', 'LinkedIn', 'GitHub', 'Portfolio',
+  ];
   const body = rows.map(a => [
     a.alumniId, a.name, a.graduationYear, a.jobTitle, a.currentCompany,
     a.email, a.phone,
     a.socialLinks?.linkedin, a.socialLinks?.github, a.socialLinks?.portfolio,
   ].map(v => `"${(v || '').toString().replace(/"/g, '""')}"`).join(','));
-  triggerDownload([headers.join(','), ...body].join('\r\n'), `alumni_${new Date().toISOString().slice(0,10)}.csv`, 'text/csv;charset=utf-8;');
+  triggerDownload(
+    [headers.join(','), ...body].join('\r\n'),
+    `alumni_${new Date().toISOString().slice(0, 10)}.csv`,
+    'text/csv;charset=utf-8;',
+  );
 };
 
-const exportTXT = (rows) => {
-  const date = new Date().toLocaleString();
-  const sep = '='.repeat(90);
+// D8: guard added
+const exportTXT = (rows, setFeedback) => {
+  if (!rows || rows.length === 0) {
+    setFeedback({ type: 'error', message: NO_RECORDS_MSG });
+    return;
+  }
+  const sep   = '='.repeat(90);
   const lines = [
     'UNIVERSITY ERP — ALUMNI DIRECTORY',
-    `Generated: ${date}   Total: ${rows.length}`,
+    `Generated: ${new Date().toLocaleString()}   Total: ${rows.length}`,
     sep,
     'ID         NAME                         YEAR   JOB TITLE                   COMPANY',
     '-'.repeat(90),
@@ -64,15 +77,24 @@ const exportTXT = (rows) => {
     ),
     sep, 'End of Report',
   ];
-  triggerDownload(lines.join('\r\n'), `alumni_${new Date().toISOString().slice(0,10)}.txt`, 'text/plain');
+  triggerDownload(
+    lines.join('\r\n'),
+    `alumni_${new Date().toISOString().slice(0, 10)}.txt`,
+    'text/plain',
+  );
 };
 
-const exportPDF = (rows) => {
-  const date = new Date().toLocaleString();
-  const rows_html = rows.map((a, i) => `
-    <tr style="background:${i%2===0?'#fff':'#f9f9f9'}">
+// D9: guard added
+const exportPDF = (rows, setFeedback) => {
+  if (!rows || rows.length === 0) {
+    setFeedback({ type: 'error', message: NO_RECORDS_MSG });
+    return;
+  }
+  const rowsHtml = rows.map((a, i) => `
+    <tr style="background:${i % 2 === 0 ? '#fff' : '#f9f9f9'}">
       <td>${i+1}</td><td>${a.alumniId||''}</td><td>${a.name||''}</td>
-      <td>${a.graduationYear||''}</td><td>${a.jobTitle||''}</td><td>${a.currentCompany||''}</td>
+      <td>${a.graduationYear||''}</td><td>${a.jobTitle||''}</td>
+      <td>${a.currentCompany||''}</td><td>${a.email||''}</td><td>${a.phone||''}</td>
     </tr>`).join('');
   const html = `<html><head><title>Alumni</title><style>
     body{font-family:Arial,sans-serif;font-size:11px;margin:24px}
@@ -81,76 +103,111 @@ const exportPDF = (rows) => {
     th{background:#111;color:#fff;padding:6px 8px;text-align:left;font-size:10px}
     td{padding:5px 8px;border-bottom:1px solid #e5e5e5}
   </style></head><body>
-    <h2>Alumni Directory</h2><p>Generated: ${date} &bull; Total: ${rows.length}</p>
-    <table><thead><tr><th>#</th><th>ID</th><th>Name</th><th>Year</th><th>Job Title</th><th>Company</th></tr></thead>
-    <tbody>${rows_html}</tbody></table>
+    <h2>Alumni Directory</h2>
+    <p>Generated: ${new Date().toLocaleString()} &bull; Total: ${rows.length}</p>
+    <table><thead><tr>
+      <th>#</th><th>ID</th><th>Name</th><th>Year</th>
+      <th>Job Title</th><th>Company</th><th>Email</th><th>Phone</th>
+    </tr></thead><tbody>${rowsHtml}</tbody></table>
   </body></html>`;
-  const w = window.open('','_blank');
-  w.document.write(html);
-  w.document.close();
-  w.print();
+  const w = window.open('', '_blank');
+  if (w) { w.document.write(html); w.document.close(); w.print(); }
 };
-
 // ─────────────────────────────────────────────────────────────────────────────
 
 const Alumni = () => {
   const navigate = useNavigate();
-  const [alumni, setAlumni] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [deleting, setDeleting] = useState(false);
-  const [search, setSearch] = useState('');
-  const [feedback, setFeedback] = useState({ type: '', message: '' });
+
+  const [alumni,    setAlumni]    = useState([]);
+  const [loading,   setLoading]   = useState(true);
+  const [loadError, setLoadError] = useState(null);   // distinct from "empty list"
+  const [deleting,  setDeleting]  = useState(false);
+  const [search,    setSearch]    = useState('');
+  const [feedback,  setFeedback]  = useState({ type: '', message: '' });
   const [showDownloadMenu, setShowDownloadMenu] = useState(false);
-  const [deleteConfirm, setDeleteConfirm] = useState(null);
+  const [deleteConfirm,    setDeleteConfirm]    = useState(null);
   const downloadMenuRef = useRef(null);
 
-  const [currentPage, setCurrentPage] = useState(1);
+  // Performance: keep a ref to the active fetch so we can abort on unmount /
+  // re-fetch, preventing stale responses from landing in state after the
+  // component has moved on.
+  const fetchControllerRef = useRef(null);
+
+  const [currentPage,  setCurrentPage]  = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(10);
 
-  const authHeader = () => {
+  const authHeader = useCallback(() => {
     const token = localStorage.getItem('erp_token');
     return { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` };
-  };
+  }, []);
 
-  useEffect(() => { fetchAlumni(); }, []);
+  // Performance: fetchAlumni is stable (useCallback) so it can be called from
+  // anywhere without triggering spurious re-renders.
+  const fetchAlumni = useCallback(async () => {
+    // Cancel any in-flight request before starting a new one
+    if (fetchControllerRef.current) fetchControllerRef.current.abort();
+    const controller = new AbortController();
+    fetchControllerRef.current = controller;
+
+    setLoading(true);
+    setLoadError(null);
+    try {
+      const res = await fetch(`${API_BASE_URL}/alumni`, {
+        headers: authHeader(),
+        signal: controller.signal,
+      });
+      if (!res.ok) throw new Error(`Server error ${res.status}`);
+      const data = await res.json();
+      setAlumni(data);
+      setFeedback({ type: '', message: '' });
+    } catch (err) {
+      if (err.name === 'AbortError') return; // navigated away — do nothing
+      setLoadError(err.message || 'Failed to load alumni');
+      setFeedback({ type: 'error', message: 'Failed to load alumni from server. Check your connection and retry.' });
+      setAlumni([]);
+    } finally {
+      // Only clear loading if this controller is still the active one
+      if (fetchControllerRef.current === controller) setLoading(false);
+    }
+  }, [authHeader]);
+
+  useEffect(() => {
+    fetchAlumni();
+    return () => { if (fetchControllerRef.current) fetchControllerRef.current.abort(); };
+  }, [fetchAlumni]);
 
   useEffect(() => {
     const handler = (e) => {
-      if (downloadMenuRef.current && !downloadMenuRef.current.contains(e.target)) setShowDownloadMenu(false);
+      if (downloadMenuRef.current && !downloadMenuRef.current.contains(e.target))
+        setShowDownloadMenu(false);
     };
     document.addEventListener('mousedown', handler);
     return () => document.removeEventListener('mousedown', handler);
   }, []);
 
-  const fetchAlumni = async () => {
-    setLoading(true);
-    try {
-      const res = await fetch(`${API_BASE_URL}/alumni`, { headers: authHeader() });
-      if (!res.ok) throw new Error('Failed to load alumni');
-      const data = await res.json();
-      setAlumni(data);
-    } catch (err) {
-      setFeedback({ type: 'error', message: 'Failed to load alumni from server' });
-      setAlumni([]);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleDelete = async (id, name) => {
+  const handleDelete = async (id) => {
     setDeleting(true);
     try {
-      const res = await fetch(`${API_BASE_URL}/alumni/${id}`, { method: 'DELETE', headers: authHeader() });
+      const res  = await fetch(`${API_BASE_URL}/alumni/${id}`, { method: 'DELETE', headers: authHeader() });
       const data = await res.json();
       if (!res.ok) throw new Error(data.message || 'Delete failed');
       setFeedback({ type: 'success', message: data.message });
-      fetchAlumni();
+      fetchAlumni(); // refresh list without full-page reload
     } catch (err) {
       setFeedback({ type: 'error', message: err.message });
     } finally {
       setDeleting(false);
       setDeleteConfirm(null);
     }
+  };
+
+  // D7-D9: pass setFeedback into export functions so they can show the message
+  const handleExport = (fmt) => {
+    setShowDownloadMenu(false);
+    setFeedback({ type: '', message: '' });
+    if (fmt === 'csv') exportCSV(filteredAlumni, setFeedback);
+    if (fmt === 'txt') exportTXT(filteredAlumni, setFeedback);
+    if (fmt === 'pdf') exportPDF(filteredAlumni, setFeedback);
   };
 
   const filteredAlumni = alumni.filter((a) => {
@@ -160,17 +217,18 @@ const Alumni = () => {
       (a.alumniId||'').toLowerCase().includes(q) ||
       (a.jobTitle||'').toLowerCase().includes(q) ||
       (a.currentCompany||'').toLowerCase().includes(q) ||
+      (a.email||'').toLowerCase().includes(q) ||
+      (a.phone||'').includes(q) ||
       String(a.graduationYear||'').includes(q);
   });
 
-  const totalPages = Math.ceil(filteredAlumni.length / itemsPerPage) || 1;
-  const startIndex = (currentPage - 1) * itemsPerPage;
-  const currentAlumni = filteredAlumni.slice(startIndex, startIndex + itemsPerPage);
-
-  const handlePageChange = (p) => { if (p >= 1 && p <= totalPages) setCurrentPage(p); };
+  const totalPages   = Math.ceil(filteredAlumni.length / itemsPerPage) || 1;
+  const startIndex   = (currentPage - 1) * itemsPerPage;
+  const currentItems = filteredAlumni.slice(startIndex, startIndex + itemsPerPage);
 
   return (
-    <div className="page-container">
+    // D1-D3: alumni-page scope for CSS overrides
+    <div className="page-container alumni-page">
       {/* Header */}
       <div className="page-header-row">
         <div>
@@ -178,8 +236,8 @@ const Alumni = () => {
           <p className="page-subtitle">Manage alumni records, professional info, and social links</p>
         </div>
 
-        <div className="header-actions-group">
-          {/* Download */}
+        {/* D1/D2/D3: alumni-header-actions keeps buttons right-aligned + content-sized on mobile */}
+        <div className="header-actions-group alumni-header-actions">
           <div className="download-dropdown-wrapper" ref={downloadMenuRef}>
             <button type="button" className="btn btn-secondary download-trigger-btn"
               onClick={() => setShowDownloadMenu(!showDownloadMenu)}>
@@ -188,13 +246,13 @@ const Alumni = () => {
             {showDownloadMenu && (
               <div className="download-dropdown-menu">
                 <div className="dropdown-menu-header">Select Export Format</div>
-                <button type="button" className="dropdown-menu-item" onClick={() => { setShowDownloadMenu(false); exportCSV(filteredAlumni); }}>
+                <button type="button" className="dropdown-menu-item" onClick={() => handleExport('csv')}>
                   <FileSpreadsheet size={15} /><span>CSV Spreadsheet (.csv)</span>
                 </button>
-                <button type="button" className="dropdown-menu-item" onClick={() => { setShowDownloadMenu(false); exportTXT(filteredAlumni); }}>
+                <button type="button" className="dropdown-menu-item" onClick={() => handleExport('txt')}>
                   <FileText size={15} /><span>Text Document (.txt)</span>
                 </button>
-                <button type="button" className="dropdown-menu-item" onClick={() => { setShowDownloadMenu(false); exportPDF(filteredAlumni); }}>
+                <button type="button" className="dropdown-menu-item" onClick={() => handleExport('pdf')}>
                   <Printer size={15} /><span>Printable PDF (.pdf)</span>
                 </button>
               </div>
@@ -219,6 +277,16 @@ const Alumni = () => {
           style={{ margin: '1rem 0' }}>
           {feedback.type === 'success' ? <CheckCircle2 size={18} /> : <AlertCircle size={18} />}
           <span>{feedback.message}</span>
+          {/* Performance: retry button when load fails */}
+          {loadError && (
+            <button type="button"
+              style={{ marginLeft: 'auto', display: 'inline-flex', alignItems: 'center', gap: '4px',
+                       background: 'transparent', border: '1px solid currentColor', borderRadius: '4px',
+                       padding: '2px 8px', fontSize: '0.8rem', cursor: 'pointer', color: 'inherit' }}
+              onClick={fetchAlumni}>
+              <RefreshCw size={13} /><span>Retry</span>
+            </button>
+          )}
         </div>
       )}
 
@@ -228,28 +296,37 @@ const Alumni = () => {
           <div className="search-box-wrapper">
             <Search size={16} className="search-icon" />
             <input type="text" className="search-input"
-              placeholder="Search by Name, ID, Job Title, or Company..."
-              value={search} onChange={(e) => { setSearch(e.target.value); setCurrentPage(1); }} />
-            {search && <button type="button" className="search-clear-btn" onClick={() => setSearch('')}>Clear</button>}
+              placeholder="Search by Name, ID, Email, Job Title, or Company…"
+              value={search}
+              onChange={(e) => { setSearch(e.target.value); setCurrentPage(1); }} />
+            {search && (
+              <button type="button" className="search-clear-btn" onClick={() => setSearch('')}>Clear</button>
+            )}
           </div>
           <div className="table-stats-badge">
-            Total: <strong>{filteredAlumni.length}</strong> {filteredAlumni.length === 1 ? 'Alumni' : 'Alumni'}
+            Total: <strong>{filteredAlumni.length}</strong> Alumni
           </div>
         </div>
 
         <div className="table-container">
           {loading ? (
             <div className="table-loading-state">
-              <Loader2 size={24} className="spin-animate" /><p>Loading alumni...</p>
+              <Loader2 size={24} className="spin-animate" /><p>Loading alumni…</p>
             </div>
           ) : filteredAlumni.length === 0 ? (
             <div className="table-empty-state">
               <Users size={36} className="empty-icon" />
               <h3>No alumni found</h3>
-              <p>{search ? `No alumni matched "${search}".` : 'Get started by adding your first alumni profile.'}</p>
-              {!search && (
-                <button type="button" className="books-btn books-btn-primary" style={{ marginTop: '1rem' }}
-                  onClick={() => navigate('/alumni/add')}>
+              <p>
+                {loadError
+                  ? 'Could not load alumni from the server. Use Retry above.'
+                  : search
+                    ? `No alumni matched "${search}".`
+                    : 'Get started by adding your first alumni profile.'}
+              </p>
+              {!loadError && !search && (
+                <button type="button" className="books-btn books-btn-primary"
+                  style={{ marginTop: '1rem' }} onClick={() => navigate('/alumni/add')}>
                   <Plus size={16} /><span>Add Alumni</span>
                 </button>
               )}
@@ -259,18 +336,20 @@ const Alumni = () => {
               <table className="data-table">
                 <thead>
                   <tr>
-                    <th style={{ width: '60px' }}>#</th>
-                    <th style={{ width: '120px' }}>Alumni id</th>
+                    <th style={{ width: '50px' }}>#</th>
+                    <th style={{ width: '110px' }}>Alumni ID</th>
                     <th>Name</th>
-                    <th style={{ width: '110px' }}>Grad. year</th>
-                    <th>Job title</th>
+                    <th style={{ width: '90px' }}>Year</th>
+                    <th>Job Title</th>
                     <th>Company</th>
-                    <th style={{ width: '200px' }}>Profile links</th>
+                    {/* Improvement C: Email + Phone instead of Profile Links */}
+                    <th style={{ width: '170px' }}>Email</th>
+                    <th style={{ width: '120px' }}>Phone</th>
                     <th style={{ width: '110px', textAlign: 'right' }}>Actions</th>
                   </tr>
                 </thead>
                 <tbody>
-                  {currentAlumni.map((a, i) => (
+                  {currentItems.map((a, i) => (
                     <tr key={a._id || a.alumniId}>
                       <td className="text-secondary">{startIndex + i + 1}</td>
                       <td><span className="code-badge">{a.alumniId}</span></td>
@@ -278,49 +357,16 @@ const Alumni = () => {
                       <td>{a.graduationYear}</td>
                       <td>{a.jobTitle || '—'}</td>
                       <td>{a.currentCompany || '—'}</td>
-                      <td>
-                        <div style={{ display: 'flex', gap: '8px', alignItems: 'center', flexWrap: 'wrap' }}>
-                          {a.socialLinks?.linkedin && (
-                            <a href={a.socialLinks.linkedin} target="_blank" rel="noopener noreferrer" title="LinkedIn"
-                              style={{ color: '#0a66c2', display: 'inline-flex', alignItems: 'center', gap: '3px', fontSize: '0.75rem', fontWeight: 500, textDecoration: 'none' }}>
-                              <Link2 size={13} />LI
-                            </a>
-                          )}
-                          {a.socialLinks?.github && (
-                            <a href={a.socialLinks.github} target="_blank" rel="noopener noreferrer" title="GitHub"
-                              style={{ color: 'var(--text-primary)', display: 'inline-flex', alignItems: 'center', gap: '3px', fontSize: '0.75rem', fontWeight: 500, textDecoration: 'none' }}>
-                              <Globe size={13} />GH
-                            </a>
-                          )}
-                          {a.socialLinks?.instagram && (
-                            <a href={a.socialLinks.instagram} target="_blank" rel="noopener noreferrer" title="Instagram"
-                              style={{ color: '#e1306c', display: 'inline-flex', alignItems: 'center', gap: '3px', fontSize: '0.75rem', fontWeight: 500, textDecoration: 'none' }}>
-                              <Globe size={13} />IG
-                            </a>
-                          )}
-                          {a.socialLinks?.twitter && (
-                            <a href={a.socialLinks.twitter} target="_blank" rel="noopener noreferrer" title="Twitter / X"
-                              style={{ color: '#1da1f2', display: 'inline-flex', alignItems: 'center', gap: '3px', fontSize: '0.75rem', fontWeight: 500, textDecoration: 'none' }}>
-                              <Globe size={13} />TW
-                            </a>
-                          )}
-                          {a.socialLinks?.portfolio && (
-                            <a href={a.socialLinks.portfolio} target="_blank" rel="noopener noreferrer" title="Portfolio"
-                              style={{ color: 'var(--text-secondary)', display: 'inline-flex', alignItems: 'center', gap: '3px', fontSize: '0.75rem', fontWeight: 500, textDecoration: 'none' }}>
-                              <Globe size={13} />Web
-                            </a>
-                          )}
-                          {a.socialLinks?.other && (
-                            <a href={a.socialLinks.other} target="_blank" rel="noopener noreferrer" title="Other Link"
-                              style={{ color: 'var(--text-secondary)', display: 'inline-flex', alignItems: 'center', gap: '3px', fontSize: '0.75rem', fontWeight: 500, textDecoration: 'none' }}>
-                              <Link2 size={13} />Url
-                            </a>
-                          )}
-                          {!a.socialLinks?.linkedin && !a.socialLinks?.github && !a.socialLinks?.instagram &&
-                           !a.socialLinks?.twitter && !a.socialLinks?.portfolio && !a.socialLinks?.other && (
-                            <span style={{ color: 'var(--text-secondary)', fontSize: '0.8125rem' }}>—</span>
-                          )}
-                        </div>
+                      {/* Improvement C: Email cell */}
+                      <td style={{ fontSize: '0.8125rem', color: a.email ? 'var(--text-primary)' : 'var(--text-secondary)' }}>
+                        {a.email
+                          ? <a href={`mailto:${a.email}`} style={{ color: 'inherit', textDecoration: 'none' }}
+                              title={a.email}>{a.email}</a>
+                          : '—'}
+                      </td>
+                      {/* Improvement C: Phone cell */}
+                      <td style={{ fontSize: '0.8125rem', color: a.phone ? 'var(--text-primary)' : 'var(--text-secondary)' }}>
+                        {a.phone || '—'}
                       </td>
                       <td style={{ textAlign: 'right' }}>
                         <div className="action-buttons-cell" style={{ justifyContent: 'flex-end' }}>
@@ -345,25 +391,30 @@ const Alumni = () => {
                     Showing {startIndex + 1} to {Math.min(startIndex + itemsPerPage, filteredAlumni.length)} of {filteredAlumni.length} alumni
                   </div>
                   <div className="pagination-buttons">
-                    <button type="button" className="pagination-btn" onClick={() => handlePageChange(currentPage - 1)} disabled={currentPage === 1}>
+                    <button type="button" className="pagination-btn"
+                      onClick={() => setCurrentPage(p => Math.max(1, p - 1))} disabled={currentPage === 1}>
                       <ChevronLeft size={16} />
                     </button>
                     {[...Array(totalPages)].map((_, i) => {
                       const p = i + 1;
-                      if (p === 1 || p === totalPages || (p >= currentPage - 1 && p <= currentPage + 1)) {
-                        return <button key={p} type="button" className={`pagination-btn ${p === currentPage ? 'active' : ''}`} onClick={() => handlePageChange(p)}>{p}</button>;
-                      } else if (p === currentPage - 2 || p === currentPage + 2) {
-                        return <span key={p} className="pagination-dots">...</span>;
-                      }
+                      if (p === 1 || p === totalPages || (p >= currentPage - 1 && p <= currentPage + 1))
+                        return <button key={p} type="button"
+                          className={`pagination-btn${p === currentPage ? ' active' : ''}`}
+                          onClick={() => setCurrentPage(p)}>{p}</button>;
+                      if (p === currentPage - 2 || p === currentPage + 2)
+                        return <span key={p} className="pagination-dots">…</span>;
                       return null;
                     })}
-                    <button type="button" className="pagination-btn" onClick={() => handlePageChange(currentPage + 1)} disabled={currentPage === totalPages}>
+                    <button type="button" className="pagination-btn"
+                      onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))} disabled={currentPage === totalPages}>
                       <ChevronRight size={16} />
                     </button>
                   </div>
                   <div className="items-per-page">
                     <span>Items per page:</span>
-                    <select value={itemsPerPage} onChange={(e) => { setItemsPerPage(Number(e.target.value)); setCurrentPage(1); }} className="items-per-page-select">
+                    <select value={itemsPerPage}
+                      onChange={(e) => { setItemsPerPage(Number(e.target.value)); setCurrentPage(1); }}
+                      className="items-per-page-select">
                       <option value={10}>10</option>
                       <option value={20}>20</option>
                       <option value={50}>50</option>
@@ -376,26 +427,35 @@ const Alumni = () => {
         </div>
       </div>
 
-      {/* Delete Confirm Modal */}
+      {/* Delete confirm */}
       {deleteConfirm && (
         <div className="modal-overlay" onClick={() => !deleting && setDeleteConfirm(null)}>
-          <div className="modal-content delete-dialog" onClick={(e) => e.stopPropagation()}>
+          <div className="modal-content delete-dialog" onClick={e => e.stopPropagation()}>
             <div className="delete-dialog-header">
               <div className="delete-dialog-icon"><AlertTriangle size={22} /></div>
               <div className="delete-dialog-title-box">
                 <h3 className="delete-dialog-title">Delete Alumni Profile</h3>
                 <p className="delete-dialog-desc">This will permanently remove the alumni record.</p>
               </div>
-              <button type="button" className="close-modal-btn" onClick={() => !deleting && setDeleteConfirm(null)} disabled={deleting}><X size={18} /></button>
+              <button type="button" className="close-modal-btn"
+                onClick={() => !deleting && setDeleteConfirm(null)} disabled={deleting}>
+                <X size={18} />
+              </button>
             </div>
             <div className="delete-item-preview">
               <div className="delete-item-name">{deleteConfirm.name}</div>
             </div>
-            <div className="delete-warning-note"><AlertCircle size={14} /><span>This action cannot be undone.</span></div>
+            <div className="delete-warning-note">
+              <AlertCircle size={14} /><span>This action cannot be undone.</span>
+            </div>
             <div className="modal-actions">
-              <button type="button" className="books-btn books-btn-ghost" onClick={() => setDeleteConfirm(null)} disabled={deleting}>Cancel</button>
-              <button type="button" className="btn btn-danger" onClick={() => handleDelete(deleteConfirm.id, deleteConfirm.name)} disabled={deleting}>
-                {deleting ? <><Loader2 size={16} className="spin-animate" /><span>Deleting...</span></> : <><Trash2 size={16} /><span>Delete</span></>}
+              <button type="button" className="books-btn books-btn-ghost"
+                onClick={() => setDeleteConfirm(null)} disabled={deleting}>Cancel</button>
+              <button type="button" className="btn btn-danger"
+                onClick={() => handleDelete(deleteConfirm.id, deleteConfirm.name)} disabled={deleting}>
+                {deleting
+                  ? <><Loader2 size={16} className="spin-animate" /><span>Deleting…</span></>
+                  : <><Trash2 size={16} /><span>Delete</span></>}
               </button>
             </div>
           </div>

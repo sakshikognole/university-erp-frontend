@@ -9,9 +9,7 @@
  * backend controller needs to change. This service layer stays the same.
  */
 
-const _IS_PROD_PM = window.location.hostname !== 'localhost';
-const _PM_NODE_URL = _IS_PROD_PM ? 'https://university-erp-node.onrender.com' : 'http://localhost:5000';
-const API_BASE = `${_PM_NODE_URL}/api/password-mgmt`;
+const API_BASE = 'http://localhost:5000/api/password-mgmt';
 
 /**
  * Generic fetch wrapper — throws an Error with the server's message on failure.

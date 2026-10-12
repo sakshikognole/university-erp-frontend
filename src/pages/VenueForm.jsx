@@ -3,11 +3,12 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { ArrowLeft, Save, AlertCircle, CheckCircle2, Loader2, Plus, X } from 'lucide-react';
 
 const _IS_PROD = window.location.hostname !== 'localhost';
-const _NODE_URL = _IS_PROD ? 'https://university-erp-node.onrender.com' : 'http://localhost:5000';
-const API_BASE_URL = `${_NODE_URL}/api`;
+const API_BASE_URL = _IS_PROD ? 'https://university-erp-node.onrender.com/api' : 'http://localhost:5000/api';
 
-// Must match backend constants in superAdminController.js
-const VENUE_ID_REGEX = /^[A-Z0-9]{1,10}(-[A-Z0-9]{1,10}){0,4}$/;
+// Must match backend constants in superAdminController.js and venueController.js
+// Each segment is 1-10 uppercase alphanumeric chars, up to 5 segments separated by hyphens.
+// The overall ID must contain at least one letter AND at least one digit.
+const VENUE_ID_REGEX = /^(?=[A-Z0-9-]*[A-Z])(?=[A-Z0-9-]*[0-9])[A-Z0-9]{1,10}(-[A-Z0-9]{1,10}){0,4}$/;
 const VENUE_NAME_REGEX = /^[A-Za-z][A-Za-z0-9 ,.\-'()]{1,99}$/;
 
 const VenueForm = () => {
@@ -19,6 +20,8 @@ const VenueForm = () => {
   const [fetching, setFetching] = useState(false);
   const [feedback, setFeedback] = useState({ type: '', message: '' });
   const [fieldErrors, setFieldErrors] = useState({});
+  // Track which fields the user has touched (blurred) so errors show on blur
+  const [touched, setTouched] = useState({});
   const [facilityInput, setFacilityInput] = useState({ name: '', details: '' });
   const [formData, setFormData] = useState({
     venueId: '',
@@ -58,6 +61,9 @@ const VenueForm = () => {
           facilities: venue.facilities || [],
           status: venue.status || 'ACTIVE',
         });
+        // Don't pre-show errors for data loaded from server
+        setFieldErrors({});
+        setTouched({});
       } else {
         setFeedback({ type: 'error', message: 'Venue not found.' });
       }
@@ -69,42 +75,62 @@ const VenueForm = () => {
     }
   };
 
+  // ── Per-field validator — returns error string or '' ───────────────────
+  const validateField = (fieldName, rawValue) => {
+    switch (fieldName) {
+      case 'venueId': {
+        const v = (rawValue || '').trim().toUpperCase();
+        if (!v) return 'Venue ID is required.';
+        if (!VENUE_ID_REGEX.test(v))
+          return 'Invalid Venue ID. Please enter a valid ID (e.g., Hall-101 or Lab-CS-01).';
+        return '';
+      }
+      case 'name': {
+        const v = (rawValue || '').trim();
+        if (!v) return 'Venue Name is required.';
+        if (!VENUE_NAME_REGEX.test(v))
+          return 'Invalid Venue Name. Please enter a valid venue name (e.g., Room 101, Block A, or Main Hall-1).';
+        return '';
+      }
+      case 'capacity': {
+        if (rawValue === '' || rawValue === null || rawValue === undefined)
+          return 'Capacity is required.';
+        if (Number(rawValue) < 1) return 'Capacity must be at least 1.';
+        return '';
+      }
+      case 'status': {
+        if (!rawValue) return 'Status is required.';
+        return '';
+      }
+      default:
+        return '';
+    }
+  };
+
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
-    // Clear the field-level error as the user types
-    if (fieldErrors[name]) {
-      setFieldErrors((prev) => ({ ...prev, [name]: '' }));
+    // Live-validate only once the field has been touched (error clears as user types)
+    if (touched[name]) {
+      const err = validateField(name, value);
+      setFieldErrors((prev) => ({ ...prev, [name]: err }));
     }
+  };
+
+  // Show error as soon as user leaves the field
+  const handleBlur = (e) => {
+    const { name, value } = e.target;
+    setTouched((prev) => ({ ...prev, [name]: true }));
+    const err = validateField(name, value);
+    setFieldErrors((prev) => ({ ...prev, [name]: err }));
   };
 
   const validateForm = () => {
     const errors = {};
-    const venueIdClean = formData.venueId.trim().toUpperCase();
-    const nameClean = formData.name.trim();
-
-    if (!venueIdClean) {
-      errors.venueId = 'Venue ID is required.';
-    } else if (!VENUE_ID_REGEX.test(venueIdClean)) {
-      errors.venueId = 'Venue ID must contain only letters and digits, optionally separated by hyphens (e.g. HALL-101, LAB-CS-01).';
-    }
-
-    if (!nameClean) {
-      errors.name = 'Venue Name is required.';
-    } else if (!VENUE_NAME_REGEX.test(nameClean)) {
-      errors.name = 'Venue Name must start with a letter and may only contain letters, digits, spaces, or basic punctuation ( , . - \' ( ) ).';
-    }
-
-    if (!formData.capacity) {
-      errors.capacity = 'Capacity is required.';
-    } else if (Number(formData.capacity) < 1) {
-      errors.capacity = 'Capacity must be at least 1.';
-    }
-
-    if (!formData.status) {
-      errors.status = 'Status is required.';
-    }
-
+    ['venueId', 'name', 'capacity', 'status'].forEach((field) => {
+      const err = validateField(field, formData[field]);
+      if (err) errors[field] = err;
+    });
     return errors;
   };
 
@@ -138,6 +164,9 @@ const VenueForm = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setFeedback({ type: '', message: '' });
+
+    // Mark all validated fields as touched so every error becomes visible
+    setTouched({ venueId: true, name: true, capacity: true, status: true });
 
     const errors = validateForm();
     if (Object.keys(errors).length > 0) {
@@ -248,13 +277,14 @@ const VenueForm = () => {
                     type="text"
                     id="venueId"
                     name="venueId"
-                    className={`form-input${fieldErrors.venueId ? ' input-error' : ''}`}
+                    className={`form-input${fieldErrors.venueId && touched.venueId ? ' input-error' : ''}`}
                     placeholder="e.g. HALL-101"
                     value={formData.venueId}
                     onChange={handleInputChange}
+                    onBlur={handleBlur}
                     required
                   />
-                  {fieldErrors.venueId && (
+                  {fieldErrors.venueId && touched.venueId && (
                     <span className="form-field-error">{fieldErrors.venueId}</span>
                   )}
                 </div>
@@ -267,13 +297,14 @@ const VenueForm = () => {
                     type="text"
                     id="name"
                     name="name"
-                    className={`form-input${fieldErrors.name ? ' input-error' : ''}`}
+                    className={`form-input${fieldErrors.name && touched.name ? ' input-error' : ''}`}
                     placeholder="e.g. Main Auditorium"
                     value={formData.name}
                     onChange={handleInputChange}
+                    onBlur={handleBlur}
                     required
                   />
-                  {fieldErrors.name && (
+                  {fieldErrors.name && touched.name && (
                     <span className="form-field-error">{fieldErrors.name}</span>
                   )}
                 </div>
@@ -288,14 +319,15 @@ const VenueForm = () => {
                     type="number"
                     id="capacity"
                     name="capacity"
-                    className={`form-input${fieldErrors.capacity ? ' input-error' : ''}`}
+                    className={`form-input${fieldErrors.capacity && touched.capacity ? ' input-error' : ''}`}
                     placeholder="e.g. 500"
                     value={formData.capacity}
                     onChange={handleInputChange}
+                    onBlur={handleBlur}
                     min="1"
                     required
                   />
-                  {fieldErrors.capacity && (
+                  {fieldErrors.capacity && touched.capacity && (
                     <span className="form-field-error">{fieldErrors.capacity}</span>
                   )}
                 </div>
@@ -307,9 +339,10 @@ const VenueForm = () => {
                   <select
                     id="status"
                     name="status"
-                    className={`form-input${fieldErrors.status ? ' input-error' : ''}`}
+                    className={`form-input${fieldErrors.status && touched.status ? ' input-error' : ''}`}
                     value={formData.status}
                     onChange={handleInputChange}
+                    onBlur={handleBlur}
                     required
                   >
                     <option value="ACTIVE">Active</option>
@@ -317,7 +350,7 @@ const VenueForm = () => {
                     <option value="MAINTENANCE">Maintenance</option>
                     <option value="RESERVED">Reserved</option>
                   </select>
-                  {fieldErrors.status && (
+                  {fieldErrors.status && touched.status && (
                     <span className="form-field-error">{fieldErrors.status}</span>
                   )}
                 </div>

@@ -551,8 +551,8 @@ th{background:#1e3a5f;color:#fff;padding:7px 10px;text-align:left;border:1px sol
               <thead>
                 <tr>
                   <th style={{ width:42 }}>#</th>
-                  <th>PRN</th>
-                  <th>Student Name</th>
+                  <th>Prn</th>
+                  <th>Student name</th>
                   <th>{activeTab} marks <span style={{ fontWeight:400, fontSize:'0.72rem' }}>/{max}</span></th>
                   <th style={{ textAlign:'center' }}>
                     {isFraction ? `/${fracScale}` : `% (/${pctScale})`}

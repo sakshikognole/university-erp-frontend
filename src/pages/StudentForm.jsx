@@ -20,8 +20,7 @@ import {
 } from '../utils/studentValidation';
 
 const _IS_PROD = window.location.hostname !== 'localhost';
-const _NODE_URL = _IS_PROD ? 'https://university-erp-node.onrender.com' : 'http://localhost:5000';
-const API_BASE_URL = `${_NODE_URL}/api`;
+const API_BASE_URL = _IS_PROD ? 'https://university-erp-node.onrender.com/api' : 'http://localhost:5000/api';
 
 // ---------------------------------------------------------------------------
 // FieldError — small red helper text shown beneath an invalid input
@@ -329,7 +328,7 @@ const StudentForm = () => {
         </div>
       )}
 
-      <div className="card" style={{ maxWidth: '720px' }}>
+      <div className="card student-form-card" style={{ maxWidth: '720px' }}>
         {fetching ? (
           <div style={{ padding: '3rem', textAlign: 'center', color: 'var(--text-secondary)' }}>
             <Loader2

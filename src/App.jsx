@@ -110,6 +110,15 @@ import SystemAnnouncements from './pages/SystemAnnouncements';
 import SystemAnnouncementForm from './pages/SystemAnnouncementForm';
 import SystemAnnouncementView from './pages/SystemAnnouncementView';
 
+// --- Announcements, Submissions, Academic Resources ---
+import Announcements from './pages/Announcements';
+import Submission from './pages/Submission';
+import AcademicResources from './pages/AcademicResources';
+
+// --- Attendance ---
+import Attendance from './pages/Attendance';
+import AttendanceReview from './pages/AttendanceReview';
+
 // --- Password Management ---
 import PasswordManagementPage from './pages/PasswordManagement/PasswordManagementPage';
 import PmOtpPage from './pages/PasswordManagement/PmOtpPage';
@@ -614,6 +623,17 @@ function AppRoutes() {
           path="system-announcements/edit/:id"
           element={<SystemAnnouncementForm />}
         />
+
+        {/* ==================== ATTENDANCE ==================== */}
+        <Route path="attendance" element={<Attendance />} />
+        <Route path="attendance/review" element={<AttendanceReview />} />
+
+        {/* ==================== ANNOUNCEMENTS ==================== */}
+        <Route path="announcements" element={<Announcements />} />
+        <Route path="submission/:announcementId" element={<Submission />} />
+
+        {/* ==================== ACADEMIC RESOURCES ==================== */}
+        <Route path="academic-resources" element={<AcademicResources />} />
       </Route>
 
       {/* Catch-all fallback */}

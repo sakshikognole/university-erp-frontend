@@ -8,14 +8,13 @@ import {
   Calendar,
   User,
   Building2,
-  FileText,
   Download,
   Edit,
+  ExternalLink,
 } from 'lucide-react';
 
 const _IS_PROD = window.location.hostname !== 'localhost';
-const _NODE_URL = _IS_PROD ? 'https://university-erp-node.onrender.com' : 'http://localhost:5000';
-const API_BASE_URL = `${_NODE_URL}/api`;
+const API_BASE_URL = _IS_PROD ? 'https://university-erp-node.onrender.com/api' : 'http://localhost:5000/api';
 
 const SystemAnnouncementView = () => {
   const { id } = useParams();
@@ -115,8 +114,10 @@ const SystemAnnouncementView = () => {
       a.download = decodeURIComponent(url.split('/').pop().split('?')[0]) || 'attachment';
       document.body.appendChild(a);
       a.click();
-      document.body.removeChild(a);
-      URL.revokeObjectURL(objectUrl);
+      setTimeout(() => {
+        document.body.removeChild(a);
+        URL.revokeObjectURL(objectUrl);
+      }, 150);
     } catch {
       // Last-resort fallback: open in new tab
       window.open(url, '_blank', 'noopener,noreferrer');
@@ -143,7 +144,7 @@ const SystemAnnouncementView = () => {
             <h1 className="page-title" style={{ fontSize: '1.5rem' }}>
               Announcement Details
             </h1>
-            <p className="page-subtitle">Full view of the system announcement</p>
+            <p className="page-subtitle">View System Announcement Details</p>
           </div>
         </div>
       </div>
@@ -205,7 +206,7 @@ const SystemAnnouncementView = () => {
               {announcement.title}
             </h2>
 
-            {/* Date & time — top right */}
+            {/* Date & time — top right, wraps on narrow screens */}
             <div
               style={{
                 display: 'flex',
@@ -213,11 +214,13 @@ const SystemAnnouncementView = () => {
                 gap: '6px',
                 color: 'var(--text-secondary)',
                 fontSize: '0.8125rem',
-                whiteSpace: 'nowrap',
                 flexShrink: 0,
+                flexWrap: 'wrap',
+                maxWidth: '200px',
+                wordBreak: 'break-word',
               }}
             >
-              <Calendar size={14} />
+              <Calendar size={14} style={{ flexShrink: 0 }} />
               <span>{formatDateTime(announcement.createdAt)}</span>
             </div>
           </div>
@@ -435,13 +438,6 @@ const SystemAnnouncementView = () => {
               >
                 <Edit size={15} />
                 <span>Edit Announcement</span>
-              </button>
-              <button
-                type="button"
-                className="books-btn books-btn-ghost"
-                onClick={() => navigate('/system-announcements')}
-              >
-                Back to List
               </button>
             </div>
           )}

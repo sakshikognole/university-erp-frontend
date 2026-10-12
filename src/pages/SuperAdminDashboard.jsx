@@ -3,13 +3,10 @@ import { useNavigate } from 'react-router-dom';
 import { Users, GraduationCap, Building2, UserPlus, ChevronDown, Loader2, Trophy } from 'lucide-react';
 
 // Students, staff, departments → Node/Express backend
-const _IS_PROD = window.location.hostname !== 'localhost';
-const _NODE_URL = _IS_PROD ? 'https://university-erp-node.onrender.com' : 'http://localhost:5000';
-const API_BASE_URL = `${_NODE_URL}/api`;
+const _IS_PROD_SA = window.location.hostname !== 'localhost';
+const API_BASE_URL = _IS_PROD_SA ? 'https://university-erp-node.onrender.com/api' : 'http://localhost:5000/api';
 // Clubs → Spring Boot backend
-const _IS_PROD_SP = window.location.hostname !== 'localhost';
-const _SPRING_URL = _IS_PROD_SP ? 'https://university-erp-spring.onrender.com' : 'http://localhost:9090';
-const SPRING_API_URL = `${_SPRING_URL}/api`;
+const SPRING_API_URL = _IS_PROD_SA ? 'https://university-erp-spring.onrender.com/api' : 'http://localhost:9090/api';
 
 const SuperAdminDashboard = () => {
   const navigate = useNavigate();

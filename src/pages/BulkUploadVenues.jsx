@@ -13,8 +13,7 @@ import {
 } from 'lucide-react';
 
 const _IS_PROD = window.location.hostname !== 'localhost';
-const _NODE_URL = _IS_PROD ? 'https://university-erp-node.onrender.com' : 'http://localhost:5000';
-const API_BASE_URL = `${_NODE_URL}/api`;
+const API_BASE_URL = _IS_PROD ? 'https://university-erp-node.onrender.com/api' : 'http://localhost:5000/api';
 
 // Must match backend constants — same rules as Add/Edit Venue
 const VENUE_ID_REGEX = /^[A-Z0-9]{1,10}(-[A-Z0-9]{1,10}){0,4}$/;
@@ -44,7 +43,7 @@ const BulkUploadVenues = () => {
       ['HALL-101', 'Main Auditorium', '500', 'ACTIVE', 'Projector: 4K Resolution; AC: Central AC System; Sound System: Dolby 5.1'],
       ['LAB-CS-01', 'Computer Lab A', '60', 'ACTIVE', 'Computers: 60 Desktops with i7 processors; Projector: HD; AC: Split AC'],
       ['ROOM-201', 'Lecture Room 201', '80', 'MAINTENANCE', 'Projector: Full HD; Whiteboard: Digital Smart Board'],
-      ['HALL-MINI', 'Mini Auditorium', '200', 'ACTIVE', 'Projector: 4K; AC: Central; Seating: Cushioned Chairs'],
+      ['HALL-M01', 'Mini Auditorium', '200', 'ACTIVE', 'Projector: 4K; AC: Central; Seating: Cushioned Chairs'],
     ];
 
     const csvContent = sampleData.map(row => row.map(cell => `"${cell}"`).join(',')).join('\r\n');
@@ -53,8 +52,12 @@ const BulkUploadVenues = () => {
     const link = document.createElement('a');
     link.href = url;
     link.download = 'sample_venues_upload.csv';
+    document.body.appendChild(link);
     link.click();
-    URL.revokeObjectURL(url);
+    setTimeout(() => {
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+    }, 150);
   };
 
   const parseCSV = (text) => {
@@ -378,7 +381,7 @@ const BulkUploadVenues = () => {
                     <thead>
                       <tr>
                         <th style={{ width: '60px' }}>#</th>
-                        <th style={{ width: '140px' }}>Venue id</th>
+                        <th style={{ width: '140px' }}>Venue ID</th>
                         <th>Name</th>
                         <th style={{ width: '100px' }}>Capacity</th>
                         <th style={{ width: '120px' }}>Status</th>
