@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { Search } from 'lucide-react';
 import { getAllStudents } from '../services/studentService';
 import PageLoader from '../components/PageLoader';
 import PageError  from '../components/PageError';
@@ -123,11 +124,14 @@ export default function SelectStudent() {
       <div className="card">
         {/* Search + selected tag */}
         <div className="books-toolbar">
-          <input
-            className="books-search-input"
-            placeholder="Search by name, ID or degree..."
-            onChange={onSearch}
-          />
+          <div className="search-box-wrapper">
+            <Search size={16} className="search-icon" />
+            <input
+              className="search-input"
+              placeholder="Search by name, ID or degree..."
+              onChange={onSearch}
+            />
+          </div>
           {selected && (
             <span className="stu-selected-tag">
               Selected: <strong>{selected.studentName}</strong> ({selected.studentId})
