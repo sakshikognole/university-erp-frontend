@@ -34,10 +34,11 @@ export default function SportModal({ isOpen, mode, sport, onSave, onClose, loadi
 
   const change = (e) => {
     const { name, value } = e.target;
-    // Defect 3: auto-uppercase Venue ID as user types
     const finalValue = name === 'venueId' ? value.toUpperCase() : value;
     setForm((f) => ({ ...f, [name]: finalValue }));
     setErrors((er) => ({ ...er, [name]: '' }));
+    // Clear duplicate error when user edits Sport ID
+    if (name === 'sportId' && onDupOk) onDupOk();
   };
 
   const validate = () => {
@@ -99,40 +100,20 @@ export default function SportModal({ isOpen, mode, sport, onSave, onClose, loadi
         <form onSubmit={submit}>
           <div className="books-modal-body">
 
-            {/* Duplicate ID popup — shown inside modal with OK button */}
-            {dupError && (
-              <div style={{
-                background: '#fef2f2', border: '1px solid #fca5a5',
-                borderRadius: 8, padding: '12px 16px', marginBottom: 16,
-                display: 'flex', flexDirection: 'column', gap: 10,
-              }}>
-                <div style={{ display: 'flex', gap: 10, alignItems: 'flex-start' }}>
-                  <span style={{ fontSize: '1.3rem' }}>⚠️</span>
-                  <p style={{ color: '#dc2626', fontWeight: 600, margin: 0, fontSize: '0.9rem' }}>
-                    {dupError}
-                  </p>
-                </div>
-                <button type="button" onClick={onDupOk} style={{
-                  alignSelf: 'flex-end', padding: '6px 24px',
-                  background: '#dc2626', color: '#fff', border: 'none',
-                  borderRadius: 6, fontWeight: 600, cursor: 'pointer', fontSize: '0.85rem',
-                }}>
-                  OK
-                </button>
-              </div>
-            )}
+            {/* Duplicate ID error is shown below Sport ID field */}
 
             {/* Sport ID + Sport Name */}
             <div className="club-form-row">
               <div className="books-form-group">
                 <label className="books-form-label">Sport ID *</label>
                 <input
-                  className={`books-form-control ${errors.sportId ? 'err' : ''}`}
+                  className={`books-form-control ${errors.sportId || dupError ? 'err' : ''}`}
                   name="sportId" value={form.sportId} onChange={change}
                   placeholder="e.g. SPT001"
                   disabled={mode === 'edit'}
                 />
                 {errors.sportId && <p className="books-form-err">{errors.sportId}</p>}
+                {dupError && <p className="books-form-err">{dupError}</p>}
               </div>
               <div className="books-form-group">
                 <label className="books-form-label">Sport Name *</label>
