@@ -44,29 +44,19 @@ export default function SportModal({ isOpen, mode, sport, onSave, onClose, loadi
     const e = {};
 
     // ── Sport ID validation ──────────────────────────────────────────────
-    // Defects 1, 2, 3:
-    // - Must NOT be only alphabets   (e.g. "SPT" is invalid)
-    // - Must NOT be only numbers     (e.g. "001" is invalid)
-    // - Must NOT contain special chars (e.g. "SPT@01" is invalid)
-    // - Must contain BOTH letters AND numbers, no special characters
     const sportIdRegex = /^(?=.*[A-Za-z])(?=.*[0-9])[A-Za-z0-9]+$/;
     if (!form.sportId.trim()) {
       e.sportId = 'Sport ID is required';
     } else if (!sportIdRegex.test(form.sportId.trim())) {
-      e.sportId = 'Sport ID must contain both letters and numbers (e.g. SPT001). No special characters allowed.';
+      e.sportId = 'Invalid Sport ID. Please enter a valid Sport ID (e.g., SPT001).';
     }
 
     // ── Sport Name validation ────────────────────────────────────────────
-    // Defects 2, 4, 5, 7, 8:
-    // - Must NOT accept numbers alone, combined with letters, or special chars
-    // - Only letters (A-Z, a-z) and spaces allowed
     const sportNameRegex = /^[A-Za-z\s]+$/;
     if (!form.sportName.trim()) {
       e.sportName = 'Sport name is required';
-    } else if (/\d/.test(form.sportName)) {
-      e.sportName = 'Sport name must not contain numbers.';
     } else if (!sportNameRegex.test(form.sportName.trim())) {
-      e.sportName = 'Sport name must contain only letters and spaces. Special characters are not allowed.';
+      e.sportName = 'Invalid Sport Name. Please enter a valid Sport Name (e.g., Cricket).';
     }
 
     // ── Capacity validation ──────────────────────────────────────────────
@@ -80,23 +70,11 @@ export default function SportModal({ isOpen, mode, sport, onSave, onClose, loadi
     if (!form.status) e.status = 'Required';
 
     // ── Venue ID validation ──────────────────────────────────────────────
-    // Defects 4-8 (edit mode): validation applies in BOTH add and edit modes.
-    // Venue ID is editable in edit mode so must be validated every time.
-    // - Must NOT be only alphabets, only numbers, or contain special chars
-    // - Must contain BOTH letters AND numbers; hyphens allowed
     const venueIdRegex = /^(?=.*[A-Za-z])(?=.*[0-9])[A-Za-z0-9\-]+$/;
     if (!form.venueId.trim()) {
       e.venueId = 'Venue ID is required';
     } else if (!venueIdRegex.test(form.venueId.trim())) {
-      if (/[^A-Za-z0-9\-]/.test(form.venueId.trim())) {
-        e.venueId = 'Venue ID must not contain special characters (only letters, numbers, hyphens).';
-      } else if (!/[0-9]/.test(form.venueId.trim())) {
-        e.venueId = 'Venue ID must contain at least one number (e.g. VEN001).';
-      } else if (!/[A-Za-z]/.test(form.venueId.trim())) {
-        e.venueId = 'Venue ID must contain at least one letter (e.g. VEN001).';
-      } else {
-        e.venueId = 'Venue ID must contain both letters and numbers (e.g. VEN001).';
-      }
+      e.venueId = 'Invalid Venue ID. Please enter a valid Venue ID (e.g., VEN001).';
     }
 
     return e;

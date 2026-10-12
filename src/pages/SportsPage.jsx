@@ -59,7 +59,7 @@ export default function SportsPage() {
         );
         if (isDuplicate) {
           clearTimeout(slowTimer);
-          setDupError(`Sport ID "${form.sportId}" already exists. Please use a different Sport ID.`);
+          setDupError(`Sport ID "${form.sportId}" already exists.`);
           setSaving(false);
           return;
         }
