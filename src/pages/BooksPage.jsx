@@ -218,7 +218,7 @@ export default function BooksPage() {
             <Search size={16} className="search-icon" />
             <input
               className="search-input"
-              placeholder="Search by title, author, or ID..."
+              placeholder="Search by Title, Author, or ID..."
               onChange={onSearch}
             />
           </div>

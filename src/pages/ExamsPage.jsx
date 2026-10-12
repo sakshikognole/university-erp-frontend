@@ -150,7 +150,7 @@ export default function ExamsPage() {
             <Search size={16} className="search-icon" />
             <input
               className="search-input"
-              placeholder="Search by Exam ID, subject, or year..."
+              placeholder="Search by Exam ID, Subject, or Year..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
             />

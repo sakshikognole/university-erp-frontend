@@ -128,7 +128,7 @@ export default function SelectStudent() {
             <Search size={16} className="search-icon" />
             <input
               className="search-input"
-              placeholder="Search by name, ID or degree..."
+              placeholder="Search by Name, PRN, Class or Degree..."
               onChange={onSearch}
             />
           </div>

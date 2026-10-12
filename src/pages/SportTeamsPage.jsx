@@ -217,7 +217,7 @@ export default function SportTeamsPage() {
             <Search size={16} className="search-icon" />
             <input
               className="search-input"
-              placeholder="Search by team name, sport ID, or coach..."
+              placeholder="Search by Team Name, Sport ID, or Coach..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
             />
