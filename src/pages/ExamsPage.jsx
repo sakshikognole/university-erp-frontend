@@ -142,32 +142,6 @@ export default function ExamsPage() {
         </div>
       )}
 
-      {/* Search + count row */}
-      <div style={{ marginBottom: 16, display: 'flex', alignItems: 'center',
-        justifyContent: 'space-between', gap: 12, flexWrap: 'wrap' }}>
-        <div style={{ position: 'relative', maxWidth: 380, flex: 1 }}>
-          <div className="search-box-wrapper">
-            <Search size={16} className="search-icon" />
-            <input
-              className="search-input"
-              placeholder="Search by Exam ID, Subject, or Year..."
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-            />
-            {search && (
-              <button type="button" onClick={() => setSearch('')} title="Clear search"
-                style={{ position: 'absolute', right: 8, top: '50%', transform: 'translateY(-50%)',
-                  background: 'none', border: 'none', cursor: 'pointer', color: '#9ca3af',
-                  fontSize: 18, lineHeight: 1, padding: '2px 4px' }}>×</button>
-            )}
-          </div>
-        </div>
-        <div className="table-stats-badge">
-          Total: <strong>{filtered.length}</strong>{' '}
-          {filtered.length === 1 ? 'Exam' : 'Exams'}
-        </div>
-      </div>
-
       {/* Table */}
       {loading ? (
         <div className="card" style={{ padding: '1rem' }}>
@@ -195,9 +169,27 @@ export default function ExamsPage() {
         </div>
       ) : (
         <div className="card" style={{ padding: '1rem' }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between',
-            alignItems: 'center', marginBottom: 10 }}>
-            <div>{/* search bar is above */}</div>
+          {/* Search + count INSIDE the card */}
+          <div className="table-controls-bar">
+            <div className="search-box-wrapper">
+              <Search size={16} className="search-icon" />
+              <input
+                className="search-input"
+                placeholder="Search by Exam ID, Subject, or Year..."
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+              />
+              {search && (
+                <button type="button" onClick={() => setSearch('')} title="Clear search"
+                  style={{ position: 'absolute', right: 8, top: '50%', transform: 'translateY(-50%)',
+                    background: 'none', border: 'none', cursor: 'pointer', color: '#9ca3af',
+                    fontSize: 18, lineHeight: 1, padding: '2px 4px' }}>×</button>
+              )}
+            </div>
+            <div className="table-stats-badge">
+              Total: <strong>{filtered.length}</strong>{' '}
+              {filtered.length === 1 ? 'Exam' : 'Exams'}
+            </div>
           </div>
 
           {/* Desktop table */}
