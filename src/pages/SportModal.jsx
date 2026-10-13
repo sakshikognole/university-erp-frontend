@@ -45,11 +45,11 @@ export default function SportModal({ isOpen, mode, sport, onSave, onClose, loadi
     const e = {};
 
     // ── Sport ID validation ──────────────────────────────────────────────
-    const sportIdRegex = /^(?=.*[A-Za-z])(?=.*[0-9])[A-Za-z0-9]+$/;
+    // Letters, numbers, or combination. No special chars or spaces.
     if (!form.sportId.trim()) {
       e.sportId = 'Sport ID is required';
-    } else if (!sportIdRegex.test(form.sportId.trim())) {
-      e.sportId = 'Invalid Sport ID. Please enter a valid Sport ID (e.g., SPT001).';
+    } else if (!/^[A-Za-z0-9]+$/.test(form.sportId.trim())) {
+      e.sportId = 'Invalid ID. Please enter a valid ID.';
     }
 
     // ── Sport Name validation ────────────────────────────────────────────

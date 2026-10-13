@@ -43,16 +43,12 @@ export default function SportTeamModal({ isOpen, mode, team, onSave, onClose, lo
   const validate = () => {
     const e = {};
 
-    // ── Defects 3, 4, 5: Team ID validation ─────────────────────────────
-    // Must contain both letters AND numbers, no special characters
+    // ── Team ID validation ─────────────────────────────────────────────
+    // Letters, numbers, or combination. No special chars or spaces.
     if (!form.teamId.trim()) {
       e.teamId = 'Team ID is required.';
-    } else if (/[^A-Za-z0-9\-]/.test(form.teamId.trim())) {
-      e.teamId = 'Team ID must not contain special characters (letters and numbers only).';
-    } else if (!/[A-Za-z]/.test(form.teamId.trim())) {
-      e.teamId = 'Team ID must contain at least one letter (e.g. TM001).';
-    } else if (!/[0-9]/.test(form.teamId.trim())) {
-      e.teamId = 'Team ID must contain at least one number (e.g. TM001).';
+    } else if (!/^[A-Za-z0-9]+$/.test(form.teamId.trim())) {
+      e.teamId = 'Invalid ID. Please enter a valid ID.';
     }
 
     // Team Name

@@ -56,20 +56,13 @@ export default function ExamModal({
     const e = {};
     const id = form.examId.trim();
 
-    // D6: no negative values (starts with -)
-    // D7: max 20 chars
+    // Exam ID validation - letters, numbers, or combination. No special chars or spaces.
     if (!id) {
       e.examId = 'Exam ID is required.';
-    } else if (id.startsWith('-')) {
-      e.examId = 'Exam ID must not start with a negative sign (-).';
     } else if (id.length > 20) {
       e.examId = 'Exam ID must not exceed 20 characters.';
-    } else if (/[^A-Za-z0-9\-]/.test(id)) {
-      e.examId = 'Exam ID must contain only letters, numbers, and hyphens.';
-    } else if (!/[A-Za-z]/.test(id)) {
-      e.examId = 'Exam ID must contain at least one letter (e.g. EX001).';
-    } else if (!/[0-9]/.test(id)) {
-      e.examId = 'Exam ID must contain at least one number (e.g. EX001).';
+    } else if (!/^[A-Za-z0-9]+$/.test(id)) {
+      e.examId = 'Invalid ID. Please enter a valid ID.';
     }
 
     // Subject — required (selected from dropdown)

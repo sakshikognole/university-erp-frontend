@@ -51,21 +51,15 @@ export default function ClubModal({ isOpen, mode, club, parentClubs, onSave, onC
     const validate = () => {
         const e = {};
         
-        // Club ID validation
+        // Club ID validation - letters, numbers, or combination. No special chars or spaces.
         if (!form.clubId.trim()) {
             e.clubId = 'Required';
         } else {
             const clubIdTrimmed = form.clubId.trim();
-            
-            // Defect #2: Check for special characters (only alphanumeric and hyphen/underscore allowed)
-            if (!/^[A-Za-z0-9\-_]+$/.test(clubIdTrimmed)) {
-                e.clubId = 'Invalid Club ID. Please enter a valid Club ID (e.g. CLB001, TECH01).';
+            if (!/^[A-Za-z0-9]+$/.test(clubIdTrimmed)) {
+                e.clubId = 'Invalid ID. Please enter a valid ID.';
             }
-            // Defect #3: Must contain both letters AND numbers (not just one type)
-            else if (!/[A-Za-z]/.test(clubIdTrimmed) || !/[0-9]/.test(clubIdTrimmed)) {
-                e.clubId = 'Invalid Club ID. Please enter a valid Club ID (e.g. CLB001, TECH01).';
-            }
-            // Defect #4: Check for duplicate Club ID (only in add mode)
+            // Check for duplicate Club ID (only in add mode)
             else if (mode === 'add' && existingClubs) {
                 const isDuplicate = existingClubs.some(
                     (c) => c.clubId.trim().toLowerCase() === clubIdTrimmed.toLowerCase()

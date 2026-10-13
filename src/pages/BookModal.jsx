@@ -38,22 +38,13 @@ export default function BookModal({ isOpen, mode, book, onSave, onClose, loading
   const validate = () => {
     const e = {};
     
-    // Book ID validation - must contain both letters AND numbers (e.g., BK-101, CS-001)
+    // Book ID validation - letters, numbers, or combination. No special chars or spaces.
     if (mode === 'add' && !form.bookId.trim()) {
       e.bookId = 'Book ID is required';
     } else if (mode === 'add') {
       const bookIdTrimmed = form.bookId.trim();
-      
-      // Must contain both letters AND numbers (like BK-101, CS-001)
-      const hasLetters = /[A-Za-z]/.test(bookIdTrimmed);
-      const hasNumbers = /[0-9]/.test(bookIdTrimmed);
-      
-      if (!hasLetters || !hasNumbers) {
-        e.bookId = 'Invalid ID. Please enter valid ID e.g. BK-101, CS-001';
-      }
-      // No special characters except hyphen and underscore
-      else if (!/^[A-Za-z0-9\-_]+$/.test(bookIdTrimmed)) {
-        e.bookId = 'Invalid ID. Please enter valid ID e.g. BK-101, CS-001';
+      if (!/^[A-Za-z0-9]+$/.test(bookIdTrimmed)) {
+        e.bookId = 'Invalid ID. Please enter a valid ID.';
       }
     }
     
