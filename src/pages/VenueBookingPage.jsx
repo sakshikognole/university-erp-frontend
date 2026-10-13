@@ -311,6 +311,7 @@ export default function VenueBookingPage() {
   const [bookings,  setBookings]  = useState([]);
   const [loading,   setLoading]   = useState(true);
   const [pageError, setPageError] = useState('');
+  const [showForm,  setShowForm]  = useState(false);
   const [form,      setForm]      = useState({ ...EMPTY_FORM, bookingId: generateBookingId() });
   const [formErrs,  setFormErrs]  = useState({});
   const [submitting,setSubmitting]= useState(false);
@@ -375,6 +376,7 @@ export default function VenueBookingPage() {
       setSuccess('Venue booking request submitted successfully.');
       setForm({ ...EMPTY_FORM, bookingId: generateBookingId() });
       setFormErrs({});
+      setShowForm(false);
       loadBookings(true);
     } catch (err) {
       setError(err.message || 'Failed to submit booking.');
@@ -421,19 +423,15 @@ export default function VenueBookingPage() {
   return (
     <div className="page-container">
 
-      {/* D1: header left-aligned on mobile — flexWrap nowrap, flexShrink */}
-      <div style={{
-        display: 'flex', alignItems: 'flex-start',
-        justifyContent: 'space-between', flexWrap: 'nowrap',
-        gap: 12, marginBottom: '1.25rem',
-      }}>
-        <div style={{ minWidth: 0 }}>
-          {/* D1: page-title is left-aligned */}
-          <h1 className="page-title" style={{ textAlign: 'left' }}>Venue Booking</h1>
-          <p className="page-subtitle" style={{ textAlign: 'left' }}>
-            Submit and manage venue booking requests
-          </p>
+      {/* Header with button top right like Books */}
+      <div className="books-page-header">
+        <div>
+          <h1 className="page-title">Venue Booking</h1>
+          <p className="page-subtitle">Submit and manage venue booking requests</p>
         </div>
+        <button className="books-btn books-btn-primary" onClick={() => { setShowForm(true); setFormErrs({}); }}>
+          + New Booking
+        </button>
       </div>
 
       {/* Alerts */}
@@ -450,113 +448,119 @@ export default function VenueBookingPage() {
         </div>
       )}
 
-      {/* ── New Booking Request Form ─────────────────────────────────────────── */}
-      <div className="card" style={{ padding: '1.5rem', marginBottom: '1.5rem' }}>
-        <h2 style={{ fontSize: '1rem', fontWeight: 700, marginBottom: '1.25rem',
-                     color: '#111827', textAlign: 'left' }}>
-          New Booking Request
-        </h2>
-
-        {dropping ? (
-          <PageLoader message="Loading events and venues..." />
-        ) : dropError ? (
-          <PageError message={dropError} />
-        ) : (
-          <form onSubmit={handleSubmit}>
-
-            {/* Booking ID */}
-            <div className="books-form-group">
-              <label className="books-form-label">Booking ID (auto-generated)</label>
-              <input className="books-form-control" value={form.bookingId} disabled
-                     style={{ background: '#f9fafb', color: '#6b7280', cursor: 'not-allowed',
-                              maxWidth: 280 }} />
+      {/* ── New Booking Request Form — Modal like Books ─────────────────────── */}
+      {showForm && (
+        <div className="books-overlay">
+          <div className="books-modal" style={{ maxWidth: 580 }}>
+            <div className="books-modal-head">
+              <h3>New Booking Request</h3>
+              <button className="books-modal-close" onClick={() => { setShowForm(false); setFormErrs({}); }}>x</button>
             </div>
 
-            {/* D2: Event + Venue — stack on mobile via flex-wrap */}
-            <div className="club-form-row">
-              <div className="books-form-group">
-                <label className="books-form-label">Event *</label>
-                <select className={`books-form-control ${formErrs.eventId ? 'err' : ''}`}
-                        name="eventId" value={form.eventId} onChange={changeForm}>
-                  <option value="">— Select an event —</option>
-                  {events.map(ev => (
-                    <option key={ev.eventId} value={ev.eventId}>
-                      {ev.eventId} — {ev.eventTitle}
-                    </option>
-                  ))}
-                </select>
-                {formErrs.eventId && <p className="books-form-err">{formErrs.eventId}</p>}
-              </div>
-              <div className="books-form-group">
-                <label className="books-form-label">Venue *</label>
-                <select className={`books-form-control ${formErrs.venueId ? 'err' : ''}`}
-                        name="venueId" value={form.venueId} onChange={changeForm}>
-                  <option value="">— Select a venue —</option>
-                  {venues.map(vn => (
-                    <option key={vn.venueId} value={vn.venueId}>
-                      {vn.venueId} — {vn.name}
-                    </option>
-                  ))}
-                </select>
-                {formErrs.venueId && <p className="books-form-err">{formErrs.venueId}</p>}
-              </div>
-            </div>
+            {dropping ? (
+              <div className="books-modal-body"><PageLoader message="Loading events and venues..." /></div>
+            ) : dropError ? (
+              <div className="books-modal-body"><PageError message={dropError} /></div>
+            ) : (
+              <form onSubmit={(e) => { handleSubmit(e); }}>
+                <div className="books-modal-body" style={{ maxHeight: '70vh', overflowY: 'auto' }}>
 
-            {/* D2: Date + Start + End — each on its own row on mobile */}
-            <div className="club-form-row">
-              <div className="books-form-group">
-                <label className="books-form-label">Booking Date *</label>
-                <input className={`books-form-control ${formErrs.bookingDate ? 'err' : ''}`}
-                       type="date" name="bookingDate" value={form.bookingDate}
-                       min={todayStr()} onChange={changeForm} />
-                {formErrs.bookingDate && <p className="books-form-err">{formErrs.bookingDate}</p>}
-              </div>
-              <div className="books-form-group">
-                {/* Improvement: placeholder HH:MM */}
-                <label className="books-form-label">Start Time * (HH:MM)</label>
-                <input className={`books-form-control ${formErrs.startTime ? 'err' : ''}`}
-                       type="time" name="startTime" value={form.startTime}
-                       placeholder="HH:MM" onChange={changeForm} />
-                {formErrs.startTime && <p className="books-form-err">{formErrs.startTime}</p>}
-              </div>
-              <div className="books-form-group">
-                <label className="books-form-label">End Time * (HH:MM)</label>
-                <input className={`books-form-control ${formErrs.endTime ? 'err' : ''}`}
-                       type="time" name="endTime" value={form.endTime}
-                       placeholder="HH:MM" onChange={changeForm} />
-                {formErrs.endTime && <p className="books-form-err">{formErrs.endTime}</p>}
-              </div>
-            </div>
+                  {/* Booking ID */}
+                  <div className="books-form-group">
+                    <label className="books-form-label">Booking ID (auto-generated)</label>
+                    <input className="books-form-control" value={form.bookingId} disabled
+                           style={{ background: '#f9fafb', color: '#6b7280', cursor: 'not-allowed' }} />
+                  </div>
 
-            {/* Improvement: larger description textarea */}
-            <div className="books-form-group">
-              <label className="books-form-label">Purpose / Description</label>
-              <textarea className="books-form-control" name="purpose"
-                        value={form.purpose} onChange={changeForm}
-                        rows={4} placeholder="Describe the purpose of this booking..."
-                        style={{ resize: 'vertical', fontFamily: 'inherit' }} />
-            </div>
+                  {/* Event + Venue */}
+                  <div className="club-form-row">
+                    <div className="books-form-group">
+                      <label className="books-form-label">Event *</label>
+                      <select className={`books-form-control ${formErrs.eventId ? 'err' : ''}`}
+                              name="eventId" value={form.eventId} onChange={changeForm}>
+                        <option value="">— Select an event —</option>
+                        {events.map(ev => (
+                          <option key={ev.eventId} value={ev.eventId}>
+                            {ev.eventId} — {ev.eventTitle}
+                          </option>
+                        ))}
+                      </select>
+                      {formErrs.eventId && <p className="books-form-err">{formErrs.eventId}</p>}
+                    </div>
+                    <div className="books-form-group">
+                      <label className="books-form-label">Venue *</label>
+                      <select className={`books-form-control ${formErrs.venueId ? 'err' : ''}`}
+                              name="venueId" value={form.venueId} onChange={changeForm}>
+                        <option value="">— Select a venue —</option>
+                        {venues.map(vn => (
+                          <option key={vn.venueId} value={vn.venueId}>
+                            {vn.venueId} — {vn.name}
+                          </option>
+                        ))}
+                      </select>
+                      {formErrs.venueId && <p className="books-form-err">{formErrs.venueId}</p>}
+                    </div>
+                  </div>
 
-            {/* Requested By — D8 */}
-            <div className="books-form-group" style={{ maxWidth: 380 }}>
-              <label className="books-form-label">Requested By *</label>
-              <input className={`books-form-control ${formErrs.requestedBy ? 'err' : ''}`}
-                     name="requestedBy" value={form.requestedBy} onChange={changeForm}
-                     placeholder="e.g. Prof. Sharma" />
-              {formErrs.requestedBy && <p className="books-form-err">{formErrs.requestedBy}</p>}
-            </div>
+                  {/* Date + Start + End */}
+                  <div className="club-form-row">
+                    <div className="books-form-group">
+                      <label className="books-form-label">Booking Date *</label>
+                      <input className={`books-form-control ${formErrs.bookingDate ? 'err' : ''}`}
+                             type="date" name="bookingDate" value={form.bookingDate}
+                             min={todayStr()} onChange={changeForm} />
+                      {formErrs.bookingDate && <p className="books-form-err">{formErrs.bookingDate}</p>}
+                    </div>
+                    <div className="books-form-group">
+                      <label className="books-form-label">Start Time * (HH:MM)</label>
+                      <input className={`books-form-control ${formErrs.startTime ? 'err' : ''}`}
+                             type="time" name="startTime" value={form.startTime}
+                             onChange={changeForm} />
+                      {formErrs.startTime && <p className="books-form-err">{formErrs.startTime}</p>}
+                    </div>
+                    <div className="books-form-group">
+                      <label className="books-form-label">End Time * (HH:MM)</label>
+                      <input className={`books-form-control ${formErrs.endTime ? 'err' : ''}`}
+                             type="time" name="endTime" value={form.endTime}
+                             onChange={changeForm} />
+                      {formErrs.endTime && <p className="books-form-err">{formErrs.endTime}</p>}
+                    </div>
+                  </div>
 
-            <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '0.75rem' }}>
-              <button type="submit"
-                      className="books-btn books-btn-primary"
-                      disabled={submitting || dropping}
-                      style={{ minWidth: 160 }}>
-                {submitting ? 'Submitting...' : 'Submit Request'}
-              </button>
-            </div>
-          </form>
-        )}
-      </div>
+                  {/* Purpose */}
+                  <div className="books-form-group">
+                    <label className="books-form-label">Purpose / Description</label>
+                    <textarea className="books-form-control" name="purpose"
+                              value={form.purpose} onChange={changeForm}
+                              rows={3} placeholder="Describe the purpose of this booking..."
+                              style={{ resize: 'vertical', fontFamily: 'inherit' }} />
+                  </div>
+
+                  {/* Requested By */}
+                  <div className="books-form-group">
+                    <label className="books-form-label">Requested By *</label>
+                    <input className={`books-form-control ${formErrs.requestedBy ? 'err' : ''}`}
+                           name="requestedBy" value={form.requestedBy} onChange={changeForm}
+                           placeholder="e.g. Prof. Sharma" />
+                    {formErrs.requestedBy && <p className="books-form-err">{formErrs.requestedBy}</p>}
+                  </div>
+                </div>
+
+                <div className="books-modal-foot">
+                  <button type="button" className="books-btn books-btn-ghost"
+                          onClick={() => { setShowForm(false); setFormErrs({}); }}>
+                    Cancel
+                  </button>
+                  <button type="submit" className="books-btn books-btn-primary"
+                          disabled={submitting || dropping}>
+                    {submitting ? 'Submitting...' : 'Submit Request'}
+                  </button>
+                </div>
+              </form>
+            )}
+          </div>
+        </div>
+      )}
 
       {/* ── All Booking Requests ─────────────────────────────────────────────── */}
       <div className="card" style={{ padding: '1.5rem' }}>

@@ -10,7 +10,7 @@ const EMPTY = {
   description: '',
 };
 
-export default function SportTeamModal({ isOpen, mode, team, onSave, onClose, loading, dupError, onDupOk }) {
+export default function SportTeamModal({ isOpen, mode, team, sports = [], onSave, onClose, loading, dupError, onDupOk }) {
   const [form,   setForm]   = useState(EMPTY);
   const [errors, setErrors] = useState({});
 
@@ -142,11 +142,25 @@ export default function SportTeamModal({ isOpen, mode, team, onSave, onClose, lo
             <div className="club-form-row">
               <div className="books-form-group">
                 <label className="books-form-label">Sport ID *</label>
-                <input
-                  className={`books-form-control ${errors.sportId ? 'err' : ''}`}
-                  name="sportId" value={form.sportId} onChange={change}
-                  placeholder="e.g. SPT001"
-                />
+                {sports.length > 0 ? (
+                  <select
+                    className={`books-form-control ${errors.sportId ? 'err' : ''}`}
+                    name="sportId" value={form.sportId} onChange={change}
+                  >
+                    <option value="">-- Select Sport --</option>
+                    {sports.map((s) => (
+                      <option key={s.sportId} value={s.sportId}>
+                        {s.sportId} — {s.sportName}
+                      </option>
+                    ))}
+                  </select>
+                ) : (
+                  <input
+                    className={`books-form-control ${errors.sportId ? 'err' : ''}`}
+                    name="sportId" value={form.sportId} onChange={change}
+                    placeholder="e.g. SPT001"
+                  />
+                )}
                 {errors.sportId && <p className="books-form-err">{errors.sportId}</p>}
               </div>
               <div className="books-form-group">

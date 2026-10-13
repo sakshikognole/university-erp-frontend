@@ -5,7 +5,6 @@ import PageLoader from '../components/PageLoader';
 import PageError  from '../components/PageError';
 import SportTeamModal from './SportTeamModal';
 import ViewSportTeamModal from './ViewSportTeamModal';
-
 // ── Status badge ──────────────────────────────────────────────────────────────
 function StatusBadge({ status }) {
   const styles = {
@@ -88,6 +87,7 @@ function MobileTeamCard({ team, onView, onEdit, onDelete, deleting }) {
 
 export default function SportTeamsPage() {
   const [teams,     setTeams]     = useState([]);
+  const [sports,    setSports]    = useState([]);  // for Sport ID dropdown
   const [loading,   setLoading]   = useState(true);
   const [pageError, setPageError] = useState('');
   const [saving,    setSaving]    = useState(false);
@@ -116,6 +116,13 @@ export default function SportTeamsPage() {
   }, []);
 
   useEffect(() => { load(); }, [load]);
+
+  // Fetch sports list for Sport ID dropdown
+  useEffect(() => {
+    springGet('/sports')
+      .then((res) => setSports(Array.isArray(res) ? res : (res.data ?? [])))
+      .catch(() => {});
+  }, []);
 
   useEffect(() => {
     if (!success && !error) return;
@@ -147,7 +154,7 @@ export default function SportTeamsPage() {
         setSuccess('Team updated successfully.');
       }
       setModalOpen(false);
-      load(true);
+      load();
     } catch (err) {
       setError(err.message || 'Failed to save team.');
     } finally {
@@ -318,6 +325,7 @@ export default function SportTeamsPage() {
         isOpen={modalOpen}
         mode={modalMode}
         team={selTeam}
+        sports={sports}
         onSave={handleSave}
         onClose={() => { setModalOpen(false); setDupError(''); }}
         loading={saving}

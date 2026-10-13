@@ -150,8 +150,7 @@ export default function ClubsPage() {
                             onClick={() => openView(club)}
                             style={{ cursor: 'pointer' }}
                         >
-                            {/* Card top strip — colored by status */}
-                            <div className={`club-card-strip ${club.status === 'Active' ? 'strip-active' : 'strip-inactive'}`} />
+                        {/* Card top strip removed */}
 
                             <div className="club-card-body">
 
