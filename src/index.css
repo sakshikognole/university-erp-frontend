@@ -4336,9 +4336,9 @@ button {
   border-color: #9ca3af;
 }
 
-/* Sub-club card has a left indent feel */
+/* Sub-club card — no left border color */
 .club-card-sub {
-  border-left: 3px solid var(--text-secondary);
+  border-left: 1px solid var(--border-color);
 }
 
 /* Top color strip */
