@@ -4346,8 +4346,8 @@ button {
   height: 4px;
   width: 100%;
 }
-.strip-active   { background: var(--color-black); }
-.strip-inactive { background: #d1d5db; }
+.strip-active   { background: transparent; }
+.strip-inactive { background: transparent; }
 
 /* Card body */
 .club-card-body {
@@ -8363,15 +8363,15 @@ input[type='password']::-webkit-inner-spin-button {
 }
 
 .club-card-sub {
-  border-left: 3px solid var(--text-secondary, #9ca3af);
+  border-left: 1px solid var(--border-primary, #e5e7eb);
 }
 
 .club-card-strip {
   height: 4px;
 }
 
-.strip-active  { background: #22c55e; }
-.strip-inactive { background: #ef4444; }
+.strip-active  { background: transparent; }
+.strip-inactive { background: transparent; }
 
 .club-card-body {
   padding: 16px 20px 12px;
