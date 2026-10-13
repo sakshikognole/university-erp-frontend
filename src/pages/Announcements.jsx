@@ -155,40 +155,45 @@ const Announcements = () => {
         </div>
       )}
 
-      {/* Create Form */}
+      {/* Create Form — Modal */}
       {showForm && (
-        <div className="card" style={{ marginBottom: '1.25rem', padding: '1.5rem' }}>
-          <h2 style={{ fontSize: '1rem', fontWeight: 700, marginBottom: '1rem', color: '#111827' }}>
-            Create New Announcement
-          </h2>
-          <div className="books-form-group">
-            <label className="books-form-label">Subject *</label>
-            <select className="books-form-control" value={subject} onChange={(e) => setSubject(e.target.value)}>
-              <option value="">Select Subject</option>
-              <option value="Database Management System">Database Management System</option>
-              <option value="Operating System">Operating System</option>
-              <option value="Computer Networks">Computer Networks</option>
-              <option value="Data Structures">Data Structures</option>
-              <option value="Artificial Intelligence">Artificial Intelligence</option>
-            </select>
-          </div>
-          <div className="books-form-group">
-            <label className="books-form-label">Title *</label>
-            <input className="books-form-control" type="text" placeholder="Enter announcement title" value={title} onChange={(e) => setTitle(e.target.value)} />
-          </div>
-          <div className="books-form-group">
-            <label className="books-form-label">Description *</label>
-            <textarea className="books-form-control" placeholder="Write your announcement..." rows={3} value={description} onChange={(e) => setDescription(e.target.value)} style={{ resize: 'vertical', fontFamily: 'inherit' }} />
-          </div>
-          <div className="books-form-group">
-            <label className="books-form-label">Submission Deadline *</label>
-            <input className="books-form-control" type="datetime-local" value={deadline} onChange={(e) => setDeadline(e.target.value)} />
-          </div>
-          <div className="books-modal-foot" style={{ padding: 0, marginTop: '1rem' }}>
-            <button className="books-btn books-btn-ghost" onClick={() => setShowForm(false)}>Cancel</button>
-            <button className="books-btn books-btn-primary" onClick={handlePublish} disabled={loading}>
-              {loading ? 'Publishing...' : 'Publish Announcement'}
-            </button>
+        <div className="books-overlay">
+          <div className="books-modal" style={{ maxWidth: 520 }}>
+            <div className="books-modal-head">
+              <h3>Create New Announcement</h3>
+              <button className="books-modal-close" onClick={() => setShowForm(false)}>x</button>
+            </div>
+            <div className="books-modal-body">
+              <div className="books-form-group">
+                <label className="books-form-label">Subject *</label>
+                <select className="books-form-control" value={subject} onChange={(e) => setSubject(e.target.value)}>
+                  <option value="">Select Subject</option>
+                  <option value="Database Management System">Database Management System</option>
+                  <option value="Operating System">Operating System</option>
+                  <option value="Computer Networks">Computer Networks</option>
+                  <option value="Data Structures">Data Structures</option>
+                  <option value="Artificial Intelligence">Artificial Intelligence</option>
+                </select>
+              </div>
+              <div className="books-form-group">
+                <label className="books-form-label">Title *</label>
+                <input className="books-form-control" type="text" placeholder="Enter announcement title" value={title} onChange={(e) => setTitle(e.target.value)} />
+              </div>
+              <div className="books-form-group">
+                <label className="books-form-label">Description *</label>
+                <textarea className="books-form-control" placeholder="Write your announcement..." rows={3} value={description} onChange={(e) => setDescription(e.target.value)} style={{ resize: 'vertical', fontFamily: 'inherit' }} />
+              </div>
+              <div className="books-form-group">
+                <label className="books-form-label">Submission Deadline *</label>
+                <input className="books-form-control" type="datetime-local" value={deadline} onChange={(e) => setDeadline(e.target.value)} />
+              </div>
+            </div>
+            <div className="books-modal-foot">
+              <button className="books-btn books-btn-ghost" onClick={() => setShowForm(false)}>Cancel</button>
+              <button className="books-btn books-btn-primary" onClick={handlePublish} disabled={loading}>
+                {loading ? 'Publishing...' : 'Publish Announcement'}
+              </button>
+            </div>
           </div>
         </div>
       )}

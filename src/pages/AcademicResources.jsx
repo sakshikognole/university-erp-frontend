@@ -95,48 +95,53 @@ const AcademicResources = () => {
         </div>
       )}
 
-      {/* Upload Form */}
+      {/* Upload Form — Modal */}
       {showForm && (
-        <div className="card" style={{ marginBottom: '1.25rem', padding: '1.5rem' }}>
-          <h2 style={{ fontSize: '1rem', fontWeight: 700, marginBottom: '1rem', color: '#111827' }}>
-            Upload Academic Resource
-          </h2>
-          <div className="club-form-row">
-            <div className="books-form-group">
-              <label className="books-form-label">Subject *</label>
-              <select className="books-form-control" value={subject} onChange={(e) => setSubject(e.target.value)}>
-                <option value="">Select Subject</option>
-                <option value="Database Management System">Database Management System</option>
-                <option value="Operating System">Operating System</option>
-                <option value="Computer Networks">Computer Networks</option>
-                <option value="Data Structures">Data Structures</option>
-                <option value="Artificial Intelligence">Artificial Intelligence</option>
-              </select>
+        <div className="books-overlay">
+          <div className="books-modal" style={{ maxWidth: 520 }}>
+            <div className="books-modal-head">
+              <h3>Upload Academic Resource</h3>
+              <button className="books-modal-close" onClick={() => { setShowForm(false); setSubject(''); setTitle(''); setFile(null); }}>x</button>
             </div>
-            <div className="books-form-group">
-              <label className="books-form-label">Resource Title *</label>
-              <input className="books-form-control" type="text" placeholder="Enter resource title" value={title} onChange={(e) => setTitle(e.target.value)} />
+            <div className="books-modal-body">
+              <div className="club-form-row">
+                <div className="books-form-group">
+                  <label className="books-form-label">Subject *</label>
+                  <select className="books-form-control" value={subject} onChange={(e) => setSubject(e.target.value)}>
+                    <option value="">Select Subject</option>
+                    <option value="Database Management System">Database Management System</option>
+                    <option value="Operating System">Operating System</option>
+                    <option value="Computer Networks">Computer Networks</option>
+                    <option value="Data Structures">Data Structures</option>
+                    <option value="Artificial Intelligence">Artificial Intelligence</option>
+                  </select>
+                </div>
+                <div className="books-form-group">
+                  <label className="books-form-label">Resource Title *</label>
+                  <input className="books-form-control" type="text" placeholder="Enter resource title" value={title} onChange={(e) => setTitle(e.target.value)} />
+                </div>
+              </div>
+              <div className="books-form-group">
+                <label className="books-form-label">Upload File * (.pdf, .doc, .docx, .ppt, .pptx)</label>
+                <input id="ar-file" className="books-form-control" type="file" accept=".pdf,.doc,.docx,.ppt,.pptx"
+                  onChange={(e) => { const f = e.target.files[0]; if (f) { setFile(f); setError(''); } }} />
+                {file && (
+                  <p style={{ fontSize: '0.82rem', color: '#6b7280', marginTop: 4 }}>
+                    {file.name} ({(file.size / (1024 * 1024)).toFixed(2)} MB)
+                    <button type="button" onClick={() => { setFile(null); const fi = document.getElementById('ar-file'); if (fi) fi.value = ''; }}
+                      style={{ marginLeft: 8, color: '#ef4444', background: 'none', border: 'none', cursor: 'pointer', fontSize: '0.82rem' }}>
+                      Remove
+                    </button>
+                  </p>
+                )}
+              </div>
             </div>
-          </div>
-          <div className="books-form-group">
-            <label className="books-form-label">Upload File * (.pdf, .doc, .docx, .ppt, .pptx)</label>
-            <input id="ar-file" className="books-form-control" type="file" accept=".pdf,.doc,.docx,.ppt,.pptx"
-              onChange={(e) => { const f = e.target.files[0]; if (f) { setFile(f); setError(''); } }} />
-            {file && (
-              <p style={{ fontSize: '0.82rem', color: '#6b7280', marginTop: 4 }}>
-                {file.name} ({(file.size / (1024 * 1024)).toFixed(2)} MB)
-                <button type="button" onClick={() => { setFile(null); const fi = document.getElementById('ar-file'); if (fi) fi.value = ''; }}
-                  style={{ marginLeft: 8, color: '#ef4444', background: 'none', border: 'none', cursor: 'pointer', fontSize: '0.82rem' }}>
-                  Remove
-                </button>
-              </p>
-            )}
-          </div>
-          <div className="books-modal-foot" style={{ padding: 0, marginTop: '1rem' }}>
-            <button className="books-btn books-btn-ghost" onClick={() => { setShowForm(false); setSubject(''); setTitle(''); setFile(null); }}>Cancel</button>
-            <button className="books-btn books-btn-primary" onClick={handleUpload} disabled={loading}>
-              {loading ? 'Uploading...' : 'Upload Resource'}
-            </button>
+            <div className="books-modal-foot">
+              <button className="books-btn books-btn-ghost" onClick={() => { setShowForm(false); setSubject(''); setTitle(''); setFile(null); }}>Cancel</button>
+              <button className="books-btn books-btn-primary" onClick={handleUpload} disabled={loading}>
+                {loading ? 'Uploading...' : 'Upload Resource'}
+              </button>
+            </div>
           </div>
         </div>
       )}
