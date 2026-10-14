@@ -318,13 +318,6 @@ export default function SportTeamPage() {
                         Edit
                       </button>
                       <button
-                        className="books-btn books-btn-sm books-btn-primary"
-                        onClick={() => { setRosterTeamId(team.teamId); setRosterOpen(true); }}
-                        title="Add students to roster"
-                      >
-                        + Roster
-                      </button>
-                      <button
                         className="books-btn books-btn-sm books-btn-danger"
                         onClick={() => handleDelete(team)}
                         disabled={deleting === team.teamId}
