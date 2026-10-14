@@ -3063,7 +3063,7 @@ button {
   border-color: #9ca3af;
 }
 
-/* Action Buttons in Table Rows - Dark styled (Edit/Delete) */
+/* Action Buttons in Table Rows — consistent style matching screenshot */
 .action-btn {
   display: inline-flex;
   align-items: center;
@@ -3071,47 +3071,53 @@ button {
   padding: 0.375rem 0.75rem;
   font-size: 0.8125rem;
   font-weight: 500;
-  border-radius: 0.375rem;
-  border: 1px solid transparent;
-  transition: all 0.2s ease;
+  border-radius: 0.5rem;
+  border: 1px solid #d1d5db;
+  background-color: #ffffff;
+  color: #1e3a5f;
   cursor: pointer;
+  transition: all 0.15s ease;
+  white-space: nowrap;
 }
 
-/* View Button - Light style */
+.action-btn:hover {
+  background-color: #f1f5f9;
+  border-color: #94a3b8;
+  color: #1e3a5f;
+}
+
+/* View Button */
 .action-btn.view-btn {
   background-color: #ffffff;
-  color: #111827;
+  color: #1e3a5f;
   border: 1px solid #d1d5db;
 }
-
 .action-btn.view-btn:hover {
-  background-color: #f9fafb;
-  border-color: #9ca3af;
-  color: #000000;
+  background-color: #f1f5f9;
+  border-color: #94a3b8;
 }
 
-/* Edit Button - Dark gray/charcoal style */
+/* Edit Button */
 .action-btn.edit-btn {
-  background-color: #374151;
-  color: #ffffff;
-  border: 1px solid #374151;
+  background-color: #ffffff;
+  color: #1e3a5f;
+  border: 1px solid #d1d5db;
 }
-
 .action-btn.edit-btn:hover {
-  background-color: #4b5563;
-  border-color: #4b5563;
+  background-color: #f1f5f9;
+  border-color: #94a3b8;
 }
 
-/* Delete Button - Dark gray/charcoal style */
+/* Delete Button */
 .action-btn.delete-btn {
-  background-color: #374151;
-  color: #ffffff;
-  border: 1px solid #374151;
+  background-color: #ffffff;
+  color: #1e3a5f;
+  border: 1px solid #d1d5db;
 }
-
 .action-btn.delete-btn:hover {
-  background-color: #4b5563;
-  border-color: #4b5563;
+  background-color: #fef2f2;
+  border-color: #fca5a5;
+  color: #dc2626;
 }
 
 .action-label {
@@ -3563,9 +3569,12 @@ button {
 .books-btn:hover:not(:disabled) { filter: brightness(0.92); }
 
 .books-btn-primary { background: var(--color-black); color: var(--color-white); }
-.books-btn-warning { background: #555; color: var(--color-white); }
-.books-btn-danger  { background: #333; color: var(--color-white); border: 1px solid #111; }
-.books-btn-ghost   { background: var(--bg-active); color: var(--text-primary); border-color: var(--border-color); }
+.books-btn-warning { background: #ffffff; color: #1e3a5f; border: 1px solid #d1d5db; }
+.books-btn-danger  { background: #ffffff; color: #1e3a5f; border: 1px solid #d1d5db; }
+.books-btn-ghost   { background: #ffffff; color: #1e3a5f; border-color: #d1d5db; }
+.books-btn-warning:hover:not(:disabled) { background: #f1f5f9; border-color: #94a3b8; }
+.books-btn-danger:hover:not(:disabled)  { background: #fef2f2; color: #dc2626; border-color: #fca5a5; }
+.books-btn-ghost:hover:not(:disabled)   { background: #f1f5f9; border-color: #94a3b8; }
 .books-btn-sm      { padding: 5px 10px; font-size: 13px; }
 
 /* ── Toolbar & search ── */
@@ -9078,7 +9087,7 @@ input[type='password']::-webkit-inner-spin-button {
   border-color: #9ca3af;
 }
 
-/* Action Buttons in Table Rows - Dark styled (Edit/Delete) */
+/* Action Buttons in Table Rows — consistent style matching screenshot */
 .action-btn {
   display: inline-flex;
   align-items: center;
@@ -9086,47 +9095,53 @@ input[type='password']::-webkit-inner-spin-button {
   padding: 0.375rem 0.75rem;
   font-size: 0.8125rem;
   font-weight: 500;
-  border-radius: 0.375rem;
-  border: 1px solid transparent;
-  transition: all 0.2s ease;
+  border-radius: 0.5rem;
+  border: 1px solid #d1d5db;
+  background-color: #ffffff;
+  color: #1e3a5f;
   cursor: pointer;
+  transition: all 0.15s ease;
+  white-space: nowrap;
 }
 
-/* View Button - Light style */
+.action-btn:hover {
+  background-color: #f1f5f9;
+  border-color: #94a3b8;
+  color: #1e3a5f;
+}
+
+/* View Button */
 .action-btn.view-btn {
   background-color: #ffffff;
-  color: #111827;
+  color: #1e3a5f;
   border: 1px solid #d1d5db;
 }
-
 .action-btn.view-btn:hover {
-  background-color: #f9fafb;
-  border-color: #9ca3af;
-  color: #000000;
+  background-color: #f1f5f9;
+  border-color: #94a3b8;
 }
 
-/* Edit Button - Dark gray/charcoal style */
+/* Edit Button */
 .action-btn.edit-btn {
-  background-color: #374151;
-  color: #ffffff;
-  border: 1px solid #374151;
+  background-color: #ffffff;
+  color: #1e3a5f;
+  border: 1px solid #d1d5db;
 }
-
 .action-btn.edit-btn:hover {
-  background-color: #4b5563;
-  border-color: #4b5563;
+  background-color: #f1f5f9;
+  border-color: #94a3b8;
 }
 
-/* Delete Button - Dark gray/charcoal style */
+/* Delete Button */
 .action-btn.delete-btn {
-  background-color: #374151;
-  color: #ffffff;
-  border: 1px solid #374151;
+  background-color: #ffffff;
+  color: #1e3a5f;
+  border: 1px solid #d1d5db;
 }
-
 .action-btn.delete-btn:hover {
-  background-color: #4b5563;
-  border-color: #4b5563;
+  background-color: #fef2f2;
+  border-color: #fca5a5;
+  color: #dc2626;
 }
 
 .action-label {
@@ -9194,6 +9209,21 @@ input[type='password']::-webkit-inner-spin-button {
   /* Ensure action buttons stay readable on mobile */
   .action-btn .action-label {
     display: none; /* hide text label, show icon only on very narrow screens */
+  }
+
+  /* books-btn action buttons on mobile — keep compact */
+  .books-btn.books-btn-sm {
+    padding: 4px 8px;
+    font-size: 12px;
+  }
+  .books-btn.books-btn-sm span svg {
+    width: 12px;
+    height: 12px;
+  }
+  /* books-actions wrap on mobile to prevent overflow */
+  .books-actions {
+    flex-wrap: wrap;
+    gap: 4px;
   }
 }
 
