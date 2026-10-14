@@ -2141,8 +2141,15 @@ button {
 }
 
 .btn-danger {
-  background-color: #dc2626;
-  color: #ffffff;
+  background-color: #ffffff;
+  color: #1e3a5f;
+  border: 1px solid #d1d5db;
+}
+.btn-danger:hover {
+  background-color: #f1f5f9;
+  border-color: #94a3b8;
+  color: #1e3a5f;
+}
   border-color: #dc2626;
 }
 
@@ -3115,9 +3122,9 @@ button {
   border: 1px solid #d1d5db;
 }
 .action-btn.delete-btn:hover {
-  background-color: #fef2f2;
-  border-color: #fca5a5;
-  color: #dc2626;
+  background-color: #f1f5f9;
+  border-color: #94a3b8;
+  color: #1e3a5f;
 }
 
 .action-label {
@@ -3572,9 +3579,9 @@ button {
 .books-btn-warning { background: #ffffff; color: #1e3a5f; border: 1px solid #d1d5db; }
 .books-btn-danger  { background: #ffffff; color: #1e3a5f; border: 1px solid #d1d5db; }
 .books-btn-ghost   { background: #ffffff; color: #1e3a5f; border-color: #d1d5db; }
-.books-btn-warning:hover:not(:disabled) { background: #f1f5f9; border-color: #94a3b8; }
-.books-btn-danger:hover:not(:disabled)  { background: #fef2f2; color: #dc2626; border-color: #fca5a5; }
-.books-btn-ghost:hover:not(:disabled)   { background: #f1f5f9; border-color: #94a3b8; }
+.books-btn-warning:hover:not(:disabled) { background: #f1f5f9; border-color: #94a3b8; color: #1e3a5f; }
+.books-btn-danger:hover:not(:disabled)  { background: #f1f5f9; border-color: #94a3b8; color: #1e3a5f; }
+.books-btn-ghost:hover:not(:disabled)   { background: #f1f5f9; border-color: #94a3b8; color: #1e3a5f; }
 .books-btn-sm      { padding: 5px 10px; font-size: 13px; }
 
 /* ── Toolbar & search ── */
@@ -7952,8 +7959,15 @@ input[type='password']::-webkit-inner-spin-button {
 }
 
 .btn-danger {
-  background-color: #dc2626;
-  color: #ffffff;
+  background-color: #ffffff;
+  color: #1e3a5f;
+  border: 1px solid #d1d5db;
+}
+.btn-danger:hover {
+  background-color: #f1f5f9;
+  border-color: #94a3b8;
+  color: #1e3a5f;
+}
   border-color: #dc2626;
 }
 
@@ -9139,9 +9153,9 @@ input[type='password']::-webkit-inner-spin-button {
   border: 1px solid #d1d5db;
 }
 .action-btn.delete-btn:hover {
-  background-color: #fef2f2;
-  border-color: #fca5a5;
-  color: #dc2626;
+  background-color: #f1f5f9;
+  border-color: #94a3b8;
+  color: #1e3a5f;
 }
 
 .action-label {
