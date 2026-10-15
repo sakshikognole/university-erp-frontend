@@ -5,7 +5,6 @@ import PageLoader from '../components/PageLoader';
 import PageError  from '../components/PageError';
 import SportTeamModal from './SportTeamModal';
 import ViewSportTeamModal from './ViewSportTeamModal';
-
 // ── Status badge ──────────────────────────────────────────────────────────────
 function StatusBadge({ status }) {
   const styles = {
@@ -72,9 +71,9 @@ function MobileTeamCard({ team, onView, onEdit, onDelete, deleting }) {
           ))}
           <div style={{ display: 'flex', gap: 8, marginTop: 10 }}>
             <button className="books-btn books-btn-sm books-btn-ghost" style={{ flex: 1, justifyContent: 'center' }}
-              onClick={() => onView(team)}>View</button>
+              onClick={() => onView(team)}><span style={{display:"inline-flex",alignItems:"center",gap:4}}><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>View</span></button>
             <button className="books-btn books-btn-sm books-btn-ghost" style={{ flex: 1, justifyContent: 'center' }}
-              onClick={() => onEdit(team)}>Edit</button>
+              onClick={() => onEdit(team)}><span style={{display:"inline-flex",alignItems:"center",gap:4}}><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>Edit</span></button>
             <button className="books-btn books-btn-sm books-btn-danger" style={{ flex: 1, justifyContent: 'center' }}
               onClick={() => onDelete(team)} disabled={deleting === team.teamId}>
               {deleting === team.teamId ? '...' : 'Delete'}
@@ -88,6 +87,7 @@ function MobileTeamCard({ team, onView, onEdit, onDelete, deleting }) {
 
 export default function SportTeamsPage() {
   const [teams,     setTeams]     = useState([]);
+  const [sports,    setSports]    = useState([]);  // for Sport ID dropdown
   const [loading,   setLoading]   = useState(true);
   const [pageError, setPageError] = useState('');
   const [saving,    setSaving]    = useState(false);
@@ -116,6 +116,13 @@ export default function SportTeamsPage() {
   }, []);
 
   useEffect(() => { load(); }, [load]);
+
+  // Fetch sports list for Sport ID dropdown
+  useEffect(() => {
+    springGet('/sports')
+      .then((res) => setSports(Array.isArray(res) ? res : (res.data ?? [])))
+      .catch(() => {});
+  }, []);
 
   useEffect(() => {
     if (!success && !error) return;
@@ -147,7 +154,7 @@ export default function SportTeamsPage() {
         setSuccess('Team updated successfully.');
       }
       setModalOpen(false);
-      load(true);
+      load();
     } catch (err) {
       setError(err.message || 'Failed to save team.');
     } finally {
@@ -294,9 +301,9 @@ export default function SportTeamsPage() {
                         <td>
                           <div className="books-actions">
                             <button className="books-btn books-btn-sm books-btn-ghost"
-                              onClick={() => openView(team)}>View</button>
+                              onClick={() => openView(team)}><span style={{display:"inline-flex",alignItems:"center",gap:4}}><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>View</span></button>
                             <button className="books-btn books-btn-sm books-btn-ghost"
-                              onClick={() => openEdit(team)}>Edit</button>
+                              onClick={() => openEdit(team)}><span style={{display:"inline-flex",alignItems:"center",gap:4}}><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>Edit</span></button>
                             <button className="books-btn books-btn-sm books-btn-danger"
                               onClick={() => handleDelete(team)}
                               disabled={deleting === team.teamId}>
@@ -318,6 +325,7 @@ export default function SportTeamsPage() {
         isOpen={modalOpen}
         mode={modalMode}
         team={selTeam}
+        sports={sports}
         onSave={handleSave}
         onClose={() => { setModalOpen(false); setDupError(''); }}
         loading={saving}

@@ -2141,14 +2141,13 @@ button {
 }
 
 .btn-danger {
-  background-color: #dc2626;
-  color: #ffffff;
-  border-color: #dc2626;
+  background-color: #ffffff;
+  color: #1e3a5f;
+  border: 1px solid #d1d5db;
 }
-
-.btn-danger:hover:not(:disabled) {
-  background-color: #b91c1c;
-  border-color: #b91c1c;
+.btn-danger:hover {
+  background-color: #f1f5f9;  border-color: #94a3b8;
+  color: #1e3a5f;
 }
 
 .btn-back {
@@ -3051,19 +3050,20 @@ button {
   border-color: #9ca3af;
 }
 
-/* Ghost Button - Transparent background (for Cancel/Back) */
+/* Ghost Button */
 .books-btn-ghost {
-  background-color: transparent;
-  color: #111827;
-  border-color: #d1d5db;
+  background-color: #ffffff;
+  color: #1e3a5f;
+  border: 1px solid #d1d5db;
 }
 
 .books-btn-ghost:hover:not(:disabled) {
-  background-color: #f3f4f6;
-  border-color: #9ca3af;
+  background-color: #f1f5f9;
+  border-color: #94a3b8;
+  color: #1e3a5f;
 }
 
-/* Action Buttons in Table Rows - Dark styled (Edit/Delete) */
+/* Action Buttons in Table Rows â€” consistent style matching screenshot */
 .action-btn {
   display: inline-flex;
   align-items: center;
@@ -3071,47 +3071,53 @@ button {
   padding: 0.375rem 0.75rem;
   font-size: 0.8125rem;
   font-weight: 500;
-  border-radius: 0.375rem;
-  border: 1px solid transparent;
-  transition: all 0.2s ease;
+  border-radius: 0.5rem;
+  border: 1px solid #d1d5db;
+  background-color: #ffffff;
+  color: #1e3a5f;
   cursor: pointer;
+  transition: all 0.15s ease;
+  white-space: nowrap;
 }
 
-/* View Button - Light style */
+.action-btn:hover {
+  background-color: #f1f5f9;
+  border-color: #94a3b8;
+  color: #1e3a5f;
+}
+
+/* View Button */
 .action-btn.view-btn {
   background-color: #ffffff;
-  color: #111827;
+  color: #1e3a5f;
   border: 1px solid #d1d5db;
 }
-
 .action-btn.view-btn:hover {
-  background-color: #f9fafb;
-  border-color: #9ca3af;
-  color: #000000;
+  background-color: #f1f5f9;
+  border-color: #94a3b8;
 }
 
-/* Edit Button - Dark gray/charcoal style */
+/* Edit Button */
 .action-btn.edit-btn {
-  background-color: #374151;
-  color: #ffffff;
-  border: 1px solid #374151;
+  background-color: #ffffff;
+  color: #1e3a5f;
+  border: 1px solid #d1d5db;
 }
-
 .action-btn.edit-btn:hover {
-  background-color: #4b5563;
-  border-color: #4b5563;
+  background-color: #f1f5f9;
+  border-color: #94a3b8;
 }
 
-/* Delete Button - Dark gray/charcoal style */
+/* Delete Button */
 .action-btn.delete-btn {
-  background-color: #374151;
-  color: #ffffff;
-  border: 1px solid #374151;
+  background-color: #ffffff;
+  color: #1e3a5f;
+  border: 1px solid #d1d5db;
 }
-
 .action-btn.delete-btn:hover {
-  background-color: #4b5563;
-  border-color: #4b5563;
+  background-color: #f1f5f9;
+  border-color: #94a3b8;
+  color: #1e3a5f;
 }
 
 .action-label {
@@ -3537,7 +3543,7 @@ button {
    collisions with the global ERP styles.
    ========================================== */
 
-/* ── Page header ── */
+/* â”€â”€ Page header â”€â”€ */
 .books-page-header {
   display: flex;
   align-items: center;
@@ -3545,7 +3551,7 @@ button {
   margin-bottom: 20px;
 }
 
-/* ── Buttons ── */
+/* â”€â”€ Buttons â”€â”€ */
 .books-btn {
   display: inline-flex;
   align-items: center;
@@ -3563,12 +3569,15 @@ button {
 .books-btn:hover:not(:disabled) { filter: brightness(0.92); }
 
 .books-btn-primary { background: var(--color-black); color: var(--color-white); }
-.books-btn-warning { background: #555; color: var(--color-white); }
-.books-btn-danger  { background: #333; color: var(--color-white); border: 1px solid #111; }
-.books-btn-ghost   { background: var(--bg-active); color: var(--text-primary); border-color: var(--border-color); }
+.books-btn-warning { background: #ffffff; color: #1e3a5f; border: 1px solid #d1d5db; }
+.books-btn-danger  { background: #ffffff; color: #1e3a5f; border: 1px solid #d1d5db; }
+.books-btn-ghost   { background: #ffffff; color: #1e3a5f; border: 1px solid #d1d5db; }
+.books-btn-warning:hover:not(:disabled) { background: #f1f5f9; border-color: #94a3b8; color: #1e3a5f; }
+.books-btn-danger:hover:not(:disabled)  { background: #f1f5f9; border-color: #94a3b8; color: #1e3a5f; }
+.books-btn-ghost:hover:not(:disabled)   { background: #f1f5f9; border-color: #94a3b8; color: #1e3a5f; }
 .books-btn-sm      { padding: 5px 10px; font-size: 13px; }
 
-/* ── Toolbar & search ── */
+/* â”€â”€ Toolbar & search â”€â”€ */
 .books-toolbar {
   display: flex;
   align-items: center;
@@ -3590,14 +3599,14 @@ button {
 }
 .books-search-input:focus { border-color: var(--color-black); }
 
-/* ── Loading state ── */
+/* â”€â”€ Loading state â”€â”€ */
 .books-loading {
   text-align: center;
   padding: 40px;
   color: var(--text-secondary);
 }
 
-/* ── Table ── */
+/* â”€â”€ Table â”€â”€ */
 .books-table-wrap { overflow-x: auto; }
 
 .books-table {
@@ -3621,7 +3630,7 @@ button {
 
 .books-actions { display: flex; gap: 6px; }
 
-/* ── Empty state ── */
+/* â”€â”€ Empty state â”€â”€ */
 .books-empty {
   text-align: center;
   padding: 40px;
@@ -3629,7 +3638,7 @@ button {
   font-size: 14px;
 }
 
-/* ── Badge ── */
+/* â”€â”€ Badge â”€â”€ */
 .books-badge {
   display: inline-block;
   padding: 2px 9px;
@@ -3641,7 +3650,7 @@ button {
   border: 1px solid var(--border-color);
 }
 
-/* ── Pagination ── */
+/* â”€â”€ Pagination â”€â”€ */
 .books-pagination-bar {
   display: flex;
   align-items: center;
@@ -3726,7 +3735,7 @@ button {
   font-family: inherit;
 }
 
-/* ── Modal overlay ── */
+/* â”€â”€ Modal overlay â”€â”€ */
 .books-overlay {
   position: fixed;
   inset: 0;
@@ -3780,7 +3789,7 @@ button {
   border-top: 1px solid var(--border-color);
 }
 
-/* ── Form fields ── */
+/* â”€â”€ Form fields â”€â”€ */
 .books-form-group { margin-bottom: 14px; }
 
 .books-form-label {
@@ -3806,7 +3815,7 @@ button {
 .books-form-control.err   { border-color: #c92a2a; }
 .books-form-err { font-size: 12px; color: #c92a2a; margin-top: 3px; }
 
-/* ── Alert toast ── */
+/* â”€â”€ Alert toast â”€â”€ */
 .books-alert {
   padding: 10px 14px;
   border-radius: 6px;
@@ -3836,7 +3845,7 @@ button {
   font-family: inherit;
 }
 
-/* ── Detail view rows ── */
+/* â”€â”€ Detail view rows â”€â”€ */
 .books-detail-row {
   display: flex;
   padding: 9px 0;
@@ -4328,7 +4337,7 @@ button {
   overflow: hidden;
   display: flex;
   flex-direction: column;
-  height: 320px; /* fixed height — all cards same size */
+  height: 320px; /* fixed height â€” all cards same size */
   transition: box-shadow 0.15s;
 }
 .club-card:hover {
@@ -4336,9 +4345,9 @@ button {
   border-color: #9ca3af;
 }
 
-/* Sub-club card has a left indent feel */
+/* Sub-club card â€” no left border color */
 .club-card-sub {
-  border-left: 3px solid var(--text-secondary);
+  border-left: 1px solid var(--border-color);
 }
 
 /* Top color strip */
@@ -4346,8 +4355,8 @@ button {
   height: 4px;
   width: 100%;
 }
-.strip-active   { background: var(--color-black); }
-.strip-inactive { background: #d1d5db; }
+.strip-active   { background: transparent; }
+.strip-inactive { background: transparent; }
 
 /* Card body */
 .club-card-body {
@@ -4473,7 +4482,7 @@ button {
   background: var(--bg-secondary);
 }
 
-/* Modal form — two column row */
+/* Modal form â€” two column row */
 .club-form-row {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -4504,7 +4513,7 @@ button {
   margin-left: 8px;
 }
 
-/* ── Select Student table row styles ── */
+/* â”€â”€ Select Student table row styles â”€â”€ */
 .stu-table-row {
   cursor: pointer;
 }
@@ -4562,7 +4571,7 @@ button {
   overflow: hidden;
   display: flex;
   flex-direction: column;
-  height: 280px; /* fixed height — all cards same size */
+  height: 280px; /* fixed height â€” all cards same size */
   transition: box-shadow 0.15s, border-color 0.15s;
 }
 .sport-card:hover {
@@ -4662,7 +4671,7 @@ button {
    Scoped under st-* prefix (sport-team).
    ========================================== */
 
-/* ── Page header ── */
+/* â”€â”€ Page header â”€â”€ */
 .st-page-header {
   display: flex;
   align-items: center;
@@ -4671,7 +4680,7 @@ button {
 }
 
 
-/* ── Back link ── */
+/* â”€â”€ Back link â”€â”€ */
 .st-back-link {
   display: inline-flex;
   align-items: center;
@@ -4688,7 +4697,7 @@ button {
 }
 .st-back-link:hover { color: var(--text-primary); }
 
-/* ── Section title ── */
+/* â”€â”€ Section title â”€â”€ */
 .st-section-title {
   font-size: 14px;
   font-weight: 700;
@@ -4698,7 +4707,7 @@ button {
   border-bottom: 1px solid var(--border-color);
 }
 
-/* ── Details block ── */
+/* â”€â”€ Details block â”€â”€ */
 .st-detail-block {
   display: flex;
   flex-direction: column;
@@ -4732,7 +4741,7 @@ button {
   flex: 1;
 }
 
-/* ── PRN lookup row ── */
+/* â”€â”€ PRN lookup row â”€â”€ */
 .st-prn-row {
   display: flex;
   align-items: center;
@@ -4754,7 +4763,7 @@ button {
 }
 .st-prn-input:focus { border-color: var(--color-black); }
 
-/* ── Found student info ── */
+/* â”€â”€ Found student info â”€â”€ */
 .st-found-student {
   display: flex;
   align-items: center;
@@ -4771,7 +4780,7 @@ button {
 .st-found-label { color: var(--text-secondary); font-weight: 500; }
 .st-found-name  { color: var(--text-primary);   font-weight: 600; }
 
-/* ── Empty state ── */
+/* â”€â”€ Empty state â”€â”€ */
 .st-empty {
   text-align: center;
   padding: 30px;
@@ -4779,7 +4788,7 @@ button {
   font-size: 14px;
 }
 
-/* ── Status badge ── */
+/* â”€â”€ Status badge â”€â”€ */
 .st-badge {
   display: inline-block;
   padding: 2px 9px;
@@ -4797,7 +4806,7 @@ button {
    Scoped under vb-* prefix.
    ========================================== */
 
-/* ── Page header ── */
+/* â”€â”€ Page header â”€â”€ */
 .vb-page-header {
   display: flex;
   align-items: center;
@@ -4811,7 +4820,7 @@ button {
   margin-top: 2px;
 }
 
-/* ── Booking form panel ── */
+/* â”€â”€ Booking form panel â”€â”€ */
 .vb-form-panel {
   border: 1px solid var(--border-color);
   border-radius: 8px;
@@ -4829,7 +4838,7 @@ button {
   border-bottom: 1px solid var(--border-color);
 }
 
-/* ── Two-column form row ── */
+/* â”€â”€ Two-column form row â”€â”€ */
 .vb-form-row {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -4848,7 +4857,7 @@ button {
   .vb-form-row-3 { grid-template-columns: 1fr; }
 }
 
-/* ── Form footer ── */
+/* â”€â”€ Form footer â”€â”€ */
 .vb-form-footer {
   display: flex;
   justify-content: flex-end;
@@ -4858,7 +4867,7 @@ button {
   border-top: 1px solid var(--border-color);
 }
 
-/* ── Section title above table ── */
+/* â”€â”€ Section title above table â”€â”€ */
 .vb-section-title {
   font-size: 14px;
   font-weight: 700;
@@ -4868,7 +4877,7 @@ button {
   border-bottom: 1px solid var(--border-color);
 }
 
-/* ── Empty state ── */
+/* â”€â”€ Empty state â”€â”€ */
 .vb-empty {
   text-align: center;
   padding: 30px;
@@ -4876,7 +4885,7 @@ button {
   font-size: 14px;
 }
 
-/* ── Status badges ── */
+/* â”€â”€ Status badges â”€â”€ */
 .vb-badge {
   display: inline-block;
   padding: 2px 10px;
@@ -4891,7 +4900,7 @@ button {
 .vb-badge-rejected  { background: #fef2f2; color: #991b1b; border-color: #fecaca; }
 .vb-badge-cancelled { background: #f9fafb; color: #6b7280; border-color: #e5e7eb; }
 
-/* ── View modal detail rows ── */
+/* â”€â”€ View modal detail rows â”€â”€ */
 .vb-detail-block {
   display: flex;
   flex-direction: column;
@@ -4925,7 +4934,7 @@ button {
    Scoped under dm-* prefix (drive-materials).
    ========================================== */
 
-/* ── Page layout ── */
+/* â”€â”€ Page layout â”€â”€ */
 .dm-page-header {
   display: flex;
   align-items: center;
@@ -4962,7 +4971,7 @@ button {
 }
 .dm-search-input:focus { border-color: var(--color-black); }
 
-/* ── Breadcrumb ── */
+/* â”€â”€ Breadcrumb â”€â”€ */
 .dm-breadcrumb {
   display: flex;
   align-items: center;
@@ -4991,7 +5000,7 @@ button {
   font-size: 13px;
 }
 
-/* ── Drive table ── */
+/* â”€â”€ Drive table â”€â”€ */
 .dm-table-wrap {
   border: 1px solid var(--border-color);
   border-radius: 8px;
@@ -5031,7 +5040,7 @@ button {
 
 .dm-table tbody tr:hover { background: var(--bg-secondary); }
 
-/* ── Name cell with icon ── */
+/* â”€â”€ Name cell with icon â”€â”€ */
 .dm-name-cell {
   display: flex;
   align-items: center;
@@ -5044,7 +5053,7 @@ button {
 .dm-item-icon { font-size: 18px; flex-shrink: 0; line-height: 1; }
 .dm-item-name { font-weight: 500; color: var(--text-primary); }
 
-/* ── File type badge ── */
+/* â”€â”€ File type badge â”€â”€ */
 .dm-type-badge {
   display: inline-block;
   padding: 2px 8px;
@@ -5062,7 +5071,7 @@ button {
 .dm-type-xlsx { background: #f0fdf4; color: #16a34a; border-color: #bbf7d0; }
 .dm-type-folder { background: #fffbeb; color: #d97706; border-color: #fde68a; }
 
-/* ── Actions cell ── */
+/* â”€â”€ Actions cell â”€â”€ */
 .dm-actions {
   display: flex;
   align-items: center;
@@ -5070,7 +5079,7 @@ button {
   flex-wrap: nowrap;
 }
 
-/* ── Empty state ── */
+/* â”€â”€ Empty state â”€â”€ */
 .dm-empty {
   text-align: center;
   padding: 40px 20px;
@@ -5080,7 +5089,7 @@ button {
 
 .dm-empty-icon { font-size: 36px; margin-bottom: 8px; }
 
-/* ── Drag & Drop upload area ── */
+/* â”€â”€ Drag & Drop upload area â”€â”€ */
 .dm-dropzone {
   border: 2px dashed var(--border-color);
   border-radius: 10px;
@@ -5120,7 +5129,7 @@ button {
   letter-spacing: 0.06em;
 }
 
-/* ── Selected files list ── */
+/* â”€â”€ Selected files list â”€â”€ */
 .dm-file-list {
   list-style: none;
   padding: 0;
@@ -5156,7 +5165,7 @@ button {
   font-size: 12px;
 }
 
-/* ── Upload progress bar ── */
+/* â”€â”€ Upload progress bar â”€â”€ */
 .dm-progress-wrap {
   width: 100%;
   background: var(--border-color);
@@ -5173,7 +5182,7 @@ button {
   transition: width 0.2s;
 }
 
-/* ── Preview modal ── */
+/* â”€â”€ Preview modal â”€â”€ */
 .dm-preview-overlay {
   position: fixed;
   inset: 0;
@@ -5246,7 +5255,7 @@ button {
   font-size: 14px;
 }
 
-/* ── Role switcher (dev helper) ── */
+/* â”€â”€ Role switcher (dev helper) â”€â”€ */
 .dm-role-bar {
   display: flex;
   align-items: center;
@@ -5273,7 +5282,7 @@ button {
    Scoped under pay-* prefix.
    ========================================== */
 
-/* ── Page header ── */
+/* â”€â”€ Page header â”€â”€ */
 .pay-page-sub {
   font-size: 13px;
   color: var(--text-secondary);
@@ -5281,7 +5290,7 @@ button {
   margin-bottom: 20px;
 }
 
-/* ── Table checkbox column ── */
+/* â”€â”€ Table checkbox column â”€â”€ */
 .pay-checkbox {
   width: 18px;
   height: 18px;
@@ -5289,7 +5298,7 @@ button {
   accent-color: var(--color-black);
 }
 
-/* ── Amount / Discount cells ── */
+/* â”€â”€ Amount / Discount cells â”€â”€ */
 .pay-amount {
   font-weight: 500;
   color: var(--text-primary);
@@ -5300,7 +5309,7 @@ button {
   color: #16a34a;
 }
 
-/* ── Pagination (matches books style) ── */
+/* â”€â”€ Pagination (matches books style) â”€â”€ */
 .pay-pagination {
   display: flex;
   align-items: center;
@@ -5341,14 +5350,14 @@ button {
   cursor: not-allowed;
 }
 
-/* ── Create payment button row ── */
+/* â”€â”€ Create payment button row â”€â”€ */
 .pay-action-row {
   display: flex;
   justify-content: center;
   margin-top: 16px;
 }
 
-/* ── Combination capsules ── */
+/* â”€â”€ Combination capsules â”€â”€ */
 .pay-capsules-title {
   font-size: 13px;
   font-weight: 600;
@@ -5386,14 +5395,14 @@ button {
    Scoped under hst-* prefix.
    ========================================== */
 
-/* ── Page header ── */
+/* â”€â”€ Page header â”€â”€ */
 .hst-page-sub {
   font-size: 13px;
   color: var(--text-secondary);
   margin-top: 2px;
 }
 
-/* ── Card grid — 3 columns like Clubs/Sports ── */
+/* â”€â”€ Card grid â€” 3 columns like Clubs/Sports â”€â”€ */
 .hst-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
@@ -5404,7 +5413,7 @@ button {
 @media (max-width: 1024px) { .hst-grid { grid-template-columns: repeat(2, 1fr); } }
 @media (max-width: 640px)  { .hst-grid { grid-template-columns: 1fr; } }
 
-/* ── Single block card ── */
+/* â”€â”€ Single block card â”€â”€ */
 .hst-card {
   border: 1px solid var(--border-color);
   border-radius: 10px;
@@ -5417,7 +5426,7 @@ button {
 }
 .hst-card:hover { box-shadow: 0 2px 10px rgba(0,0,0,0.08); }
 
-/* ── Card top row: badge + status dot ── */
+/* â”€â”€ Card top row: badge + status dot â”€â”€ */
 .hst-card-top {
   display: flex;
   align-items: center;
@@ -5450,7 +5459,7 @@ button {
 .hst-status-dot.active   { background: #16a34a; }
 .hst-status-dot.inactive { background: #9ca3af; }
 
-/* ── Card body ── */
+/* â”€â”€ Card body â”€â”€ */
 .hst-card-id {
   font-size: 11px;
   font-weight: 600;
@@ -5471,7 +5480,7 @@ button {
   color: var(--text-secondary);
 }
 
-/* ── Card footer: action buttons ── */
+/* â”€â”€ Card footer: action buttons â”€â”€ */
 .hst-card-footer {
   display: flex;
   align-items: center;
@@ -5482,7 +5491,7 @@ button {
   margin-top: 4px;
 }
 
-/* ── Back link ── */
+/* â”€â”€ Back link â”€â”€ */
 .hst-back-link {
   display: inline-flex;
   align-items: center;
@@ -5499,7 +5508,7 @@ button {
 }
 .hst-back-link:hover { color: var(--text-primary); }
 
-/* ── Section title inside details ── */
+/* â”€â”€ Section title inside details â”€â”€ */
 .hst-section-title {
   font-size: 14px;
   font-weight: 700;
@@ -5509,7 +5518,7 @@ button {
   border-bottom: 1px solid var(--border-color);
 }
 
-/* ── Room cards row ── */
+/* â”€â”€ Room cards row â”€â”€ */
 .hst-rooms-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
@@ -5548,7 +5557,7 @@ button {
 .hst-room-occupancy.full  { background: #fef2f2; color: #dc2626; }
 .hst-room-occupancy.open  { background: #f0fdf4; color: #16a34a; }
 
-/* ── PRN input row (same pattern as SportTeam) ── */
+/* â”€â”€ PRN input row (same pattern as SportTeam) â”€â”€ */
 .hst-prn-row {
   display: flex;
   align-items: center;
@@ -5570,7 +5579,7 @@ button {
 }
 .hst-prn-input:focus { border-color: var(--color-black); }
 
-/* ── Empty state ── */
+/* â”€â”€ Empty state â”€â”€ */
 .hst-empty {
   text-align: center;
   padding: 32px 20px;
@@ -5578,7 +5587,7 @@ button {
   font-size: 14px;
 }
 /* ==========================================
-   BOOKS — DEFECT FIXES
+   BOOKS â€” DEFECT FIXES
    ========================================== */
 
 /* Defects #7 + #8: skeleton shimmer animation */
@@ -5587,7 +5596,7 @@ button {
   100% { background-position: -200% 0; }
 }
 
-/* Defect #1: responsive table on mobile — horizontal scroll + min widths */
+/* Defect #1: responsive table on mobile â€” horizontal scroll + min widths */
 @media (max-width: 768px) {
   .books-table-wrap {
     overflow-x: auto;
@@ -5623,7 +5632,7 @@ button {
   }
 }
 /* ==========================================
-   BOOKS — MOBILE ACCORDION CARDS (Defect #1)
+   BOOKS â€” MOBILE ACCORDION CARDS (Defect #1)
    show .book-mob-list on mobile, hide on desktop
    show .book-desk-table on desktop, hide on mobile
    ========================================== */
@@ -5638,7 +5647,7 @@ button {
   .book-desk-table { display: none; }
 }
 
-/* ── Mobile card wrapper ── */
+/* â”€â”€ Mobile card wrapper â”€â”€ */
 .book-mob-card {
   border: 1px solid var(--border-color, #e5e7eb);
   border-radius: 10px;
@@ -5647,7 +5656,7 @@ button {
   background: #fff;
 }
 
-/* ── Tap header ── */
+/* â”€â”€ Tap header â”€â”€ */
 .book-mob-header {
   width: 100%;
   display: flex;
@@ -5716,7 +5725,7 @@ button {
   flex-shrink: 0;
 }
 
-/* ── Expanded detail rows ── */
+/* â”€â”€ Expanded detail rows â”€â”€ */
 .book-mob-details {
   border-top: 1px solid #f3f4f6;
   padding: 12px 14px 8px;
@@ -5750,7 +5759,7 @@ button {
   color: #6b7280;
 }
 
-/* ── Action buttons row ── */
+/* â”€â”€ Action buttons row â”€â”€ */
 .book-mob-actions {
   display: flex;
   gap: 8px;
@@ -5764,7 +5773,7 @@ button {
   justify-content: center;
 }
 
-/* ── Books Modal Mobile Responsive ── */
+/* â”€â”€ Books Modal Mobile Responsive â”€â”€ */
 @media (max-width: 768px) {
   .books-modal {
     width: 95% !important;
@@ -5782,7 +5791,7 @@ button {
 }
 
 /* ==========================================
-   SPORT TEAMS — MOBILE / DESKTOP TOGGLE
+   SPORT TEAMS â€” MOBILE / DESKTOP TOGGLE
    ========================================== */
 
 /* Default: show desktop table, hide mobile cards */
@@ -7943,14 +7952,13 @@ input[type='password']::-webkit-inner-spin-button {
 }
 
 .btn-danger {
-  background-color: #dc2626;
-  color: #ffffff;
-  border-color: #dc2626;
+  background-color: #ffffff;
+  color: #1e3a5f;
+  border: 1px solid #d1d5db;
 }
-
-.btn-danger:hover:not(:disabled) {
-  background-color: #b91c1c;
-  border-color: #b91c1c;
+.btn-danger:hover {
+  background-color: #f1f5f9;  border-color: #94a3b8;
+  color: #1e3a5f;
 }
 
 .btn-back {
@@ -8363,15 +8371,15 @@ input[type='password']::-webkit-inner-spin-button {
 }
 
 .club-card-sub {
-  border-left: 3px solid var(--text-secondary, #9ca3af);
+  border-left: 1px solid var(--border-primary, #e5e7eb);
 }
 
 .club-card-strip {
   height: 4px;
 }
 
-.strip-active  { background: #22c55e; }
-.strip-inactive { background: #ef4444; }
+.strip-active  { background: transparent; }
+.strip-inactive { background: transparent; }
 
 .club-card-body {
   padding: 16px 20px 12px;
@@ -9066,19 +9074,20 @@ input[type='password']::-webkit-inner-spin-button {
   border-color: #9ca3af;
 }
 
-/* Ghost Button - Transparent background (for Cancel/Back) */
+/* Ghost Button */
 .books-btn-ghost {
-  background-color: transparent;
-  color: #111827;
-  border-color: #d1d5db;
+  background-color: #ffffff;
+  color: #1e3a5f;
+  border: 1px solid #d1d5db;
 }
 
 .books-btn-ghost:hover:not(:disabled) {
-  background-color: #f3f4f6;
-  border-color: #9ca3af;
+  background-color: #f1f5f9;
+  border-color: #94a3b8;
+  color: #1e3a5f;
 }
 
-/* Action Buttons in Table Rows - Dark styled (Edit/Delete) */
+/* Action Buttons in Table Rows â€” consistent style matching screenshot */
 .action-btn {
   display: inline-flex;
   align-items: center;
@@ -9086,47 +9095,53 @@ input[type='password']::-webkit-inner-spin-button {
   padding: 0.375rem 0.75rem;
   font-size: 0.8125rem;
   font-weight: 500;
-  border-radius: 0.375rem;
-  border: 1px solid transparent;
-  transition: all 0.2s ease;
+  border-radius: 0.5rem;
+  border: 1px solid #d1d5db;
+  background-color: #ffffff;
+  color: #1e3a5f;
   cursor: pointer;
+  transition: all 0.15s ease;
+  white-space: nowrap;
 }
 
-/* View Button - Light style */
+.action-btn:hover {
+  background-color: #f1f5f9;
+  border-color: #94a3b8;
+  color: #1e3a5f;
+}
+
+/* View Button */
 .action-btn.view-btn {
   background-color: #ffffff;
-  color: #111827;
+  color: #1e3a5f;
   border: 1px solid #d1d5db;
 }
-
 .action-btn.view-btn:hover {
-  background-color: #f9fafb;
-  border-color: #9ca3af;
-  color: #000000;
+  background-color: #f1f5f9;
+  border-color: #94a3b8;
 }
 
-/* Edit Button - Dark gray/charcoal style */
+/* Edit Button */
 .action-btn.edit-btn {
-  background-color: #374151;
-  color: #ffffff;
-  border: 1px solid #374151;
+  background-color: #ffffff;
+  color: #1e3a5f;
+  border: 1px solid #d1d5db;
 }
-
 .action-btn.edit-btn:hover {
-  background-color: #4b5563;
-  border-color: #4b5563;
+  background-color: #f1f5f9;
+  border-color: #94a3b8;
 }
 
-/* Delete Button - Dark gray/charcoal style */
+/* Delete Button */
 .action-btn.delete-btn {
-  background-color: #374151;
-  color: #ffffff;
-  border: 1px solid #374151;
+  background-color: #ffffff;
+  color: #1e3a5f;
+  border: 1px solid #d1d5db;
 }
-
 .action-btn.delete-btn:hover {
-  background-color: #4b5563;
-  border-color: #4b5563;
+  background-color: #f1f5f9;
+  border-color: #94a3b8;
+  color: #1e3a5f;
 }
 
 .action-label {
@@ -9135,10 +9150,10 @@ input[type='password']::-webkit-inner-spin-button {
 }
 
 
-/* ═══════════════════════════════════════════════════════════════════
-   Department module — supplementary styles
-   (Added to fix DEF-003–DEF-016)
-   ═══════════════════════════════════════════════════════════════════ */
+/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+   Department module â€” supplementary styles
+   (Added to fix DEF-003â€“DEF-016)
+   â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
 
 /* Inline field-level validation error message (DEF-003 to DEF-014) */
 .form-field-error {
@@ -9162,7 +9177,7 @@ input[type='password']::-webkit-inner-spin-button {
   box-shadow: 0 0 0 2px rgba(185, 28, 28, 0.15);
 }
 
-/* ── DEF-016: Responsive search placeholder / search-box layout ──
+/* â”€â”€ DEF-016: Responsive search placeholder / search-box layout â”€â”€
    On narrow viewports the search box would shrink to the point where
    the placeholder text gets clipped. The fixes below ensure the box
    is always usable and never causes horizontal overflow.            */
@@ -9195,6 +9210,21 @@ input[type='password']::-webkit-inner-spin-button {
   .action-btn .action-label {
     display: none; /* hide text label, show icon only on very narrow screens */
   }
+
+  /* books-btn action buttons on mobile â€” keep compact */
+  .books-btn.books-btn-sm {
+    padding: 4px 8px;
+    font-size: 12px;
+  }
+  .books-btn.books-btn-sm span svg {
+    width: 12px;
+    height: 12px;
+  }
+  /* books-actions wrap on mobile to prevent overflow */
+  .books-actions {
+    flex-wrap: wrap;
+    gap: 4px;
+  }
 }
 
 @media (max-width: 480px) {
@@ -9215,7 +9245,7 @@ input[type='password']::-webkit-inner-spin-button {
    Used by ClubsPage, BooksPage, SportsPage, and modals
    ========================================== */
 
-/* ── Button System ── */
+/* â”€â”€ Button System â”€â”€ */
 .books-btn {
   display: inline-flex;
   align-items: center;
@@ -9256,29 +9286,31 @@ input[type='password']::-webkit-inner-spin-button {
   border-color: #9ca3af;
 }
 .books-btn-ghost {
-  background-color: transparent;
-  color: #111827;
+  background-color: #ffffff;
+  color: #1e3a5f;
   border-color: #d1d5db;
 }
 .books-btn-ghost:hover:not(:disabled) {
-  background-color: #f3f4f6;
-  border-color: #9ca3af;
+  background-color: #f1f5f9;
+  border-color: #94a3b8;
+  color: #1e3a5f;
 }
 .books-btn-danger {
-  background-color: #fff;
-  color: #dc2626;
-  border-color: #fca5a5;
+  background-color: #ffffff;
+  color: #1e3a5f;
+  border: 1px solid #d1d5db;
 }
 .books-btn-danger:hover:not(:disabled) {
-  background-color: #fef2f2;
-  border-color: #dc2626;
+  background-color: #f1f5f9;
+  border-color: #94a3b8;
+  color: #1e3a5f;
 }
 .books-btn-sm {
   padding: 0.3rem 0.75rem;
   font-size: 0.8125rem;
 }
 
-/* ── Page Header ── */
+/* â”€â”€ Page Header â”€â”€ */
 .books-page-header {
   display: flex;
   align-items: center;
@@ -9288,7 +9320,7 @@ input[type='password']::-webkit-inner-spin-button {
   gap: 1rem;
 }
 
-/* ── Loading & Empty state ── */
+/* â”€â”€ Loading & Empty state â”€â”€ */
 .books-loading {
   text-align: center;
   padding: 3rem;
@@ -9296,7 +9328,7 @@ input[type='password']::-webkit-inner-spin-button {
   font-size: 0.9375rem;
 }
 
-/* ── Alert Banners ── */
+/* â”€â”€ Alert Banners â”€â”€ */
 .books-alert {
   display: flex;
   align-items: center;
@@ -9331,8 +9363,8 @@ input[type='password']::-webkit-inner-spin-button {
 
 
 /* ==========================================
-   FEEDBACK BANNER — Department module
-   (DEF-001 to DEF-016 — missing from earlier builds)
+   FEEDBACK BANNER â€” Department module
+   (DEF-001 to DEF-016 â€” missing from earlier builds)
    ========================================== */
 
 .feedback-banner {
@@ -9360,7 +9392,7 @@ input[type='password']::-webkit-inner-spin-button {
 }
 
 /* ==========================================
-   RESPONSIVE SEARCH INPUT — DEF-016
+   RESPONSIVE SEARCH INPUT â€” DEF-016
    Prevent placeholder truncation on mobile
    ========================================== */
 
@@ -9388,20 +9420,20 @@ input[type='password']::-webkit-inner-spin-button {
    Used by PaymentPage.jsx and Pagination.jsx
    ========================================== */
 
-/* ── Page subtitle (used by PaymentPage, ClubsPage, etc.) ── */
+/* â”€â”€ Page subtitle (used by PaymentPage, ClubsPage, etc.) â”€â”€ */
 .stu-page-sub {
   font-size: 0.875rem;
   color: var(--text-secondary, #6b7280);
   margin: 0.15rem 0 0 0;
 }
 
-/* ── Table wrapper — horizontal scroll on small screens ── */
+/* â”€â”€ Table wrapper â€” horizontal scroll on small screens â”€â”€ */
 .books-table-wrap {
   overflow-x: auto;
   -webkit-overflow-scrolling: touch;
 }
 
-/* ── Table ── */
+/* â”€â”€ Table â”€â”€ */
 .books-table {
   width: 100%;
   border-collapse: collapse;
@@ -9436,7 +9468,7 @@ input[type='password']::-webkit-inner-spin-button {
   background: var(--bg-secondary, #f9fafb);
 }
 
-/* ── Empty state inside table ── */
+/* â”€â”€ Empty state inside table â”€â”€ */
 .books-empty {
   text-align: center;
   padding: 2.5rem 1rem;
@@ -9444,7 +9476,7 @@ input[type='password']::-webkit-inner-spin-button {
   font-size: 0.9rem;
 }
 
-/* ── Amount / discount highlight colours ── */
+/* â”€â”€ Amount / discount highlight colours â”€â”€ */
 .pay-amount {
   font-weight: 600;
   color: var(--text-primary, #111827);
@@ -9454,7 +9486,7 @@ input[type='password']::-webkit-inner-spin-button {
   font-weight: 600;
 }
 
-/* ── Checkbox in payment table ── */
+/* â”€â”€ Checkbox in payment table â”€â”€ */
 .pay-checkbox {
   width: 15px;
   height: 15px;
@@ -9462,7 +9494,7 @@ input[type='password']::-webkit-inner-spin-button {
   accent-color: #111827;
 }
 
-/* ── "Create combination" action row ── */
+/* â”€â”€ "Create combination" action row â”€â”€ */
 .pay-action-row {
   display: flex;
   align-items: center;
@@ -9480,7 +9512,7 @@ input[type='password']::-webkit-inner-spin-button {
   margin: 0;
 }
 
-/* ── Combination capsules section ── */
+/* â”€â”€ Combination capsules section â”€â”€ */
 .pay-capsules-title {
   font-size: 0.9375rem;
   font-weight: 700;
@@ -9515,9 +9547,9 @@ input[type='password']::-webkit-inner-spin-button {
   color: var(--text-secondary, #6b7280);
 }
 
-/* ══════════════════════════════════════════
+/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
    PAGINATION BAR  (Pagination.jsx)
-   ══════════════════════════════════════════ */
+   â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
 .books-pagination-bar {
   display: flex;
   align-items: center;
@@ -9626,7 +9658,7 @@ input[type='password']::-webkit-inner-spin-button {
 
 /* ==========================================
    PASSWORD MANAGEMENT MODULE
-   Isolated styles — do not affect existing pages
+   Isolated styles â€” do not affect existing pages
    ========================================== */
 
 /* Flow selection buttons on the landing screen */
@@ -9717,7 +9749,7 @@ input[type='password']::-webkit-inner-spin-button {
   margin-top: 0.25rem;
 }
 
-/* Success icon variant — green tint */
+/* Success icon variant â€” green tint */
 .pm-success-icon {
   background-color: #166534 !important;
 }
@@ -9730,7 +9762,7 @@ input[type='password']::-webkit-inner-spin-button {
   text-align: center;
 }
 
-/* Test Login page — result box */
+/* Test Login page â€” result box */
 .pm-result-box {
   padding: 1rem 1.25rem;
   border-radius: 0.5rem;
@@ -9765,7 +9797,7 @@ input[type='password']::-webkit-inner-spin-button {
 /* --------------------------------------------------------------------------
    1. Field-level validation error text
    Used by StudentForm.jsx <FieldError> component and BulkUploadStudents.jsx
-   .input-error border already exists for .department-form — extend it to all
+   .input-error border already exists for .department-form â€” extend it to all
    form inputs in the student module (and globally for consistency).
    -------------------------------------------------------------------------- */
 
@@ -9824,7 +9856,7 @@ input[type='password']::-webkit-inner-spin-button {
 }
 
 /* --------------------------------------------------------------------------
-   3. Students list — filter bar additions
+   3. Students list â€” filter bar additions
    -------------------------------------------------------------------------- */
 
 /* The right-side cluster: "Clear all" + stats badge */
@@ -9859,7 +9891,7 @@ input[type='password']::-webkit-inner-spin-button {
   background-color: #f3f4f6;
 }
 
-/* Filter toggle button — inherits .btn .btn-secondary,
+/* Filter toggle button â€” inherits .btn .btn-secondary,
    this just adds a visual active state when filters are applied */
 .students-filter-btn {
   white-space: nowrap;
@@ -9956,7 +9988,7 @@ input[type='password']::-webkit-inner-spin-button {
 }
 
 /* --------------------------------------------------------------------------
-   5. Mobile — header actions + search + table
+   5. Mobile â€” header actions + search + table
    Sections 7 & 8: Add Student button fully visible; no horizontal overflow.
    -------------------------------------------------------------------------- */
 
@@ -10042,7 +10074,7 @@ input[type='password']::-webkit-inner-spin-button {
 }
 
 /* --------------------------------------------------------------------------
-   6. Table horizontal overflow — Chrome delayed scrollbar fix (Section 9)
+   6. Table horizontal overflow â€” Chrome delayed scrollbar fix (Section 9)
    Force the table-container to always reserve space for the scrollbar so
    the layout doesn't reflow after data loads, eliminating the 5-6 second
    Chrome delayed-render artefact.
@@ -10065,7 +10097,7 @@ input[type='password']::-webkit-inner-spin-button {
 }
 
 /* --------------------------------------------------------------------------
-   7. Feedback banner — make sure it lays out correctly at all widths
+   7. Feedback banner â€” make sure it lays out correctly at all widths
    -------------------------------------------------------------------------- */
 
 .feedback-banner {
@@ -10075,7 +10107,7 @@ input[type='password']::-webkit-inner-spin-button {
 }
 
 /* --------------------------------------------------------------------------
-   8. Form — ensure field-error messages don't cause layout shifts in the
+   8. Form â€” ensure field-error messages don't cause layout shifts in the
    two-column form-row grid (the grid should absorb the extra height).
    -------------------------------------------------------------------------- */
 
@@ -10087,7 +10119,7 @@ input[type='password']::-webkit-inner-spin-button {
 
 
 /* ==========================================================================
-   STAFF MODULE — Defect fixes
+   STAFF MODULE â€” Defect fixes
    (DEF-001 to DEF-012 of the Staff defect report)
    ========================================================================== */
 
@@ -10126,7 +10158,7 @@ input[type='password']::-webkit-inner-spin-button {
 .date-input-wrapper.date-empty::before {
   content: attr(data-placeholder);
   position: absolute;
-  /* vertically centre inside the input — mirrors form-input padding */
+  /* vertically centre inside the input â€” mirrors form-input padding */
   top: 50%;
   left: 0.75rem;
   transform: translateY(-50%);
@@ -10196,7 +10228,7 @@ input[type='password']::-webkit-inner-spin-button {
    -------------------------------------------------------------------------- */
 
 /* --------------------------------------------------------------------------
-   DEF-001 (continued): Staff search — use a shorter placeholder text
+   DEF-001 (continued): Staff search â€” use a shorter placeholder text
    at very narrow screens so it is readable without truncation.
    The full placeholder is still set on the element for accessibility
    (screen readers read it); CSS content-visibility controls the visible hint.
@@ -10212,7 +10244,7 @@ input[type='password']::-webkit-inner-spin-button {
 }
 
 /* ==========================================================================
-   VENUE MODULE — Targeted defect fixes
+   VENUE MODULE â€” Targeted defect fixes
    DEF-V04: Mobile search text overlaps Clear button
    DEF-V05: Add Venue button partially hidden on mobile
    DEF-V06: Add/Edit Venue form + Bulk Upload button overflow on mobile
@@ -10221,13 +10253,13 @@ input[type='password']::-webkit-inner-spin-button {
 /* --------------------------------------------------------------------------
    DEF-V04: Search text / Clear button overlap on mobile.
    The shared .search-box-wrapper .search-input already gets width:100% and
-   text-overflow:ellipsis at ≤640px, but does NOT guarantee enough right
+   text-overflow:ellipsis at â‰¤640px, but does NOT guarantee enough right
    padding for the "Clear" button.  This rule adds the necessary padding
    specifically for the Venues page search input when the viewport is narrow.
    We scope to .venues-search-input so it has zero effect on other pages.
    -------------------------------------------------------------------------- */
 .venues-search-input {
-  /* Reserve space for the absolute-positioned Clear button (≈3.5rem) */
+  /* Reserve space for the absolute-positioned Clear button (â‰ˆ3.5rem) */
   padding-right: 3.5rem !important;
 }
 
@@ -10259,7 +10291,7 @@ input[type='password']::-webkit-inner-spin-button {
     width: 100%;
   }
 
-  /* Every button in the venues header fills the row — nothing is cut off */
+  /* Every button in the venues header fills the row â€” nothing is cut off */
   .venues-page .header-actions-group > .btn,
   .venues-page .header-actions-group > .books-btn,
   .venues-page .header-actions-group > .download-dropdown-wrapper {
@@ -10308,7 +10340,7 @@ input[type='password']::-webkit-inner-spin-button {
 }
 
 /* --------------------------------------------------------------------------
-   DEF-V06 (continued): Bulk Upload — "Download Sample CSV Template" button
+   DEF-V06 (continued): Bulk Upload â€” "Download Sample CSV Template" button
    must stay inside its container on narrow mobile.
    .venue-bulk-action-btn wraps the button in BulkUploadVenues.jsx.
    -------------------------------------------------------------------------- */
@@ -10327,7 +10359,7 @@ input[type='password']::-webkit-inner-spin-button {
   }
 }
 
-/* ── Upload Materials — Folder list (replaces table, mobile-friendly) ── */
+/* â”€â”€ Upload Materials â€” Folder list (replaces table, mobile-friendly) â”€â”€ */
 .dm-folder-list {
   display: flex;
   flex-direction: column;
@@ -10355,7 +10387,7 @@ input[type='password']::-webkit-inner-spin-button {
   border-color: #93c5fd !important;
 }
 
-/* ── Upload Materials — File card list (mobile-friendly, no horizontal scroll) ── */
+/* â”€â”€ Upload Materials â€” File card list (mobile-friendly, no horizontal scroll) â”€â”€ */
 .dm-files-list {
   display: flex;
   flex-direction: column;
@@ -10407,7 +10439,7 @@ input[type='password']::-webkit-inner-spin-button {
    ATTENDANCE PAGE
    ========================================== */
 
-/* ── Summary chips ── */
+/* â”€â”€ Summary chips â”€â”€ */
 .attendance-chip {
   display: inline-flex;
   align-items: center;
@@ -10437,7 +10469,7 @@ input[type='password']::-webkit-inner-spin-button {
   color: #b91c1c;
 }
 
-/* ── Bulk action buttons ── */
+/* â”€â”€ Bulk action buttons â”€â”€ */
 .attendance-bulk-btn {
   display: inline-flex;
   align-items: center;
@@ -10468,7 +10500,7 @@ input[type='password']::-webkit-inner-spin-button {
   opacity: 1;
 }
 
-/* ── Student list table ── */
+/* â”€â”€ Student list table â”€â”€ */
 .attendance-table-header {
   display: flex;
   align-items: center;
@@ -10514,7 +10546,7 @@ input[type='password']::-webkit-inner-spin-button {
   font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
 }
 
-/* ── Toggle button (Present / Absent) ── */
+/* â”€â”€ Toggle button (Present / Absent) â”€â”€ */
 .attendance-toggle-btn {
   display: inline-flex;
   align-items: center;
@@ -10562,7 +10594,7 @@ input[type='password']::-webkit-inner-spin-button {
   opacity: 0.7;
 }
 
-/* ── Bottom action buttons ── */
+/* â”€â”€ Bottom action buttons â”€â”€ */
 .attendance-submit-btn {
   display: inline-flex;
   align-items: center;
@@ -10629,7 +10661,7 @@ input[type='password']::-webkit-inner-spin-button {
 
 
 /* ==========================================
-   ATTENDANCE — SESSION CARD (improved header)
+   ATTENDANCE â€” SESSION CARD (improved header)
    ========================================== */
 
 /* Outer card gets no extra padding; we control it via inner sections */
@@ -10792,7 +10824,7 @@ input[type='password']::-webkit-inner-spin-button {
   margin-bottom: 1rem;
 }
 
-/* ── AttendanceReview — read-only tile value ── */
+/* â”€â”€ AttendanceReview â€” read-only tile value â”€â”€ */
 .att-review-value {
   font-size: 0.9375rem;
   font-weight: 600;
@@ -10801,7 +10833,7 @@ input[type='password']::-webkit-inner-spin-button {
   line-height: 1.4;
 }
 
-/* ── AttendanceReview — present pill badge in the list ── */
+/* â”€â”€ AttendanceReview â€” present pill badge in the list â”€â”€ */
 .att-present-pill {
   display: inline-flex;
   align-items: center;

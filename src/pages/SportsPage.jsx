@@ -5,8 +5,12 @@ import PageError  from '../components/PageError';
 import SportModal from './SportModal';
 import ViewSportModal from './ViewSportModal';
 
+const _IS_PROD_SP = window.location.hostname !== 'localhost';
+const NODE_API = _IS_PROD_SP ? 'https://university-erp-node.onrender.com/api' : 'http://localhost:5000/api';
+
 export default function SportsPage() {
   const [sports,     setSports]     = useState([]);
+  const [venues,     setVenues]     = useState([]);
   const [loading,    setLoading]    = useState(true);
   const [pageError,  setPageError]  = useState('');
   const [saving,     setSaving]     = useState(false);
@@ -35,6 +39,16 @@ export default function SportsPage() {
   }, []);
 
   useEffect(() => { load(); }, [load]);
+
+  // Fetch venues for dropdown
+  useEffect(() => {
+    fetch(`${NODE_API}/venues`, {
+      headers: { Authorization: `Bearer ${localStorage.getItem('erp_token')}` },
+    })
+      .then((r) => r.json())
+      .then((d) => setVenues(Array.isArray(d) ? d : (d.venues ?? [])))
+      .catch(() => {});
+  }, []);
 
   useEffect(() => {
     if (!success && !error) return;
@@ -149,8 +163,7 @@ export default function SportsPage() {
               onClick={() => openView(sport)}
               style={{ cursor: 'pointer' }}
             >
-              {/* Top strip */}
-              <div className={`sport-card-strip ${sport.status === 'ACTIVE' ? 'sport-strip-active' : 'sport-strip-inactive'}`} />
+              {/* Card top strip removed */}
 
               <div className="sport-card-body">
 
@@ -189,9 +202,7 @@ export default function SportsPage() {
                 <button
                   className="books-btn books-btn-sm books-btn-ghost"
                   onClick={() => openEdit(sport)}
-                >
-                  Edit
-                </button>
+                ><span style={{display:"inline-flex",alignItems:"center",gap:4}}><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg> Edit</span></button>
                 <button
                   className="books-btn books-btn-sm books-btn-danger"
                   onClick={() => handleDelete(sport)}
@@ -210,6 +221,7 @@ export default function SportsPage() {
         isOpen={modalOpen}
         mode={modalMode}
         sport={selSport}
+        venues={venues}
         onSave={handleSave}
         onClose={() => { setModalOpen(false); setDupError(''); }}
         loading={saving}

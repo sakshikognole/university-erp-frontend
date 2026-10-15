@@ -323,8 +323,8 @@ function AppRoutes() {
 
         {/* ==================== SPORTS ==================== */}
         <Route path="sports" element={<SportsPage />} />
-        <Route path="sport-teams" element={<SportTeamsPage />} />
-        <Route path="sport-team-v2" element={<SportTeamPage />} />
+        <Route path="sport-teams" element={<SportTeamPage />} />
+        <Route path="sport-team-v2" element={<SportTeamsPage />} />
 
         {/* ==================== VENUE BOOKING ==================== */}
         <Route path="venue-booking" element={<VenueBookingPage />} />

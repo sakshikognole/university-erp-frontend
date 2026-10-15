@@ -9,7 +9,7 @@ const EMPTY = {
   venueId:     '',
 };
 
-export default function SportModal({ isOpen, mode, sport, onSave, onClose, loading, dupError, onDupOk }) {
+export default function SportModal({ isOpen, mode, sport, venues = [], onSave, onClose, loading, dupError, onDupOk }) {
   const [form,   setForm]   = useState(EMPTY);
   const [errors, setErrors] = useState({});
 
@@ -45,11 +45,11 @@ export default function SportModal({ isOpen, mode, sport, onSave, onClose, loadi
     const e = {};
 
     // ── Sport ID validation ──────────────────────────────────────────────
-    const sportIdRegex = /^(?=.*[A-Za-z])(?=.*[0-9])[A-Za-z0-9]+$/;
+    // Letters, numbers, or combination. No special chars or spaces.
     if (!form.sportId.trim()) {
       e.sportId = 'Sport ID is required';
-    } else if (!sportIdRegex.test(form.sportId.trim())) {
-      e.sportId = 'Invalid Sport ID. Please enter a valid Sport ID (e.g., SPT001).';
+    } else if (!/^[A-Za-z0-9]+$/.test(form.sportId.trim())) {
+      e.sportId = 'Invalid ID. Please enter a valid ID.';
     }
 
     // ── Sport Name validation ────────────────────────────────────────────
@@ -71,11 +71,8 @@ export default function SportModal({ isOpen, mode, sport, onSave, onClose, loadi
     if (!form.status) e.status = 'Required';
 
     // ── Venue ID validation ──────────────────────────────────────────────
-    const venueIdRegex = /^(?=.*[A-Za-z])(?=.*[0-9])[A-Za-z0-9\-]+$/;
     if (!form.venueId.trim()) {
       e.venueId = 'Venue ID is required';
-    } else if (!venueIdRegex.test(form.venueId.trim())) {
-      e.venueId = 'Invalid Venue ID. Please enter a valid Venue ID (e.g., VEN001).';
     }
 
     return e;
@@ -151,14 +148,28 @@ export default function SportModal({ isOpen, mode, sport, onSave, onClose, loadi
               </div>
             </div>
 
-            {/* Venue ID */}
+            {/* Venue ID — dropdown from Venues API */}
             <div className="books-form-group">
               <label className="books-form-label">Venue ID *</label>
-              <input
-                className={`books-form-control ${errors.venueId ? 'err' : ''}`}
-                name="venueId" value={form.venueId} onChange={change}
-                placeholder="e.g. VEN001"
-              />
+              {venues.length > 0 ? (
+                <select
+                  className={`books-form-control ${errors.venueId ? 'err' : ''}`}
+                  name="venueId" value={form.venueId} onChange={change}
+                >
+                  <option value="">-- Select Venue --</option>
+                  {venues.map((v) => (
+                    <option key={v.venueId || v._id} value={v.venueId}>
+                      {v.venueId} — {v.name}
+                    </option>
+                  ))}
+                </select>
+              ) : (
+                <input
+                  className={`books-form-control ${errors.venueId ? 'err' : ''}`}
+                  name="venueId" value={form.venueId} onChange={change}
+                  placeholder="e.g. VEN001"
+                />
+              )}
               {errors.venueId && <p className="books-form-err">{errors.venueId}</p>}
             </div>
 
