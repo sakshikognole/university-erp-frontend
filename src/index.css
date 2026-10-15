@@ -3054,7 +3054,7 @@ button {
 .books-btn-ghost {
   background-color: #ffffff;
   color: #1e3a5f;
-  border-color: #d1d5db;
+  border: 1px solid #d1d5db;
 }
 
 .books-btn-ghost:hover:not(:disabled) {
@@ -3571,7 +3571,7 @@ button {
 .books-btn-primary { background: var(--color-black); color: var(--color-white); }
 .books-btn-warning { background: #ffffff; color: #1e3a5f; border: 1px solid #d1d5db; }
 .books-btn-danger  { background: #ffffff; color: #1e3a5f; border: 1px solid #d1d5db; }
-.books-btn-ghost   { background: #ffffff; color: #1e3a5f; border-color: #d1d5db; }
+.books-btn-ghost   { background: #ffffff; color: #1e3a5f; border: 1px solid #d1d5db; }
 .books-btn-warning:hover:not(:disabled) { background: #f1f5f9; border-color: #94a3b8; color: #1e3a5f; }
 .books-btn-danger:hover:not(:disabled)  { background: #f1f5f9; border-color: #94a3b8; color: #1e3a5f; }
 .books-btn-ghost:hover:not(:disabled)   { background: #f1f5f9; border-color: #94a3b8; color: #1e3a5f; }
@@ -9078,7 +9078,7 @@ input[type='password']::-webkit-inner-spin-button {
 .books-btn-ghost {
   background-color: #ffffff;
   color: #1e3a5f;
-  border-color: #d1d5db;
+  border: 1px solid #d1d5db;
 }
 
 .books-btn-ghost:hover:not(:disabled) {
