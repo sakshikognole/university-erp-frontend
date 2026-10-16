@@ -376,7 +376,7 @@ const Alumni = () => {
                           </button>
                           <button type="button" className="action-btn delete-btn" title="Delete"
                             onClick={() => setDeleteConfirm({ id: a._id || a.alumniId, name: a.name })}>
-                            <Trash2 size={15} />
+                            <Trash2 size={15} /><span className="action-label">Delete</span>
                           </button>
                         </div>
                       </td>

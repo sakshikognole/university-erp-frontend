@@ -332,7 +332,7 @@ const Transport = () => {
                               <Edit size={14} /><span className="action-label">Edit</span>
                             </button>
                             <button type="button" className="action-btn delete-btn" title="Delete" onClick={() => setDeleteConfirm({ type: 'route', item: route })}>
-                              <Trash2 size={14} />
+                              <Trash2 size={14} /><span className="action-label">Delete</span>
                             </button>
                           </div>
                         </td>
@@ -374,7 +374,7 @@ const Transport = () => {
                               <Edit size={14} /><span className="action-label">Edit</span>
                             </button>
                             <button type="button" className="action-btn delete-btn" title="Delete" onClick={() => setDeleteConfirm({ type: 'driver', item: driver })}>
-                              <Trash2 size={14} />
+                              <Trash2 size={14} /><span className="action-label">Delete</span>
                             </button>
                           </div>
                         </td>
@@ -417,7 +417,7 @@ const Transport = () => {
                               <Edit size={14} /><span className="action-label">Edit</span>
                             </button>
                             <button type="button" className="action-btn delete-btn" title="Delete" onClick={() => setDeleteConfirm({ type: 'vehicle', item: vehicle })}>
-                              <Trash2 size={14} />
+                              <Trash2 size={14} /><span className="action-label">Delete</span>
                             </button>
                           </div>
                         </td>
@@ -467,7 +467,7 @@ const Transport = () => {
                               <Edit size={14} /><span className="action-label">Edit</span>
                             </button>
                             <button type="button" className="action-btn delete-btn" title="Delete" onClick={() => setDeleteConfirm({ type: 'pass', item: pass })}>
-                              <Trash2 size={14} />
+                              <Trash2 size={14} /><span className="action-label">Delete</span>
                             </button>
                           </div>
                         </td>

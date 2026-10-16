@@ -296,7 +296,7 @@ const SystemAnnouncements = () => {
                               title="Delete"
                               onClick={() => setDeleteConfirm({ id: ann._id, title: ann.title })}
                             >
-                              <Trash2 size={15} />
+                              <Trash2 size={15} /><span className="action-label">Delete</span>
                             </button>
                           )}
                         </div>
