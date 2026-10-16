@@ -200,7 +200,7 @@ const EventDetailsDialog = ({ eventId, onClose, onEdit, onDeleted }) => {
                 <div style={{ display: 'flex', gap: '0.75rem', justifyContent: 'flex-end' }}>
                   <button type="button" className="books-btn books-btn-ghost" onClick={() => setConfirmDel(false)} disabled={deleting}>Cancel</button>
                   <button type="button" className="btn btn-danger" onClick={handleDelete} disabled={deleting}>
-                    {deleting ? <><Loader2 size={14} className="spin-animate" /><span>Deleting…</span></> : <><Trash2 size={14} /><span>Delete</span></>}
+                    {deleting ? <><Loader2 size={14} className="spin-animate" /><span>Deleting…</span></> : <><Trash2 size={14} /><span><span style={{display:"inline-flex",alignItems:"center",gap:4}}><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>Delete</span></span></>}
                   </button>
                 </div>
               </div>
@@ -213,7 +213,7 @@ const EventDetailsDialog = ({ eventId, onClose, onEdit, onDeleted }) => {
                   <Edit size={14} /><span>Edit</span>
                 </button>
                 <button type="button" className="btn btn-danger" onClick={() => setConfirmDel(true)}>
-                  <Trash2 size={14} /><span>Delete</span>
+                  <Trash2 size={14} /><span><span style={{display:"inline-flex",alignItems:"center",gap:4}}><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>Delete</span></span>
                 </button>
               </div>
             )}

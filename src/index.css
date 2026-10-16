@@ -3930,9 +3930,10 @@ button {
 .stu-btn:hover:not(:disabled) { filter: brightness(0.92); }
 
 .stu-btn-primary { background: var(--color-black); color: var(--color-white); }
-.stu-btn-ghost   { background: var(--bg-active); color: var(--text-primary); border-color: var(--border-color); }
-.stu-btn-danger  { background: #333; color: var(--color-white); }
+.stu-btn-ghost   { background: #ffffff; color: #1e3a5f; border: 1px solid #d1d5db; }
+.stu-btn-danger  { background: #ffffff; color: #1e3a5f; border: 1px solid #d1d5db; }
 .stu-btn-sm      { padding: 5px 10px; font-size: 13px; }
+.stu-btn-danger:hover { background: #f1f5f9; border-color: #94a3b8; color: #1e3a5f; }
 
 .stu-button-row {
   display: flex;
