@@ -404,6 +404,7 @@ export default function SubjectsPage() {
                               <button
                                 className="books-btn books-btn-sm books-btn-ghost"
                                 onClick={() => openView(sub)}
+                                style={{ border: '1px solid #d1d5db' }}
                               ><span style={{display:"inline-flex",alignItems:"center",gap:4}}><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg> View</span></button>
                               <button
                                 className="books-btn books-btn-sm books-btn-warning"
@@ -414,7 +415,7 @@ export default function SubjectsPage() {
                                 onClick={() => handleDelete(sub)}
                                 disabled={deleting === sub.subjectId}
                               >
-                                {deleting === sub.subjectId ? '...' : 'Delete'}
+                                {deleting === sub.subjectId ? '...' : <span style={{display:"inline-flex",alignItems:"center",gap:4}}><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>Delete</span>}
                               </button>
                             </div>
                           </td>
@@ -455,7 +456,7 @@ export default function SubjectsPage() {
                         <button
                           className="books-btn books-btn-sm books-btn-ghost"
                           onClick={() => openView(sub)}
-                        ><span style={{display:"inline-flex",alignItems:"center",gap:4}}><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg> View</span></button>
+                         style={{border:'1px solid #d1d5db'}}><span style={{display:"inline-flex",alignItems:"center",gap:4}}><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg> View</span></button>
                         <button
                           className="books-btn books-btn-sm books-btn-warning"
                           onClick={() => openEdit(sub)}
@@ -465,7 +466,7 @@ export default function SubjectsPage() {
                           onClick={() => handleDelete(sub)}
                           disabled={deleting === sub.subjectId}
                         >
-                          {deleting === sub.subjectId ? '...' : 'Delete'}
+                          {deleting === sub.subjectId ? '...' : <span style={{display:"inline-flex",alignItems:"center",gap:4}}><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>Delete</span>}
                         </button>
                       </div>
                     </div>
