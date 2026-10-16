@@ -2105,7 +2105,7 @@ button {
   border-radius: 0.375rem;
   transition: all 0.2s ease;
   cursor: pointer;
-  border: 1px solid transparent;
+  border: 1px solid #d1d5db;
   line-height: 1.25;
   white-space: nowrap;
   font-family: inherit;
@@ -3014,7 +3014,7 @@ button {
   border-radius: 0.375rem;
   transition: all 0.2s ease;
   cursor: pointer;
-  border: 1px solid transparent;
+  border: 1px solid #d1d5db;
   line-height: 1.25;
   white-space: nowrap;
   font-family: inherit;
@@ -3063,7 +3063,7 @@ button {
   color: #1e3a5f;
 }
 
-/* Action Buttons in Table Rows â€” consistent style matching screenshot */
+/* Action Buttons in Table Rows ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â consistent style matching screenshot */
 .action-btn {
   display: inline-flex;
   align-items: center;
@@ -3543,7 +3543,7 @@ button {
    collisions with the global ERP styles.
    ========================================== */
 
-/* â”€â”€ Page header â”€â”€ */
+/* ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ Page header ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ */
 .books-page-header {
   display: flex;
   align-items: center;
@@ -3551,7 +3551,7 @@ button {
   margin-bottom: 20px;
 }
 
-/* â”€â”€ Buttons â”€â”€ */
+/* ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ Buttons ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ */
 .books-btn {
   display: inline-flex;
   align-items: center;
@@ -3561,7 +3561,7 @@ button {
   font-size: 14px;
   font-weight: 500;
   cursor: pointer;
-  border: 1px solid transparent;
+  border: 1px solid #d1d5db;
   transition: filter 0.15s;
   font-family: inherit;
 }
@@ -3577,7 +3577,7 @@ button {
 .books-btn-ghost:hover:not(:disabled)   { background: #f1f5f9; border-color: #94a3b8; color: #1e3a5f; }
 .books-btn-sm      { padding: 5px 10px; font-size: 13px; }
 
-/* â”€â”€ Toolbar & search â”€â”€ */
+/* ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ Toolbar & search ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ */
 .books-toolbar {
   display: flex;
   align-items: center;
@@ -3599,14 +3599,14 @@ button {
 }
 .books-search-input:focus { border-color: var(--color-black); }
 
-/* â”€â”€ Loading state â”€â”€ */
+/* ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ Loading state ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ */
 .books-loading {
   text-align: center;
   padding: 40px;
   color: var(--text-secondary);
 }
 
-/* â”€â”€ Table â”€â”€ */
+/* ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ Table ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ */
 .books-table-wrap { overflow-x: auto; }
 
 .books-table {
@@ -3630,7 +3630,7 @@ button {
 
 .books-actions { display: flex; gap: 6px; }
 
-/* â”€â”€ Empty state â”€â”€ */
+/* ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ Empty state ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ */
 .books-empty {
   text-align: center;
   padding: 40px;
@@ -3638,7 +3638,7 @@ button {
   font-size: 14px;
 }
 
-/* â”€â”€ Badge â”€â”€ */
+/* ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ Badge ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ */
 .books-badge {
   display: inline-block;
   padding: 2px 9px;
@@ -3650,7 +3650,7 @@ button {
   border: 1px solid var(--border-color);
 }
 
-/* â”€â”€ Pagination â”€â”€ */
+/* ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ Pagination ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ */
 .books-pagination-bar {
   display: flex;
   align-items: center;
@@ -3735,7 +3735,7 @@ button {
   font-family: inherit;
 }
 
-/* â”€â”€ Modal overlay â”€â”€ */
+/* ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ Modal overlay ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ */
 .books-overlay {
   position: fixed;
   inset: 0;
@@ -3789,7 +3789,7 @@ button {
   border-top: 1px solid var(--border-color);
 }
 
-/* â”€â”€ Form fields â”€â”€ */
+/* ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ Form fields ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ */
 .books-form-group { margin-bottom: 14px; }
 
 .books-form-label {
@@ -3815,7 +3815,7 @@ button {
 .books-form-control.err   { border-color: #c92a2a; }
 .books-form-err { font-size: 12px; color: #c92a2a; margin-top: 3px; }
 
-/* â”€â”€ Alert toast â”€â”€ */
+/* ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ Alert toast ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ */
 .books-alert {
   padding: 10px 14px;
   border-radius: 6px;
@@ -3845,7 +3845,7 @@ button {
   font-family: inherit;
 }
 
-/* â”€â”€ Detail view rows â”€â”€ */
+/* ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ Detail view rows ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ */
 .books-detail-row {
   display: flex;
   padding: 9px 0;
@@ -3922,7 +3922,7 @@ button {
   font-size: 14px;
   font-weight: 500;
   cursor: pointer;
-  border: 1px solid transparent;
+  border: 1px solid #d1d5db;
   transition: filter 0.15s;
   font-family: inherit;
 }
@@ -4337,7 +4337,7 @@ button {
   overflow: hidden;
   display: flex;
   flex-direction: column;
-  height: 320px; /* fixed height â€” all cards same size */
+  height: 320px; /* fixed height ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â all cards same size */
   transition: box-shadow 0.15s;
 }
 .club-card:hover {
@@ -4345,7 +4345,7 @@ button {
   border-color: #9ca3af;
 }
 
-/* Sub-club card â€” no left border color */
+/* Sub-club card ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â no left border color */
 .club-card-sub {
   border-left: 1px solid var(--border-color);
 }
@@ -4482,7 +4482,7 @@ button {
   background: var(--bg-secondary);
 }
 
-/* Modal form â€” two column row */
+/* Modal form ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â two column row */
 .club-form-row {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -4513,7 +4513,7 @@ button {
   margin-left: 8px;
 }
 
-/* â”€â”€ Select Student table row styles â”€â”€ */
+/* ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ Select Student table row styles ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ */
 .stu-table-row {
   cursor: pointer;
 }
@@ -4571,7 +4571,7 @@ button {
   overflow: hidden;
   display: flex;
   flex-direction: column;
-  height: 280px; /* fixed height â€” all cards same size */
+  height: 280px; /* fixed height ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â all cards same size */
   transition: box-shadow 0.15s, border-color 0.15s;
 }
 .sport-card:hover {
@@ -4671,7 +4671,7 @@ button {
    Scoped under st-* prefix (sport-team).
    ========================================== */
 
-/* â”€â”€ Page header â”€â”€ */
+/* ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ Page header ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ */
 .st-page-header {
   display: flex;
   align-items: center;
@@ -4680,7 +4680,7 @@ button {
 }
 
 
-/* â”€â”€ Back link â”€â”€ */
+/* ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ Back link ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ */
 .st-back-link {
   display: inline-flex;
   align-items: center;
@@ -4697,7 +4697,7 @@ button {
 }
 .st-back-link:hover { color: var(--text-primary); }
 
-/* â”€â”€ Section title â”€â”€ */
+/* ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ Section title ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ */
 .st-section-title {
   font-size: 14px;
   font-weight: 700;
@@ -4707,7 +4707,7 @@ button {
   border-bottom: 1px solid var(--border-color);
 }
 
-/* â”€â”€ Details block â”€â”€ */
+/* ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ Details block ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ */
 .st-detail-block {
   display: flex;
   flex-direction: column;
@@ -4741,7 +4741,7 @@ button {
   flex: 1;
 }
 
-/* â”€â”€ PRN lookup row â”€â”€ */
+/* ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ PRN lookup row ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ */
 .st-prn-row {
   display: flex;
   align-items: center;
@@ -4763,7 +4763,7 @@ button {
 }
 .st-prn-input:focus { border-color: var(--color-black); }
 
-/* â”€â”€ Found student info â”€â”€ */
+/* ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ Found student info ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ */
 .st-found-student {
   display: flex;
   align-items: center;
@@ -4780,7 +4780,7 @@ button {
 .st-found-label { color: var(--text-secondary); font-weight: 500; }
 .st-found-name  { color: var(--text-primary);   font-weight: 600; }
 
-/* â”€â”€ Empty state â”€â”€ */
+/* ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ Empty state ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ */
 .st-empty {
   text-align: center;
   padding: 30px;
@@ -4788,7 +4788,7 @@ button {
   font-size: 14px;
 }
 
-/* â”€â”€ Status badge â”€â”€ */
+/* ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ Status badge ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ */
 .st-badge {
   display: inline-block;
   padding: 2px 9px;
@@ -4806,7 +4806,7 @@ button {
    Scoped under vb-* prefix.
    ========================================== */
 
-/* â”€â”€ Page header â”€â”€ */
+/* ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ Page header ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ */
 .vb-page-header {
   display: flex;
   align-items: center;
@@ -4820,7 +4820,7 @@ button {
   margin-top: 2px;
 }
 
-/* â”€â”€ Booking form panel â”€â”€ */
+/* ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ Booking form panel ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ */
 .vb-form-panel {
   border: 1px solid var(--border-color);
   border-radius: 8px;
@@ -4838,7 +4838,7 @@ button {
   border-bottom: 1px solid var(--border-color);
 }
 
-/* â”€â”€ Two-column form row â”€â”€ */
+/* ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ Two-column form row ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ */
 .vb-form-row {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -4857,7 +4857,7 @@ button {
   .vb-form-row-3 { grid-template-columns: 1fr; }
 }
 
-/* â”€â”€ Form footer â”€â”€ */
+/* ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ Form footer ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ */
 .vb-form-footer {
   display: flex;
   justify-content: flex-end;
@@ -4867,7 +4867,7 @@ button {
   border-top: 1px solid var(--border-color);
 }
 
-/* â”€â”€ Section title above table â”€â”€ */
+/* ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ Section title above table ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ */
 .vb-section-title {
   font-size: 14px;
   font-weight: 700;
@@ -4877,7 +4877,7 @@ button {
   border-bottom: 1px solid var(--border-color);
 }
 
-/* â”€â”€ Empty state â”€â”€ */
+/* ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ Empty state ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ */
 .vb-empty {
   text-align: center;
   padding: 30px;
@@ -4885,7 +4885,7 @@ button {
   font-size: 14px;
 }
 
-/* â”€â”€ Status badges â”€â”€ */
+/* ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ Status badges ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ */
 .vb-badge {
   display: inline-block;
   padding: 2px 10px;
@@ -4900,7 +4900,7 @@ button {
 .vb-badge-rejected  { background: #fef2f2; color: #991b1b; border-color: #fecaca; }
 .vb-badge-cancelled { background: #f9fafb; color: #6b7280; border-color: #e5e7eb; }
 
-/* â”€â”€ View modal detail rows â”€â”€ */
+/* ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ View modal detail rows ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ */
 .vb-detail-block {
   display: flex;
   flex-direction: column;
@@ -4934,7 +4934,7 @@ button {
    Scoped under dm-* prefix (drive-materials).
    ========================================== */
 
-/* â”€â”€ Page layout â”€â”€ */
+/* ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ Page layout ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ */
 .dm-page-header {
   display: flex;
   align-items: center;
@@ -4971,7 +4971,7 @@ button {
 }
 .dm-search-input:focus { border-color: var(--color-black); }
 
-/* â”€â”€ Breadcrumb â”€â”€ */
+/* ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ Breadcrumb ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ */
 .dm-breadcrumb {
   display: flex;
   align-items: center;
@@ -5000,7 +5000,7 @@ button {
   font-size: 13px;
 }
 
-/* â”€â”€ Drive table â”€â”€ */
+/* ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ Drive table ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ */
 .dm-table-wrap {
   border: 1px solid var(--border-color);
   border-radius: 8px;
@@ -5040,7 +5040,7 @@ button {
 
 .dm-table tbody tr:hover { background: var(--bg-secondary); }
 
-/* â”€â”€ Name cell with icon â”€â”€ */
+/* ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ Name cell with icon ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ */
 .dm-name-cell {
   display: flex;
   align-items: center;
@@ -5053,7 +5053,7 @@ button {
 .dm-item-icon { font-size: 18px; flex-shrink: 0; line-height: 1; }
 .dm-item-name { font-weight: 500; color: var(--text-primary); }
 
-/* â”€â”€ File type badge â”€â”€ */
+/* ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ File type badge ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ */
 .dm-type-badge {
   display: inline-block;
   padding: 2px 8px;
@@ -5071,7 +5071,7 @@ button {
 .dm-type-xlsx { background: #f0fdf4; color: #16a34a; border-color: #bbf7d0; }
 .dm-type-folder { background: #fffbeb; color: #d97706; border-color: #fde68a; }
 
-/* â”€â”€ Actions cell â”€â”€ */
+/* ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ Actions cell ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ */
 .dm-actions {
   display: flex;
   align-items: center;
@@ -5079,7 +5079,7 @@ button {
   flex-wrap: nowrap;
 }
 
-/* â”€â”€ Empty state â”€â”€ */
+/* ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ Empty state ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ */
 .dm-empty {
   text-align: center;
   padding: 40px 20px;
@@ -5089,7 +5089,7 @@ button {
 
 .dm-empty-icon { font-size: 36px; margin-bottom: 8px; }
 
-/* â”€â”€ Drag & Drop upload area â”€â”€ */
+/* ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ Drag & Drop upload area ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ */
 .dm-dropzone {
   border: 2px dashed var(--border-color);
   border-radius: 10px;
@@ -5129,7 +5129,7 @@ button {
   letter-spacing: 0.06em;
 }
 
-/* â”€â”€ Selected files list â”€â”€ */
+/* ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ Selected files list ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ */
 .dm-file-list {
   list-style: none;
   padding: 0;
@@ -5165,7 +5165,7 @@ button {
   font-size: 12px;
 }
 
-/* â”€â”€ Upload progress bar â”€â”€ */
+/* ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ Upload progress bar ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ */
 .dm-progress-wrap {
   width: 100%;
   background: var(--border-color);
@@ -5182,7 +5182,7 @@ button {
   transition: width 0.2s;
 }
 
-/* â”€â”€ Preview modal â”€â”€ */
+/* ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ Preview modal ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ */
 .dm-preview-overlay {
   position: fixed;
   inset: 0;
@@ -5255,7 +5255,7 @@ button {
   font-size: 14px;
 }
 
-/* â”€â”€ Role switcher (dev helper) â”€â”€ */
+/* ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ Role switcher (dev helper) ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ */
 .dm-role-bar {
   display: flex;
   align-items: center;
@@ -5282,7 +5282,7 @@ button {
    Scoped under pay-* prefix.
    ========================================== */
 
-/* â”€â”€ Page header â”€â”€ */
+/* ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ Page header ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ */
 .pay-page-sub {
   font-size: 13px;
   color: var(--text-secondary);
@@ -5290,7 +5290,7 @@ button {
   margin-bottom: 20px;
 }
 
-/* â”€â”€ Table checkbox column â”€â”€ */
+/* ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ Table checkbox column ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ */
 .pay-checkbox {
   width: 18px;
   height: 18px;
@@ -5298,7 +5298,7 @@ button {
   accent-color: var(--color-black);
 }
 
-/* â”€â”€ Amount / Discount cells â”€â”€ */
+/* ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ Amount / Discount cells ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ */
 .pay-amount {
   font-weight: 500;
   color: var(--text-primary);
@@ -5309,7 +5309,7 @@ button {
   color: #16a34a;
 }
 
-/* â”€â”€ Pagination (matches books style) â”€â”€ */
+/* ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ Pagination (matches books style) ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ */
 .pay-pagination {
   display: flex;
   align-items: center;
@@ -5350,14 +5350,14 @@ button {
   cursor: not-allowed;
 }
 
-/* â”€â”€ Create payment button row â”€â”€ */
+/* ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ Create payment button row ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ */
 .pay-action-row {
   display: flex;
   justify-content: center;
   margin-top: 16px;
 }
 
-/* â”€â”€ Combination capsules â”€â”€ */
+/* ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ Combination capsules ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ */
 .pay-capsules-title {
   font-size: 13px;
   font-weight: 600;
@@ -5395,14 +5395,14 @@ button {
    Scoped under hst-* prefix.
    ========================================== */
 
-/* â”€â”€ Page header â”€â”€ */
+/* ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ Page header ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ */
 .hst-page-sub {
   font-size: 13px;
   color: var(--text-secondary);
   margin-top: 2px;
 }
 
-/* â”€â”€ Card grid â€” 3 columns like Clubs/Sports â”€â”€ */
+/* ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ Card grid ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â 3 columns like Clubs/Sports ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ */
 .hst-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
@@ -5413,7 +5413,7 @@ button {
 @media (max-width: 1024px) { .hst-grid { grid-template-columns: repeat(2, 1fr); } }
 @media (max-width: 640px)  { .hst-grid { grid-template-columns: 1fr; } }
 
-/* â”€â”€ Single block card â”€â”€ */
+/* ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ Single block card ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ */
 .hst-card {
   border: 1px solid var(--border-color);
   border-radius: 10px;
@@ -5426,7 +5426,7 @@ button {
 }
 .hst-card:hover { box-shadow: 0 2px 10px rgba(0,0,0,0.08); }
 
-/* â”€â”€ Card top row: badge + status dot â”€â”€ */
+/* ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ Card top row: badge + status dot ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ */
 .hst-card-top {
   display: flex;
   align-items: center;
@@ -5459,7 +5459,7 @@ button {
 .hst-status-dot.active   { background: #16a34a; }
 .hst-status-dot.inactive { background: #9ca3af; }
 
-/* â”€â”€ Card body â”€â”€ */
+/* ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ Card body ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ */
 .hst-card-id {
   font-size: 11px;
   font-weight: 600;
@@ -5480,7 +5480,7 @@ button {
   color: var(--text-secondary);
 }
 
-/* â”€â”€ Card footer: action buttons â”€â”€ */
+/* ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ Card footer: action buttons ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ */
 .hst-card-footer {
   display: flex;
   align-items: center;
@@ -5491,7 +5491,7 @@ button {
   margin-top: 4px;
 }
 
-/* â”€â”€ Back link â”€â”€ */
+/* ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ Back link ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ */
 .hst-back-link {
   display: inline-flex;
   align-items: center;
@@ -5508,7 +5508,7 @@ button {
 }
 .hst-back-link:hover { color: var(--text-primary); }
 
-/* â”€â”€ Section title inside details â”€â”€ */
+/* ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ Section title inside details ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ */
 .hst-section-title {
   font-size: 14px;
   font-weight: 700;
@@ -5518,7 +5518,7 @@ button {
   border-bottom: 1px solid var(--border-color);
 }
 
-/* â”€â”€ Room cards row â”€â”€ */
+/* ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ Room cards row ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ */
 .hst-rooms-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
@@ -5557,7 +5557,7 @@ button {
 .hst-room-occupancy.full  { background: #fef2f2; color: #dc2626; }
 .hst-room-occupancy.open  { background: #f0fdf4; color: #16a34a; }
 
-/* â”€â”€ PRN input row (same pattern as SportTeam) â”€â”€ */
+/* ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ PRN input row (same pattern as SportTeam) ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ */
 .hst-prn-row {
   display: flex;
   align-items: center;
@@ -5579,7 +5579,7 @@ button {
 }
 .hst-prn-input:focus { border-color: var(--color-black); }
 
-/* â”€â”€ Empty state â”€â”€ */
+/* ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ Empty state ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ */
 .hst-empty {
   text-align: center;
   padding: 32px 20px;
@@ -5587,7 +5587,7 @@ button {
   font-size: 14px;
 }
 /* ==========================================
-   BOOKS â€” DEFECT FIXES
+   BOOKS ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â DEFECT FIXES
    ========================================== */
 
 /* Defects #7 + #8: skeleton shimmer animation */
@@ -5596,7 +5596,7 @@ button {
   100% { background-position: -200% 0; }
 }
 
-/* Defect #1: responsive table on mobile â€” horizontal scroll + min widths */
+/* Defect #1: responsive table on mobile ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â horizontal scroll + min widths */
 @media (max-width: 768px) {
   .books-table-wrap {
     overflow-x: auto;
@@ -5632,7 +5632,7 @@ button {
   }
 }
 /* ==========================================
-   BOOKS â€” MOBILE ACCORDION CARDS (Defect #1)
+   BOOKS ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â MOBILE ACCORDION CARDS (Defect #1)
    show .book-mob-list on mobile, hide on desktop
    show .book-desk-table on desktop, hide on mobile
    ========================================== */
@@ -5647,7 +5647,7 @@ button {
   .book-desk-table { display: none; }
 }
 
-/* â”€â”€ Mobile card wrapper â”€â”€ */
+/* ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ Mobile card wrapper ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ */
 .book-mob-card {
   border: 1px solid var(--border-color, #e5e7eb);
   border-radius: 10px;
@@ -5656,7 +5656,7 @@ button {
   background: #fff;
 }
 
-/* â”€â”€ Tap header â”€â”€ */
+/* ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ Tap header ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ */
 .book-mob-header {
   width: 100%;
   display: flex;
@@ -5725,7 +5725,7 @@ button {
   flex-shrink: 0;
 }
 
-/* â”€â”€ Expanded detail rows â”€â”€ */
+/* ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ Expanded detail rows ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ */
 .book-mob-details {
   border-top: 1px solid #f3f4f6;
   padding: 12px 14px 8px;
@@ -5759,7 +5759,7 @@ button {
   color: #6b7280;
 }
 
-/* â”€â”€ Action buttons row â”€â”€ */
+/* ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ Action buttons row ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ */
 .book-mob-actions {
   display: flex;
   gap: 8px;
@@ -5773,7 +5773,7 @@ button {
   justify-content: center;
 }
 
-/* â”€â”€ Books Modal Mobile Responsive â”€â”€ */
+/* ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ Books Modal Mobile Responsive ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ */
 @media (max-width: 768px) {
   .books-modal {
     width: 95% !important;
@@ -5791,7 +5791,7 @@ button {
 }
 
 /* ==========================================
-   SPORT TEAMS â€” MOBILE / DESKTOP TOGGLE
+   SPORT TEAMS ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â MOBILE / DESKTOP TOGGLE
    ========================================== */
 
 /* Default: show desktop table, hide mobile cards */
@@ -7916,7 +7916,7 @@ input[type='password']::-webkit-inner-spin-button {
   border-radius: 0.375rem;
   transition: all 0.2s ease;
   cursor: pointer;
-  border: 1px solid transparent;
+  border: 1px solid #d1d5db;
   line-height: 1.25;
   white-space: nowrap;
   font-family: inherit;
@@ -9038,7 +9038,7 @@ input[type='password']::-webkit-inner-spin-button {
   border-radius: 0.375rem;
   transition: all 0.2s ease;
   cursor: pointer;
-  border: 1px solid transparent;
+  border: 1px solid #d1d5db;
   line-height: 1.25;
   white-space: nowrap;
   font-family: inherit;
@@ -9087,7 +9087,7 @@ input[type='password']::-webkit-inner-spin-button {
   color: #1e3a5f;
 }
 
-/* Action Buttons in Table Rows â€” consistent style matching screenshot */
+/* Action Buttons in Table Rows ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â consistent style matching screenshot */
 .action-btn {
   display: inline-flex;
   align-items: center;
@@ -9150,10 +9150,10 @@ input[type='password']::-webkit-inner-spin-button {
 }
 
 
-/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
-   Department module â€” supplementary styles
-   (Added to fix DEF-003â€“DEF-016)
-   â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
+/* ÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚Â
+   Department module ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â supplementary styles
+   (Added to fix DEF-003ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Å“DEF-016)
+   ÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚Â */
 
 /* Inline field-level validation error message (DEF-003 to DEF-014) */
 .form-field-error {
@@ -9177,7 +9177,7 @@ input[type='password']::-webkit-inner-spin-button {
   box-shadow: 0 0 0 2px rgba(185, 28, 28, 0.15);
 }
 
-/* â”€â”€ DEF-016: Responsive search placeholder / search-box layout â”€â”€
+/* ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ DEF-016: Responsive search placeholder / search-box layout ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬
    On narrow viewports the search box would shrink to the point where
    the placeholder text gets clipped. The fixes below ensure the box
    is always usable and never causes horizontal overflow.            */
@@ -9211,7 +9211,7 @@ input[type='password']::-webkit-inner-spin-button {
     display: none; /* hide text label, show icon only on very narrow screens */
   }
 
-  /* books-btn action buttons on mobile â€” keep compact */
+  /* books-btn action buttons on mobile ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â keep compact */
   .books-btn.books-btn-sm {
     padding: 4px 8px;
     font-size: 12px;
@@ -9245,7 +9245,7 @@ input[type='password']::-webkit-inner-spin-button {
    Used by ClubsPage, BooksPage, SportsPage, and modals
    ========================================== */
 
-/* â”€â”€ Button System â”€â”€ */
+/* ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ Button System ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ */
 .books-btn {
   display: inline-flex;
   align-items: center;
@@ -9257,7 +9257,7 @@ input[type='password']::-webkit-inner-spin-button {
   border-radius: 0.375rem;
   transition: all 0.2s ease;
   cursor: pointer;
-  border: 1px solid transparent;
+  border: 1px solid #d1d5db;
   line-height: 1.25;
   white-space: nowrap;
   font-family: inherit;
@@ -9310,7 +9310,7 @@ input[type='password']::-webkit-inner-spin-button {
   font-size: 0.8125rem;
 }
 
-/* â”€â”€ Page Header â”€â”€ */
+/* ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ Page Header ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ */
 .books-page-header {
   display: flex;
   align-items: center;
@@ -9320,7 +9320,7 @@ input[type='password']::-webkit-inner-spin-button {
   gap: 1rem;
 }
 
-/* â”€â”€ Loading & Empty state â”€â”€ */
+/* ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ Loading & Empty state ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ */
 .books-loading {
   text-align: center;
   padding: 3rem;
@@ -9328,7 +9328,7 @@ input[type='password']::-webkit-inner-spin-button {
   font-size: 0.9375rem;
 }
 
-/* â”€â”€ Alert Banners â”€â”€ */
+/* ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ Alert Banners ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ */
 .books-alert {
   display: flex;
   align-items: center;
@@ -9363,8 +9363,8 @@ input[type='password']::-webkit-inner-spin-button {
 
 
 /* ==========================================
-   FEEDBACK BANNER â€” Department module
-   (DEF-001 to DEF-016 â€” missing from earlier builds)
+   FEEDBACK BANNER ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â Department module
+   (DEF-001 to DEF-016 ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â missing from earlier builds)
    ========================================== */
 
 .feedback-banner {
@@ -9376,7 +9376,7 @@ input[type='password']::-webkit-inner-spin-button {
   font-size: 0.875rem;
   font-weight: 500;
   line-height: 1.4;
-  border: 1px solid transparent;
+  border: 1px solid #d1d5db;
 }
 
 .feedback-success {
@@ -9392,7 +9392,7 @@ input[type='password']::-webkit-inner-spin-button {
 }
 
 /* ==========================================
-   RESPONSIVE SEARCH INPUT â€” DEF-016
+   RESPONSIVE SEARCH INPUT ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â DEF-016
    Prevent placeholder truncation on mobile
    ========================================== */
 
@@ -9420,20 +9420,20 @@ input[type='password']::-webkit-inner-spin-button {
    Used by PaymentPage.jsx and Pagination.jsx
    ========================================== */
 
-/* â”€â”€ Page subtitle (used by PaymentPage, ClubsPage, etc.) â”€â”€ */
+/* ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ Page subtitle (used by PaymentPage, ClubsPage, etc.) ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ */
 .stu-page-sub {
   font-size: 0.875rem;
   color: var(--text-secondary, #6b7280);
   margin: 0.15rem 0 0 0;
 }
 
-/* â”€â”€ Table wrapper â€” horizontal scroll on small screens â”€â”€ */
+/* ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ Table wrapper ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â horizontal scroll on small screens ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ */
 .books-table-wrap {
   overflow-x: auto;
   -webkit-overflow-scrolling: touch;
 }
 
-/* â”€â”€ Table â”€â”€ */
+/* ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ Table ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ */
 .books-table {
   width: 100%;
   border-collapse: collapse;
@@ -9468,7 +9468,7 @@ input[type='password']::-webkit-inner-spin-button {
   background: var(--bg-secondary, #f9fafb);
 }
 
-/* â”€â”€ Empty state inside table â”€â”€ */
+/* ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ Empty state inside table ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ */
 .books-empty {
   text-align: center;
   padding: 2.5rem 1rem;
@@ -9476,7 +9476,7 @@ input[type='password']::-webkit-inner-spin-button {
   font-size: 0.9rem;
 }
 
-/* â”€â”€ Amount / discount highlight colours â”€â”€ */
+/* ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ Amount / discount highlight colours ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ */
 .pay-amount {
   font-weight: 600;
   color: var(--text-primary, #111827);
@@ -9486,7 +9486,7 @@ input[type='password']::-webkit-inner-spin-button {
   font-weight: 600;
 }
 
-/* â”€â”€ Checkbox in payment table â”€â”€ */
+/* ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ Checkbox in payment table ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ */
 .pay-checkbox {
   width: 15px;
   height: 15px;
@@ -9494,7 +9494,7 @@ input[type='password']::-webkit-inner-spin-button {
   accent-color: #111827;
 }
 
-/* â”€â”€ "Create combination" action row â”€â”€ */
+/* ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ "Create combination" action row ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ */
 .pay-action-row {
   display: flex;
   align-items: center;
@@ -9512,7 +9512,7 @@ input[type='password']::-webkit-inner-spin-button {
   margin: 0;
 }
 
-/* â”€â”€ Combination capsules section â”€â”€ */
+/* ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ Combination capsules section ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ */
 .pay-capsules-title {
   font-size: 0.9375rem;
   font-weight: 700;
@@ -9547,9 +9547,9 @@ input[type='password']::-webkit-inner-spin-button {
   color: var(--text-secondary, #6b7280);
 }
 
-/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+/* ÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚Â
    PAGINATION BAR  (Pagination.jsx)
-   â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
+   ÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚Â */
 .books-pagination-bar {
   display: flex;
   align-items: center;
@@ -9658,7 +9658,7 @@ input[type='password']::-webkit-inner-spin-button {
 
 /* ==========================================
    PASSWORD MANAGEMENT MODULE
-   Isolated styles â€” do not affect existing pages
+   Isolated styles ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â do not affect existing pages
    ========================================== */
 
 /* Flow selection buttons on the landing screen */
@@ -9749,7 +9749,7 @@ input[type='password']::-webkit-inner-spin-button {
   margin-top: 0.25rem;
 }
 
-/* Success icon variant â€” green tint */
+/* Success icon variant ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â green tint */
 .pm-success-icon {
   background-color: #166534 !important;
 }
@@ -9762,7 +9762,7 @@ input[type='password']::-webkit-inner-spin-button {
   text-align: center;
 }
 
-/* Test Login page â€” result box */
+/* Test Login page ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â result box */
 .pm-result-box {
   padding: 1rem 1.25rem;
   border-radius: 0.5rem;
@@ -9797,7 +9797,7 @@ input[type='password']::-webkit-inner-spin-button {
 /* --------------------------------------------------------------------------
    1. Field-level validation error text
    Used by StudentForm.jsx <FieldError> component and BulkUploadStudents.jsx
-   .input-error border already exists for .department-form â€” extend it to all
+   .input-error border already exists for .department-form ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â extend it to all
    form inputs in the student module (and globally for consistency).
    -------------------------------------------------------------------------- */
 
@@ -9856,7 +9856,7 @@ input[type='password']::-webkit-inner-spin-button {
 }
 
 /* --------------------------------------------------------------------------
-   3. Students list â€” filter bar additions
+   3. Students list ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â filter bar additions
    -------------------------------------------------------------------------- */
 
 /* The right-side cluster: "Clear all" + stats badge */
@@ -9891,7 +9891,7 @@ input[type='password']::-webkit-inner-spin-button {
   background-color: #f3f4f6;
 }
 
-/* Filter toggle button â€” inherits .btn .btn-secondary,
+/* Filter toggle button ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â inherits .btn .btn-secondary,
    this just adds a visual active state when filters are applied */
 .students-filter-btn {
   white-space: nowrap;
@@ -9988,7 +9988,7 @@ input[type='password']::-webkit-inner-spin-button {
 }
 
 /* --------------------------------------------------------------------------
-   5. Mobile â€” header actions + search + table
+   5. Mobile ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â header actions + search + table
    Sections 7 & 8: Add Student button fully visible; no horizontal overflow.
    -------------------------------------------------------------------------- */
 
@@ -10074,7 +10074,7 @@ input[type='password']::-webkit-inner-spin-button {
 }
 
 /* --------------------------------------------------------------------------
-   6. Table horizontal overflow â€” Chrome delayed scrollbar fix (Section 9)
+   6. Table horizontal overflow ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â Chrome delayed scrollbar fix (Section 9)
    Force the table-container to always reserve space for the scrollbar so
    the layout doesn't reflow after data loads, eliminating the 5-6 second
    Chrome delayed-render artefact.
@@ -10097,7 +10097,7 @@ input[type='password']::-webkit-inner-spin-button {
 }
 
 /* --------------------------------------------------------------------------
-   7. Feedback banner â€” make sure it lays out correctly at all widths
+   7. Feedback banner ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â make sure it lays out correctly at all widths
    -------------------------------------------------------------------------- */
 
 .feedback-banner {
@@ -10107,7 +10107,7 @@ input[type='password']::-webkit-inner-spin-button {
 }
 
 /* --------------------------------------------------------------------------
-   8. Form â€” ensure field-error messages don't cause layout shifts in the
+   8. Form ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â ensure field-error messages don't cause layout shifts in the
    two-column form-row grid (the grid should absorb the extra height).
    -------------------------------------------------------------------------- */
 
@@ -10119,7 +10119,7 @@ input[type='password']::-webkit-inner-spin-button {
 
 
 /* ==========================================================================
-   STAFF MODULE â€” Defect fixes
+   STAFF MODULE ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â Defect fixes
    (DEF-001 to DEF-012 of the Staff defect report)
    ========================================================================== */
 
@@ -10158,7 +10158,7 @@ input[type='password']::-webkit-inner-spin-button {
 .date-input-wrapper.date-empty::before {
   content: attr(data-placeholder);
   position: absolute;
-  /* vertically centre inside the input â€” mirrors form-input padding */
+  /* vertically centre inside the input ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â mirrors form-input padding */
   top: 50%;
   left: 0.75rem;
   transform: translateY(-50%);
@@ -10228,7 +10228,7 @@ input[type='password']::-webkit-inner-spin-button {
    -------------------------------------------------------------------------- */
 
 /* --------------------------------------------------------------------------
-   DEF-001 (continued): Staff search â€” use a shorter placeholder text
+   DEF-001 (continued): Staff search ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â use a shorter placeholder text
    at very narrow screens so it is readable without truncation.
    The full placeholder is still set on the element for accessibility
    (screen readers read it); CSS content-visibility controls the visible hint.
@@ -10244,7 +10244,7 @@ input[type='password']::-webkit-inner-spin-button {
 }
 
 /* ==========================================================================
-   VENUE MODULE â€” Targeted defect fixes
+   VENUE MODULE ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â Targeted defect fixes
    DEF-V04: Mobile search text overlaps Clear button
    DEF-V05: Add Venue button partially hidden on mobile
    DEF-V06: Add/Edit Venue form + Bulk Upload button overflow on mobile
@@ -10253,13 +10253,13 @@ input[type='password']::-webkit-inner-spin-button {
 /* --------------------------------------------------------------------------
    DEF-V04: Search text / Clear button overlap on mobile.
    The shared .search-box-wrapper .search-input already gets width:100% and
-   text-overflow:ellipsis at â‰¤640px, but does NOT guarantee enough right
+   text-overflow:ellipsis at ÃƒÂ¢Ã¢â‚¬Â°Ã‚Â¤640px, but does NOT guarantee enough right
    padding for the "Clear" button.  This rule adds the necessary padding
    specifically for the Venues page search input when the viewport is narrow.
    We scope to .venues-search-input so it has zero effect on other pages.
    -------------------------------------------------------------------------- */
 .venues-search-input {
-  /* Reserve space for the absolute-positioned Clear button (â‰ˆ3.5rem) */
+  /* Reserve space for the absolute-positioned Clear button (ÃƒÂ¢Ã¢â‚¬Â°Ã‹â€ 3.5rem) */
   padding-right: 3.5rem !important;
 }
 
@@ -10291,7 +10291,7 @@ input[type='password']::-webkit-inner-spin-button {
     width: 100%;
   }
 
-  /* Every button in the venues header fills the row â€” nothing is cut off */
+  /* Every button in the venues header fills the row ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â nothing is cut off */
   .venues-page .header-actions-group > .btn,
   .venues-page .header-actions-group > .books-btn,
   .venues-page .header-actions-group > .download-dropdown-wrapper {
@@ -10340,7 +10340,7 @@ input[type='password']::-webkit-inner-spin-button {
 }
 
 /* --------------------------------------------------------------------------
-   DEF-V06 (continued): Bulk Upload â€” "Download Sample CSV Template" button
+   DEF-V06 (continued): Bulk Upload ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â "Download Sample CSV Template" button
    must stay inside its container on narrow mobile.
    .venue-bulk-action-btn wraps the button in BulkUploadVenues.jsx.
    -------------------------------------------------------------------------- */
@@ -10359,7 +10359,7 @@ input[type='password']::-webkit-inner-spin-button {
   }
 }
 
-/* â”€â”€ Upload Materials â€” Folder list (replaces table, mobile-friendly) â”€â”€ */
+/* ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ Upload Materials ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â Folder list (replaces table, mobile-friendly) ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ */
 .dm-folder-list {
   display: flex;
   flex-direction: column;
@@ -10387,7 +10387,7 @@ input[type='password']::-webkit-inner-spin-button {
   border-color: #93c5fd !important;
 }
 
-/* â”€â”€ Upload Materials â€” File card list (mobile-friendly, no horizontal scroll) â”€â”€ */
+/* ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ Upload Materials ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â File card list (mobile-friendly, no horizontal scroll) ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ */
 .dm-files-list {
   display: flex;
   flex-direction: column;
@@ -10439,7 +10439,7 @@ input[type='password']::-webkit-inner-spin-button {
    ATTENDANCE PAGE
    ========================================== */
 
-/* â”€â”€ Summary chips â”€â”€ */
+/* ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ Summary chips ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ */
 .attendance-chip {
   display: inline-flex;
   align-items: center;
@@ -10469,7 +10469,7 @@ input[type='password']::-webkit-inner-spin-button {
   color: #b91c1c;
 }
 
-/* â”€â”€ Bulk action buttons â”€â”€ */
+/* ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ Bulk action buttons ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ */
 .attendance-bulk-btn {
   display: inline-flex;
   align-items: center;
@@ -10500,7 +10500,7 @@ input[type='password']::-webkit-inner-spin-button {
   opacity: 1;
 }
 
-/* â”€â”€ Student list table â”€â”€ */
+/* ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ Student list table ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ */
 .attendance-table-header {
   display: flex;
   align-items: center;
@@ -10546,7 +10546,7 @@ input[type='password']::-webkit-inner-spin-button {
   font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
 }
 
-/* â”€â”€ Toggle button (Present / Absent) â”€â”€ */
+/* ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ Toggle button (Present / Absent) ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ */
 .attendance-toggle-btn {
   display: inline-flex;
   align-items: center;
@@ -10594,7 +10594,7 @@ input[type='password']::-webkit-inner-spin-button {
   opacity: 0.7;
 }
 
-/* â”€â”€ Bottom action buttons â”€â”€ */
+/* ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ Bottom action buttons ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ */
 .attendance-submit-btn {
   display: inline-flex;
   align-items: center;
@@ -10661,7 +10661,7 @@ input[type='password']::-webkit-inner-spin-button {
 
 
 /* ==========================================
-   ATTENDANCE â€” SESSION CARD (improved header)
+   ATTENDANCE ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â SESSION CARD (improved header)
    ========================================== */
 
 /* Outer card gets no extra padding; we control it via inner sections */
@@ -10824,7 +10824,7 @@ input[type='password']::-webkit-inner-spin-button {
   margin-bottom: 1rem;
 }
 
-/* â”€â”€ AttendanceReview â€” read-only tile value â”€â”€ */
+/* ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ AttendanceReview ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â read-only tile value ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ */
 .att-review-value {
   font-size: 0.9375rem;
   font-weight: 600;
@@ -10833,7 +10833,7 @@ input[type='password']::-webkit-inner-spin-button {
   line-height: 1.4;
 }
 
-/* â”€â”€ AttendanceReview â€” present pill badge in the list â”€â”€ */
+/* ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ AttendanceReview ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â present pill badge in the list ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ */
 .att-present-pill {
   display: inline-flex;
   align-items: center;
