@@ -332,7 +332,7 @@ const Transport = () => {
                               <Edit size={14} /><span className="action-label">Edit</span>
                             </button>
                             <button type="button" className="action-btn delete-btn" title="Delete" onClick={() => setDeleteConfirm({ type: 'route', item: route })}>
-                              <Trash2 size={14} />
+                              <Trash2 size={14} /><span className="action-label">Delete</span>
                             </button>
                           </div>
                         </td>
@@ -374,7 +374,7 @@ const Transport = () => {
                               <Edit size={14} /><span className="action-label">Edit</span>
                             </button>
                             <button type="button" className="action-btn delete-btn" title="Delete" onClick={() => setDeleteConfirm({ type: 'driver', item: driver })}>
-                              <Trash2 size={14} />
+                              <Trash2 size={14} /><span className="action-label">Delete</span>
                             </button>
                           </div>
                         </td>
@@ -417,7 +417,7 @@ const Transport = () => {
                               <Edit size={14} /><span className="action-label">Edit</span>
                             </button>
                             <button type="button" className="action-btn delete-btn" title="Delete" onClick={() => setDeleteConfirm({ type: 'vehicle', item: vehicle })}>
-                              <Trash2 size={14} />
+                              <Trash2 size={14} /><span className="action-label">Delete</span>
                             </button>
                           </div>
                         </td>
@@ -467,7 +467,7 @@ const Transport = () => {
                               <Edit size={14} /><span className="action-label">Edit</span>
                             </button>
                             <button type="button" className="action-btn delete-btn" title="Delete" onClick={() => setDeleteConfirm({ type: 'pass', item: pass })}>
-                              <Trash2 size={14} />
+                              <Trash2 size={14} /><span className="action-label">Delete</span>
                             </button>
                           </div>
                         </td>
@@ -553,7 +553,7 @@ const Transport = () => {
             <div className="modal-actions">
               <button type="button" className="books-btn books-btn-ghost" onClick={() => setDeleteConfirm(null)} disabled={deleting}>Cancel</button>
               <button type="button" className="btn btn-danger" onClick={handleConfirmDelete} disabled={deleting}>
-                {deleting ? <><Loader2 size={16} className="spin-animate" /><span>Deleting...</span></> : <><Trash2 size={16} /><span>Delete</span></>}
+                {deleting ? <><Loader2 size={16} className="spin-animate" /><span>Deleting...</span></> : <><Trash2 size={16} /><span><span style={{display:"inline-flex",alignItems:"center",gap:4}}><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>Delete</span></span></>}
               </button>
             </div>
           </div>

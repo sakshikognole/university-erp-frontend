@@ -376,7 +376,7 @@ const Alumni = () => {
                           </button>
                           <button type="button" className="action-btn delete-btn" title="Delete"
                             onClick={() => setDeleteConfirm({ id: a._id || a.alumniId, name: a.name })}>
-                            <Trash2 size={15} />
+                            <Trash2 size={15} /><span className="action-label">Delete</span>
                           </button>
                         </div>
                       </td>
@@ -455,7 +455,7 @@ const Alumni = () => {
                 onClick={() => handleDelete(deleteConfirm.id, deleteConfirm.name)} disabled={deleting}>
                 {deleting
                   ? <><Loader2 size={16} className="spin-animate" /><span>Deleting…</span></>
-                  : <><Trash2 size={16} /><span>Delete</span></>}
+                  : <><Trash2 size={16} /><span><span style={{display:"inline-flex",alignItems:"center",gap:4}}><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>Delete</span></span></>}
               </button>
             </div>
           </div>
