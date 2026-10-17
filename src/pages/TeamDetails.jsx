@@ -76,7 +76,8 @@ export default function TeamDetails({ teamId, onBack }) {
     lookupTimer.current = setTimeout(async () => {
       try {
         const res = await springApi.get(`/students/by-prn/${trimmed}`);
-        const name = res?.studentName || res?.data?.studentName;
+        // Handle various response shapes
+        const name = res?.studentName || res?.data?.studentName || res?.name || res?.data?.name;
         setNamePreview(name || 'Not found');
       } catch {
         setNamePreview('Not found');
@@ -130,9 +131,9 @@ export default function TeamDetails({ teamId, onBack }) {
   return (
     <div className="page-container">
 
-      {/* Back button */}
-      <button className="st-back-link" onClick={onBack}>
-        ← Back to Sport Teams
+      {/* Back button — icon only */}
+      <button className="st-back-link" onClick={onBack} style={{ fontSize: '1.2rem', lineHeight: 1 }}>
+        ←
       </button>
 
       {/* Page title */}
@@ -185,43 +186,42 @@ export default function TeamDetails({ teamId, onBack }) {
       {/* Add student by PRN */}
       <div style={{ marginBottom: 14 }}>
 
-        {/* PRN input */}
-        <div className="books-form-group" style={{ maxWidth: 320, marginBottom: 8 }}>
-          <label className="books-form-label">PRN</label>
-          <input
-            className="st-prn-input"
-            placeholder="Enter PRN"
-            value={prnInput}
-            onChange={handlePrnInput}
-            style={{ width: '100%' }}
-          />
-        </div>
-
-        {/* Name preview box */}
-        <div className="books-form-group" style={{ maxWidth: 320, marginBottom: 8 }}>
-          <label className="books-form-label">Student Name</label>
-          <input
-            className="st-prn-input"
-            value={
-              namePreview === 'Looking up...'        ? 'Looking up...' :
-              namePreview === 'Not found'  ? 'Student not found' :
-              namePreview
-            }
-            readOnly
-            style={{
-              width: '100%',
-              background: 'var(--bg-secondary)',
-              color: namePreview === 'Not found'
-                ? '#dc2626'
-                : 'var(--text-primary)',
-              cursor: 'default',
-            }}
-            placeholder="Name will appear here"
-          />
+        {/* PRN + Name in same row */}
+        <div className="club-form-row" style={{ alignItems: 'flex-end' }}>
+          <div className="books-form-group" style={{ flex: 1 }}>
+            <label className="books-form-label">PRN number</label>
+            <input
+              className="books-form-control"
+              placeholder="Enter PRN"
+              value={prnInput}
+              onChange={handlePrnInput}
+            />
+          </div>
+          <div className="books-form-group" style={{ flex: 1 }}>
+            <label className="books-form-label">Student name</label>
+            <input
+              className="books-form-control"
+              value={
+                namePreview === 'Looking up...' ? 'Looking up...' :
+                namePreview === 'Not found' ? 'Student not found' :
+                namePreview
+              }
+              readOnly
+              style={{
+                background: 'var(--bg-secondary)',
+                color: namePreview === 'Not found' ? '#dc2626'
+                  : namePreview && namePreview !== 'Looking up...' ? '#166534'
+                  : 'var(--text-secondary)',
+                fontWeight: namePreview && namePreview !== 'Looking up...' && namePreview !== 'Not found' ? 600 : 400,
+                cursor: 'default',
+              }}
+              placeholder="Auto-filled after PRN"
+            />
+          </div>
         </div>
 
         <p style={{ fontSize: 12, color: 'var(--text-secondary)', marginBottom: 10 }}>
-          Type a PRN — the student name appears below. Press <strong>,</strong> (comma) to add to the list.
+          Type a PRN — the student name appears automatically. Press <strong>,</strong> (comma) to add to the list.
         </p>
 
         {/* Students list table */}

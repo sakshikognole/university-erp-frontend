@@ -139,6 +139,7 @@ export default function SportTeamPage() {
   const [selTeam,  setSelTeam]  = useState(null);
   const [success,  setSuccess]  = useState('');
   const [error,    setError]    = useState('');
+  const [dupError, setDupError] = useState('');
   const [rosterOpen,   setRosterOpen]   = useState(false);
   const [rosterTeamId, setRosterTeamId] = useState('');
 
@@ -162,8 +163,8 @@ export default function SportTeamPage() {
     return () => clearTimeout(t);
   }, [success, error]);
 
-  const openAdd  = ()     => { setSelTeam(null); setFormMode('add');  setFormOpen(true); };
-  const openEdit = (team) => { setSelTeam(team); setFormMode('edit'); setFormOpen(true); };
+  const openAdd  = ()     => { setSelTeam(null); setFormMode('add');  setDupError(''); setFormOpen(true); };
+  const openEdit = (team) => { setSelTeam(team); setFormMode('edit'); setDupError(''); setFormOpen(true); };
   // Navigate to detail view by setting URL param
   const openView = (team) => setSearchParams({ team: team.teamId });
   const goBack   = ()     => { setSearchParams({}); load(true); };
@@ -189,7 +190,13 @@ export default function SportTeamPage() {
       load(true);
     } catch (err) {
       clearTimeout(slowTimer);
-      setError(err.message || 'Failed to save team.');
+      const msg = err.message || 'Failed to save team.';
+      // If it's a duplicate team ID error, show it inside the modal
+      if (msg.toLowerCase().includes('already exists') || msg.toLowerCase().includes('duplicate')) {
+        setDupError(msg);
+      } else {
+        setError(msg);
+      }
     } finally {
       setSaving(false);
     }
@@ -334,8 +341,10 @@ export default function SportTeamPage() {
         mode={formMode}
         team={selTeam}
         onSave={handleSave}
-        onClose={() => setFormOpen(false)}
+        onClose={() => { setFormOpen(false); setDupError(''); }}
         loading={saving}
+        dupError={dupError}
+        onDupOk={() => setDupError('')}
       />
 
       <AddRosterModal

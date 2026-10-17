@@ -9,7 +9,7 @@ const EMPTY = {
   captainName: '',
 };
 
-export default function TeamForm({ isOpen, mode, team, onSave, onClose, loading }) {
+export default function TeamForm({ isOpen, mode, team, onSave, onClose, loading, dupError, onDupOk }) {
   const [form,   setForm]   = useState(EMPTY);
   const [errors, setErrors] = useState({});
   const [sports, setSports] = useState([]);
@@ -64,36 +64,26 @@ export default function TeamForm({ isOpen, mode, team, onSave, onClose, loading 
   const validate = () => {
     const e = {};
 
-    // Team ID: must have both letters and numbers, no special chars
+    // Team ID: allow letters, numbers, or combination. Reject only special chars.
     if (!form.teamId.trim()) {
       e.teamId = 'Team ID is required.';
-    } else if (/[^A-Za-z0-9\-]/.test(form.teamId.trim())) {
-      e.teamId = 'Team ID must not contain special characters.';
-    } else if (!/[A-Za-z]/.test(form.teamId.trim())) {
-      e.teamId = 'Team ID must contain at least one letter (e.g. T001).';
-    } else if (!/[0-9]/.test(form.teamId.trim())) {
-      e.teamId = 'Team ID must contain at least one number (e.g. T001).';
+    } else if (/[^A-Za-z0-9]/.test(form.teamId.trim())) {
+      e.teamId = 'Invalid ID. Please enter a valid ID.';
     }
 
     if (!form.sportId) e.sportId = 'Sport is required.';
 
-    // Coach Name: letters, spaces and dots only — no numbers, no alphanumeric combos, no special chars
     const nameRegex = /^[A-Za-z\s.]+$/;
     if (!form.coachName.trim()) {
       e.coachName = 'Coach Name is required.';
-    } else if (/\d/.test(form.coachName)) {
-      e.coachName = 'Coach Name must not contain numbers or alphanumeric combinations.';
-    } else if (!nameRegex.test(form.coachName.trim())) {
-      e.coachName = 'Coach Name must contain only letters and spaces. Special characters are not allowed.';
+    } else if (/\d/.test(form.coachName) || !nameRegex.test(form.coachName.trim())) {
+      e.coachName = 'Invalid Coach Name. Please enter a valid name.';
     }
 
-    // Captain Name: same rules as Coach Name
     if (!form.captainName.trim()) {
       e.captainName = 'Captain Name is required.';
-    } else if (/\d/.test(form.captainName)) {
-      e.captainName = 'Captain Name must not contain numbers or alphanumeric combinations.';
-    } else if (!nameRegex.test(form.captainName.trim())) {
-      e.captainName = 'Captain Name must contain only letters and spaces. Special characters are not allowed.';
+    } else if (/\d/.test(form.captainName) || !nameRegex.test(form.captainName.trim())) {
+      e.captainName = 'Invalid Captain Name. Please enter a valid name.';
     }
 
     return e;
@@ -123,14 +113,15 @@ export default function TeamForm({ isOpen, mode, team, onSave, onClose, loading 
               <div className="books-form-group">
                 <label className="books-form-label">Team ID *</label>
                 <input
-                  className={`books-form-control ${errors.teamId ? 'err' : ''}`}
+                  className={`books-form-control ${errors.teamId || dupError ? 'err' : ''}`}
                   name="teamId"
                   value={form.teamId}
-                  onChange={change}
+                  onChange={(e) => { change(e); if (onDupOk) onDupOk(); }}
                   placeholder="e.g. T001"
                   disabled={mode === 'edit'}
                 />
                 {errors.teamId && <p className="books-form-err">{errors.teamId}</p>}
+                {dupError && <p className="books-form-err">{dupError}</p>}
               </div>
 
               <div className="books-form-group">

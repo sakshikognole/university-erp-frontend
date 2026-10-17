@@ -43,11 +43,10 @@ export default function SportTeamModal({ isOpen, mode, team, sports = [], onSave
   const validate = () => {
     const e = {};
 
-    // ── Team ID validation ─────────────────────────────────────────────
-    // Letters, numbers, or combination. No special chars or spaces.
+    // ── Team ID validation — allow letters, numbers, or combination. Reject only special chars.
     if (!form.teamId.trim()) {
       e.teamId = 'Team ID is required.';
-    } else if (!/^[A-Za-z0-9]+$/.test(form.teamId.trim())) {
+    } else if (/[^A-Za-z0-9]/.test(form.teamId.trim())) {
       e.teamId = 'Invalid ID. Please enter a valid ID.';
     }
 
@@ -57,14 +56,10 @@ export default function SportTeamModal({ isOpen, mode, team, sports = [], onSave
     // Sport ID
     if (!form.sportId.trim()) e.sportId = 'Sport ID is required.';
 
-    // ── Defects 7, 8: Coach Name validation ─────────────────────────────
-    // Must contain only letters and spaces — no numbers or special characters
     if (!form.coachName.trim()) {
       e.coachName = 'Coach Name is required.';
-    } else if (/\d/.test(form.coachName)) {
-      e.coachName = 'Coach Name must not contain numbers.';
-    } else if (!/^[A-Za-z\s.]+$/.test(form.coachName.trim())) {
-      e.coachName = 'Coach Name must contain only letters and spaces. Special characters are not allowed.';
+    } else if (/\d/.test(form.coachName) || !/^[A-Za-z\s.]+$/.test(form.coachName.trim())) {
+      e.coachName = 'Invalid Coach Name. Please enter a valid name.';
     }
 
     if (!form.status) e.status = 'Required';
@@ -94,38 +89,18 @@ export default function SportTeamModal({ isOpen, mode, team, sports = [], onSave
         <form onSubmit={submit}>
           <div className="books-modal-body">
 
-            {/* Defect 6: Duplicate Team ID popup — visible inside modal */}
-            {dupError && (
-              <div style={{
-                background: '#fef2f2', border: '1px solid #fca5a5',
-                borderRadius: 8, padding: '12px 16px', marginBottom: 16,
-                display: 'flex', flexDirection: 'column', gap: 10,
-              }}>
-                <div style={{ display: 'flex', gap: 10, alignItems: 'flex-start' }}>
-                  <span style={{ fontSize: '1.3rem' }}>⚠️</span>
-                  <p style={{ color: '#dc2626', fontWeight: 600, margin: 0, fontSize: '0.9rem' }}>
-                    {dupError}
-                  </p>
-                </div>
-                <button type="button" onClick={onDupOk} style={{
-                  alignSelf: 'flex-end', padding: '6px 24px',
-                  background: '#dc2626', color: '#fff', border: 'none',
-                  borderRadius: 6, fontWeight: 600, cursor: 'pointer', fontSize: '0.85rem',
-                }}>OK</button>
-              </div>
-            )}
-
             {/* Team ID + Team Name */}
             <div className="club-form-row">
               <div className="books-form-group">
                 <label className="books-form-label">Team ID *</label>
                 <input
-                  className={`books-form-control ${errors.teamId ? 'err' : ''}`}
-                  name="teamId" value={form.teamId} onChange={change}
+                  className={`books-form-control ${errors.teamId || dupError ? 'err' : ''}`}
+                  name="teamId" value={form.teamId} onChange={(e) => { change(e); if (onDupOk) onDupOk(); }}
                   placeholder="e.g. TM001"
                   disabled={mode === 'edit'}
                 />
                 {errors.teamId && <p className="books-form-err">{errors.teamId}</p>}
+                {dupError && <p className="books-form-err">{dupError}</p>}
               </div>
               <div className="books-form-group">
                 <label className="books-form-label">Team Name *</label>
