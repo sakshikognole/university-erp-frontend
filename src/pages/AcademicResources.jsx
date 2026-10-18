@@ -189,7 +189,24 @@ const AcademicResources = () => {
                     </td>
                     <td>
                       <div className="books-actions" style={{ justifyContent: 'flex-end' }}>
-                        <a href={res.fileUrl} target="_blank" rel="noopener noreferrer" className="books-btn books-btn-sm books-btn-ghost">Open</a>
+        <button
+                          className="books-btn books-btn-sm books-btn-ghost"
+                          onClick={async () => {
+                            const url = res.fileUrl.startsWith('/api')
+                              ? `${NODE_URL.replace('/api','')}${res.fileUrl}`
+                              : res.fileUrl;
+                            try {
+                              const resp = await fetch(url);
+                              if (!resp.ok) {
+                                alert('File not available. Please delete this entry and re-upload the file.');
+                              } else {
+                                window.open(url, '_blank');
+                              }
+                            } catch {
+                              alert('Could not open file. Please try again.');
+                            }
+                          }}
+                        >Open</button>
                         <button className="books-btn books-btn-sm books-btn-danger" onClick={() => handleDelete(res._id)}><span style={{display:"inline-flex",alignItems:"center",gap:4}}><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>Delete</span></button>
                       </div>
                     </td>
