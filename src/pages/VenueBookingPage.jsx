@@ -49,10 +49,20 @@ function validateRequestedBy(val) {
   const t = val.trim();
   if (!t) return 'Requested by is required.';
   if (!/^[A-Za-z\s.]+$/.test(t))
-    return 'Requested By must contain only letters, spaces, and dots.';
+    return 'Invalid Requested By. Please enter a valid Requested By (e.g., Prof. Sharma).';
   if (/\s{2,}/.test(t))
-    return 'Requested By must not contain double spaces.';
+    return 'Invalid Requested By. Please enter a valid Requested By (e.g., Prof. Sharma).';
   return '';
+}
+
+// ── Convert 24hr (HH:MM) to 12hr format (e.g. 3:30 PM) ──────────────────────
+function fmt12(time) {
+  if (!time) return '—';
+  const [h, m] = time.split(':').map(Number);
+  if (isNaN(h) || isNaN(m)) return time;
+  const suffix = h >= 12 ? 'PM' : 'AM';
+  const hour12 = h % 12 === 0 ? 12 : h % 12;
+  return `${hour12}:${String(m).padStart(2, '0')} ${suffix}`;
 }
 
 const EMPTY_FORM = {
@@ -121,8 +131,8 @@ function ViewModal({ booking, events, venues, onClose }) {
             ['Event',        ev ? `${ev.eventId} — ${ev.eventTitle}` : booking.eventId],
             ['Venue',        vn ? `${vn.venueId} — ${vn.name}` : booking.venueId],
             ['Booking Date', fmtDate(booking.bookingDate)],
-            ['Start Time',   booking.startTime],
-            ['End Time',     booking.endTime],
+            ['Start Time',   fmt12(booking.startTime)],
+            ['End Time',     fmt12(booking.endTime)],
             ['Purpose',      booking.purpose || '—'],
             ['Requested By', booking.requestedBy],
           ].map(([label, val]) => (
@@ -253,14 +263,14 @@ function EditModal({ booking, events, venues, onSave, onClose, saving }) {
             {/* Start + End time */}
             <div className="club-form-row">
               <div className="books-form-group">
-                <label className="books-form-label">Start Time * (HH:MM)</label>
+                <label className="books-form-label">Start Time *</label>
                 <input className={`books-form-control ${errors.startTime ? 'err' : ''}`}
                        type="time" name="startTime" value={form.startTime}
                        placeholder="HH:MM" onChange={change} />
                 {errors.startTime && <p className="books-form-err">{errors.startTime}</p>}
               </div>
               <div className="books-form-group">
-                <label className="books-form-label">End Time * (HH:MM)</label>
+                <label className="books-form-label">End Time *</label>
                 <input className={`books-form-control ${errors.endTime ? 'err' : ''}`}
                        type="time" name="endTime" value={form.endTime}
                        placeholder="HH:MM" onChange={change} />
@@ -508,21 +518,24 @@ export default function VenueBookingPage() {
                       <label className="books-form-label">Booking Date *</label>
                       <input className={`books-form-control ${formErrs.bookingDate ? 'err' : ''}`}
                              type="date" name="bookingDate" value={form.bookingDate}
-                             min={todayStr()} onChange={changeForm} />
+                             min={todayStr()} onChange={changeForm}
+                             placeholder="DD/MM/YYYY" />
                       {formErrs.bookingDate && <p className="books-form-err">{formErrs.bookingDate}</p>}
                     </div>
                     <div className="books-form-group">
-                      <label className="books-form-label">Start Time * (HH:MM)</label>
+                      <label className="books-form-label">Start Time *</label>
                       <input className={`books-form-control ${formErrs.startTime ? 'err' : ''}`}
                              type="time" name="startTime" value={form.startTime}
-                             onChange={changeForm} />
+                             onChange={changeForm}
+                             placeholder="HH:MM" />
                       {formErrs.startTime && <p className="books-form-err">{formErrs.startTime}</p>}
                     </div>
                     <div className="books-form-group">
-                      <label className="books-form-label">End Time * (HH:MM)</label>
+                      <label className="books-form-label">End Time *</label>
                       <input className={`books-form-control ${formErrs.endTime ? 'err' : ''}`}
                              type="time" name="endTime" value={form.endTime}
-                             onChange={changeForm} />
+                             onChange={changeForm}
+                             placeholder="HH:MM" />
                       {formErrs.endTime && <p className="books-form-err">{formErrs.endTime}</p>}
                     </div>
                   </div>
@@ -626,7 +639,7 @@ export default function VenueBookingPage() {
                           {fmtDate(b.bookingDate)}
                         </td>
                         <td style={{ textAlign: 'center', fontSize: 13 }}>
-                          {b.startTime}
+                          {fmt12(b.startTime)}
                         </td>
                         <td style={{ textAlign: 'center' }}>
                           <StatusBadge status={b.status} />
@@ -670,7 +683,7 @@ export default function VenueBookingPage() {
                       ['Event',   eventLabel(b.eventId)],
                       ['Venue',   venueLabel(b.venueId)],
                       ['Date',    fmtDate(b.bookingDate)],
-                      ['Time',    `${b.startTime} — ${b.endTime}`],
+                      ['Time',    `${fmt12(b.startTime)} — ${fmt12(b.endTime)}`],
                       ['Req. By', b.requestedBy],
                     ].map(([label, val]) => (
                       <div key={label} style={{ display: 'flex', gap: 8,
