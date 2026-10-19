@@ -65,6 +65,20 @@ function fmt12(time) {
   return `${hour12}:${String(m).padStart(2, '0')} ${suffix}`;
 }
 
+// ── Parse 12hr text input to 24hr value for storage ────────────────────────
+function parse12hrTo24hr(val) {
+  if (!val) return '';
+  const match = val.trim().match(/^(\d{1,2}):(\d{2})\s*(AM|PM)$/i);
+  if (!match) return '';
+  let h = parseInt(match[1], 10);
+  const m = parseInt(match[2], 10);
+  const suffix = match[3].toUpperCase();
+  if (h < 1 || h > 12 || m < 0 || m > 59) return '';
+  if (suffix === 'AM') { if (h === 12) h = 0; }
+  else { if (h !== 12) h += 12; }
+  return `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}`;
+}
+
 const EMPTY_FORM = {
   bookingId: '', eventId: '', venueId: '',
   bookingDate: '', startTime: '', endTime: '',
@@ -89,20 +103,24 @@ function validateBooking(form, isEdit = false) {
     e.bookingDate = 'Booking date cannot be in the past.';
   }
 
-  // D7: validate time — HTML time input auto-corrects invalid values to max
-  // We use pattern validation to catch the edge-case
+  // Validate time — accept HH:MM AM/PM format (e.g. 2:14 PM, 10:30 AM)
+  const timeRegex = /^(\d{1,2}):(\d{2})\s*(AM|PM)$/i;
   if (!form.startTime) {
     e.startTime = 'Start time is required.';
-  } else if (!/^([01]\d|2[0-3]):[0-5]\d$/.test(form.startTime)) {
-    e.startTime = 'Please enter a valid time (HH:MM).';
+  } else if (!timeRegex.test(form.startTime.trim()) || !parse12hrTo24hr(form.startTime)) {
+    e.startTime = 'Enter time in HH:MM AM/PM format (e.g. 2:30 PM).';
   }
 
   if (!form.endTime) {
     e.endTime = 'End time is required.';
-  } else if (!/^([01]\d|2[0-3]):[0-5]\d$/.test(form.endTime)) {
-    e.endTime = 'Please enter a valid time (HH:MM).';
-  } else if (form.startTime && form.endTime && form.endTime <= form.startTime) {
-    e.endTime = 'End time must be after start time.';
+  } else if (!timeRegex.test(form.endTime.trim()) || !parse12hrTo24hr(form.endTime)) {
+    e.endTime = 'Enter time in HH:MM AM/PM format (e.g. 4:00 PM).';
+  } else {
+    const start24 = parse12hrTo24hr(form.startTime);
+    const end24   = parse12hrTo24hr(form.endTime);
+    if (start24 && end24 && end24 <= start24) {
+      e.endTime = 'End time must be after start time.';
+    }
   }
 
   // D8: Requested By validation
@@ -172,7 +190,12 @@ function EditModal({ booking, events, venues, onSave, onClose, saving }) {
   const [errors, setErrors] = useState({});
 
   useEffect(() => {
-    if (booking) setForm({ ...EMPTY_FORM, ...booking });
+    if (booking) setForm({
+      ...EMPTY_FORM, ...booking,
+      // Pre-populate with 12hr format for display in text inputs
+      startTime: fmt12(booking.startTime) !== '—' ? fmt12(booking.startTime) : booking.startTime,
+      endTime:   fmt12(booking.endTime)   !== '—' ? fmt12(booking.endTime)   : booking.endTime,
+    });
     setErrors({});
   }, [booking]);
 
@@ -188,7 +211,7 @@ function EditModal({ booking, events, venues, onSave, onClose, saving }) {
     e.preventDefault();
     const errs = validateBooking(form, true);
     if (Object.keys(errs).length) { setErrors(errs); return; }
-    onSave(form);
+    onSave(form); // handleModalSave converts 12hr→24hr before API call
   };
 
   return (
@@ -265,15 +288,15 @@ function EditModal({ booking, events, venues, onSave, onClose, saving }) {
               <div className="books-form-group">
                 <label className="books-form-label">Start Time *</label>
                 <input className={`books-form-control ${errors.startTime ? 'err' : ''}`}
-                       type="time" name="startTime" value={form.startTime}
-                       placeholder="HH:MM" onChange={change} />
+                       type="text" name="startTime" value={form.startTime}
+                       placeholder="e.g. 2:30 PM" onChange={change} />
                 {errors.startTime && <p className="books-form-err">{errors.startTime}</p>}
               </div>
               <div className="books-form-group">
                 <label className="books-form-label">End Time *</label>
                 <input className={`books-form-control ${errors.endTime ? 'err' : ''}`}
-                       type="time" name="endTime" value={form.endTime}
-                       placeholder="HH:MM" onChange={change} />
+                       type="text" name="endTime" value={form.endTime}
+                       placeholder="e.g. 4:00 PM" onChange={change} />
                 {errors.endTime && <p className="books-form-err">{errors.endTime}</p>}
               </div>
             </div>
@@ -382,7 +405,13 @@ export default function VenueBookingPage() {
     if (Object.keys(errs).length) { setFormErrs(errs); return; }
     setSubmitting(true);
     try {
-      await venueBookingService.create(form);
+      // Convert 12hr text input to 24hr for storage
+      const submitForm = {
+        ...form,
+        startTime: parse12hrTo24hr(form.startTime) || form.startTime,
+        endTime:   parse12hrTo24hr(form.endTime)   || form.endTime,
+      };
+      await venueBookingService.create(submitForm);
       setSuccess('Venue booking request submitted successfully.');
       setForm({ ...EMPTY_FORM, bookingId: generateBookingId() });
       setFormErrs({});
@@ -398,7 +427,13 @@ export default function VenueBookingPage() {
   const handleModalSave = async (updated) => {
     setSaving(true);
     try {
-      await venueBookingService.update(updated.bookingId, updated);
+      // Convert 12hr text to 24hr for storage
+      const toSave = {
+        ...updated,
+        startTime: parse12hrTo24hr(updated.startTime) || updated.startTime,
+        endTime:   parse12hrTo24hr(updated.endTime)   || updated.endTime,
+      };
+      await venueBookingService.update(toSave.bookingId, toSave);
       setSuccess('Booking updated successfully.');
       setEditBooking(null);
       loadBookings(true);
@@ -518,24 +553,23 @@ export default function VenueBookingPage() {
                       <label className="books-form-label">Booking Date *</label>
                       <input className={`books-form-control ${formErrs.bookingDate ? 'err' : ''}`}
                              type="date" name="bookingDate" value={form.bookingDate}
-                             min={todayStr()} onChange={changeForm}
-                             placeholder="DD/MM/YYYY" />
+                             min={todayStr()} onChange={changeForm} />
                       {formErrs.bookingDate && <p className="books-form-err">{formErrs.bookingDate}</p>}
                     </div>
                     <div className="books-form-group">
                       <label className="books-form-label">Start Time *</label>
                       <input className={`books-form-control ${formErrs.startTime ? 'err' : ''}`}
-                             type="time" name="startTime" value={form.startTime}
+                             type="text" name="startTime" value={form.startTime}
                              onChange={changeForm}
-                             placeholder="HH:MM" />
+                             placeholder="e.g. 2:30 PM" />
                       {formErrs.startTime && <p className="books-form-err">{formErrs.startTime}</p>}
                     </div>
                     <div className="books-form-group">
                       <label className="books-form-label">End Time *</label>
                       <input className={`books-form-control ${formErrs.endTime ? 'err' : ''}`}
-                             type="time" name="endTime" value={form.endTime}
+                             type="text" name="endTime" value={form.endTime}
                              onChange={changeForm}
-                             placeholder="HH:MM" />
+                             placeholder="e.g. 4:00 PM" />
                       {formErrs.endTime && <p className="books-form-err">{formErrs.endTime}</p>}
                     </div>
                   </div>

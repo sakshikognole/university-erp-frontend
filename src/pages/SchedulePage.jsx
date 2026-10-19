@@ -39,41 +39,44 @@ function ExamScheduleModal({ isOpen, mode, schedule, onSave, onClose, saving }) 
   const [classrooms, setClassrooms] = useState([]);
   const [bunches, setBunches] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [loadError, setLoadError] = useState('');
 
   useEffect(() => {
     if (!isOpen) return;
     setErrors({});
+    setLoadError('');
     setLoading(true);
-    Promise.all([
-      springGet('/exams'),
-      springGet('/classrooms'),
-      springGet('/classroom-bunches'),
-    ])
-      .then(([examRes, classroomRes, bunchRes]) => {
-        const examList = Array.isArray(examRes) ? examRes : (examRes.data ?? []);
-        examList.sort((a, b) => a.examId.localeCompare(b.examId));
+
+    // Fetch each independently so one failure doesn't wipe the others
+    const p1 = springGet('/exams')
+      .then(res => Array.isArray(res) ? res : (res?.content ?? res?.data ?? []))
+      .catch(() => []);
+
+    const p2 = springGet('/classrooms', { params: { page: 0, size: 1000 } })
+      .then(res => Array.isArray(res) ? res : (res?.content ?? []))
+      .catch(() => []);
+
+    const p3 = springGet('/classroom-bunches')
+      .then(res => Array.isArray(res) ? res : [])
+      .catch(() => []);
+
+    Promise.all([p1, p2, p3])
+      .then(([examList, allClassrooms, allBunches]) => {
+        // Sort exams
+        examList.sort((a, b) => (a.examId || '').localeCompare(b.examId || ''));
         setExams(examList);
-        
-        // Get all classrooms
-        const allClassrooms = Array.isArray(classroomRes?.content) ? classroomRes.content : [];
-        const allBunches = Array.isArray(bunchRes) ? bunchRes : [];
-        
-        // Get classroom IDs that are in bunches
+
+        // Filter classrooms — exclude those already in a bunch
         const classroomIdsInBunches = new Set();
         allBunches.forEach(bunch => {
           bunch.classroomIds?.forEach(id => classroomIdsInBunches.add(id));
         });
-        
-        // Filter classrooms - only show those NOT in any bunch
-        const availableClassrooms = allClassrooms.filter(c => !classroomIdsInBunches.has(c.classroomId));
-        
-        setClassrooms(availableClassrooms);
+        setClassrooms(allClassrooms.filter(c => !classroomIdsInBunches.has(c.classroomId)));
         setBunches(allBunches);
-      })
-      .catch(() => {
-        setExams([]);
-        setClassrooms([]);
-        setBunches([]);
+
+        if (examList.length === 0) {
+          setLoadError('No exams found. Please add exams first, or the server may be waking up — try closing and reopening this modal.');
+        }
       })
       .finally(() => setLoading(false));
   }, [isOpen]);
@@ -121,7 +124,13 @@ function ExamScheduleModal({ isOpen, mode, schedule, onSave, onClose, saving }) 
   const validate = () => {
     const e = {};
     if (!form.examId) e.examId = 'Please select an exam.';
-    if (!form.scheduleDate) e.scheduleDate = 'Date is required.';
+    if (!form.scheduleDate) {
+      e.scheduleDate = 'Date is required.';
+    } else {
+      const today = new Date(); today.setHours(0, 0, 0, 0);
+      const picked = new Date(form.scheduleDate);
+      if (picked < today) e.scheduleDate = 'Date cannot be in the past.';
+    }
     if (!form.daySlots.length) e.daySlots = 'Select at least one day.';
     else {
       for (const slot of form.daySlots) {
@@ -155,6 +164,24 @@ function ExamScheduleModal({ isOpen, mode, schedule, onSave, onClose, saving }) 
         {loading ? (
           <div className="books-modal-body" style={{ textAlign: 'center', padding: 32 }}>
             <p>Loading exams...</p>
+          </div>
+        ) : loadError ? (
+          <div className="books-modal-body" style={{ padding: 24 }}>
+            <div className="books-alert books-alert-error" style={{ marginBottom: 12 }}>
+              <span>{loadError}</span>
+            </div>
+            <button className="books-btn books-btn-ghost" style={{ fontSize: 13 }}
+              onClick={() => { setLoadError(''); setLoading(true);
+                const p1 = springGet('/exams').then(r => Array.isArray(r) ? r : (r?.content ?? r?.data ?? [])).catch(() => []);
+                const p2 = springGet('/classrooms', { params: { page: 0, size: 1000 } }).then(r => Array.isArray(r) ? r : (r?.content ?? [])).catch(() => []);
+                const p3 = springGet('/classroom-bunches').then(r => Array.isArray(r) ? r : []).catch(() => []);
+                Promise.all([p1, p2, p3]).then(([el, cl, bl]) => {
+                  el.sort((a, b) => (a.examId||'').localeCompare(b.examId||'')); setExams(el);
+                  const ids = new Set(); bl.forEach(b => b.classroomIds?.forEach(id => ids.add(id)));
+                  setClassrooms(cl.filter(c => !ids.has(c.classroomId))); setBunches(bl);
+                  if (el.length === 0) setLoadError('Still no exams found. Please add exams in the Exam module first.');
+                }).finally(() => setLoading(false));
+              }}>↻ Retry</button>
           </div>
         ) : (
           <form onSubmit={submit}>
@@ -511,6 +538,143 @@ function ClassScheduleModal({ isOpen, onSave, onClose, saving }) {
   );
 }
 
+// Schedule Mobile Card (accordion — same pattern as BookMobileCard)
+function ScheduleMobileCard({ sch, index, activeTab, isExpanded, onToggle, onEdit, onDelete, deleting }) {
+  const isExam = activeTab === 'exam';
+
+  // Header title and subtitle
+  const title = isExam ? (sch.examName || sch.subjectName || '—') : (sch.subjectName || '—');
+  const subtitle = isExam ? (sch.examId || '—') : (sch.department || '—');
+
+  // Day pills
+  const dayPills = (sch.daySlots || []).map(s => s.day).join(', ') || '—';
+
+  // Formatted date
+  const fmtDate = sch.scheduleDate
+    ? new Date(sch.scheduleDate).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' })
+    : '—';
+
+  return (
+    <div className="sch-mob-card">
+      <button type="button" className="sch-mob-header" onClick={onToggle} aria-expanded={isExpanded}>
+        <div className="sch-mob-summary">
+          <span className="sch-mob-num">{index + 1}</span>
+          <div className="sch-mob-title-wrap">
+            <span className="sch-mob-title">{title}</span>
+            <span className="sch-mob-sub">{subtitle}</span>
+          </div>
+        </div>
+        <span className="sch-mob-chevron">{isExpanded ? '▲' : '▼'}</span>
+      </button>
+
+      {isExpanded && (
+        <div className="sch-mob-details">
+          {/* Schedule ID */}
+          <div className="sch-mob-row">
+            <span className="sch-mob-label">Schedule id</span>
+            <span className="sch-mob-value mono">{sch.scheduleId || '—'}</span>
+          </div>
+
+          {isExam ? (
+            <>
+              <div className="sch-mob-row">
+                <span className="sch-mob-label">Exam</span>
+                <span className="sch-mob-value">{sch.examName || sch.subjectName || '—'}</span>
+              </div>
+              <div className="sch-mob-row">
+                <span className="sch-mob-label">Exam id</span>
+                <span className="sch-mob-value mono">{sch.examId || '—'}</span>
+              </div>
+              <div className="sch-mob-row">
+                <span className="sch-mob-label">Start time</span>
+                <span className="sch-mob-value">{sch.daySlots?.[0]?.startTime || '—'}</span>
+              </div>
+              <div className="sch-mob-row">
+                <span className="sch-mob-label">Date</span>
+                <span className="sch-mob-value">{fmtDate}</span>
+              </div>
+              <div className="sch-mob-row">
+                <span className="sch-mob-label">Days</span>
+                <span className="sch-mob-value">{dayPills}</span>
+              </div>
+              <div className="sch-mob-row">
+                <span className="sch-mob-label">Classroom</span>
+                <span className="sch-mob-value">{sch.classroom || sch.venueName || 'TBA'}</span>
+              </div>
+            </>
+          ) : (
+            <>
+              <div className="sch-mob-row">
+                <span className="sch-mob-label">Department</span>
+                <span className="sch-mob-value">{sch.department || '—'}</span>
+              </div>
+              <div className="sch-mob-row">
+                <span className="sch-mob-label">Semester</span>
+                <span className="sch-mob-value">{sch.semester || '—'}</span>
+              </div>
+              <div className="sch-mob-row">
+                <span className="sch-mob-label">Subject</span>
+                <span className="sch-mob-value">{sch.subjectName || '—'}</span>
+              </div>
+              <div className="sch-mob-row">
+                <span className="sch-mob-label">Faculty</span>
+                <span className="sch-mob-value">{sch.facultyName || '—'}</span>
+              </div>
+              <div className="sch-mob-row">
+                <span className="sch-mob-label">Start time</span>
+                <span className="sch-mob-value">{sch.daySlots?.[0]?.startTime || '—'}</span>
+              </div>
+              <div className="sch-mob-row">
+                <span className="sch-mob-label">Date</span>
+                <span className="sch-mob-value">{fmtDate}</span>
+              </div>
+              <div className="sch-mob-row">
+                <span className="sch-mob-label">Days</span>
+                <span className="sch-mob-value">{dayPills}</span>
+              </div>
+              <div className="sch-mob-row">
+                <span className="sch-mob-label">Venue</span>
+                <span className="sch-mob-value">{sch.venueName || sch.venueId || '—'}</span>
+              </div>
+            </>
+          )}
+
+          <div className="sch-mob-actions">
+            {isExam && (
+              <button className="books-btn books-btn-sm books-btn-warning" onClick={() => onEdit(sch)}>
+                <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}>
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+                    <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+                  </svg>
+                  Edit
+                </span>
+              </button>
+            )}
+            <button
+              className="books-btn books-btn-sm books-btn-danger"
+              onClick={() => onDelete(sch)}
+              disabled={deleting === sch.scheduleId}
+            >
+              {deleting === sch.scheduleId ? '...' : (
+                <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}>
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <polyline points="3 6 5 6 21 6"/>
+                    <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/>
+                    <path d="M10 11v6"/><path d="M14 11v6"/>
+                    <path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/>
+                  </svg>
+                  Delete
+                </span>
+              )}
+            </button>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
 // Main Page
 export default function SchedulePage() {
   const [activeTab, setActiveTab] = useState('exam'); // 'exam' or 'schedule'
@@ -525,6 +689,7 @@ export default function SchedulePage() {
   const [classModalOpen, setClassModalOpen] = useState(false);
   const [success, setSuccess] = useState('');
   const [error, setError] = useState('');
+  const [expandedId, setExpandedId] = useState(null); // mobile accordion
 
   useEffect(() => {
     if (!success && !error) return;
@@ -535,8 +700,8 @@ export default function SchedulePage() {
   const load = useCallback(async (silent = false) => {
     if (!silent) { setLoading(true); setPageError(''); }
     try {
-      const res = await springGet('/schedules');
-      const list = Array.isArray(res) ? res : (res.data?.content ?? res.content ?? []);
+      const res = await springGet('/schedules', { params: { page: 0, size: 1000 } });
+      const list = Array.isArray(res) ? res : (res?.content ?? res?.data?.content ?? []);
       setSchedules(list);
     } catch (err) {
       if (!silent) setPageError(err.message || 'Failed to load schedules.');
@@ -585,7 +750,7 @@ export default function SchedulePage() {
       }
       
       setExamModalOpen(false);
-      load(true);
+      await load(true);
     } catch (err) {
       setError(err.message || 'Failed to save exam schedule.');
     } finally {
@@ -599,7 +764,7 @@ export default function SchedulePage() {
       await springApi.post('/schedules', form);
       setSuccess('Class schedule added successfully.');
       setClassModalOpen(false);
-      load(true);
+      await load(true);
     } catch (err) {
       setError(err.message || 'Failed to save class schedule.');
     } finally {
@@ -613,7 +778,7 @@ export default function SchedulePage() {
     try {
       await springApi.delete(`/schedules/${sch.scheduleId}`);
       setSuccess('Schedule deleted.');
-      load(true);
+      await load(true);
     } catch {
       setError('Failed to delete schedule.');
     } finally {
@@ -622,41 +787,43 @@ export default function SchedulePage() {
   };
 
   // Filter schedules based on active tab
+  // Exam schedules: examId is a non-empty string
+  // Class schedules: examId is null, undefined, or empty string
   const filteredSchedules = schedules.filter(s => {
-    if (activeTab === 'exam') return s.examId;
-    return !s.examId;
+    if (activeTab === 'exam') return s.examId && s.examId.trim() !== '';
+    return !s.examId || s.examId.trim() === '';
   });
 
   return (
     <div className="page-container">
       {/* Header */}
-      <div className="books-page-header" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12, flexWrap: 'wrap' }}>
+      <div className="books-page-header" style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 12, flexWrap: 'wrap' }}>
         <div style={{ minWidth: 0 }}>
           <h1 className="page-title">Schedule</h1>
           <p className="page-subtitle">Manage exam and class schedules</p>
         </div>
-        <div style={{ display: 'flex', gap: 8, flexShrink: 0 }}>
+        <div style={{ display: 'flex', gap: 8, flexShrink: 0, flexWrap: 'nowrap' }}>
           <button className="books-btn books-btn-primary" onClick={openExamAdd}>
             + Add Exam Schedule
           </button>
           <button className="books-btn books-btn-primary" onClick={() => setClassModalOpen(true)}>
-            + Add Schedule
+            + Add Class Schedule
           </button>
         </div>
       </div>
 
       {/* Tabs */}
-      <div style={{ display: 'flex', gap: 8, marginTop: 16, marginBottom: 16, borderBottom: '2px solid #e5e7eb' }}>
+      <div style={{ display: 'flex', gap: 0, marginTop: 16, marginBottom: 16 }}>
         <button
           onClick={() => setActiveTab('exam')}
           style={{
-            padding: '12px 24px',
-            border: 'none',
-            borderBottom: activeTab === 'exam' ? '3px solid #fbbf24' : '3px solid transparent',
-            background: 'transparent',
-            color: activeTab === 'exam' ? '#111827' : '#6b7280',
+            padding: '10px 24px',
+            border: '1px solid #d1d5db',
+            borderRadius: '6px 0 0 6px',
+            background: activeTab === 'exam' ? '#111827' : '#f3f4f6',
+            color: activeTab === 'exam' ? '#ffffff' : '#6b7280',
             fontWeight: activeTab === 'exam' ? 700 : 500,
-            fontSize: '0.95rem',
+            fontSize: '0.9rem',
             cursor: 'pointer',
             transition: 'all 0.2s',
           }}
@@ -666,18 +833,19 @@ export default function SchedulePage() {
         <button
           onClick={() => setActiveTab('schedule')}
           style={{
-            padding: '12px 24px',
-            border: 'none',
-            borderBottom: activeTab === 'schedule' ? '3px solid #3b82f6' : '3px solid transparent',
-            background: 'transparent',
-            color: activeTab === 'schedule' ? '#111827' : '#6b7280',
+            padding: '10px 24px',
+            border: '1px solid #d1d5db',
+            borderLeft: 'none',
+            borderRadius: '0 6px 6px 0',
+            background: activeTab === 'schedule' ? '#111827' : '#f3f4f6',
+            color: activeTab === 'schedule' ? '#ffffff' : '#6b7280',
             fontWeight: activeTab === 'schedule' ? 700 : 500,
-            fontSize: '0.95rem',
+            fontSize: '0.9rem',
             cursor: 'pointer',
             transition: 'all 0.2s',
           }}
         >
-          Schedule
+          Class Schedule
         </button>
       </div>
 
@@ -712,11 +880,13 @@ export default function SchedulePage() {
             className="books-btn books-btn-primary"
             onClick={() => activeTab === 'exam' ? openExamAdd() : setClassModalOpen(true)}
           >
-            + Add {activeTab === 'exam' ? 'Exam Schedule' : 'Schedule'}
+            + Add {activeTab === 'exam' ? 'Exam Schedule' : 'Class Schedule'}
           </button>
         </div>
       ) : (
         <div className="card" style={{ padding: '1rem' }}>
+          {/* ── Desktop table (hidden on mobile) ── */}
+          <div className="sch-desk-table">
           <div className="books-table-wrap">
             <table className="books-table">
               <thead>
@@ -727,6 +897,7 @@ export default function SchedulePage() {
                     <>
                       <th>Exam</th>
                       <th>Exam id</th>
+                      <th>Start time</th>
                       <th>Date</th>
                       <th>Days</th>
                       <th>Classroom</th>
@@ -737,6 +908,7 @@ export default function SchedulePage() {
                       <th>Semester</th>
                       <th>Subject</th>
                       <th>Faculty</th>
+                      <th>Start time</th>
                       <th>Date</th>
                       <th>Days</th>
                       <th>Venue</th>
@@ -762,6 +934,9 @@ export default function SchedulePage() {
                       <>
                         <td style={{ fontWeight: 500 }}>{sch.examName || sch.subjectName}</td>
                         <td style={{ fontSize: 13 }}>{sch.examId || '—'}</td>
+                        <td style={{ fontSize: 13, whiteSpace: 'nowrap' }}>
+                          {sch.daySlots?.[0]?.startTime || '—'}
+                        </td>
                         <td style={{ fontSize: 13, whiteSpace: 'nowrap' }}>
                           {sch.scheduleDate
                             ? new Date(sch.scheduleDate).toLocaleDateString('en-IN', {
@@ -792,6 +967,9 @@ export default function SchedulePage() {
                         <td style={{ fontSize: 13 }}>{sch.subjectName}</td>
                         <td style={{ fontSize: 13 }}>{sch.facultyName}</td>
                         <td style={{ fontSize: 13, whiteSpace: 'nowrap' }}>
+                          {sch.daySlots?.[0]?.startTime || '—'}
+                        </td>
+                        <td style={{ fontSize: 13, whiteSpace: 'nowrap' }}>
                           {sch.scheduleDate
                             ? new Date(sch.scheduleDate).toLocaleDateString('en-IN', {
                                 day: '2-digit', month: 'short', year: 'numeric'
@@ -816,7 +994,7 @@ export default function SchedulePage() {
                       </>
                     )}
                     <td>
-                      <div className="books-actions">
+                      <div className="books-actions" style={{ display: 'flex', gap: 6, flexWrap: 'nowrap', alignItems: 'center' }}>
                         {activeTab === 'exam' && (
                           <button
                             className="books-btn books-btn-sm books-btn-warning"
@@ -836,6 +1014,24 @@ export default function SchedulePage() {
                 ))}
               </tbody>
             </table>
+          </div>
+          </div>{/* end sch-desk-table */}
+
+          {/* ── Mobile accordion cards (hidden on desktop) ── */}
+          <div className="sch-mob-list">
+            {filteredSchedules.map((sch, i) => (
+              <ScheduleMobileCard
+                key={sch.scheduleId}
+                sch={sch}
+                index={i}
+                activeTab={activeTab}
+                isExpanded={expandedId === sch.scheduleId}
+                onToggle={() => setExpandedId(expandedId === sch.scheduleId ? null : sch.scheduleId)}
+                onEdit={openExamEdit}
+                onDelete={handleDelete}
+                deleting={deleting}
+              />
+            ))}
           </div>
         </div>
       )}

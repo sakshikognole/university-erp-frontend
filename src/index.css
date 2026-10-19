@@ -5806,6 +5806,145 @@ button {
 }
 
 /* ==========================================================
+   SCHEDULE — MOBILE / DESKTOP TOGGLE
+   Desktop: show .sch-desk-table, hide .sch-mob-list
+   Mobile (<=768px): flip
+   ========================================================== */
+
+/* Default: show desktop table, hide mobile cards */
+.sch-mob-list  { display: none; }
+.sch-desk-table { display: block; }
+
+/* Mobile (<=768px): flip visibility */
+@media (max-width: 768px) {
+  .sch-mob-list  { display: block; }
+  .sch-desk-table { display: none; }
+}
+
+/* ── Mobile card wrapper ── */
+.sch-mob-card {
+  border: 1px solid var(--border-color, #e5e7eb);
+  border-radius: 10px;
+  margin-bottom: 8px;
+  overflow: hidden;
+  background: #fff;
+}
+
+/* ── Tap header ── */
+.sch-mob-header {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 14px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  text-align: left;
+  gap: 10px;
+}
+.sch-mob-header:active { background: #f9fafb; }
+
+.sch-mob-summary {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex: 1;
+  min-width: 0;
+}
+
+.sch-mob-num {
+  min-width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: #111827;
+  color: #fff;
+  font-size: 0.72rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.sch-mob-title-wrap {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.sch-mob-title {
+  font-weight: 600;
+  font-size: 0.9rem;
+  color: #111827;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.sch-mob-sub {
+  font-size: 0.78rem;
+  color: #6b7280;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.sch-mob-chevron {
+  font-size: 0.65rem;
+  color: #9ca3af;
+  flex-shrink: 0;
+}
+
+/* ── Expanded detail rows ── */
+.sch-mob-details {
+  border-top: 1px solid #f3f4f6;
+  padding: 12px 14px 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.sch-mob-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.85rem;
+}
+
+.sch-mob-label {
+  color: #6b7280;
+  font-weight: 500;
+  flex-shrink: 0;
+  margin-right: 8px;
+}
+
+.sch-mob-value {
+  color: #111827;
+  text-align: right;
+}
+
+.sch-mob-value.mono {
+  font-family: monospace;
+  font-size: 0.8rem;
+  color: #6b7280;
+}
+
+/* ── Action buttons row ── */
+.sch-mob-actions {
+  display: flex;
+  gap: 8px;
+  padding-top: 8px;
+  border-top: 1px solid #f3f4f6;
+  margin-top: 4px;
+}
+
+.sch-mob-actions .books-btn {
+  flex: 1;
+  justify-content: center;
+}
+
+/* ==========================================================
    MERGED LOCAL CSS
    The local stylesheet is appended after the hosting stylesheet
    so both sets of rules are retained. Later matching rules take

@@ -21,7 +21,7 @@ export default function CertificatePreview({ student, customContent, docType }) 
     let objectUrl = '';
     setLoading(true); setError(''); setPdfUrl('');
 
-    getCertificatePdfUrl(student.studentId, customContent, docType)
+    getCertificatePdfUrl(student.studentId, customContent, docType, student)
       .then((url) => { objectUrl = url; setPdfUrl(url); })
       .catch(() => setError('Failed to generate certificate. Please try again.'))
       .finally(() => setLoading(false));
@@ -33,7 +33,7 @@ export default function CertificatePreview({ student, customContent, docType }) 
     setDownloading(true);
     try {
       await downloadCertificatePdf(
-        student.studentId, student.studentName, customContent, docType
+        student.studentId, student.studentName, customContent, docType, student
       );
     } catch {
       setError('Download failed. Please try again.');

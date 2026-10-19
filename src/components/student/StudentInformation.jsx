@@ -2,14 +2,14 @@ export default function StudentInformation({ student }) {
   if (!student) return null;
 
   const fields = [
-    { label: 'Student Name',       value: student.studentName },
-    { label: 'Gender',             value: student.gender },
+    { label: 'Student Name',       value: student.studentName || '-' },
+    { label: 'Gender',             value: student.gender || 'Not specified' },
     { label: 'PRN',                value: student.prn            || '-' },
     { label: 'Division',           value: student.division       || '-' },
     { label: 'Year of Enrollment', value: student.yearOfEnrollment || '-' },
-    { label: 'Studying Year',      value: student.studyingYear },
-    { label: 'Degree Program',     value: student.degreeProgramName },
-    { label: 'Academic Year',      value: student.academicYear },
+    { label: 'Studying Year',      value: student.studyingYear   || '-' },
+    { label: 'Degree Program',     value: student.degreeProgramName || '-' },
+    { label: 'Academic Year',      value: student.academicYear   || 'Not specified' },
   ];
 
   return (

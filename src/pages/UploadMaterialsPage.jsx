@@ -53,9 +53,29 @@ function PreviewModal({ material, onClose }) {
   const type = (material.fileType || '').toLowerCase();
   const url  = absoluteUrl(material.fileUrl);
 
+  // Force download via fetch + blob to bypass browser's open-in-tab behavior
+  const forceDownload = async (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    try {
+      const res = await fetch(url);
+      const blob = await res.blob();
+      const blobUrl = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = blobUrl;
+      a.download = material.fileName;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      window.URL.revokeObjectURL(blobUrl);
+    } catch {
+      // fallback
+      window.open(url, '_blank');
+    }
+  };
+
   let body;
   if (type === 'pdf') {
-    // FIX: use absolute Spring URL so browser loads from 8080, not 5173
     body = (
       <iframe
         src={url}
@@ -64,7 +84,6 @@ function PreviewModal({ material, onClose }) {
       />
     );
   } else if (['jpg', 'jpeg', 'png'].includes(type)) {
-    // FIX: use <img> with absolute URL, not just filename
     body = (
       <img
         src={url}
@@ -73,7 +92,6 @@ function PreviewModal({ material, onClose }) {
       />
     );
   } else {
-    // XLS/XLSX — cannot preview in browser, offer download only
     body = (
       <div style={{
         display: 'flex', flexDirection: 'column', alignItems: 'center',
@@ -83,35 +101,32 @@ function PreviewModal({ material, onClose }) {
         <p style={{ color: 'var(--text-secondary)', fontSize: 14 }}>
           Preview not available for {type.toUpperCase()} files.
         </p>
-        <a
-          href={url}
-          download={material.fileName}
-          className="books-btn books-btn-primary"
-        >
+        <button className="books-btn books-btn-primary" onClick={forceDownload}>
           ⬇ Download to Open
-        </a>
+        </button>
       </div>
     );
   }
 
   return (
     <div className="dm-preview-overlay" onClick={onClose}>
-      <div className="dm-preview-modal" onClick={(e) => e.stopPropagation()}>
+      <div className="dm-preview-modal" onClick={(e) => e.stopPropagation()}
+           style={{ width: '90vw', maxWidth: 900, height: '85vh' }}>
         <div className="dm-preview-head">
           <span className="dm-preview-title">
             {fileIcon(type)} {material.fileName}
           </span>
-          <a
-            href={url}
-            download={material.fileName}
+          <button
             className="books-btn books-btn-sm books-btn-ghost"
-            onClick={(e) => e.stopPropagation()}
+            onClick={forceDownload}
           >
             ⬇ Download
-          </a>
+          </button>
           <button className="books-modal-close" onClick={onClose}>x</button>
         </div>
-        <div className="dm-preview-body">{body}</div>
+        <div className="dm-preview-body" style={{ height: 'calc(85vh - 52px)' }}>
+          {body}
+        </div>
       </div>
     </div>
   );
@@ -315,18 +330,25 @@ export default function UploadMaterialsPage() {
   };
 
   // ── Drag & drop ───────────────────────────────────────────────────────
-  const onDragOver  = (e) => { e.preventDefault(); setDragOver(true); };
-  const onDragLeave = ()  => setDragOver(false);
+  const onDragOver  = (e) => { e.preventDefault(); e.stopPropagation(); setDragOver(true); };
+  const onDragEnter = (e) => { e.preventDefault(); e.stopPropagation(); setDragOver(true); };
+  const onDragLeave = (e) => { e.stopPropagation(); setDragOver(false); };
   const onDrop      = (e) => {
     e.preventDefault();
+    e.stopPropagation();
     setDragOver(false);
-    queueFiles(e.dataTransfer.files);
+    if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+      queueFiles(e.dataTransfer.files);
+      e.dataTransfer.clearData();
+    }
   };
 
   // ── Browse ────────────────────────────────────────────────────────────
   const onBrowse = (e) => {
     queueFiles(e.target.files);
-    e.target.value = ''; // reset so same file can be re-selected after error
+    // Always reset input so same file can be reselected after error/failure
+    e.target.value = '';
+    if (fileInputRef.current) fileInputRef.current.value = '';
   };
 
   const removeFile = (id) => {
@@ -566,9 +588,13 @@ export default function UploadMaterialsPage() {
         <div
           className={`dm-dropzone ${dragOver ? 'drag-over' : ''}`}
           onDragOver={onDragOver}
+          onDragEnter={onDragEnter}
           onDragLeave={onDragLeave}
           onDrop={onDrop}
           onClick={() => fileInputRef.current?.click()}
+          role="button"
+          tabIndex={0}
+          onKeyDown={(e) => e.key === 'Enter' && fileInputRef.current?.click()}
         >
           <div className="dm-dropzone-icon">☁️</div>
           <p className="dm-dropzone-title">Drag &amp; Drop Files Here</p>
@@ -700,12 +726,14 @@ export default function UploadMaterialsPage() {
                         flexWrap: 'wrap' }}>
             <button
               className="books-btn books-btn-primary"
-              onClick={uploadAll}
+              onClick={hasErrors && !hasPending ? retryFailed : uploadAll}
               disabled={uploading || (!hasPending && !hasErrors)}
             >
               {uploading
                 ? 'Uploading...'
-                : `Upload ${pendingFiles.filter((f) => f.status === 'pending').length} File(s)`}
+                : hasErrors && !hasPending
+                  ? `↺ Retry ${pendingFiles.filter((f) => f.status === 'error').length} Failed File(s)`
+                  : `Upload ${pendingFiles.filter((f) => f.status === 'pending').length} File(s)`}
             </button>
             {/* FIX: folder hint shown INSIDE step 2, next to upload button */}
             {!selectedFolderId && (
@@ -846,15 +874,29 @@ export default function UploadMaterialsPage() {
                         className="books-btn books-btn-sm books-btn-ghost"
                         onClick={() => setPreviewFile(file)}
                       ><span style={{display:"inline-flex",alignItems:"center",gap:4}}><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg> View</span></button>
-                      {/* FIX: Download uses absolute Spring URL */}
-                      <a
-                        href={absUrl}
-                        download={file.fileName}
+                      {/* Force download via fetch+blob */}
+                      <button
                         className="books-btn books-btn-sm books-btn-ghost"
-                        onClick={(e) => e.stopPropagation()}
+                        onClick={async (e) => {
+                          e.stopPropagation();
+                          try {
+                            const res = await fetch(absUrl);
+                            const blob = await res.blob();
+                            const blobUrl = window.URL.createObjectURL(blob);
+                            const a = document.createElement('a');
+                            a.href = blobUrl;
+                            a.download = file.fileName;
+                            document.body.appendChild(a);
+                            a.click();
+                            a.remove();
+                            window.URL.revokeObjectURL(blobUrl);
+                          } catch {
+                            window.open(absUrl, '_blank');
+                          }
+                        }}
                       >
                         ⬇ Download
-                      </a>
+                      </button>
                       <button
                         className="books-btn books-btn-sm books-btn-danger"
                         onClick={() => handleDeleteFile(file)}

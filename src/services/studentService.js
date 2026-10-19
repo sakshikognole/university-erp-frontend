@@ -1,29 +1,42 @@
 import { springApi } from './api';
 import axios from 'axios';
 
-// springApi interceptor returns res.data directly (the response body).
-// Spring /api/students returns a Page object: { content: [...], totalElements: N, ... }
-// We need to handle both paginated and raw array responses, and fetch ALL pages.
+// ── Node.js backend URL (where real students are stored) ──────────────────────
+const _IS_PROD = window.location.hostname !== 'localhost';
+const NODE_API  = _IS_PROD
+  ? 'https://university-erp-node.onrender.com/api'
+  : 'http://localhost:5000/api';
+
+// ── Map Node.js student fields → Spring-compatible field names used by Certificate/Handout
+function mapNodeStudent(s) {
+  return {
+    studentId:        s._id || s.prn,
+    studentName:      s.name,
+    gender:           s.gender || '',
+    prn:              s.prn,
+    division:         s.division || '',
+    yearOfEnrollment: s.yearOfEnrollment || '',
+    studyingYear:     s.class || '',
+    degreeProgramName: s.degree || '',
+    academicYear:     s.academicYear || '',
+    // Keep original fields too
+    name:   s.name,
+    class:  s.class,
+    degree: s.degree,
+    _id:    s._id,
+  };
+}
+
+// Fetch all students from Node.js backend (same source as Students feature)
 export async function getAllStudents() {
-  // First request to get total count
-  const firstRes = await springApi.get('/students', { params: { page: 0, size: 200 } });
-  // Handle both paginated { content:[], totalElements:N } and raw array
-  if (Array.isArray(firstRes)) return firstRes;
-  if (firstRes && Array.isArray(firstRes.content)) {
-    const total = firstRes.totalElements ?? firstRes.content.length;
-    const pageSize = 200;
-    const totalPages = Math.ceil(total / pageSize);
-    if (totalPages <= 1) return firstRes.content;
-    // Fetch remaining pages in parallel
-    const rest = await Promise.all(
-      Array.from({ length: totalPages - 1 }, (_, i) =>
-        springApi.get('/students', { params: { page: i + 1, size: pageSize } })
-          .then(r => (Array.isArray(r) ? r : r.content ?? []))
-      )
-    );
-    return [...firstRes.content, ...rest.flat()];
-  }
-  return firstRes.data ?? [];
+  const token = localStorage.getItem('erp_token');
+  const res = await fetch(`${NODE_API}/super-admin/students`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  if (!res.ok) throw new Error('Failed to load students');
+  const data = await res.json();
+  const students = Array.isArray(data) ? data : (data.students ?? data.content ?? []);
+  return students.map(mapNodeStudent);
 }
 
 export async function getStudentById(studentId) {
@@ -38,10 +51,19 @@ const SPRING_BASE = onLocalhost
   ? 'http://localhost:9090'
   : 'https://university-erp-spring.onrender.com';
 
-export async function getCertificatePdfUrl(studentId, customContent, docType) {
+export async function getCertificatePdfUrl(studentId, customContent, docType, student = {}) {
   const res = await axios.post(
     `${SPRING_BASE}/api/documents/bonafide`,
-    { studentId, customContent, docType },
+    {
+      studentId,
+      customContent,
+      docType,
+      studentName:       student.studentName       || '',
+      degreeProgramName: student.degreeProgramName || '',
+      studyingYear:      student.studyingYear      || '',
+      academicYear:      student.academicYear      || '',
+      gender:            student.gender            || '',
+    },
     { responseType: 'blob' },
   );
   return window.URL.createObjectURL(
@@ -49,10 +71,19 @@ export async function getCertificatePdfUrl(studentId, customContent, docType) {
   );
 }
 
-export async function downloadCertificatePdf(studentId, studentName, customContent, docType) {
+export async function downloadCertificatePdf(studentId, studentName, customContent, docType, student = {}) {
   const res = await axios.post(
     `${SPRING_BASE}/api/documents/bonafide`,
-    { studentId, customContent, docType },
+    {
+      studentId,
+      customContent,
+      docType,
+      studentName:       student.studentName       || studentName || '',
+      degreeProgramName: student.degreeProgramName || '',
+      studyingYear:      student.studyingYear      || '',
+      academicYear:      student.academicYear      || '',
+      gender:            student.gender            || '',
+    },
     { responseType: 'blob' },
   );
   const url      = window.URL.createObjectURL(
