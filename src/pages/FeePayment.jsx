@@ -89,6 +89,42 @@ const loadRazorpayScript = () => {
   });
 };
 
+// Mobile accordion card for Fee Payment
+function FeeMobCard({ record, num, processingId, onPay, onReceipt, expanded, onToggle }) {
+  const isRowProcessing = processingId === record._id;
+  const statusBg = record.status === 'PAID' ? '#dcfce7' : record.status === 'PARTIAL' ? '#fef3c7' : '#fee2e2';
+  const statusClr = record.status === 'PAID' ? '#15803d' : record.status === 'PARTIAL' ? '#b45309' : '#b91c1c';
+  return (
+    <div className="mob-card">
+      <button type="button" className="mob-card-header" onClick={onToggle} aria-expanded={expanded}>
+        <div className="mob-card-summary">
+          <span className="mob-card-num">{num}</span>
+          <div className="mob-card-title-wrap">
+            <span className="mob-card-title">{record.feeType || 'Academic Fee'}</span>
+            <span className="mob-card-sub" style={{color: record.status === 'PAID' ? '#15803d' : '#b91c1c'}}>{record.status || 'PENDING'}</span>
+          </div>
+        </div>
+        <span className="mob-card-chevron">{expanded ? '▲' : '▼'}</span>
+      </button>
+      {expanded && (
+        <div className="mob-card-details">
+          <div className="mob-card-row"><span className="mob-card-label">Total fee</span><span className="mob-card-value" style={{fontWeight:600}}>₹{(record.totalFeeAmount||0).toLocaleString('en-IN')}</span></div>
+          <div className="mob-card-row"><span className="mob-card-label">Discount</span><span className="mob-card-value" style={{color:'#047857'}}>{(record.discountAmount||0) > 0 ? `- ₹${(record.discountAmount||0).toLocaleString('en-IN')}` : '₹0'}</span></div>
+          <div className="mob-card-row"><span className="mob-card-label">Paid</span><span className="mob-card-value" style={{color:'#2563eb',fontWeight:600}}>₹{(record.paidAmount||0).toLocaleString('en-IN')}</span></div>
+          <div className="mob-card-row"><span className="mob-card-label">Remaining</span><span className="mob-card-value" style={{fontWeight:700,color:record.remainingAmount===0?'#047857':'#dc2626'}}>₹{(record.remainingAmount||0).toLocaleString('en-IN')}</span></div>
+          <div className="mob-card-row"><span className="mob-card-label">Status</span><span className="mob-card-value"><span style={{padding:'2px 10px',borderRadius:'12px',fontSize:'0.78rem',fontWeight:600,backgroundColor:statusBg,color:statusClr}}>{record.status||'PENDING'}</span></span></div>
+          <div className="mob-card-actions">
+            {record.remainingAmount > 0
+              ? <button type="button" className="books-btn books-btn-primary" onClick={onPay} disabled={isRowProcessing} style={{flex:1,justifyContent:'center'}}>{isRowProcessing ? '...' : 'Pay'}</button>
+              : <button type="button" className="btn btn-secondary" onClick={onReceipt} style={{flex:1,justifyContent:'center'}}>Receipt</button>
+            }
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
 const FeePayment = () => {
   const navigate = useNavigate();
   const [feeRecords, setFeeRecords] = useState(() => {
@@ -109,6 +145,7 @@ const FeePayment = () => {
   // Pagination State
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(10);
+  const [feeExpanded, setFeeExpanded] = useState(null);
 
   const authHeader = () => {
     const token = localStorage.getItem('erp_token');
@@ -422,6 +459,7 @@ const FeePayment = () => {
             </div>
           ) : (
             <>
+              <div className="fee-desk-table">
               <table className="data-table">
                 <thead>
                   <tr>
@@ -576,6 +614,24 @@ const FeePayment = () => {
                 </tbody>
               </table>
 
+              </div>
+              <div className="fee-mob-list">
+                {currentRecords.map((record, index) => {
+                  const isSelected = selectedRecord && selectedRecord._id === record._id;
+                  return (
+                    <FeeMobCard
+                      key={record._id || index}
+                      record={record}
+                      num={startIndex + index + 1}
+                      processingId={processingId}
+                      onPay={() => handlePay(record)}
+                      onReceipt={() => navigate("/fee-payment/success", { state: { receipt: { receiptNumber: "RCP-PAID-COMPLETED", transactionId: "TXN_VERIFIED_ONLINE", razorpayPaymentId: "pay_verified_razorpay", feeType: record.feeType || "Tuition & Academic Fee", totalFeeAmount: record.totalFeeAmount, discountAmount: record.discountAmount || 0, amountPaidThisTransaction: record.paidAmount, totalPaidSoFar: record.paidAmount, remainingBalance: 0, status: "PAID", paymentMethod: "Razorpay", paidAt: new Date().toISOString() } } })}
+                      expanded={feeExpanded === (record._id || index)}
+                      onToggle={() => setFeeExpanded(prev => prev === (record._id || index) ? null : (record._id || index))}
+                    />
+                  );
+                })}
+              </div>
               {/* Pagination Controls */}
               {totalPages > 0 && (
                 <div className="pagination-controls">

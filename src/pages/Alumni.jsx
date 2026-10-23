@@ -115,6 +115,38 @@ const exportPDF = (rows, setFeedback) => {
 };
 // ─────────────────────────────────────────────────────────────────────────────
 
+// Mobile accordion card
+function AlmMobCard({ a, num, onEdit, onDelete, expanded, onToggle }) {
+  return (
+    <div className="mob-card">
+      <button type="button" className="mob-card-header" onClick={onToggle} aria-expanded={expanded}>
+        <div className="mob-card-summary">
+          <span className="mob-card-num">{num}</span>
+          <div className="mob-card-title-wrap">
+            <span className="mob-card-title">{a.name}</span>
+            <span className="mob-card-sub">{a.alumniId} — {a.graduationYear}</span>
+          </div>
+        </div>
+        <span className="mob-card-chevron">{expanded ? '▲' : '▼'}</span>
+      </button>
+      {expanded && (
+        <div className="mob-card-details">
+          <div className="mob-card-row"><span className="mob-card-label">Alumni ID</span><span className="mob-card-value mono">{a.alumniId}</span></div>
+          <div className="mob-card-row"><span className="mob-card-label">Year</span><span className="mob-card-value">{a.graduationYear || '—'}</span></div>
+          <div className="mob-card-row"><span className="mob-card-label">Job Title</span><span className="mob-card-value">{a.jobTitle || '—'}</span></div>
+          <div className="mob-card-row"><span className="mob-card-label">Company</span><span className="mob-card-value">{a.currentCompany || '—'}</span></div>
+          <div className="mob-card-row"><span className="mob-card-label">Email</span><span className="mob-card-value">{a.email || '—'}</span></div>
+          <div className="mob-card-row"><span className="mob-card-label">Phone</span><span className="mob-card-value">{a.phone || '—'}</span></div>
+          <div className="mob-card-actions">
+            <button type="button" className="action-btn edit-btn" onClick={onEdit}><span className="action-label">Edit</span></button>
+            <button type="button" className="action-btn delete-btn" onClick={onDelete}><span className="action-label">Delete</span></button>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
 const Alumni = () => {
   const navigate = useNavigate();
 
@@ -126,6 +158,7 @@ const Alumni = () => {
   const [feedback,  setFeedback]  = useState({ type: '', message: '' });
   const [showDownloadMenu, setShowDownloadMenu] = useState(false);
   const [deleteConfirm,    setDeleteConfirm]    = useState(null);
+  const [almExpanded, setAlmExpanded] = useState(null);
   const downloadMenuRef = useRef(null);
 
   // Performance: keep a ref to the active fetch so we can abort on unmount /
@@ -333,6 +366,7 @@ const Alumni = () => {
             </div>
           ) : (
             <>
+              <div className="alm-desk-table">
               <table className="data-table">
                 <thead>
                   <tr>
@@ -384,6 +418,20 @@ const Alumni = () => {
                   ))}
                 </tbody>
               </table>
+              </div>
+              <div className="alm-mob-list">
+                {currentItems.map((a, i) => (
+                  <AlmMobCard
+                    key={a._id || a.alumniId}
+                    a={a}
+                    num={startIndex + i + 1}
+                    onEdit={() => navigate(`/alumni/edit/${a._id || a.alumniId}`)}
+                    onDelete={() => setDeleteConfirm({ id: a._id || a.alumniId, name: a.name })}
+                    expanded={almExpanded === (a._id || a.alumniId)}
+                    onToggle={() => setAlmExpanded(prev => prev === (a._id || a.alumniId) ? null : (a._id || a.alumniId))}
+                  />
+                ))}
+              </div>
 
               {totalPages > 1 && (
                 <div className="pagination-controls">

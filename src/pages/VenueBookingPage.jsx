@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
+import { Eye, Edit, Trash2 } from 'lucide-react';
 import {
   venueBookingService,
   fetchEvents,
@@ -681,12 +682,30 @@ export default function VenueBookingPage() {
                         {/* D4: Actions always visible — not pushed off-screen */}
                         <td style={{ textAlign: 'center' }}>
                           <div className="books-actions" style={{ justifyContent: 'center' }}>
-                            <button className="books-btn books-btn-sm books-btn-ghost"
-                                    onClick={() => setViewBooking(b)}><span style={{display:"inline-flex",alignItems:"center",gap:4}}><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg> View</span></button>
-                            <button className="books-btn books-btn-sm books-btn-ghost"
-                                    onClick={() => setEditBooking(b)}><span style={{display:"inline-flex",alignItems:"center",gap:4}}><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg> Edit</span></button>
-                            <button className="books-btn books-btn-sm books-btn-danger"
-                                    onClick={() => handleDelete(b)}><span style={{display:"inline-flex",alignItems:"center",gap:4}}><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg> Delete</span></button>
+                            <button
+                              type="button"
+                              className="action-btn view-btn"
+                              title="View Booking"
+                              onClick={() => setViewBooking(b)}
+                            >
+                              <Eye size={14} /><span className="action-label">View</span>
+                            </button>
+                            <button
+                              type="button"
+                              className="action-btn edit-btn"
+                              title="Edit Booking"
+                              onClick={() => setEditBooking(b)}
+                            >
+                              <Edit size={14} /><span className="action-label">Edit</span>
+                            </button>
+                            <button
+                              type="button"
+                              className="action-btn delete-btn"
+                              title="Delete Booking"
+                              onClick={() => handleDelete(b)}
+                            >
+                              <Trash2 size={14} /><span className="action-label">Delete</span>
+                            </button>
                           </div>
                         </td>
                       </tr>
@@ -732,15 +751,30 @@ export default function VenueBookingPage() {
                       </div>
                     ))}
                     <div style={{ display: 'flex', gap: 8, marginTop: 10 }}>
-                      <button className="books-btn books-btn-sm books-btn-ghost"
-                              style={{ flex: 1 }}
-                              onClick={() => setViewBooking(b)}><span style={{display:"inline-flex",alignItems:"center",gap:4}}><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg> View</span></button>
-                      <button className="books-btn books-btn-sm books-btn-ghost"
-                              style={{ flex: 1 }}
-                              onClick={() => setEditBooking(b)}><span style={{display:"inline-flex",alignItems:"center",gap:4}}><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg> Edit</span></button>
-                      <button className="books-btn books-btn-sm books-btn-danger"
-                              style={{ flex: 1 }}
-                              onClick={() => handleDelete(b)}><span style={{display:"inline-flex",alignItems:"center",gap:4}}><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg> Delete</span></button>
+                      <button
+                        type="button"
+                        className="action-btn view-btn"
+                        style={{ flex: 1, justifyContent: 'center' }}
+                        onClick={() => setViewBooking(b)}
+                      >
+                        <Eye size={14} /><span className="action-label">View</span>
+                      </button>
+                      <button
+                        type="button"
+                        className="action-btn edit-btn"
+                        style={{ flex: 1, justifyContent: 'center' }}
+                        onClick={() => setEditBooking(b)}
+                      >
+                        <Edit size={14} /><span className="action-label">Edit</span>
+                      </button>
+                      <button
+                        type="button"
+                        className="action-btn delete-btn"
+                        style={{ flex: 1, justifyContent: 'center' }}
+                        onClick={() => handleDelete(b)}
+                      >
+                        <Trash2 size={14} /><span className="action-label">Delete</span>
+                      </button>
                     </div>
                   </div>
                 </div>

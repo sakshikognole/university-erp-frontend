@@ -103,6 +103,41 @@ const STATUS_CLASSES = {
   EXPIRED: 'status-pill status-pill-completed',
 };
 
+// Mobile accordion card for AlumniJobs
+function AjbMobCard({ j, num, fmtDate, isExpired, getJobStatus, STATUS_CLASSES, onEdit, onDelete, expanded, onToggle }) {
+  const status = getJobStatus(j);
+  return (
+    <div className="mob-card">
+      <button type="button" className="mob-card-header" onClick={onToggle} aria-expanded={expanded}>
+        <div className="mob-card-summary">
+          <span className="mob-card-num">{num}</span>
+          <div className="mob-card-title-wrap">
+            <span className="mob-card-title">{j.role} @ {j.company}</span>
+            <span className="mob-card-sub">{j.jobId}</span>
+          </div>
+        </div>
+        <span className="mob-card-chevron">{expanded ? '▲' : '▼'}</span>
+      </button>
+      {expanded && (
+        <div className="mob-card-details">
+          <div className="mob-card-row"><span className="mob-card-label">Job ID</span><span className="mob-card-value mono">{j.jobId}</span></div>
+          <div className="mob-card-row"><span className="mob-card-label">Alumni ID</span><span className="mob-card-value mono">{j.alumniId}</span></div>
+          <div className="mob-card-row"><span className="mob-card-label">Company</span><span className="mob-card-value">{j.company}</span></div>
+          <div className="mob-card-row"><span className="mob-card-label">Role</span><span className="mob-card-value">{j.role}</span></div>
+          <div className="mob-card-row"><span className="mob-card-label">Status</span><span className="mob-card-value"><span className={STATUS_CLASSES[status] || 'status-pill'}>{status}</span></span></div>
+          <div className="mob-card-row"><span className="mob-card-label">Posted</span><span className="mob-card-value">{fmtDate(j.datePosted)}</span></div>
+          <div className="mob-card-row"><span className="mob-card-label">Expiry</span><span className="mob-card-value" style={{color: isExpired(j.dateOfExpiry) ? '#ef4444' : 'inherit'}}>{fmtDate(j.dateOfExpiry)}</span></div>
+          {j.applicationLink && <div className="mob-card-row"><span className="mob-card-label">Apply</span><span className="mob-card-value"><a href={j.applicationLink} target="_blank" rel="noopener noreferrer">Link</a></span></div>}
+          <div className="mob-card-actions">
+            <button type="button" className="action-btn edit-btn" onClick={onEdit}><span className="action-label">Edit</span></button>
+            <button type="button" className="action-btn delete-btn" onClick={onDelete}><span className="action-label">Delete</span></button>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
 const AlumniJobs = () => {
   const navigate = useNavigate();
   const [jobs, setJobs] = useState([]);
@@ -115,6 +150,7 @@ const AlumniJobs = () => {
   const [feedback, setFeedback] = useState({ type: '', message: '' });
   const [showDownloadMenu, setShowDownloadMenu] = useState(false);
   const [deleteConfirm, setDeleteConfirm] = useState(null);
+  const [ajbExpanded, setAjbExpanded] = useState(null);
   const downloadMenuRef = useRef(null);
 
   const [currentPage, setCurrentPage] = useState(1);
@@ -334,6 +370,7 @@ const AlumniJobs = () => {
             </div>
           ) : (
             <>
+              <div className="ajb-desk-table">
               <table className="data-table">
                 <thead>
                   <tr>
@@ -410,7 +447,7 @@ const AlumniJobs = () => {
                             title="Delete"
                             onClick={() => setDeleteConfirm({ id: j._id || j.jobId, label: `${j.role} @ ${j.company}` })}
                           >
-                            <Trash2 size={14} />
+                            <Trash2 size={14} /><span className="action-label">Delete</span>
                           </button>
                         </div>
                       </td>
@@ -418,6 +455,24 @@ const AlumniJobs = () => {
                   ))}
                 </tbody>
               </table>
+              </div>
+              <div className="ajb-mob-list">
+                {current.map((j, i) => (
+                  <AjbMobCard
+                    key={j._id || j.jobId}
+                    j={j}
+                    num={startIndex + i + 1}
+                    fmtDate={fmtDate}
+                    isExpired={isExpired}
+                    getJobStatus={getJobStatus}
+                    STATUS_CLASSES={STATUS_CLASSES}
+                    onEdit={() => navigate(`/alumni-jobs/edit/${j._id || j.jobId}`)}
+                    onDelete={() => setDeleteConfirm({ id: j._id || j.jobId, label: `${j.role} @ ${j.company}` })}
+                    expanded={ajbExpanded === (j._id || j.jobId)}
+                    onToggle={() => setAjbExpanded(prev => prev === (j._id || j.jobId) ? null : (j._id || j.jobId))}
+                  />
+                ))}
+              </div>
 
               {totalPages > 1 && (
                 <div className="pagination-controls">

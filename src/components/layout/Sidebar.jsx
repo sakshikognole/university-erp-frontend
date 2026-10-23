@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { NavLink } from 'react-router-dom';
 import { navigationConfig } from '../../config/navigationConfig';
 import { X, GraduationCap } from 'lucide-react';
@@ -6,13 +6,26 @@ import { X, GraduationCap } from 'lucide-react';
 const Sidebar = ({ isOpen, toggleSidebar, isCollapsed, role = 'SUPER_ADMIN' }) => {
   const links = navigationConfig[role] || [];
 
+  // Lock background body scroll when mobile sidebar is open
+  useEffect(() => {
+    if (isOpen && window.innerWidth <= 768) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+    return () => {
+      document.body.style.overflow = '';
+    };
+  }, [isOpen]);
+
   return (
+
     <>
       {/* Mobile overlay */}
       {isOpen && <div className="sidebar-overlay" onClick={toggleSidebar}></div>}
-      
+
       <aside className={`sidebar ${isOpen ? 'open' : ''} ${isCollapsed ? 'collapsed' : ''}`}>
-        
+
         {/* Desktop Header Logo */}
         <div className="sidebar-header">
           <div className="logo-container">
@@ -27,15 +40,15 @@ const Sidebar = ({ isOpen, toggleSidebar, isCollapsed, role = 'SUPER_ADMIN' }) =
             <X size={24} />
           </button>
         </div>
-        
+
         <nav className="sidebar-nav">
           <ul className="nav-list">
             {links.map((link) => {
               const Icon = link.icon;
               return (
                 <li key={link.path} className="nav-item">
-                  <NavLink 
-                    to={link.path} 
+                  <NavLink
+                    to={link.path}
                     className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}
                     onClick={() => {
                       // Close sidebar on mobile when a link is clicked

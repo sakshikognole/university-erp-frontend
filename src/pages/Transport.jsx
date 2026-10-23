@@ -21,6 +21,69 @@ import {
 const _IS_PROD = window.location.hostname !== 'localhost';
 const API_BASE_URL = _IS_PROD ? 'https://university-erp-node.onrender.com/api' : 'http://localhost:5000/api';
 
+// Mobile accordion card for Transport (all 4 tabs)
+function TrnMobCard({ item, tab, num, navigate, setDeleteConfirm, expanded, onToggle }) {
+  const fmtDate = d => d ? new Date(d).toLocaleDateString() : '\u2014';
+  let title = '', sub = '';
+  if (tab === 'routes')  { title = item.routeName || `Route #${item.routeId}`; sub = item.routeId; }
+  if (tab === 'drivers') { title = item.name; sub = item.driverId; }
+  if (tab === 'vehicles'){ title = item.name; sub = item.vehicleId; }
+  if (tab === 'passes')  { title = item.studentName || item.studentId; sub = item.passId; }
+  const editPath =
+    tab === 'routes'   ? `/transport/edit-route/${item._id || item.routeId}` :
+    tab === 'drivers'  ? `/transport/edit-driver/${item._id || item.driverId}` :
+    tab === 'vehicles' ? `/transport/edit-vehicle/${item._id || item.vehicleId}` :
+    `/transport/edit-bus-pass/${item._id || item.passId}`;
+  return (
+    <div className="mob-card">
+      <button type="button" className="mob-card-header" onClick={onToggle} aria-expanded={expanded}>
+        <div className="mob-card-summary">
+          <span className="mob-card-num">{num}</span>
+          <div className="mob-card-title-wrap">
+            <span className="mob-card-title">{title}</span>
+            <span className="mob-card-sub">{sub}</span>
+          </div>
+        </div>
+        <span className="mob-card-chevron">{expanded ? '\u25b2' : '\u25bc'}</span>
+      </button>
+      {expanded && (
+        <div className="mob-card-details">
+          {tab === 'routes' && <>
+            <div className="mob-card-row"><span className="mob-card-label">Route ID</span><span className="mob-card-value mono">{item.routeId}</span></div>
+            <div className="mob-card-row"><span className="mob-card-label">Driver</span><span className="mob-card-value">{item.driverName || '\u2014'}</span></div>
+            <div className="mob-card-row"><span className="mob-card-label">Vehicle</span><span className="mob-card-value">{item.vehicleName || '\u2014'}</span></div>
+            <div className="mob-card-row"><span className="mob-card-label">Stops</span><span className="mob-card-value">{(item.stops||[]).join(', ') || '\u2014'}</span></div>
+          </>}
+          {tab === 'drivers' && <>
+            <div className="mob-card-row"><span className="mob-card-label">Driver ID</span><span className="mob-card-value mono">{item.driverId}</span></div>
+            <div className="mob-card-row"><span className="mob-card-label">Phone</span><span className="mob-card-value">{item.phone || '\u2014'}</span></div>
+            <div className="mob-card-row"><span className="mob-card-label">License</span><span className="mob-card-value">{item.licenseNumber || '\u2014'}</span></div>
+            <div className="mob-card-row"><span className="mob-card-label">Status</span><span className="mob-card-value"><span style={{padding:'2px 8px',borderRadius:'12px',fontSize:'0.78rem',fontWeight:600,backgroundColor:item.status==='ACTIVE'?'#dcfce7':'#fee2e2',color:item.status==='ACTIVE'?'#15803d':'#b91c1c'}}>{item.status}</span></span></div>
+          </>}
+          {tab === 'vehicles' && <>
+            <div className="mob-card-row"><span className="mob-card-label">Vehicle ID</span><span className="mob-card-value mono">{item.vehicleId}</span></div>
+            <div className="mob-card-row"><span className="mob-card-label">Plate</span><span className="mob-card-value">{item.vehicleNumber || '\u2014'}</span></div>
+            <div className="mob-card-row"><span className="mob-card-label">Capacity</span><span className="mob-card-value">{item.capacity || '\u2014'}</span></div>
+            <div className="mob-card-row"><span className="mob-card-label">Status</span><span className="mob-card-value"><span style={{padding:'2px 8px',borderRadius:'12px',fontSize:'0.78rem',fontWeight:600,backgroundColor:item.status==='ACTIVE'?'#dcfce7':'#fef3c7',color:item.status==='ACTIVE'?'#15803d':'#b45309'}}>{item.status}</span></span></div>
+          </>}
+          {tab === 'passes' && <>
+            <div className="mob-card-row"><span className="mob-card-label">Pass ID</span><span className="mob-card-value mono">{item.passId}</span></div>
+            <div className="mob-card-row"><span className="mob-card-label">Student ID</span><span className="mob-card-value">{item.studentId}</span></div>
+            <div className="mob-card-row"><span className="mob-card-label">Route</span><span className="mob-card-value mono">Route #{item.routeId}</span></div>
+            <div className="mob-card-row"><span className="mob-card-label">Stops</span><span className="mob-card-value">{item.fromStop} \u2192 {item.toStop}</span></div>
+            <div className="mob-card-row"><span className="mob-card-label">Payment</span><span className="mob-card-value"><span style={{padding:'2px 8px',borderRadius:'12px',fontSize:'0.78rem',fontWeight:600,backgroundColor:item.paymentStatus==='PAID'?'#dcfce7':'#fee2e2',color:item.paymentStatus==='PAID'?'#15803d':'#b91c1c'}}>{item.paymentStatus}</span></span></div>
+            <div className="mob-card-row"><span className="mob-card-label">Valid till</span><span className="mob-card-value">{fmtDate(item.validTill)}</span></div>
+          </>}
+          <div className="mob-card-actions">
+            <button type="button" className="action-btn edit-btn" onClick={() => navigate(editPath)}><span className="action-label">Edit</span></button>
+            <button type="button" className="action-btn delete-btn" onClick={() => setDeleteConfirm({ type: tab === 'passes' ? 'pass' : tab.slice(0,-1), item })}><span className="action-label">Delete</span></button>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
 const Transport = () => {
   const navigate = useNavigate();
 
@@ -32,6 +95,7 @@ const Transport = () => {
   const [loading,  setLoading]  = useState(true);
   const [deleting, setDeleting] = useState(false);
   const [deleteConfirm, setDeleteConfirm] = useState(null);
+  const [trnExpanded, setTrnExpanded] = useState(null);
 
   const [search,   setSearch]   = useState('');
   const [feedback, setFeedback] = useState({ type: '', message: '' });
@@ -285,6 +349,8 @@ const Transport = () => {
             <>
               {/* D1: transport-table gives centered <th> to route + vehicle tables */}
               {activeTab === 'routes' && (
+              <>
+              <div className="trn-desk-table">
                 <table className="data-table transport-table">
                   <thead>
                     <tr>
@@ -340,9 +406,18 @@ const Transport = () => {
                     ))}
                   </tbody>
                 </table>
+              </div>
+              <div className="trn-mob-list">
+                {paginatedData.map((item, i) => {
+                  const id = item._id || item.routeId || i;
+                  return <TrnMobCard key={id} item={item} tab="routes" num={startIndex + i + 1} navigate={navigate} setDeleteConfirm={setDeleteConfirm} expanded={trnExpanded === id} onToggle={() => setTrnExpanded(p => p === id ? null : id)} />;
+                })}
+              </div>
+              </>
               )}
-
               {activeTab === 'drivers' && (
+              <>
+              <div className="trn-desk-table">
                 <table className="data-table transport-table">
                   <thead>
                     <tr>
@@ -382,10 +457,19 @@ const Transport = () => {
                     ))}
                   </tbody>
                 </table>
+              </div>
+              <div className="trn-mob-list">
+                {paginatedData.map((item, i) => {
+                  const id = item._id || item.driverId || i;
+                  return <TrnMobCard key={id} item={item} tab="drivers" num={startIndex + i + 1} navigate={navigate} setDeleteConfirm={setDeleteConfirm} expanded={trnExpanded === id} onToggle={() => setTrnExpanded(p => p === id ? null : id)} />;
+                })}
+              </div>
+              </>
               )}
 
-              {/* D4: transport-table gives centered <th> */}
               {activeTab === 'vehicles' && (
+              <>
+              <div className="trn-desk-table">
                 <table className="data-table transport-table">
                   <thead>
                     <tr>
@@ -425,9 +509,19 @@ const Transport = () => {
                     ))}
                   </tbody>
                 </table>
+              </div>
+              <div className="trn-mob-list">
+                {paginatedData.map((item, i) => {
+                  const id = item._id || item.vehicleId || i;
+                  return <TrnMobCard key={id} item={item} tab="vehicles" num={startIndex + i + 1} navigate={navigate} setDeleteConfirm={setDeleteConfirm} expanded={trnExpanded === id} onToggle={() => setTrnExpanded(p => p === id ? null : id)} />;
+                })}
+              </div>
+              </>
               )}
 
               {activeTab === 'passes' && (
+              <>
+              <div className="trn-desk-table">
                 <table className="data-table transport-table">
                   <thead>
                     <tr>
@@ -475,6 +569,14 @@ const Transport = () => {
                     ))}
                   </tbody>
                 </table>
+              </div>
+              <div className="trn-mob-list">
+                {paginatedData.map((item, i) => {
+                  const id = item._id || item.passId || i;
+                  return <TrnMobCard key={id} item={item} tab="passes" num={startIndex + i + 1} navigate={navigate} setDeleteConfirm={setDeleteConfirm} expanded={trnExpanded === id} onToggle={() => setTrnExpanded(p => p === id ? null : id)} />;
+                })}
+              </div>
+              </>
               )}
 
               {totalPages > 1 && (

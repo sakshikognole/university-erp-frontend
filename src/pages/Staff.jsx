@@ -21,6 +21,36 @@ import { exportStaff } from '../utils/exportUtils';
 const _IS_PROD = window.location.hostname !== 'localhost';
 const API_BASE_URL = _IS_PROD ? 'https://university-erp-node.onrender.com/api' : 'http://localhost:5000/api';
 
+
+// Mobile accordion card
+function StfMobCard({ staff, num, formatDate, onEdit, expanded, onToggle }) {
+  return (
+    <div className="mob-card">
+      <button type="button" className="mob-card-header" onClick={onToggle} aria-expanded={expanded}>
+        <div className="mob-card-summary">
+          <span className="mob-card-num">{num}</span>
+          <div className="mob-card-title-wrap">
+            <span className="mob-card-title">{staff.name}</span>
+            <span className="mob-card-sub">{staff.role || staff.staffId}</span>
+          </div>
+        </div>
+        <span className="mob-card-chevron">{expanded ? '\u25b2' : '\u25bc'}</span>
+      </button>
+      {expanded && (
+        <div className="mob-card-details">
+          <div className="mob-card-row"><span className="mob-card-label">Staff ID</span><span className="mob-card-value mono">{staff.staffId}</span></div>
+          <div className="mob-card-row"><span className="mob-card-label">Email</span><span className="mob-card-value">{staff.email || '\u2014'}</span></div>
+          <div className="mob-card-row"><span className="mob-card-label">Phone</span><span className="mob-card-value">{staff.phone || '\u2014'}</span></div>
+          <div className="mob-card-row"><span className="mob-card-label">Role</span><span className="mob-card-value">{staff.role || '\u2014'}</span></div>
+          <div className="mob-card-row"><span className="mob-card-label">Join date</span><span className="mob-card-value">{formatDate(staff.dateOfJoining)}</span></div>
+          <div className="mob-card-actions">
+            <button type="button" className="action-btn edit-btn" onClick={onEdit}><span className="action-label">Edit</span></button>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
 const Staff = () => {
   const navigate = useNavigate();
   const [staffList, setStaffList] = useState([]);
@@ -33,6 +63,7 @@ const Staff = () => {
   // Pagination state
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(10);
+  const [stfExpanded, setStfExpanded] = useState(null);
 
   const authHeader = () => {
     const token = localStorage.getItem('erp_token');
@@ -257,6 +288,7 @@ const Staff = () => {
             </div>
           ) : (
             <>
+              <div className="stf-desk-table">
               <table className="data-table">
                 <thead>
                   <tr>
@@ -301,6 +333,20 @@ const Staff = () => {
                   ))}
                 </tbody>
               </table>
+              </div>
+              <div className="stf-mob-list">
+                {currentStaff.map((staff, index) => (
+                  <StfMobCard
+                    key={staff._id || staff.staffId || index}
+                    staff={staff}
+                    num={startIndex + index + 1}
+                    formatDate={formatDate}
+                    onEdit={() => navigate(`/staff/edit/${staff._id || staff.staffId}`)}
+                    expanded={stfExpanded === (staff._id || staff.staffId || index)}
+                    onToggle={() => setStfExpanded(prev => prev === (staff._id || staff.staffId || index) ? null : (staff._id || staff.staffId || index))}
+                  />
+                ))}
+              </div>
 
               {totalPages > 1 && (
                 <div className="pagination-controls">

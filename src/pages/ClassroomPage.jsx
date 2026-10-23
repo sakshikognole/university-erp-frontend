@@ -210,6 +210,38 @@ function ClassroomModal({ isOpen, mode, classroom, onSave, onClose, saving }) {
 }
 
 // Main Page
+// Mobile accordion card for Classroom
+function ClsMobCard({ c, num, onEdit, onDelete, deleting, expanded, onToggle }) {
+  return (
+    <div className="mob-card">
+      <button type="button" className="mob-card-header" onClick={onToggle} aria-expanded={expanded}>
+        <div className="mob-card-summary">
+          <span className="mob-card-num">{num}</span>
+          <div className="mob-card-title-wrap">
+            <span className="mob-card-title">{c.classroomName}</span>
+            <span className="mob-card-sub">{c.classroomId}</span>
+          </div>
+        </div>
+        <span className="mob-card-chevron">{expanded ? '▲' : '▼'}</span>
+      </button>
+      {expanded && (
+        <div className="mob-card-details">
+          <div className="mob-card-row"><span className="mob-card-label">Classroom ID</span><span className="mob-card-value mono">{c.classroomId}</span></div>
+          <div className="mob-card-row"><span className="mob-card-label">Rows</span><span className="mob-card-value">{c.rows}</span></div>
+          <div className="mob-card-row"><span className="mob-card-label">Columns</span><span className="mob-card-value">{c.columns}</span></div>
+          <div className="mob-card-row"><span className="mob-card-label">Extra</span><span className="mob-card-value">{c.extra}</span></div>
+          <div className="mob-card-row"><span className="mob-card-label">Capacity</span><span className="mob-card-value" style={{fontWeight:700,color:'#065f46'}}>{c.capacity}</span></div>
+          <div className="mob-card-row"><span className="mob-card-label">Examiner</span><span className="mob-card-value">{c.examinerName || '—'}</span></div>
+          <div className="mob-card-actions">
+            <button className="books-btn books-btn-sm books-btn-warning" onClick={onEdit}><span className="action-label">Edit</span></button>
+            <button className="books-btn books-btn-sm books-btn-danger" onClick={onDelete} disabled={deleting === c.classroomId}>{deleting === c.classroomId ? '...' : <span className="action-label">Delete</span>}</button>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
 export default function ClassroomPage() {
   const [classrooms, setClassrooms] = useState([]);
   const [pageInfo, setPageInfo] = useState(DEFAULT_PAGE);
@@ -222,6 +254,7 @@ export default function ClassroomPage() {
   const [selClassroom, setSelClassroom] = useState(null);
   const [saving, setSaving] = useState(false);
   const [deleting, setDeleting] = useState(null);
+  const [clsExpanded, setClsExpanded] = useState(null);
   const [success, setSuccess] = useState('');
   const [error, setError] = useState('');
   
@@ -435,6 +468,7 @@ export default function ClassroomPage() {
       ) : (
         <>
           <div className="card" style={{ padding: '1rem' }}>
+          <div className="cls-desk-table">
             <div className="books-table-wrap">
               <table className="books-table">
                 <thead>
@@ -512,6 +546,21 @@ export default function ClassroomPage() {
                 </tbody>
               </table>
             </div>
+          </div>
+          <div className="cls-mob-list">
+            {classrooms.map((c, i) => (
+              <ClsMobCard
+                key={c.classroomId}
+                c={c}
+                num={page * size + i + 1}
+                onEdit={() => openEdit(c)}
+                onDelete={() => handleDelete(c)}
+                deleting={deleting}
+                expanded={clsExpanded === c.classroomId}
+                onToggle={() => setClsExpanded(prev => prev === c.classroomId ? null : c.classroomId)}
+              />
+            ))}
+          </div>
           </div>
 
           {/* Pagination */}

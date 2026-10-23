@@ -1,6 +1,7 @@
 import { springApi } from '../services/api';
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { useSearchParams } from 'react-router-dom';
+import { Eye, Edit, Trash2 } from 'lucide-react';
 import TeamForm from './TeamForm';
 import TeamDetails from './TeamDetails';
 
@@ -125,6 +126,86 @@ function AddRosterModal({ isOpen, teamId, onClose, onSuccess }) {
   );
 }
 
+// ── Mobile accordion card — same pattern as BooksPage ──────────────
+function SportTeamMobileCard({ team, index, isExpanded, onToggle, onView, onEdit, onDelete, deleting }) {
+  return (
+    <div className="book-mob-card">
+      {/* Tap header to expand/collapse */}
+      <button
+        type="button"
+        className="book-mob-header"
+        onClick={onToggle}
+        aria-expanded={isExpanded}
+      >
+        <div className="book-mob-summary">
+          <span className="book-mob-num">{index + 1}</span>
+          <div className="book-mob-title-wrap">
+            <span className="book-mob-title">{team.sportName || team.teamId}</span>
+            <span className="book-mob-author">Team ID: {team.teamId}</span>
+          </div>
+        </div>
+        <span className="book-mob-chevron">{isExpanded ? '▲' : '▼'}</span>
+      </button>
+
+      {/* Expanded details */}
+      {isExpanded && (
+        <div className="book-mob-details">
+          <div className="book-mob-row">
+            <span className="book-mob-label">Team ID</span>
+            <span className="book-mob-value mono">{team.teamId}</span>
+          </div>
+          <div className="book-mob-row">
+            <span className="book-mob-label">Sport Name</span>
+            <span className="book-mob-value">{team.sportName || '—'}</span>
+          </div>
+          <div className="book-mob-row">
+            <span className="book-mob-label">Coach Name</span>
+            <span className="book-mob-value">{team.coachName || '—'}</span>
+          </div>
+          <div className="book-mob-row">
+            <span className="book-mob-label">Captain Name</span>
+            <span className="book-mob-value">{team.captainName || '—'}</span>
+          </div>
+          <div className="book-mob-row">
+            <span className="book-mob-label">Roster</span>
+            <span className="book-mob-value">{team.roster ? team.roster.length : 0} student(s)</span>
+          </div>
+          <div className="book-mob-actions">
+            <button
+              type="button"
+              className="action-btn view-btn"
+              style={{ flex: 1, justifyContent: 'center' }}
+              title="View Team"
+              onClick={() => onView(team)}
+            >
+              <Eye size={14} /><span className="action-label">View</span>
+            </button>
+            <button
+              type="button"
+              className="action-btn edit-btn"
+              style={{ flex: 1, justifyContent: 'center' }}
+              title="Edit Team"
+              onClick={() => onEdit(team)}
+            >
+              <Edit size={14} /><span className="action-label">Edit</span>
+            </button>
+            <button
+              type="button"
+              className="action-btn delete-btn"
+              style={{ flex: 1, justifyContent: 'center' }}
+              title="Delete Team"
+              onClick={() => onDelete(team)}
+              disabled={deleting === team.teamId}
+            >
+              <Trash2 size={14} /><span className="action-label">{deleting === team.teamId ? '...' : 'Delete'}</span>
+            </button>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
 export default function SportTeamPage() {
   const [searchParams, setSearchParams] = useSearchParams();
   // ?team=T001 → shows TeamDetails; no param → shows list
@@ -142,6 +223,10 @@ export default function SportTeamPage() {
   const [dupError, setDupError] = useState('');
   const [rosterOpen,   setRosterOpen]   = useState(false);
   const [rosterTeamId, setRosterTeamId] = useState('');
+
+  // Mobile accordion — only one team expanded at a time (same as BooksPage)
+  const [expandedId, setExpandedId] = useState(null);
+  const toggleExpand = (id) => setExpandedId(prev => prev === id ? null : id);
 
   const load = useCallback(async (silent = false) => {
     if (!silent) setLoading(true);
@@ -290,50 +375,82 @@ export default function SportTeamPage() {
       ) : teams.length === 0 ? (
         <p className="st-empty">No sport teams yet. Click "+ Add Team" to get started.</p>
       ) : (
-        <div className="books-table-wrap">
-          <table className="books-table">
-            <thead>
-              <tr>
-                <th>Team id</th>
-                <th>Sport name</th>
-                <th>Coach name</th>
-                <th>Captain name</th>
-                <th>Roster</th>
-                <th>Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {teams.map((team) => (
-                <tr key={team.teamId}>
-                  <td>{team.teamId}</td>
-                  <td>{team.sportName}</td>
-                  <td>{team.coachName}</td>
-                  <td>{team.captainName}</td>
-                  <td>{team.roster ? team.roster.length : 0} student(s)</td>
-                  <td>
-                    <div className="books-actions">
-                      <button
-                        className="books-btn books-btn-sm books-btn-ghost"
-                        onClick={() => openView(team)}
-                      ><span style={{display:"inline-flex",alignItems:"center",gap:4}}><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg> View</span></button>
-                      <button
-                        className="books-btn books-btn-sm books-btn-ghost"
-                        onClick={() => openEdit(team)}
-                      ><span style={{display:"inline-flex",alignItems:"center",gap:4}}><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg> Edit</span></button>
-                      <button
-                        className="books-btn books-btn-sm books-btn-danger"
-                        onClick={() => handleDelete(team)}
-                        disabled={deleting === team.teamId}
-                      >
-                        {deleting === team.teamId ? 'Deleting...' : <span style={{display:"inline-flex",alignItems:"center",gap:4}}><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>Delete</span>}
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+        <>
+          {/* ── Mobile view — accordion cards (same as BooksPage, hidden on tablet/desktop) ── */}
+          <div className="book-mob-list">
+            {teams.map((team, i) => (
+              <SportTeamMobileCard
+                key={team.teamId}
+                team={team}
+                index={i}
+                isExpanded={expandedId === team.teamId}
+                onToggle={() => toggleExpand(team.teamId)}
+                onView={openView}
+                onEdit={openEdit}
+                onDelete={handleDelete}
+                deleting={deleting}
+              />
+            ))}
+          </div>
+
+          {/* ── Desktop/tablet view — full table (hidden on mobile) ── */}
+          <div className="book-desk-table">
+            <div className="books-table-wrap">
+              <table className="books-table">
+                <thead>
+                  <tr>
+                    <th>Team id</th>
+                    <th>Sport name</th>
+                    <th>Coach name</th>
+                    <th>Captain name</th>
+                    <th>Roster</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {teams.map((team) => (
+                    <tr key={team.teamId}>
+                      <td>{team.teamId}</td>
+                      <td>{team.sportName}</td>
+                      <td>{team.coachName}</td>
+                      <td>{team.captainName}</td>
+                      <td>{team.roster ? team.roster.length : 0} student(s)</td>
+                      <td>
+                        <div className="books-actions">
+                          <button
+                            type="button"
+                            className="action-btn view-btn"
+                            title="View Team"
+                            onClick={() => openView(team)}
+                          >
+                            <Eye size={14} /><span className="action-label">View</span>
+                          </button>
+                          <button
+                            type="button"
+                            className="action-btn edit-btn"
+                            title="Edit Team"
+                            onClick={() => openEdit(team)}
+                          >
+                            <Edit size={14} /><span className="action-label">Edit</span>
+                          </button>
+                          <button
+                            type="button"
+                            className="action-btn delete-btn"
+                            title="Delete Team"
+                            onClick={() => handleDelete(team)}
+                            disabled={deleting === team.teamId}
+                          >
+                            <Trash2 size={14} /><span className="action-label">{deleting === team.teamId ? 'Deleting...' : 'Delete'}</span>
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </>
       )}
 
       <TeamForm
