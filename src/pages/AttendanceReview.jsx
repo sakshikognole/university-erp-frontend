@@ -193,10 +193,13 @@ const AttendanceReview = () => {
 
         {/* Table header */}
         <div className="attendance-table-header">
-          <span style={{ flex: '0 0 60px' }}>#</span>
-          <span style={{ flex: '0 0 120px' }}>Roll No</span>
-          <span style={{ flex: 1 }}>Student Name</span>
-          <span style={{ flex: '0 0 110px', textAlign: 'center' }}>Status</span>
+          <span className="attendance-col-index">#</span>
+          <span className="attendance-col-roll">Roll No</span>
+          <span className="attendance-col-name">
+            <span className="attendance-header-desktop">Student Name</span>
+            <span className="attendance-header-mobile">Student Details</span>
+          </span>
+          <span className="attendance-col-action" style={{ textAlign: 'center' }}>Status</span>
         </div>
 
         {presentStudents.length === 0 ? (
@@ -219,36 +222,19 @@ const AttendanceReview = () => {
                 index % 2 === 0 ? 'attendance-row--even' : ''
               }`}
             >
-              <span
-                style={{
-                  flex: '0 0 60px',
-                  fontSize: '0.8125rem',
-                  color: 'var(--text-secondary)',
-                  fontWeight: '600',
-                }}
-              >
+              <span className="attendance-col-index attendance-review-index">
                 {index + 1}
               </span>
-              <span className="attendance-roll" style={{ flex: '0 0 120px' }}>
+              <span className="attendance-col-roll attendance-roll">
                 {student.rollNo}
               </span>
-              <span
-                style={{
-                  flex: 1,
-                  fontWeight: '500',
-                  color: 'var(--text-primary)',
-                  fontSize: '0.9rem',
-                }}
-              >
-                {student.name}
+              <span className="attendance-col-name">
+                <span className="attendance-student-name">{student.name}</span>
+                <span className="attendance-roll-mobile">
+                  #{index + 1} • Roll No: {student.rollNo}
+                </span>
               </span>
-              <span
-                style={{
-                  flex: '0 0 110px',
-                  display: 'flex',
-                  justifyContent: 'center',
-                }}
-              >
+              <span className="attendance-col-action">
                 <span className="att-present-pill">
                   <CheckCircle2 size={13} /> Present
                 </span>

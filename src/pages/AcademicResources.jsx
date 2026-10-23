@@ -4,6 +4,43 @@ import { FileText } from 'lucide-react';
 const _IS_PROD_AR = window.location.hostname !== 'localhost';
 const NODE_URL = _IS_PROD_AR ? 'https://university-erp-node.onrender.com/api' : 'http://localhost:5000/api';
 
+// Mobile accordion card
+function ResMobCard({ res, num, nodeUrl, onDelete, expanded, onToggle }) {
+  const fmtDate = d => new Date(d).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' });
+  const openFile = async () => {
+    const url = res.fileUrl.startsWith('/api') ? `${nodeUrl.replace('/api','')}${res.fileUrl}` : res.fileUrl;
+    try {
+      const resp = await fetch(url);
+      if (!resp.ok) { alert('File not available. Please delete this entry and re-upload the file.'); }
+      else { window.open(url, '_blank'); }
+    } catch { alert('Could not open file. Please try again.'); }
+  };
+  return (
+    <div className="mob-card">
+      <button type="button" className="mob-card-header" onClick={onToggle} aria-expanded={expanded}>
+        <div className="mob-card-summary">
+          <span className="mob-card-num">{num}</span>
+          <div className="mob-card-title-wrap">
+            <span className="mob-card-title">{res.title}</span>
+            <span className="mob-card-sub">{res.subject}</span>
+          </div>
+        </div>
+        <span className="mob-card-chevron">{expanded ? '▲' : '▼'}</span>
+      </button>
+      {expanded && (
+        <div className="mob-card-details">
+          <div className="mob-card-row"><span className="mob-card-label">Title</span><span className="mob-card-value">{res.title}</span></div>
+          <div className="mob-card-row"><span className="mob-card-label">Subject</span><span className="mob-card-value mono">{res.subject}</span></div>
+          <div className="mob-card-row"><span className="mob-card-label">Uploaded on</span><span className="mob-card-value">{fmtDate(res.createdAt)}</span></div>
+          <div className="mob-card-actions">
+            <button className="books-btn books-btn-sm books-btn-ghost" onClick={openFile}>Open</button>
+            <button className="books-btn books-btn-sm books-btn-danger" onClick={() => onDelete(res._id)}><span className="action-label">Delete</span></button>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
 const AcademicResources = () => {
   const [showForm, setShowForm] = useState(false);
   const [subject, setSubject] = useState('');
@@ -13,6 +50,7 @@ const AcademicResources = () => {
   const [loading, setLoading] = useState(false);
   const [fetching, setFetching] = useState(true);
   const [success, setSuccess] = useState('');
+  const [resExpanded, setResExpanded] = useState(null);
   const [error, setError] = useState('');
 
   useEffect(() => { fetchResources(); }, []);
@@ -162,6 +200,7 @@ const AcademicResources = () => {
         </div>
       ) : (
         <div className="card" style={{ padding: 0, overflow: 'hidden' }}>
+          <div className="res-desk-table">
           <div className="books-table-wrap">
             <table className="books-table">
               <thead>
@@ -214,6 +253,20 @@ const AcademicResources = () => {
                 ))}
               </tbody>
             </table>
+          </div>
+          </div>
+          <div className="res-mob-list">
+            {resources.map((res, i) => (
+              <ResMobCard
+                key={res._id}
+                res={res}
+                num={i + 1}
+                nodeUrl={NODE_URL}
+                onDelete={handleDelete}
+                expanded={resExpanded === res._id}
+                onToggle={() => setResExpanded(prev => prev === res._id ? null : res._id)}
+              />
+            ))}
           </div>
         </div>
       )}

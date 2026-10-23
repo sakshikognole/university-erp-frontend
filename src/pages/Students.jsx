@@ -35,6 +35,36 @@ const authHeader = () => {
   };
 };
 
+// ── Mobile accordion card ────────────────────────────────────────────────────
+function StuMobCard({ student, num, onEdit, expanded, onToggle }) {
+  return (
+    <div className="mob-card">
+      <button type="button" className="mob-card-header" onClick={onToggle} aria-expanded={expanded}>
+        <div className="mob-card-summary">
+          <span className="mob-card-num">{num}</span>
+          <div className="mob-card-title-wrap">
+            <span className="mob-card-title">{student.name}</span>
+            <span className="mob-card-sub">{student.prn}</span>
+          </div>
+        </div>
+        <span className="mob-card-chevron">{expanded ? '▲' : '▼'}</span>
+      </button>
+      {expanded && (
+        <div className="mob-card-details">
+          <div className="mob-card-row"><span className="mob-card-label">PRN</span><span className="mob-card-value mono">{student.prn}</span></div>
+          <div className="mob-card-row"><span className="mob-card-label">Class</span><span className="mob-card-value">{student.class || '—'}</span></div>
+          <div className="mob-card-row"><span className="mob-card-label">Division</span><span className="mob-card-value">{student.division || '—'}</span></div>
+          <div className="mob-card-row"><span className="mob-card-label">Degree</span><span className="mob-card-value">{student.degree || '—'}</span></div>
+          <div className="mob-card-row"><span className="mob-card-label">Year</span><span className="mob-card-value">{student.yearOfEnrollment || '—'}</span></div>
+          <div className="mob-card-actions">
+            <button type="button" className="action-btn edit-btn" onClick={onEdit}><Edit size={14} /><span className="action-label">Edit</span></button>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
 // ---------------------------------------------------------------------------
 // Students — list, search, filter, pagination
 // ---------------------------------------------------------------------------
@@ -72,6 +102,7 @@ const Students = () => {
   // ── Pagination ───────────────────────────────────────────────────────────
   const [currentPage, setCurrentPage]   = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(10);
+  const [stuExpanded, setStuExpanded]   = useState(null); // mobile accordion
 
   // ────────────────────────────────────────────────────────────────────────
   // Fetch all students once on mount.
@@ -450,6 +481,8 @@ const Students = () => {
             </div>
           ) : (
             <>
+              {/* ── Desktop table ── */}
+              <div className="stu-desk-table">
               <table className="data-table">
                 <thead>
                   <tr>
@@ -499,6 +532,20 @@ const Students = () => {
                   ))}
                 </tbody>
               </table>
+              </div>
+              {/* ── Mobile accordion cards ── */}
+              <div className="stu-mob-list">
+                {currentStudents.map((student, index) => (
+                  <StuMobCard
+                    key={student._id || student.prn || index}
+                    student={student}
+                    num={startIndex + index + 1}
+                    onEdit={() => navigate(`/students/edit/${student._id || student.prn}`)}
+                    expanded={stuExpanded === (student._id || student.prn)}
+                    onToggle={() => setStuExpanded(prev => prev === (student._id || student.prn) ? null : (student._id || student.prn))}
+                  />
+                ))}
+              </div>
 
               {/* ── Pagination ── */}
               {totalPages > 1 && (

@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
+import { Edit, Trash2 } from 'lucide-react';
 import { springApi, springGet } from '../services/api';
 import PageLoader from '../components/PageLoader';
 import PageError  from '../components/PageError';
@@ -267,17 +268,21 @@ export default function AddDocumentPage() {
                     <span className="stu-doc-name">{doc.documentName}</span>
                     <div style={{ display: 'flex', gap: '0.5rem' }}>
                       <button
-                        className="stu-btn stu-btn-sm stu-btn-ghost"
+                        type="button"
+                        className="action-btn edit-btn"
                         onClick={() =>
                           editingId === doc.id ? setEditingId(null) : startEditing(doc)
                         }
                       >
-                        {editingId === doc.id ? 'Cancel' : 'Edit Content'}
+                        <Edit size={14} /><span className="action-label">{editingId === doc.id ? 'Cancel' : 'Edit Content'}</span>
                       </button>
                       <button
-                        className="stu-btn stu-btn-sm stu-btn-danger"
+                        type="button"
+                        className="action-btn delete-btn"
                         onClick={() => handleDelete(doc.id, doc.documentName)}
-                      ><span style={{display:"inline-flex",alignItems:"center",gap:4}}><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg> Delete</span></button>
+                      >
+                        <Trash2 size={14} /><span className="action-label">Delete</span>
+                      </button>
                     </div>
                   </div>
 

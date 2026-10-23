@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
+import { Eye, Edit, Trash2 } from 'lucide-react';
 import axios from 'axios';
 import ClubModal from './ClubModal';
 import ViewClubModal from './ViewClubModal';
@@ -218,15 +219,29 @@ export default function ClubsPage() {
                             {/* Card actions */}
                             <div className="club-card-footer" onClick={(e) => e.stopPropagation()}>
                                 <button
-                                    className="books-btn books-btn-sm books-btn-ghost"
-                                    onClick={() => openEdit(club)}
-                                ><span style={{display:"inline-flex",alignItems:"center",gap:4}}><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg> Edit</span></button>
+                                    type="button"
+                                    className="action-btn view-btn"
+                                    title="View Details"
+                                    onClick={() => openView(club)}
+                                >
+                                    <Eye size={14} /><span className="action-label">View</span>
+                                </button>
                                 <button
-                                    className="books-btn books-btn-sm books-btn-danger"
+                                    type="button"
+                                    className="action-btn edit-btn"
+                                    title="Edit Club"
+                                    onClick={() => openEdit(club)}
+                                >
+                                    <Edit size={14} /><span className="action-label">Edit</span>
+                                </button>
+                                <button
+                                    type="button"
+                                    className="action-btn delete-btn"
+                                    title="Delete Club"
                                     onClick={() => handleDelete(club)}
                                     disabled={deleting === club.id}
                                 >
-                                    {deleting === club.id ? 'Deleting...' : <span style={{display:"inline-flex",alignItems:"center",gap:4}}><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>Delete</span>}
+                                    <Trash2 size={14} /><span className="action-label">{deleting === club.id ? 'Deleting...' : 'Delete'}</span>
                                 </button>
                             </div>
 
