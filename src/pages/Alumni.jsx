@@ -138,8 +138,8 @@ function AlmMobCard({ a, num, onEdit, onDelete, expanded, onToggle }) {
           <div className="mob-card-row"><span className="mob-card-label">Email</span><span className="mob-card-value">{a.email || '—'}</span></div>
           <div className="mob-card-row"><span className="mob-card-label">Phone</span><span className="mob-card-value">{a.phone || '—'}</span></div>
           <div className="mob-card-actions">
-            <button type="button" className="action-btn edit-btn" onClick={onEdit}><span className="action-label">Edit</span></button>
-            <button type="button" className="action-btn delete-btn" onClick={onDelete}><span className="action-label">Delete</span></button>
+            <button type="button" className="action-btn edit-btn" onClick={onEdit}><Edit size={15} /><span className="action-label">Edit</span></button>
+            <button type="button" className="action-btn delete-btn" onClick={onDelete}><Trash2 size={15} /><span className="action-label">Delete</span></button>
           </div>
         </div>
       )}

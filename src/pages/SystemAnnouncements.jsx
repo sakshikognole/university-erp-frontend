@@ -38,8 +38,8 @@ function AnnMobCard({ ann, num, formatDate, navigate, canDelete, onDelete, expan
           <div className="mob-card-row"><span className="mob-card-label">Title</span><span className="mob-card-value">{ann.title}</span></div>
           <div className="mob-card-row"><span className="mob-card-label">Date</span><span className="mob-card-value">{formatDate(ann.createdAt)}</span></div>
           <div className="mob-card-actions">
-            <button type="button" className="action-btn view-btn" onClick={() => navigate(`/system-announcements/view/${ann._id}`)}><span className="action-label">View</span></button>
-            {canDelete && <button type="button" className="action-btn delete-btn" onClick={() => onDelete(ann)}><span className="action-label">Delete</span></button>}
+            <button type="button" className="action-btn view-btn" onClick={() => navigate(`/system-announcements/view/${ann._id}`)}><Eye size={15} /><span className="action-label">View</span></button>
+            {canDelete && <button type="button" className="action-btn delete-btn" onClick={() => onDelete(ann)}><Trash2 size={15} /><span className="action-label">Delete</span></button>}
           </div>
         </div>
       )}

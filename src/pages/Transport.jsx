@@ -75,8 +75,8 @@ function TrnMobCard({ item, tab, num, navigate, setDeleteConfirm, expanded, onTo
             <div className="mob-card-row"><span className="mob-card-label">Valid till</span><span className="mob-card-value">{fmtDate(item.validTill)}</span></div>
           </>}
           <div className="mob-card-actions">
-            <button type="button" className="action-btn edit-btn" onClick={() => navigate(editPath)}><span className="action-label">Edit</span></button>
-            <button type="button" className="action-btn delete-btn" onClick={() => setDeleteConfirm({ type: tab === 'passes' ? 'pass' : tab.slice(0,-1), item })}><span className="action-label">Delete</span></button>
+            <button type="button" className="action-btn edit-btn" onClick={() => navigate(editPath)}><Edit size={15} /><span className="action-label">Edit</span></button>
+            <button type="button" className="action-btn delete-btn" onClick={() => setDeleteConfirm({ type: tab === 'passes' ? 'pass' : tab.slice(0,-1), item })}><Trash2 size={15} /><span className="action-label">Delete</span></button>
           </div>
         </div>
       )}
