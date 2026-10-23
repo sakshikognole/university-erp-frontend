@@ -49,8 +49,8 @@ function VenMobCard({ venue, num, getStatusBadgeClass, onEdit, onDelete, expande
           <div className="mob-card-row"><span className="mob-card-label">Facilities</span><span className="mob-card-value">{facilities}</span></div>
           <div className="mob-card-row"><span className="mob-card-label">Status</span><span className="mob-card-value"><span className={getStatusBadgeClass(venue.status)}>{venue.status || 'N/A'}</span></span></div>
           <div className="mob-card-actions">
-            <button type="button" className="action-btn edit-btn" onClick={onEdit}><span className="action-label">Edit</span></button>
-            <button type="button" className="action-btn delete-btn" onClick={onDelete}><span className="action-label">Delete</span></button>
+            <button type="button" className="action-btn edit-btn" onClick={onEdit}><Edit size={15} /><span className="action-label">Edit</span></button>
+            <button type="button" className="action-btn delete-btn" onClick={onDelete}><Trash2 size={15} /><span className="action-label">Delete</span></button>
           </div>
         </div>
       )}

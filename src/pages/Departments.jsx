@@ -73,8 +73,8 @@ function DptMobCard({ dept, num, onEdit, onDelete, expanded, onToggle }) {
           <div className="mob-card-row"><span className="mob-card-label">Department ID</span><span className="mob-card-value mono">{deptId}</span></div>
           <div className="mob-card-row"><span className="mob-card-label">Name</span><span className="mob-card-value">{dept.name}</span></div>
           <div className="mob-card-actions">
-            <button type="button" className="action-btn edit-btn" onClick={onEdit}><span className="action-label">Edit</span></button>
-            <button type="button" className="action-btn delete-btn" onClick={onDelete}><span className="action-label">Delete</span></button>
+            <button type="button" className="action-btn edit-btn" onClick={onEdit}><Edit size={15} /><span className="action-label">Edit</span></button>
+            <button type="button" className="action-btn delete-btn" onClick={onDelete}><Trash2 size={15} /><span className="action-label">Delete</span></button>
           </div>
         </div>
       )}

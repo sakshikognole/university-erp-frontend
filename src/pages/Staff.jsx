@@ -44,7 +44,7 @@ function StfMobCard({ staff, num, formatDate, onEdit, expanded, onToggle }) {
           <div className="mob-card-row"><span className="mob-card-label">Role</span><span className="mob-card-value">{staff.role || '\u2014'}</span></div>
           <div className="mob-card-row"><span className="mob-card-label">Join date</span><span className="mob-card-value">{formatDate(staff.dateOfJoining)}</span></div>
           <div className="mob-card-actions">
-            <button type="button" className="action-btn edit-btn" onClick={onEdit}><span className="action-label">Edit</span></button>
+            <button type="button" className="action-btn edit-btn" onClick={onEdit}><Edit size={15} /><span className="action-label">Edit</span></button>
           </div>
         </div>
       )}
