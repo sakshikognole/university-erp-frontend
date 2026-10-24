@@ -1,30 +1,17 @@
-import React, { useState, useEffect, useRef, useCallback } from 'react';
+﻿import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
-  Building2,
-  Plus,
-  Download,
-  Search,
-  Edit,
-  Trash2,
-  FileText,
-  FileSpreadsheet,
-  Printer,
-  ChevronDown,
-  AlertCircle,
-  AlertTriangle,
-  CheckCircle2,
-  Loader2,
-  X,
+  Building2, Plus, Download, Search, Edit, Trash2, FileText, FileSpreadsheet,
+  Printer, ChevronDown, AlertCircle, AlertTriangle, CheckCircle2, Loader2, X,
 } from 'lucide-react';
 import { exportDepartments } from '../utils/exportUtils';
 import { useAuth } from '../context/AuthContext';
+import DepartmentFormModal from './DepartmentForm';
 
-const _IS_PROD = window.location.hostname !== 'localhost';
-const API_BASE_URL = _IS_PROD ? 'https://university-erp-node.onrender.com/api' : 'http://localhost:5000/api';
+const API_BASE_URL = 'http://localhost:5000/api';
 
-// -----------------------------------------------------------------------------
-// Departments page � Super Admin view
+// ─────────────────────────────────────────────────────────────────────────────
+// Departments page — Super Admin view
 //
 // DEF-001 / DEF-002 / DEF-015:
 //   - Uses `authLoading` from AuthContext to defer access-control decisions until
@@ -50,37 +37,8 @@ const API_BASE_URL = _IS_PROD ? 'https://university-erp-node.onrender.com/api' :
 //   - Feedback banners auto-dismiss after 5 seconds.
 //   - No duplicate API calls on navigation back (localStorage cache used as
 //     optimistic display while real fetch is in flight).
-// -----------------------------------------------------------------------------
+// ─────────────────────────────────────────────────────────────────────────────
 
-
-// Mobile accordion card
-function DptMobCard({ dept, num, onEdit, onDelete, expanded, onToggle }) {
-  const deptId = dept.departmentId || dept.code || 'N/A';
-  return (
-    <div className="mob-card">
-      <button type="button" className="mob-card-header" onClick={onToggle} aria-expanded={expanded}>
-        <div className="mob-card-summary">
-          <span className="mob-card-num">{num}</span>
-          <div className="mob-card-title-wrap">
-            <span className="mob-card-title">{dept.name}</span>
-            <span className="mob-card-sub">{deptId}</span>
-          </div>
-        </div>
-        <span className="mob-card-chevron">{expanded ? '\u25b2' : '\u25bc'}</span>
-      </button>
-      {expanded && (
-        <div className="mob-card-details">
-          <div className="mob-card-row"><span className="mob-card-label">Department ID</span><span className="mob-card-value mono">{deptId}</span></div>
-          <div className="mob-card-row"><span className="mob-card-label">Name</span><span className="mob-card-value">{dept.name}</span></div>
-          <div className="mob-card-actions">
-            <button type="button" className="action-btn edit-btn" onClick={onEdit}><Edit size={15} /><span className="action-label">Edit</span></button>
-            <button type="button" className="action-btn delete-btn" onClick={onDelete}><Trash2 size={15} /><span className="action-label">Delete</span></button>
-          </div>
-        </div>
-      )}
-    </div>
-  );
-}
 const Departments = () => {
   const navigate = useNavigate();
   const { user, authLoading } = useAuth();
@@ -92,11 +50,14 @@ const Departments = () => {
   const [feedback, setFeedback] = useState({ type: '', message: '' });
   const [showDownloadMenu, setShowDownloadMenu] = useState(false);
   const [deleteConfirm, setDeleteConfirm] = useState(null);
-  const [dptExpanded, setDptExpanded] = useState(null);
   const downloadMenuRef = useRef(null);
   const feedbackTimerRef = useRef(null);
 
-  // DEF-016: responsive placeholder � tracks whether the viewport is "mobile"
+  // Modal state
+  const [modalOpen, setModalOpen]   = useState(false);
+  const [editDeptId, setEditDeptId] = useState(null);
+
+  // DEF-016: responsive placeholder — tracks whether the viewport is "mobile"
   const [isMobile, setIsMobile] = useState(
     typeof window !== 'undefined' ? window.matchMedia('(max-width: 640px)').matches : false
   );
@@ -221,7 +182,7 @@ const Departments = () => {
       localStorage.setItem('erp_departments_custom', JSON.stringify(updated));
       showFeedback('success', `Department '${dept.name}' deleted successfully.`);
     } catch (err) {
-      // Show the real error � do not fake success (DEF-007)
+      // Show the real error — do not fake success (DEF-007)
       showFeedback('error', err.message || 'Failed to delete department. Please try again.');
     } finally {
       setDeleting(false);
@@ -234,6 +195,17 @@ const Departments = () => {
     exportDepartments(filteredDepartments, format);
   };
 
+  // Modal helpers
+  const openAddModal  = ()   => { setEditDeptId(null);  setModalOpen(true); };
+  const openEditModal = (id) => { setEditDeptId(id);    setModalOpen(true); };
+  const closeModal    = ()   => { setModalOpen(false);  setEditDeptId(null); };
+  const handleModalSuccess = useCallback(() => {
+    closeModal();
+    fetchDepartments();
+    showFeedback('success', editDeptId ? 'Department updated successfully.' : 'Department created successfully.');
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [editDeptId, fetchDepartments, showFeedback]);
+
   // Filter departments by search query
   const filteredDepartments = departments.filter((d) => {
     const query = search.toLowerCase().trim();
@@ -243,7 +215,7 @@ const Departments = () => {
     return idStr.includes(query) || nameStr.includes(query);
   });
 
-  // -- Render: auth still settling � show spinner (DEF-001, DEF-002, DEF-015) --
+  // ── Render: auth still settling — show spinner (DEF-001, DEF-002, DEF-015) ──
   if (authLoading) {
     return (
       <div className="page-container">
@@ -263,7 +235,7 @@ const Departments = () => {
     );
   }
 
-  // -- Render: non-Super-Admin user --
+  // ── Render: non-Super-Admin user ──
   if (!isSuperAdmin) {
     return (
       <div className="page-container">
@@ -277,7 +249,7 @@ const Departments = () => {
     );
   }
 
-  // -- Render: full Super Admin view --
+  // ── Render: full Super Admin view ──
   return (
     <div className="page-container">
       {/* Top Header with Action Buttons on Top-Right Corner */}
@@ -339,7 +311,7 @@ const Departments = () => {
           <button
             type="button"
             className="btn btn-primary add-department-btn"
-            onClick={() => navigate('/departments/add')}
+            onClick={openAddModal}
           >
             <Plus size={16} />
             <span>Add Department</span>
@@ -347,7 +319,7 @@ const Departments = () => {
         </div>
       </div>
 
-      {/* Feedback Banner � auto-dismissed after 5 s */}
+      {/* Feedback Banner — auto-dismissed after 5 s */}
       {feedback.message && (
         <div
           className={`feedback-banner ${
@@ -405,7 +377,7 @@ const Departments = () => {
               className="search-input"
               /*
                * DEF-016: responsive placeholder.
-               * On mobile (=640 px) a shorter label is shown so the text fits
+               * On mobile (≤640 px) a shorter label is shown so the text fits
                * without being truncated by the browser. On desktop the full
                * label is shown. Both convey the same search intent.
                */
@@ -457,7 +429,7 @@ const Departments = () => {
                   type="button"
                   className="btn btn-primary"
                   style={{ marginTop: '1rem' }}
-                  onClick={() => navigate('/departments/add')}
+                  onClick={openAddModal}
                 >
                   <Plus size={16} />
                   <span>Add Department</span>
@@ -465,8 +437,6 @@ const Departments = () => {
               )}
             </div>
           ) : (
-            <div>
-            <div className="dpt-desk-table">
             <table className="data-table">
               <thead>
                 <tr>
@@ -494,9 +464,9 @@ const Departments = () => {
                             type="button"
                             className="action-btn edit-btn"
                             title="Edit Department"
-                            onClick={() => navigate(`/departments/edit/${dept._id || deptIdDisplay}`)}
+                            onClick={() => openEditModal(dept._id || deptIdDisplay)}
                           >
-                            <Edit size={15} />
+                            <Edit size={14} />
                             <span className="action-label">Edit</span>
                           </button>
                           <button
@@ -505,7 +475,7 @@ const Departments = () => {
                             title="Delete Department"
                             onClick={() => setDeleteConfirm(dept)}
                           >
-                            <Trash2 size={15} />
+                            <Trash2 size={14} />
                             <span className="action-label">Delete</span>
                           </button>
                         </div>
@@ -515,24 +485,6 @@ const Departments = () => {
                 })}
               </tbody>
             </table>
-            </div>
-            <div className="dpt-mob-list">
-              {filteredDepartments.map((dept, index) => {
-                const deptIdDisplay = dept.departmentId || dept.code || 'N/A';
-                return (
-                  <DptMobCard
-                    key={dept._id || deptIdDisplay || index}
-                    dept={dept}
-                    num={index + 1}
-                    onEdit={() => navigate(`/departments/edit/${dept._id || deptIdDisplay}`)}
-                    onDelete={() => setDeleteConfirm(dept)}
-                    expanded={dptExpanded === (dept._id || deptIdDisplay)}
-                    onToggle={() => setDptExpanded(prev => prev === (dept._id || deptIdDisplay) ? null : (dept._id || deptIdDisplay))}
-                  />
-                );
-              })}
-            </div>
-            </div>
           )}
         </div>
       </div>
@@ -595,21 +547,29 @@ const Departments = () => {
                 disabled={deleting}
               >
                 {deleting ? (
-                  <div>
+                  <>
                     <Loader2 size={16} className="spin-animate" />
                     <span>Deleting...</span>
-                  </div>
+                  </>
                 ) : (
-                  <div>
+                  <>
                     <Trash2 size={16} />
                     <span>Delete Department</span>
-                  </div>
+                  </>
                 )}
               </button>
             </div>
           </div>
         </div>
       )}
+
+      {/* Department Form Modal */}
+      <DepartmentFormModal
+        isOpen={modalOpen}
+        deptId={editDeptId}
+        onClose={closeModal}
+        onSuccess={handleModalSuccess}
+      />
     </div>
   );
 };

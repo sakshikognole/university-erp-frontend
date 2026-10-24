@@ -7,7 +7,7 @@ const Login = () => {
   const navigate = useNavigate();
   const { loginAdmin, loading } = useAuth();
 
-  const [adminType, setAdminType] = useState('SUPER_ADMIN'); // SUPER_ADMIN, SUB_ADMIN, TEACHER
+  const [adminType, setAdminType] = useState('SUPER_ADMIN');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
@@ -59,7 +59,6 @@ const Login = () => {
     <div className="auth-container">
       <div className="auth-card">
 
-        {/* Header Branding */}
         <div className="auth-header">
           <div className="auth-logo-icon">
             <GraduationCap size={32} />
@@ -68,7 +67,6 @@ const Login = () => {
           <p className="auth-subtitle">Admin Authentication Management System</p>
         </div>
 
-        {/* Admin Type Selector */}
         <div className="admin-type-selector">
           <label className="input-label">Select Admin Access Level</label>
           <div className="admin-tabs">
@@ -93,7 +91,6 @@ const Login = () => {
           </div>
         </div>
 
-        {/* Feedback Alerts */}
         {error && (
           <div className="auth-alert alert-error">
             <AlertCircle size={18} />
@@ -108,7 +105,6 @@ const Login = () => {
           </div>
         )}
 
-        {/* Login Form */}
         <form onSubmit={handleSubmit} className="auth-form">
           <div className="form-group">
             <label className="form-label" htmlFor="email-input">
@@ -177,21 +173,12 @@ const Login = () => {
           </button>
         </form>
 
-        {/* Footer Navigation */}
         <div className="auth-footer">
           <span className="footer-text">Student Portal Access?</span>
           <Link to="/login/student" className="footer-link">
             Switch to Student Login
           </Link>
         </div>
-
-        {/* Demo Credentials Helper
-        <div className="demo-credentials-box">
-          <p className="demo-title">Default Demo Credentials:</p>
-          <p>Super Admin: <code>superadmin@university.edu</code> | Pass: <code>Admin@123</code></p>
-          <p>Sub Admin: <code>subadmin@university.edu</code> | Pass: <code>SubAdmin@123</code></p>
-          <p>Teacher: <code>teacher@university.edu</code> | Pass: <code>Teacher@123</code></p>
-        </div> */}
 
       </div>
     </div>

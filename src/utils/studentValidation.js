@@ -7,10 +7,10 @@
  */
 
 // ---------------------------------------------------------------------------
-// PRN — must match "PRN" (case-insensitive) followed by 4-digit year and
-// 3-digit sequence, e.g. PRN2024001.  The schema stores it uppercased.
+// PRN — alphanumeric only, at least 2 characters, no spaces or symbols.
+// Stored uppercased. Accepts any format: PRN2024001, 2024001, ABC123, etc.
 // ---------------------------------------------------------------------------
-export const PRN_REGEX = /^PRN\d{4}\d{3}$/i;
+export const PRN_REGEX = /^[A-Za-z0-9]{2,}$/;
 
 // ---------------------------------------------------------------------------
 // Name — letters (including accented / Unicode letters), spaces, hyphens,
@@ -49,6 +49,11 @@ export const DEGREE_VALID_REGEX = /^[A-Za-z][A-Za-z0-9 .()\-&,/]+$/;
 export const DIVISION_VALID_REGEX = /^[A-Za-z][A-Za-z0-9 . -]*$/;
 
 // ---------------------------------------------------------------------------
+// Email — standard email format. Field is optional.
+// ---------------------------------------------------------------------------
+export const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+// ---------------------------------------------------------------------------
 // validateName
 // Returns an error string or "" if valid.
 // ---------------------------------------------------------------------------
@@ -58,30 +63,24 @@ export function validateName(raw) {
   }
   const name = raw.trim();
 
-  // Reject leading/trailing quotes
-  if (/^["']|["']$/.test(name)) {
-    return 'Invalid Name. Please enter a valid full name. (e.g., Neha More)';
-  }
-
-  // Reject numeric-only
+  // Reject purely numeric
   if (/^\d+$/.test(name)) {
-    return 'Invalid Name. Please enter a valid full name. (e.g., Neha More)';
+    return 'Invalid name. Please enter a valid name.';
   }
 
-  // Reject alphanumeric (letters mixed with digits)
+  // Must contain at least one letter
+  if (!/[A-Za-z]/.test(name)) {
+    return 'Invalid name. Please enter a valid name.';
+  }
+
+  // No digits allowed
   if (/\d/.test(name)) {
-    return 'Invalid Name. Please enter a valid full name. (e.g., Neha More)';
+    return 'Invalid name. Please enter a valid name.';
   }
 
-  // Reject invalid special characters
-  if (!NAME_VALID_CHARS_REGEX.test(name)) {
-    return 'Invalid Name. Please enter a valid full name. (e.g., Neha More)';
-  }
-
-  // Require at least two words (first + last name)
-  const words = name.split(/\s+/).filter((w) => w.length > 0);
-  if (words.length < 2) {
-    return 'Invalid Name. Please enter a valid full name. (e.g., Neha More)';
+  // No special characters — only letters, spaces, hyphens, apostrophes, dots
+  if (/[^A-Za-z\u00C0-\u024F\u1E00-\u1EFF\s'\-.]/.test(name)) {
+    return 'Invalid name. Please enter a valid name.';
   }
 
   return '';
@@ -94,10 +93,10 @@ export function validatePRN(raw) {
   if (!raw || raw.trim().length === 0) {
     return 'PRN is required.';
   }
-  const prn = raw.trim().toUpperCase();
+  const prn = raw.trim();
 
   if (!PRN_REGEX.test(prn)) {
-    return 'Invalid PRN. Please enter a valid PRN. (e.g., PRN2024001)';
+    return 'Invalid PRN. Only letters and numbers are allowed (e.g. PRN2024001, 2024001).';
   }
   return '';
 }
@@ -111,13 +110,9 @@ export function validateClass(raw) {
   }
   const cls = raw.trim();
 
-  // Must contain at least one letter
-  if (!/[A-Za-z]/.test(cls)) {
-    return 'Invalid Class. Please enter a valid class. (e.g., First Year, Second Year)';
-  }
-
-  if (!CLASS_VALID_REGEX.test(cls)) {
-    return 'Invalid Class. Please enter a valid class. (e.g., First Year, Second Year)';
+  // Letters and spaces only — no numbers, symbols, or special characters
+  if (!/^[A-Za-z\u00C0-\u024F\u1E00-\u1EFF\s]+$/.test(cls)) {
+    return 'Invalid class. Please enter a valid class (e.g. First Year, Second Year).';
   }
 
   return '';
@@ -171,10 +166,22 @@ export function validateDivision(raw) {
   }
   const div = raw.trim();
 
-  if (!DIVISION_VALID_REGEX.test(div)) {
-    return 'Invalid Division. Please enter a valid division. (e.g., A, B, C)';
+  if (!/^[A-Za-z]$/.test(div)) {
+    return 'Division must be a single letter (e.g. A, B, C).';
   }
 
+  return '';
+}
+
+// ---------------------------------------------------------------------------
+// validateEmail
+// Email is optional — empty value is acceptable.
+// ---------------------------------------------------------------------------
+export function validateEmail(raw) {
+  if (!raw || raw.trim().length === 0) return '';
+  if (!EMAIL_REGEX.test(raw.trim())) {
+    return 'Invalid email address. Please enter a valid email (e.g. student@university.edu).';
+  }
   return '';
 }
 
@@ -184,7 +191,7 @@ export function validateDivision(raw) {
 // Returns an object: { field: errorMessage }
 // An empty object means all fields are valid.
 // ---------------------------------------------------------------------------
-export function validateStudentFields({ name, prn, class: cls, division, degree, yearOfEnrollment }) {
+export function validateStudentFields({ name, prn, class: cls, division, degree, yearOfEnrollment, email }) {
   const errors = {};
 
   const nameErr = validateName(name);
@@ -204,6 +211,9 @@ export function validateStudentFields({ name, prn, class: cls, division, degree,
 
   const yearErr = validateYearOfEnrollment(yearOfEnrollment);
   if (yearErr) errors.yearOfEnrollment = yearErr;
+
+  const emailErr = validateEmail(email);
+  if (emailErr) errors.email = emailErr;
 
   return errors;
 }

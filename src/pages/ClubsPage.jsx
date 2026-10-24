@@ -1,12 +1,9 @@
 import { useState, useEffect, useCallback } from 'react';
-import { Eye, Edit, Trash2 } from 'lucide-react';
 import axios from 'axios';
 import ClubModal from './ClubModal';
 import ViewClubModal from './ViewClubModal';
 
-const _IS_PROD_SP = window.location.hostname !== 'localhost';
-const _SPRING_URL = _IS_PROD_SP ? 'https://university-erp-spring.onrender.com' : 'http://localhost:9090';
-const SPRING_API = `${_SPRING_URL}/api`;
+const SPRING_API = 'http://localhost:9090/api';
 
 export default function ClubsPage() {
     const [clubs, setClubs] = useState([]);
@@ -25,7 +22,7 @@ export default function ClubsPage() {
         if (!silent) setLoading(true);
         try {
             const res = await axios.get(`${SPRING_API}/clubs`);
-            setClubs(Array.isArray(res.data) ? res.data : (res.data?.content ?? []));
+            setClubs(res.data);
         } catch {
             setError('Failed to load clubs.');
         } finally {
@@ -114,7 +111,7 @@ export default function ClubsPage() {
             <div className="books-page-header">
                 <div>
                     <h1 className="page-title">Clubs</h1>
-                    <p className="page-subtitle">Manage clubs and sub-clubs</p>
+                    <p className="stu-page-sub">Manage clubs and sub-clubs</p>
                 </div>
                 <button className="books-btn books-btn-primary" onClick={openAdd}>
                     + Add Club
@@ -151,7 +148,8 @@ export default function ClubsPage() {
                             onClick={() => openView(club)}
                             style={{ cursor: 'pointer' }}
                         >
-                        {/* Card top strip removed */}
+                            {/* Card top strip — colored by status */}
+                            <div className={`club-card-strip ${club.status === 'Active' ? 'strip-active' : 'strip-inactive'}`} />
 
                             <div className="club-card-body">
 
@@ -219,29 +217,17 @@ export default function ClubsPage() {
                             {/* Card actions */}
                             <div className="club-card-footer" onClick={(e) => e.stopPropagation()}>
                                 <button
-                                    type="button"
-                                    className="action-btn view-btn"
-                                    title="View Details"
-                                    onClick={() => openView(club)}
-                                >
-                                    <Eye size={14} /><span className="action-label">View</span>
-                                </button>
-                                <button
-                                    type="button"
-                                    className="action-btn edit-btn"
-                                    title="Edit Club"
+                                    className="books-btn books-btn-sm books-btn-ghost"
                                     onClick={() => openEdit(club)}
                                 >
-                                    <Edit size={14} /><span className="action-label">Edit</span>
+                                    Edit
                                 </button>
                                 <button
-                                    type="button"
-                                    className="action-btn delete-btn"
-                                    title="Delete Club"
+                                    className="books-btn books-btn-sm books-btn-danger"
                                     onClick={() => handleDelete(club)}
                                     disabled={deleting === club.id}
                                 >
-                                    <Trash2 size={14} /><span className="action-label">{deleting === club.id ? 'Deleting...' : 'Delete'}</span>
+                                    {deleting === club.id ? 'Deleting...' : 'Delete'}
                                 </button>
                             </div>
 
@@ -255,7 +241,6 @@ export default function ClubsPage() {
                 mode={modalMode}
                 club={selClub}
                 parentClubs={parentClubs}
-                existingClubs={clubs}
                 onSave={handleSave}
                 onClose={() => setModalOpen(false)}
                 loading={saving}

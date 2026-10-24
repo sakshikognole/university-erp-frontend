@@ -20,9 +20,9 @@ import {
   X,
 } from 'lucide-react';
 import { exportStudents } from '../utils/exportUtils';
+import StudentFormModal from './StudentForm';
 
-const _IS_PROD = window.location.hostname !== 'localhost';
-const API_BASE_URL = _IS_PROD ? 'https://university-erp-node.onrender.com/api' : 'http://localhost:5000/api';
+const API_BASE_URL = 'http://localhost:5000/api';
 
 // ---------------------------------------------------------------------------
 // Helpers
@@ -35,46 +35,21 @@ const authHeader = () => {
   };
 };
 
-// ── Mobile accordion card ────────────────────────────────────────────────────
-function StuMobCard({ student, num, onEdit, expanded, onToggle }) {
-  return (
-    <div className="mob-card">
-      <button type="button" className="mob-card-header" onClick={onToggle} aria-expanded={expanded}>
-        <div className="mob-card-summary">
-          <span className="mob-card-num">{num}</span>
-          <div className="mob-card-title-wrap">
-            <span className="mob-card-title">{student.name}</span>
-            <span className="mob-card-sub">{student.prn}</span>
-          </div>
-        </div>
-        <span className="mob-card-chevron">{expanded ? '▲' : '▼'}</span>
-      </button>
-      {expanded && (
-        <div className="mob-card-details">
-          <div className="mob-card-row"><span className="mob-card-label">PRN</span><span className="mob-card-value mono">{student.prn}</span></div>
-          <div className="mob-card-row"><span className="mob-card-label">Class</span><span className="mob-card-value">{student.class || '—'}</span></div>
-          <div className="mob-card-row"><span className="mob-card-label">Division</span><span className="mob-card-value">{student.division || '—'}</span></div>
-          <div className="mob-card-row"><span className="mob-card-label">Degree</span><span className="mob-card-value">{student.degree || '—'}</span></div>
-          <div className="mob-card-row"><span className="mob-card-label">Year</span><span className="mob-card-value">{student.yearOfEnrollment || '—'}</span></div>
-          <div className="mob-card-actions">
-            <button type="button" className="action-btn edit-btn" onClick={onEdit}><Edit size={14} /><span className="action-label">Edit</span></button>
-          </div>
-        </div>
-      )}
-    </div>
-  );
-}
-
 // ---------------------------------------------------------------------------
-// Students — list, search, filter, pagination
+// Students — list, search, filter, pagination + inline Add/Edit modal
 // ---------------------------------------------------------------------------
 const Students = () => {
   const navigate = useNavigate();
 
   // ── Data ────────────────────────────────────────────────────────────────
-  const [students, setStudents]   = useState([]);
-  const [loading, setLoading]     = useState(true);
-  const [feedback, _setFeedback]   = useState({ type: '', message: '' });
+  const [students, setStudents] = useState([]);
+  const [loading, setLoading]   = useState(true);
+  const [feedback, setFeedback] = useState({ type: '', message: '' });
+  const feedbackTimerRef        = useRef(null);
+
+  // ── Modal state ─────────────────────────────────────────────────────────
+  const [modalOpen, setModalOpen]       = useState(false);
+  const [editStudentId, setEditStudentId] = useState(null); // null = Add, string = Edit
 
   // ── Search ──────────────────────────────────────────────────────────────
   const [search, setSearch] = useState('');
@@ -87,12 +62,11 @@ const Students = () => {
     yearOfEnrollment: '',
     division:         '',
   });
-  // Derived unique values from the loaded dataset (for filter dropdowns)
   const [filterOptions, setFilterOptions] = useState({
-    degrees:    [],
-    classes:    [],
-    years:      [],
-    divisions:  [],
+    degrees:   [],
+    classes:   [],
+    years:     [],
+    divisions: [],
   });
 
   // ── Download dropdown ────────────────────────────────────────────────────
@@ -102,15 +76,8 @@ const Students = () => {
   // ── Pagination ───────────────────────────────────────────────────────────
   const [currentPage, setCurrentPage]   = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(10);
-  const [stuExpanded, setStuExpanded]   = useState(null); // mobile accordion
 
-  // ────────────────────────────────────────────────────────────────────────
-  // Fetch all students once on mount.
-  // We fetch the full list client-side so that filter dropdowns are always
-  // populated and searching/filtering is instant without extra round-trips.
-  // For very large datasets the backend also accepts query params for
-  // server-side filtering (see studentController.getStudents).
-  // ────────────────────────────────────────────────────────────────────────
+  // ── Fetch ─────────────────────────────────────────────────────────────────
   const fetchStudents = useCallback(async () => {
     setLoading(true);
     try {
@@ -121,7 +88,6 @@ const Students = () => {
       const data = await res.json();
       setStudents(data);
 
-      // Build unique sorted option lists for filter dropdowns
       const unique = (arr) =>
         [...new Set(arr.filter(Boolean).map((v) => v.trim()))].sort();
       setFilterOptions({
@@ -138,64 +104,91 @@ const Students = () => {
     }
   }, []);
 
-  // Single useEffect — only runs once on mount (fetchStudents is stable)
   useEffect(() => {
     fetchStudents();
   }, [fetchStudents]);
 
   // Close download menu on outside click
   useEffect(() => {
-    const handleClickOutside = (e) => {
+    const handler = (e) => {
       if (downloadMenuRef.current && !downloadMenuRef.current.contains(e.target)) {
         setShowDownloadMenu(false);
       }
     };
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
+    document.addEventListener('mousedown', handler);
+    return () => document.removeEventListener('mousedown', handler);
   }, []);
 
-  // ── Filter / search logic ────────────────────────────────────────────────
+  // Auto-clear feedback banner after 4 s
+  const showBanner = useCallback((type, message) => {
+    setFeedback({ type, message });
+    clearTimeout(feedbackTimerRef.current);
+    feedbackTimerRef.current = setTimeout(
+      () => setFeedback({ type: '', message: '' }),
+      4000
+    );
+  }, []);
+
+  useEffect(() => () => clearTimeout(feedbackTimerRef.current), []);
+
+  // ── Modal open helpers ───────────────────────────────────────────────────
+  const openAddModal = () => {
+    setEditStudentId(null);
+    setModalOpen(true);
+  };
+
+  const openEditModal = (studentId) => {
+    setEditStudentId(studentId);
+    setModalOpen(true);
+  };
+
+  const closeModal = () => {
+    setModalOpen(false);
+    setEditStudentId(null);
+  };
+
+  const handleModalSuccess = useCallback(() => {
+    closeModal();
+    fetchStudents();
+    showBanner(
+      'success',
+      editStudentId
+        ? 'Student updated successfully.'
+        : 'Student added successfully.'
+    );
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [editStudentId, fetchStudents, showBanner]);
+
+  // ── Filter / search ──────────────────────────────────────────────────────
   const filteredStudents = students.filter((s) => {
-    // Text search across name, PRN, class, degree
     const query = search.toLowerCase().trim();
     if (query) {
-      const nameStr   = (s.name   || '').toLowerCase();
-      const prnStr    = (s.prn    || '').toLowerCase();
-      const classStr  = (s.class  || '').toLowerCase();
-      const degreeStr = (s.degree || '').toLowerCase();
       const matches =
-        nameStr.includes(query) ||
-        prnStr.includes(query)  ||
-        classStr.includes(query) ||
-        degreeStr.includes(query);
+        (s.name   || '').toLowerCase().includes(query) ||
+        (s.prn    || '').toLowerCase().includes(query) ||
+        (s.class  || '').toLowerCase().includes(query) ||
+        (s.degree || '').toLowerCase().includes(query);
       if (!matches) return false;
     }
-
-    // Dropdown filters (exact match, case-insensitive)
-    if (filters.degree && s.degree?.trim().toLowerCase() !== filters.degree.toLowerCase()) return false;
-    if (filters.class  && s.class?.trim().toLowerCase()  !== filters.class.toLowerCase())  return false;
-    if (filters.yearOfEnrollment && s.yearOfEnrollment?.trim() !== filters.yearOfEnrollment) return false;
-    if (filters.division && s.division?.trim().toLowerCase() !== filters.division.toLowerCase()) return false;
-
+    if (filters.degree           && s.degree?.trim().toLowerCase() !== filters.degree.toLowerCase())               return false;
+    if (filters.class            && s.class?.trim().toLowerCase()  !== filters.class.toLowerCase())                return false;
+    if (filters.yearOfEnrollment && s.yearOfEnrollment?.trim()     !== filters.yearOfEnrollment)                   return false;
+    if (filters.division         && s.division?.trim().toLowerCase() !== filters.division.toLowerCase())           return false;
     return true;
   });
 
-  // Count active filters for the badge
   const activeFilterCount = Object.values(filters).filter(Boolean).length;
 
-  // Reset to page 1 whenever search or filters change
-  useEffect(() => {
-    setCurrentPage(1);
-  }, [search, filters]);
+  useEffect(() => { setCurrentPage(1); }, [search, filters]);
 
   // ── Pagination ───────────────────────────────────────────────────────────
-  const totalPages  = Math.ceil(filteredStudents.length / itemsPerPage);
-  const startIndex  = (currentPage - 1) * itemsPerPage;
-  const endIndex    = startIndex + itemsPerPage;
+  const totalPages      = Math.ceil(filteredStudents.length / itemsPerPage);
+  const startIndex      = (currentPage - 1) * itemsPerPage;
+  const endIndex        = startIndex + itemsPerPage;
   const currentStudents = filteredStudents.slice(startIndex, endIndex);
 
-  const handlePageChange = (newPage) => {
-    if (newPage >= 1 && newPage <= totalPages) setCurrentPage(newPage);
+  const handlePageChange = (p) => {
+    if (p >= 1 && p <= totalPages) setCurrentPage(p);
   };
 
   const handleItemsPerPageChange = (val) => {
@@ -204,18 +197,13 @@ const Students = () => {
   };
 
   // ── Filter handlers ──────────────────────────────────────────────────────
-  const handleFilterChange = (field, value) => {
+  const handleFilterChange = (field, value) =>
     setFilters((prev) => ({ ...prev, [field]: value }));
-  };
 
-  const clearFilters = () => {
+  const clearFilters = () =>
     setFilters({ degree: '', class: '', yearOfEnrollment: '', division: '' });
-  };
 
-  const clearAll = () => {
-    setSearch('');
-    clearFilters();
-  };
+  const clearAll = () => { setSearch(''); clearFilters(); };
 
   // ── Download ─────────────────────────────────────────────────────────────
   const handleDownload = (format) => {
@@ -274,11 +262,11 @@ const Students = () => {
             <span>Bulk Upload</span>
           </button>
 
-          {/* Add Student */}
+          {/* Add Student — opens modal */}
           <button
             type="button"
             className="books-btn books-btn-primary"
-            onClick={() => navigate('/add-student')}
+            onClick={openAddModal}
           >
             <Plus size={16} />
             <span>Add Student</span>
@@ -286,7 +274,7 @@ const Students = () => {
         </div>
       </div>
 
-      {/* ── Feedback banner ── */}
+      {/* ── Page-level feedback banner ── */}
       {feedback.message && (
         <div
           className={`feedback-banner ${
@@ -294,8 +282,27 @@ const Students = () => {
           }`}
           style={{ margin: '1rem 0' }}
         >
-          {feedback.type === 'success' ? <CheckCircle2 size={18} /> : <AlertCircle size={18} />}
+          {feedback.type === 'success'
+            ? <CheckCircle2 size={18} />
+            : <AlertCircle size={18} />
+          }
           <span>{feedback.message}</span>
+          <button
+            type="button"
+            onClick={() => setFeedback({ type: '', message: '' })}
+            style={{
+              marginLeft: 'auto',
+              background: 'none',
+              border: 'none',
+              cursor: 'pointer',
+              padding: '0 0.25rem',
+              color: 'inherit',
+              opacity: 0.7,
+            }}
+            aria-label="Dismiss"
+          >
+            <X size={15} />
+          </button>
         </div>
       )}
 
@@ -304,7 +311,6 @@ const Students = () => {
 
         {/* ── Search + filter bar ── */}
         <div className="table-controls-bar">
-          {/* Search box */}
           <div className="search-box-wrapper">
             <Search size={16} className="search-icon" />
             <input
@@ -321,7 +327,6 @@ const Students = () => {
             )}
           </div>
 
-          {/* Filter toggle button */}
           <button
             type="button"
             className={`btn btn-secondary students-filter-btn${activeFilterCount > 0 ? ' filter-active' : ''}`}
@@ -339,7 +344,6 @@ const Students = () => {
             />
           </button>
 
-          {/* Stats + clear-all */}
           <div className="students-bar-right">
             {(activeFilterCount > 0 || search) && (
               <button type="button" className="students-clear-all-btn" onClick={clearAll}>
@@ -354,88 +358,43 @@ const Students = () => {
           </div>
         </div>
 
-        {/* ── Filter panel (collapsible) ── */}
+        {/* ── Filter panel ── */}
         {showFilters && (
           <div className="students-filter-panel">
             <div className="students-filter-grid">
-              {/* Degree */}
               <div className="students-filter-group">
-                <label className="students-filter-label" htmlFor="filter-degree">
-                  Degree
-                </label>
-                <select
-                  id="filter-degree"
-                  className="students-filter-select"
-                  value={filters.degree}
-                  onChange={(e) => handleFilterChange('degree', e.target.value)}
-                >
+                <label className="students-filter-label" htmlFor="filter-degree">Degree</label>
+                <select id="filter-degree" className="students-filter-select" value={filters.degree} onChange={(e) => handleFilterChange('degree', e.target.value)}>
                   <option value="">All Degrees</option>
-                  {filterOptions.degrees.map((d) => (
-                    <option key={d} value={d}>{d}</option>
-                  ))}
+                  {filterOptions.degrees.map((d) => <option key={d} value={d}>{d}</option>)}
                 </select>
               </div>
-
-              {/* Class */}
               <div className="students-filter-group">
-                <label className="students-filter-label" htmlFor="filter-class">
-                  Class
-                </label>
-                <select
-                  id="filter-class"
-                  className="students-filter-select"
-                  value={filters.class}
-                  onChange={(e) => handleFilterChange('class', e.target.value)}
-                >
+                <label className="students-filter-label" htmlFor="filter-class">Class</label>
+                <select id="filter-class" className="students-filter-select" value={filters.class} onChange={(e) => handleFilterChange('class', e.target.value)}>
                   <option value="">All Classes</option>
-                  {filterOptions.classes.map((c) => (
-                    <option key={c} value={c}>{c}</option>
-                  ))}
+                  {filterOptions.classes.map((c) => <option key={c} value={c}>{c}</option>)}
                 </select>
               </div>
-
-              {/* Year */}
               <div className="students-filter-group">
-                <label className="students-filter-label" htmlFor="filter-year">
-                  Year of Enrollment
-                </label>
-                <select
-                  id="filter-year"
-                  className="students-filter-select"
-                  value={filters.yearOfEnrollment}
-                  onChange={(e) => handleFilterChange('yearOfEnrollment', e.target.value)}
-                >
+                <label className="students-filter-label" htmlFor="filter-year">Year of Enrollment</label>
+                <select id="filter-year" className="students-filter-select" value={filters.yearOfEnrollment} onChange={(e) => handleFilterChange('yearOfEnrollment', e.target.value)}>
                   <option value="">All Years</option>
-                  {filterOptions.years.map((y) => (
-                    <option key={y} value={y}>{y}</option>
-                  ))}
+                  {filterOptions.years.map((y) => <option key={y} value={y}>{y}</option>)}
                 </select>
               </div>
-
-              {/* Division */}
               <div className="students-filter-group">
-                <label className="students-filter-label" htmlFor="filter-division">
-                  Division
-                </label>
-                <select
-                  id="filter-division"
-                  className="students-filter-select"
-                  value={filters.division}
-                  onChange={(e) => handleFilterChange('division', e.target.value)}
-                >
+                <label className="students-filter-label" htmlFor="filter-division">Division</label>
+                <select id="filter-division" className="students-filter-select" value={filters.division} onChange={(e) => handleFilterChange('division', e.target.value)}>
                   <option value="">All Divisions</option>
-                  {filterOptions.divisions.map((d) => (
-                    <option key={d} value={d}>{d}</option>
-                  ))}
+                  {filterOptions.divisions.map((d) => <option key={d} value={d}>{d}</option>)}
                 </select>
               </div>
             </div>
-
             {activeFilterCount > 0 && (
               <div style={{ paddingTop: '0.25rem' }}>
                 <button type="button" className="students-clear-filters-btn" onClick={clearFilters}>
-                  <X size={13} />
-                  <span>Clear filters</span>
+                  <X size={13} /><span>Clear filters</span>
                 </button>
               </div>
             )}
@@ -472,7 +431,7 @@ const Students = () => {
                   type="button"
                   className="books-btn books-btn-primary"
                   style={{ marginTop: '1rem' }}
-                  onClick={() => navigate('/add-student')}
+                  onClick={openAddModal}
                 >
                   <Plus size={16} />
                   <span>Add Student</span>
@@ -481,8 +440,6 @@ const Students = () => {
             </div>
           ) : (
             <>
-              {/* ── Desktop table ── */}
-              <div className="stu-desk-table">
               <table className="data-table">
                 <thead>
                   <tr>
@@ -493,6 +450,7 @@ const Students = () => {
                     <th style={{ width: '90px' }}>Division</th>
                     <th>Degree</th>
                     <th style={{ width: '80px' }}>Year</th>
+                    <th>Email</th>
                     <th style={{ width: '90px', textAlign: 'right' }}>Actions</th>
                   </tr>
                 </thead>
@@ -510,20 +468,21 @@ const Students = () => {
                       <td>{student.division || '—'}</td>
                       <td>{student.degree}</td>
                       <td>{student.yearOfEnrollment}</td>
+                      <td>
+                        {student.email
+                          ? <span className="students-email-cell">{student.email}</span>
+                          : <span className="text-secondary">—</span>
+                        }
+                      </td>
                       <td style={{ textAlign: 'right' }}>
-                        <div
-                          className="action-buttons-cell"
-                          style={{ justifyContent: 'flex-end' }}
-                        >
+                        <div className="action-buttons-cell" style={{ justifyContent: 'flex-end' }}>
                           <button
                             type="button"
                             className="action-btn edit-btn"
                             title="Edit Student"
-                            onClick={() =>
-                              navigate(`/students/edit/${student._id || student.prn}`)
-                            }
+                            onClick={() => openEditModal(student._id || student.prn)}
                           >
-                            <Edit size={15} />
+                            <Edit size={14} />
                             <span className="action-label">Edit</span>
                           </button>
                         </div>
@@ -532,20 +491,6 @@ const Students = () => {
                   ))}
                 </tbody>
               </table>
-              </div>
-              {/* ── Mobile accordion cards ── */}
-              <div className="stu-mob-list">
-                {currentStudents.map((student, index) => (
-                  <StuMobCard
-                    key={student._id || student.prn || index}
-                    student={student}
-                    num={startIndex + index + 1}
-                    onEdit={() => navigate(`/students/edit/${student._id || student.prn}`)}
-                    expanded={stuExpanded === (student._id || student.prn)}
-                    onToggle={() => setStuExpanded(prev => prev === (student._id || student.prn) ? null : (student._id || student.prn))}
-                  />
-                ))}
-              </div>
 
               {/* ── Pagination ── */}
               {totalPages > 1 && (
@@ -582,15 +527,8 @@ const Students = () => {
                             {pageNum}
                           </button>
                         );
-                      } else if (
-                        pageNum === currentPage - 2 ||
-                        pageNum === currentPage + 2
-                      ) {
-                        return (
-                          <span key={pageNum} className="pagination-dots">
-                            …
-                          </span>
-                        );
+                      } else if (pageNum === currentPage - 2 || pageNum === currentPage + 2) {
+                        return <span key={pageNum} className="pagination-dots">…</span>;
                       }
                       return null;
                     })}
@@ -623,6 +561,15 @@ const Students = () => {
           )}
         </div>
       </div>
+
+      {/* ── Student Form Modal ── */}
+      <StudentFormModal
+        isOpen={modalOpen}
+        studentId={editStudentId}
+        onClose={closeModal}
+        onSuccess={handleModalSuccess}
+      />
+
     </div>
   );
 };

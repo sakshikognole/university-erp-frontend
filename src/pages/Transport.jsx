@@ -13,76 +13,16 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
+import AddBusRouteModal from './AddBusRoute';
+import AddDriverModal from './AddDriver';
+import AddVehicleModal from './AddVehicle';
+import AddBusPassModal from './AddBusPass';
 import {
   Bus, Plus, Search, AlertCircle, AlertTriangle, CheckCircle2, Loader2,
   ChevronLeft, ChevronRight, Edit, Trash2, UserCheck, Truck, Ticket, X,
 } from 'lucide-react';
 
-const _IS_PROD = window.location.hostname !== 'localhost';
-const API_BASE_URL = _IS_PROD ? 'https://university-erp-node.onrender.com/api' : 'http://localhost:5000/api';
-
-// Mobile accordion card for Transport (all 4 tabs)
-function TrnMobCard({ item, tab, num, navigate, setDeleteConfirm, expanded, onToggle }) {
-  const fmtDate = d => d ? new Date(d).toLocaleDateString() : '\u2014';
-  let title = '', sub = '';
-  if (tab === 'routes')  { title = item.routeName || `Route #${item.routeId}`; sub = item.routeId; }
-  if (tab === 'drivers') { title = item.name; sub = item.driverId; }
-  if (tab === 'vehicles'){ title = item.name; sub = item.vehicleId; }
-  if (tab === 'passes')  { title = item.studentName || item.studentId; sub = item.passId; }
-  const editPath =
-    tab === 'routes'   ? `/transport/edit-route/${item._id || item.routeId}` :
-    tab === 'drivers'  ? `/transport/edit-driver/${item._id || item.driverId}` :
-    tab === 'vehicles' ? `/transport/edit-vehicle/${item._id || item.vehicleId}` :
-    `/transport/edit-bus-pass/${item._id || item.passId}`;
-  return (
-    <div className="mob-card">
-      <button type="button" className="mob-card-header" onClick={onToggle} aria-expanded={expanded}>
-        <div className="mob-card-summary">
-          <span className="mob-card-num">{num}</span>
-          <div className="mob-card-title-wrap">
-            <span className="mob-card-title">{title}</span>
-            <span className="mob-card-sub">{sub}</span>
-          </div>
-        </div>
-        <span className="mob-card-chevron">{expanded ? '\u25b2' : '\u25bc'}</span>
-      </button>
-      {expanded && (
-        <div className="mob-card-details">
-          {tab === 'routes' && <>
-            <div className="mob-card-row"><span className="mob-card-label">Route ID</span><span className="mob-card-value mono">{item.routeId}</span></div>
-            <div className="mob-card-row"><span className="mob-card-label">Driver</span><span className="mob-card-value">{item.driverName || '\u2014'}</span></div>
-            <div className="mob-card-row"><span className="mob-card-label">Vehicle</span><span className="mob-card-value">{item.vehicleName || '\u2014'}</span></div>
-            <div className="mob-card-row"><span className="mob-card-label">Stops</span><span className="mob-card-value">{(item.stops||[]).join(', ') || '\u2014'}</span></div>
-          </>}
-          {tab === 'drivers' && <>
-            <div className="mob-card-row"><span className="mob-card-label">Driver ID</span><span className="mob-card-value mono">{item.driverId}</span></div>
-            <div className="mob-card-row"><span className="mob-card-label">Phone</span><span className="mob-card-value">{item.phone || '\u2014'}</span></div>
-            <div className="mob-card-row"><span className="mob-card-label">License</span><span className="mob-card-value">{item.licenseNumber || '\u2014'}</span></div>
-            <div className="mob-card-row"><span className="mob-card-label">Status</span><span className="mob-card-value"><span style={{padding:'2px 8px',borderRadius:'12px',fontSize:'0.78rem',fontWeight:600,backgroundColor:item.status==='ACTIVE'?'#dcfce7':'#fee2e2',color:item.status==='ACTIVE'?'#15803d':'#b91c1c'}}>{item.status}</span></span></div>
-          </>}
-          {tab === 'vehicles' && <>
-            <div className="mob-card-row"><span className="mob-card-label">Vehicle ID</span><span className="mob-card-value mono">{item.vehicleId}</span></div>
-            <div className="mob-card-row"><span className="mob-card-label">Plate</span><span className="mob-card-value">{item.vehicleNumber || '\u2014'}</span></div>
-            <div className="mob-card-row"><span className="mob-card-label">Capacity</span><span className="mob-card-value">{item.capacity || '\u2014'}</span></div>
-            <div className="mob-card-row"><span className="mob-card-label">Status</span><span className="mob-card-value"><span style={{padding:'2px 8px',borderRadius:'12px',fontSize:'0.78rem',fontWeight:600,backgroundColor:item.status==='ACTIVE'?'#dcfce7':'#fef3c7',color:item.status==='ACTIVE'?'#15803d':'#b45309'}}>{item.status}</span></span></div>
-          </>}
-          {tab === 'passes' && <>
-            <div className="mob-card-row"><span className="mob-card-label">Pass ID</span><span className="mob-card-value mono">{item.passId}</span></div>
-            <div className="mob-card-row"><span className="mob-card-label">Student ID</span><span className="mob-card-value">{item.studentId}</span></div>
-            <div className="mob-card-row"><span className="mob-card-label">Route</span><span className="mob-card-value mono">Route #{item.routeId}</span></div>
-            <div className="mob-card-row"><span className="mob-card-label">Stops</span><span className="mob-card-value">{item.fromStop} \u2192 {item.toStop}</span></div>
-            <div className="mob-card-row"><span className="mob-card-label">Payment</span><span className="mob-card-value"><span style={{padding:'2px 8px',borderRadius:'12px',fontSize:'0.78rem',fontWeight:600,backgroundColor:item.paymentStatus==='PAID'?'#dcfce7':'#fee2e2',color:item.paymentStatus==='PAID'?'#15803d':'#b91c1c'}}>{item.paymentStatus}</span></span></div>
-            <div className="mob-card-row"><span className="mob-card-label">Valid till</span><span className="mob-card-value">{fmtDate(item.validTill)}</span></div>
-          </>}
-          <div className="mob-card-actions">
-            <button type="button" className="action-btn edit-btn" onClick={() => navigate(editPath)}><Edit size={15} /><span className="action-label">Edit</span></button>
-            <button type="button" className="action-btn delete-btn" onClick={() => setDeleteConfirm({ type: tab === 'passes' ? 'pass' : tab.slice(0,-1), item })}><Trash2 size={15} /><span className="action-label">Delete</span></button>
-          </div>
-        </div>
-      )}
-    </div>
-  );
-}
+const API_BASE_URL = 'http://localhost:5000/api';
 
 const Transport = () => {
   const navigate = useNavigate();
@@ -95,7 +35,13 @@ const Transport = () => {
   const [loading,  setLoading]  = useState(true);
   const [deleting, setDeleting] = useState(false);
   const [deleteConfirm, setDeleteConfirm] = useState(null);
-  const [trnExpanded, setTrnExpanded] = useState(null);
+
+  // Modal state — one modal open at a time, type = 'route'|'driver'|'vehicle'|'pass'
+  const [modalType,   setModalType]   = useState(null);
+  const [modalItemId, setModalItemId] = useState(null);
+  const openModal  = (type, id = null) => { setModalType(type);  setModalItemId(id);   };
+  const closeModal = ()               => { setModalType(null);   setModalItemId(null); };
+  const handleModalSuccess = () => { closeModal(); fetchAllData(); };
 
   const [search,   setSearch]   = useState('');
   const [feedback, setFeedback] = useState({ type: '', message: '' });
@@ -258,16 +204,16 @@ const Transport = () => {
           <p className="page-subtitle">Manage campus bus routes, drivers, vehicles, and student passes</p>
         </div>
         <div className="header-actions-group transport-header-actions">
-          <button type="button" className="btn btn-secondary" onClick={() => navigate('/transport/add-driver')}>
+          <button type="button" className="btn btn-secondary" onClick={() => openModal('driver')}>
             <UserCheck size={15} /><span>Add Driver</span>
           </button>
-          <button type="button" className="btn btn-secondary" onClick={() => navigate('/transport/add-vehicle')}>
+          <button type="button" className="btn btn-secondary" onClick={() => openModal('vehicle')}>
             <Truck size={15} /><span>Add Vehicle</span>
           </button>
-          <button type="button" className="btn btn-secondary" onClick={() => navigate('/transport/add-bus-pass')}>
+          <button type="button" className="btn btn-secondary" onClick={() => openModal('pass')}>
             <Ticket size={15} /><span>Add Bus Pass</span>
           </button>
-          <button type="button" className="books-btn books-btn-primary" onClick={() => navigate('/transport/add-route')}>
+          <button type="button" className="books-btn books-btn-primary" onClick={() => openModal('route')}>
             <Plus size={15} /><span>Add Bus Route</span>
           </button>
         </div>
@@ -335,10 +281,10 @@ const Transport = () => {
               {!search && (
                 <button type="button" className="books-btn books-btn-primary" style={{ marginTop: '1rem' }}
                   onClick={() => {
-                    if (activeTab === 'routes')  navigate('/transport/add-route');
-                    else if (activeTab === 'drivers')  navigate('/transport/add-driver');
-                    else if (activeTab === 'vehicles') navigate('/transport/add-vehicle');
-                    else navigate('/transport/add-bus-pass');
+                    if (activeTab === 'routes')        openModal('route');
+                    else if (activeTab === 'drivers')  openModal('driver');
+                    else if (activeTab === 'vehicles') openModal('vehicle');
+                    else openModal('pass');
                   }}>
                   <Plus size={16} />
                   <span>Add {activeTab === 'routes' ? 'Bus Route' : activeTab === 'drivers' ? 'Driver' : activeTab === 'vehicles' ? 'Vehicle' : 'Bus Pass'}</span>
@@ -349,8 +295,6 @@ const Transport = () => {
             <>
               {/* D1: transport-table gives centered <th> to route + vehicle tables */}
               {activeTab === 'routes' && (
-              <>
-              <div className="trn-desk-table">
                 <table className="data-table transport-table">
                   <thead>
                     <tr>
@@ -394,7 +338,7 @@ const Transport = () => {
                         </td>
                         <td style={{ textAlign: 'right' }}>
                           <div className="action-buttons-cell" style={{ justifyContent: 'flex-end' }}>
-                            <button type="button" className="action-btn edit-btn" title="Edit" onClick={() => navigate(`/transport/edit-route/${route._id || route.routeId}`)}>
+                            <button type="button" className="action-btn edit-btn" title="Edit" onClick={() => openModal('route', route._id || route.routeId)}>
                               <Edit size={14} /><span className="action-label">Edit</span>
                             </button>
                             <button type="button" className="action-btn delete-btn" title="Delete" onClick={() => setDeleteConfirm({ type: 'route', item: route })}>
@@ -406,18 +350,9 @@ const Transport = () => {
                     ))}
                   </tbody>
                 </table>
-              </div>
-              <div className="trn-mob-list">
-                {paginatedData.map((item, i) => {
-                  const id = item._id || item.routeId || i;
-                  return <TrnMobCard key={id} item={item} tab="routes" num={startIndex + i + 1} navigate={navigate} setDeleteConfirm={setDeleteConfirm} expanded={trnExpanded === id} onToggle={() => setTrnExpanded(p => p === id ? null : id)} />;
-                })}
-              </div>
-              </>
               )}
+
               {activeTab === 'drivers' && (
-              <>
-              <div className="trn-desk-table">
                 <table className="data-table transport-table">
                   <thead>
                     <tr>
@@ -445,7 +380,7 @@ const Transport = () => {
                         </td>
                         <td style={{ textAlign: 'right' }}>
                           <div className="action-buttons-cell" style={{ justifyContent: 'flex-end' }}>
-                            <button type="button" className="action-btn edit-btn" title="Edit" onClick={() => navigate(`/transport/edit-driver/${driver._id || driver.driverId}`)}>
+                            <button type="button" className="action-btn edit-btn" title="Edit" onClick={() => openModal('driver', driver._id || driver.driverId)}>
                               <Edit size={14} /><span className="action-label">Edit</span>
                             </button>
                             <button type="button" className="action-btn delete-btn" title="Delete" onClick={() => setDeleteConfirm({ type: 'driver', item: driver })}>
@@ -457,19 +392,10 @@ const Transport = () => {
                     ))}
                   </tbody>
                 </table>
-              </div>
-              <div className="trn-mob-list">
-                {paginatedData.map((item, i) => {
-                  const id = item._id || item.driverId || i;
-                  return <TrnMobCard key={id} item={item} tab="drivers" num={startIndex + i + 1} navigate={navigate} setDeleteConfirm={setDeleteConfirm} expanded={trnExpanded === id} onToggle={() => setTrnExpanded(p => p === id ? null : id)} />;
-                })}
-              </div>
-              </>
               )}
 
+              {/* D4: transport-table gives centered <th> */}
               {activeTab === 'vehicles' && (
-              <>
-              <div className="trn-desk-table">
                 <table className="data-table transport-table">
                   <thead>
                     <tr>
@@ -497,7 +423,7 @@ const Transport = () => {
                         </td>
                         <td style={{ textAlign: 'right' }}>
                           <div className="action-buttons-cell" style={{ justifyContent: 'flex-end' }}>
-                            <button type="button" className="action-btn edit-btn" title="Edit" onClick={() => navigate(`/transport/edit-vehicle/${vehicle._id || vehicle.vehicleId}`)}>
+                            <button type="button" className="action-btn edit-btn" title="Edit" onClick={() => openModal('vehicle', vehicle._id || vehicle.vehicleId)}>
                               <Edit size={14} /><span className="action-label">Edit</span>
                             </button>
                             <button type="button" className="action-btn delete-btn" title="Delete" onClick={() => setDeleteConfirm({ type: 'vehicle', item: vehicle })}>
@@ -509,19 +435,9 @@ const Transport = () => {
                     ))}
                   </tbody>
                 </table>
-              </div>
-              <div className="trn-mob-list">
-                {paginatedData.map((item, i) => {
-                  const id = item._id || item.vehicleId || i;
-                  return <TrnMobCard key={id} item={item} tab="vehicles" num={startIndex + i + 1} navigate={navigate} setDeleteConfirm={setDeleteConfirm} expanded={trnExpanded === id} onToggle={() => setTrnExpanded(p => p === id ? null : id)} />;
-                })}
-              </div>
-              </>
               )}
 
               {activeTab === 'passes' && (
-              <>
-              <div className="trn-desk-table">
                 <table className="data-table transport-table">
                   <thead>
                     <tr>
@@ -557,7 +473,7 @@ const Transport = () => {
                         <td>{pass.validTill ? new Date(pass.validTill).toLocaleDateString() : '—'}</td>
                         <td style={{ textAlign: 'right' }}>
                           <div className="action-buttons-cell" style={{ justifyContent: 'flex-end' }}>
-                            <button type="button" className="action-btn edit-btn" title="Edit" onClick={() => navigate(`/transport/edit-bus-pass/${pass._id || pass.passId}`)}>
+                            <button type="button" className="action-btn edit-btn" title="Edit" onClick={() => openModal('pass', pass._id || pass.passId)}>
                               <Edit size={14} /><span className="action-label">Edit</span>
                             </button>
                             <button type="button" className="action-btn delete-btn" title="Delete" onClick={() => setDeleteConfirm({ type: 'pass', item: pass })}>
@@ -569,14 +485,6 @@ const Transport = () => {
                     ))}
                   </tbody>
                 </table>
-              </div>
-              <div className="trn-mob-list">
-                {paginatedData.map((item, i) => {
-                  const id = item._id || item.passId || i;
-                  return <TrnMobCard key={id} item={item} tab="passes" num={startIndex + i + 1} navigate={navigate} setDeleteConfirm={setDeleteConfirm} expanded={trnExpanded === id} onToggle={() => setTrnExpanded(p => p === id ? null : id)} />;
-                })}
-              </div>
-              </>
               )}
 
               {totalPages > 1 && (
@@ -655,12 +563,17 @@ const Transport = () => {
             <div className="modal-actions">
               <button type="button" className="books-btn books-btn-ghost" onClick={() => setDeleteConfirm(null)} disabled={deleting}>Cancel</button>
               <button type="button" className="btn btn-danger" onClick={handleConfirmDelete} disabled={deleting}>
-                {deleting ? <><Loader2 size={16} className="spin-animate" /><span>Deleting...</span></> : <><Trash2 size={16} /><span><span style={{display:"inline-flex",alignItems:"center",gap:4}}><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>Delete</span></span></>}
+                {deleting ? <><Loader2 size={16} className="spin-animate" /><span>Deleting...</span></> : <><Trash2 size={16} /><span>Delete</span></>}
               </button>
             </div>
           </div>
         </div>
       )}
+
+      <AddBusRouteModal isOpen={modalType === 'route'}   routeId={modalItemId}   onClose={closeModal} onSuccess={handleModalSuccess} />
+      <AddDriverModal   isOpen={modalType === 'driver'}  driverId={modalItemId}  onClose={closeModal} onSuccess={handleModalSuccess} />
+      <AddVehicleModal  isOpen={modalType === 'vehicle'} vehicleId={modalItemId} onClose={closeModal} onSuccess={handleModalSuccess} />
+      <AddBusPassModal  isOpen={modalType === 'pass'}    passId={modalItemId}    onClose={closeModal} onSuccess={handleModalSuccess} />
     </div>
   );
 };

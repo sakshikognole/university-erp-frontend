@@ -29,8 +29,7 @@ import {
   validateGraduationYear,
 } from '../utils/alumniValidation';
 
-const _IS_PROD = window.location.hostname !== 'localhost';
-const API_BASE_URL = _IS_PROD ? 'https://university-erp-node.onrender.com/api' : 'http://localhost:5000/api';
+const API_BASE_URL = 'http://localhost:5000/api';
 
 const BulkUploadAlumni = () => {
   const navigate = useNavigate();

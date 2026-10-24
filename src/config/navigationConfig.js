@@ -25,6 +25,7 @@ import {
   School,
   Newspaper,
   LibraryBig,
+  Mail,
 } from 'lucide-react';
 
 export const navigationConfig = {
@@ -60,6 +61,7 @@ export const navigationConfig = {
     { label: 'Alumni Jobs',           path: '/alumni-jobs',             icon: Briefcase },
     { label: 'System Announcements',  path: '/system-announcements',    icon: BellRing },
     { label: 'Attendance',            path: '/attendance',              icon: ClipboardList },
+    { label: 'Email Communication',   path: '/email-communication',     icon: Mail },
     { label: 'Announcements',         path: '/announcements',           icon: Newspaper },
     { label: 'Academic Resources',    path: '/academic-resources',      icon: LibraryBig },
   ],
@@ -95,6 +97,7 @@ export const navigationConfig = {
     { label: 'Alumni Jobs',           path: '/alumni-jobs',             icon: Briefcase },
     { label: 'System Announcements',  path: '/system-announcements',    icon: BellRing },
     { label: 'Attendance',            path: '/attendance',              icon: ClipboardList },
+    { label: 'Email Communication',   path: '/email-communication',     icon: Mail },
     { label: 'Announcements',         path: '/announcements',           icon: Newspaper },
     { label: 'Academic Resources',    path: '/academic-resources',      icon: LibraryBig },
   ],

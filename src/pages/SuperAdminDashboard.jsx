@@ -1,12 +1,18 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Users, GraduationCap, Building2, UserPlus, ChevronDown, Loader2, Trophy } from 'lucide-react';
+import StudentFormModal from './StudentForm';
+import StaffFormModal from './StaffForm';
 
 // Students, staff, departments → Node/Express backend
-const _IS_PROD_SA = window.location.hostname !== 'localhost';
-const API_BASE_URL = _IS_PROD_SA ? 'https://university-erp-node.onrender.com/api' : 'http://localhost:5000/api';
+const _IS_PROD = window.location.hostname !== 'localhost';
+const API_BASE_URL = _IS_PROD
+  ? 'https://university-erp-node.onrender.com/api'
+  : 'http://localhost:5000/api';
 // Clubs → Spring Boot backend
-const SPRING_API_URL = _IS_PROD_SA ? 'https://university-erp-spring.onrender.com/api' : 'http://localhost:9090/api';
+const SPRING_API_URL = _IS_PROD
+  ? 'https://university-erp-spring.onrender.com/api'
+  : 'http://localhost:9090/api';
 
 const SuperAdminDashboard = () => {
   const navigate = useNavigate();
@@ -19,6 +25,10 @@ const SuperAdminDashboard = () => {
   });
   const [showAddUserMenu, setShowAddUserMenu] = useState(false);
   const addUserMenuRef = useRef(null);
+
+  // Inline modal state
+  const [studentModalOpen, setStudentModalOpen] = useState(false);
+  const [staffModalOpen,   setStaffModalOpen]   = useState(false);
 
   const authHeader = () => {
     const token = localStorage.getItem('erp_token');
@@ -133,7 +143,7 @@ const SuperAdminDashboard = () => {
                 className="dropdown-menu-item"
                 onClick={() => {
                   setShowAddUserMenu(false);
-                  navigate('/add-student');
+                  setStudentModalOpen(true);
                 }}
               >
                 <GraduationCap size={15} />
@@ -144,7 +154,7 @@ const SuperAdminDashboard = () => {
                 className="dropdown-menu-item"
                 onClick={() => {
                   setShowAddUserMenu(false);
-                  navigate('/add-staff');
+                  setStaffModalOpen(true);
                 }}
               >
                 <Users size={15} />
@@ -190,6 +200,22 @@ const SuperAdminDashboard = () => {
           })}
         </div>
       )}
+
+      {/* Inline Add Student modal */}
+      <StudentFormModal
+        isOpen={studentModalOpen}
+        studentId={null}
+        onClose={() => setStudentModalOpen(false)}
+        onSuccess={() => { setStudentModalOpen(false); fetchDashboardStats(); }}
+      />
+
+      {/* Inline Add Staff modal */}
+      <StaffFormModal
+        isOpen={staffModalOpen}
+        staffId={null}
+        onClose={() => setStaffModalOpen(false)}
+        onSuccess={() => { setStaffModalOpen(false); fetchDashboardStats(); }}
+      />
     </div>
   );
 };

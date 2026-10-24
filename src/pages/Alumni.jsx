@@ -23,8 +23,9 @@ import {
   Upload, Edit, Trash2, X, AlertTriangle, RefreshCw,
 } from 'lucide-react';
 
-const _IS_PROD = window.location.hostname !== 'localhost';
-const API_BASE_URL = _IS_PROD ? 'https://university-erp-node.onrender.com/api' : 'http://localhost:5000/api';
+import AlumniFormModal from './AlumniForm';
+
+const API_BASE_URL = 'http://localhost:5000/api';
 const NO_RECORDS_MSG = 'No Alumni records available to download.';
 
 // ── Export helpers ────────────────────────────────────────────────────────────
@@ -115,56 +116,23 @@ const exportPDF = (rows, setFeedback) => {
 };
 // ─────────────────────────────────────────────────────────────────────────────
 
-// Mobile accordion card
-function AlmMobCard({ a, num, onEdit, onDelete, expanded, onToggle }) {
-  return (
-    <div className="mob-card">
-      <button type="button" className="mob-card-header" onClick={onToggle} aria-expanded={expanded}>
-        <div className="mob-card-summary">
-          <span className="mob-card-num">{num}</span>
-          <div className="mob-card-title-wrap">
-            <span className="mob-card-title">{a.name}</span>
-            <span className="mob-card-sub">{a.alumniId} — {a.graduationYear}</span>
-          </div>
-        </div>
-        <span className="mob-card-chevron">{expanded ? '▲' : '▼'}</span>
-      </button>
-      {expanded && (
-        <div className="mob-card-details">
-          <div className="mob-card-row"><span className="mob-card-label">Alumni ID</span><span className="mob-card-value mono">{a.alumniId}</span></div>
-          <div className="mob-card-row"><span className="mob-card-label">Year</span><span className="mob-card-value">{a.graduationYear || '—'}</span></div>
-          <div className="mob-card-row"><span className="mob-card-label">Job Title</span><span className="mob-card-value">{a.jobTitle || '—'}</span></div>
-          <div className="mob-card-row"><span className="mob-card-label">Company</span><span className="mob-card-value">{a.currentCompany || '—'}</span></div>
-          <div className="mob-card-row"><span className="mob-card-label">Email</span><span className="mob-card-value">{a.email || '—'}</span></div>
-          <div className="mob-card-row"><span className="mob-card-label">Phone</span><span className="mob-card-value">{a.phone || '—'}</span></div>
-          <div className="mob-card-actions">
-            <button type="button" className="action-btn edit-btn" onClick={onEdit}><Edit size={15} /><span className="action-label">Edit</span></button>
-            <button type="button" className="action-btn delete-btn" onClick={onDelete}><Trash2 size={15} /><span className="action-label">Delete</span></button>
-          </div>
-        </div>
-      )}
-    </div>
-  );
-}
-
 const Alumni = () => {
   const navigate = useNavigate();
 
   const [alumni,    setAlumni]    = useState([]);
   const [loading,   setLoading]   = useState(true);
-  const [loadError, setLoadError] = useState(null);   // distinct from "empty list"
+  const [loadError, setLoadError] = useState(null);
   const [deleting,  setDeleting]  = useState(false);
   const [search,    setSearch]    = useState('');
   const [feedback,  setFeedback]  = useState({ type: '', message: '' });
   const [showDownloadMenu, setShowDownloadMenu] = useState(false);
   const [deleteConfirm,    setDeleteConfirm]    = useState(null);
-  const [almExpanded, setAlmExpanded] = useState(null);
   const downloadMenuRef = useRef(null);
-
-  // Performance: keep a ref to the active fetch so we can abort on unmount /
-  // re-fetch, preventing stale responses from landing in state after the
-  // component has moved on.
   const fetchControllerRef = useRef(null);
+
+  // Modal state
+  const [modalOpen,    setModalOpen]    = useState(false);
+  const [editAlumniId, setEditAlumniId] = useState(null);
 
   const [currentPage,  setCurrentPage]  = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(10);
@@ -243,6 +211,16 @@ const Alumni = () => {
     if (fmt === 'pdf') exportPDF(filteredAlumni, setFeedback);
   };
 
+  // Modal helpers
+  const openAddModal    = ()    => { setEditAlumniId(null);     setModalOpen(true); };
+  const openEditModal   = (id)  => { setEditAlumniId(id);       setModalOpen(true); };
+  const closeModal      = ()    => { setModalOpen(false);       setEditAlumniId(null); };
+  const handleModalSuccess = useCallback(() => {
+    closeModal();
+    fetchAlumni();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [fetchAlumni]);
+
   const filteredAlumni = alumni.filter((a) => {
     const q = search.toLowerCase().trim();
     return !q ||
@@ -298,7 +276,7 @@ const Alumni = () => {
           </button>
 
           <button type="button" className="books-btn books-btn-primary"
-            onClick={() => navigate('/alumni/add')}>
+            onClick={openAddModal}>
             <Plus size={16} /><span>Add Alumni</span>
           </button>
         </div>
@@ -359,14 +337,13 @@ const Alumni = () => {
               </p>
               {!loadError && !search && (
                 <button type="button" className="books-btn books-btn-primary"
-                  style={{ marginTop: '1rem' }} onClick={() => navigate('/alumni/add')}>
+                  style={{ marginTop: '1rem' }} onClick={openAddModal}>
                   <Plus size={16} /><span>Add Alumni</span>
                 </button>
               )}
             </div>
           ) : (
             <>
-              <div className="alm-desk-table">
               <table className="data-table">
                 <thead>
                   <tr>
@@ -405,12 +382,12 @@ const Alumni = () => {
                       <td style={{ textAlign: 'right' }}>
                         <div className="action-buttons-cell" style={{ justifyContent: 'flex-end' }}>
                           <button type="button" className="action-btn edit-btn" title="Edit"
-                            onClick={() => navigate(`/alumni/edit/${a._id || a.alumniId}`)}>
-                            <Edit size={15} /><span className="action-label">Edit</span>
+                            onClick={() => openEditModal(a._id || a.alumniId)}>
+                            <Edit size={14} /><span className="action-label">Edit</span>
                           </button>
                           <button type="button" className="action-btn delete-btn" title="Delete"
                             onClick={() => setDeleteConfirm({ id: a._id || a.alumniId, name: a.name })}>
-                            <Trash2 size={15} /><span className="action-label">Delete</span>
+                            <Trash2 size={14} /><span className="action-label">Delete</span>
                           </button>
                         </div>
                       </td>
@@ -418,20 +395,6 @@ const Alumni = () => {
                   ))}
                 </tbody>
               </table>
-              </div>
-              <div className="alm-mob-list">
-                {currentItems.map((a, i) => (
-                  <AlmMobCard
-                    key={a._id || a.alumniId}
-                    a={a}
-                    num={startIndex + i + 1}
-                    onEdit={() => navigate(`/alumni/edit/${a._id || a.alumniId}`)}
-                    onDelete={() => setDeleteConfirm({ id: a._id || a.alumniId, name: a.name })}
-                    expanded={almExpanded === (a._id || a.alumniId)}
-                    onToggle={() => setAlmExpanded(prev => prev === (a._id || a.alumniId) ? null : (a._id || a.alumniId))}
-                  />
-                ))}
-              </div>
 
               {totalPages > 1 && (
                 <div className="pagination-controls">
@@ -503,12 +466,20 @@ const Alumni = () => {
                 onClick={() => handleDelete(deleteConfirm.id, deleteConfirm.name)} disabled={deleting}>
                 {deleting
                   ? <><Loader2 size={16} className="spin-animate" /><span>Deleting…</span></>
-                  : <><Trash2 size={16} /><span><span style={{display:"inline-flex",alignItems:"center",gap:4}}><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>Delete</span></span></>}
+                  : <><Trash2 size={16} /><span>Delete</span></>}
               </button>
             </div>
           </div>
         </div>
       )}
+
+      {/* Alumni Form Modal */}
+      <AlumniFormModal
+        isOpen={modalOpen}
+        alumniId={editAlumniId}
+        onClose={closeModal}
+        onSuccess={handleModalSuccess}
+      />
     </div>
   );
 };

@@ -40,9 +40,8 @@ import { exportEvents } from '../utils/exportUtils';
 import { getEventImage } from '../utils/eventImageUtils';
 import EventForm from './EventForm';
 
-const _IS_PROD_EV = window.location.hostname !== 'localhost';
-const API_BASE_URL  = _IS_PROD_EV ? 'https://university-erp-spring.onrender.com/api' : 'http://localhost:9090/api';
-const NODE_API_URL  = _IS_PROD_EV ? 'https://university-erp-node.onrender.com/api' : 'http://localhost:5000/api';
+const API_BASE_URL  = 'http://localhost:9090/api';
+const NODE_API_URL  = 'http://localhost:5000/api';
 
 // ─── View Event Details dialog (inline, reusing existing modal CSS) ───────────
 const EventDetailsDialog = ({ eventId, onClose, onEdit, onDeleted }) => {
@@ -200,7 +199,7 @@ const EventDetailsDialog = ({ eventId, onClose, onEdit, onDeleted }) => {
                 <div style={{ display: 'flex', gap: '0.75rem', justifyContent: 'flex-end' }}>
                   <button type="button" className="books-btn books-btn-ghost" onClick={() => setConfirmDel(false)} disabled={deleting}>Cancel</button>
                   <button type="button" className="btn btn-danger" onClick={handleDelete} disabled={deleting}>
-                    {deleting ? <><Loader2 size={14} className="spin-animate" /><span>Deleting…</span></> : <><Trash2 size={14} /><span className="action-label">Delete</span><span><span style={{display:"inline-flex",alignItems:"center",gap:4}}><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>Delete</span></span></>}
+                    {deleting ? <><Loader2 size={14} className="spin-animate" /><span>Deleting…</span></> : <><Trash2 size={14} /><span>Delete</span></>}
                   </button>
                 </div>
               </div>
@@ -213,7 +212,7 @@ const EventDetailsDialog = ({ eventId, onClose, onEdit, onDeleted }) => {
                   <Edit size={14} /><span>Edit</span>
                 </button>
                 <button type="button" className="btn btn-danger" onClick={() => setConfirmDel(true)}>
-                  <Trash2 size={14} /><span className="action-label">Delete</span><span><span style={{display:"inline-flex",alignItems:"center",gap:4}}><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>Delete</span></span>
+                  <Trash2 size={14} /><span>Delete</span>
                 </button>
               </div>
             )}
@@ -263,9 +262,7 @@ const Events = () => {
   const fetchEvents = async () => {
     setLoading(true);
     try {
-      const res = await fetch(`${API_BASE_URL}/events`, {
-        headers: { Authorization: `Bearer ${localStorage.getItem('erp_token')}` },
-      });
+      const res = await fetch(`${API_BASE_URL}/events`);
       if (!res.ok) throw new Error('Failed to load events');
       setEvents(await res.json());
       setFeedback({ type: '', message: '' });
@@ -278,10 +275,7 @@ const Events = () => {
   const handleDelete = async (eventId, eventTitle) => {
     setDeleting(true);
     try {
-      const res = await fetch(`${API_BASE_URL}/events/${eventId}`, {
-        method: 'DELETE',
-        headers: { Authorization: `Bearer ${localStorage.getItem('erp_token')}` },
-      });
+      const res = await fetch(`${API_BASE_URL}/events/${eventId}`, { method: 'DELETE' });
       if (!res.ok) { const d = await res.json().catch(()=>({})); throw new Error(d.error || 'Failed to delete event'); }
       const d = await res.json();
       setFeedback({ type: 'success', message: d.message || `Event '${eventTitle}' deleted successfully.` });
@@ -494,7 +488,8 @@ const Events = () => {
                           e.stopPropagation();
                           setDeleteConfirm({ id: event.eventId, eventId: event.eventId, title: eventTitle, venueId: event.venueId, eventType: event.eventType });
                         }}>
-                        <Trash2 size={14} /><span className="action-label">Delete</span>
+                        <Trash2 size={14} />
+                        <span className="action-label">Delete</span>
                       </button>
                     </div>
                   </div>

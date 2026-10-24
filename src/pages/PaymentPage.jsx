@@ -2,9 +2,7 @@ import { useState, useEffect, useCallback } from 'react';
 import axios from 'axios';
 import Pagination from '../components/Pagination';
 
-const _IS_PROD_PM = window.location.hostname !== 'localhost';
-const _SPRING_URL_PM = _IS_PROD_PM ? 'https://university-erp-spring.onrender.com' : 'http://localhost:9090';
-const SPRING_API = `${_SPRING_URL_PM}/api`;
+const SPRING_API = 'http://localhost:9090/api';
 
 const DEFAULT_PAGE = {
   pageNumber: 0, pageSize: 10, totalElements: 0,
@@ -147,32 +145,6 @@ function AddPaymentModal({ isOpen, onClose, onSaved }) {
 // PaymentPage — Admin payment title + combination management
 // Accessible at /payment-management (Super Admin only)
 // ══════════════════════════════════════════════════════════════════════════
-// Mobile accordion card for Payment Titles
-function PayMobCard({ t, fmt, selected, onToggle, expanded, onCardToggle }) {
-  return (
-    <div className="mob-card" style={{ border: selected ? '2px solid #2563eb' : undefined }}>
-      <button type="button" className="mob-card-header" onClick={onCardToggle} aria-expanded={expanded}>
-        <div className="mob-card-summary">
-          <input type="checkbox" checked={selected} onChange={onToggle} onClick={e => e.stopPropagation()} style={{ flexShrink: 0 }} />
-          <div className="mob-card-title-wrap" style={{ marginLeft: 6 }}>
-            <span className="mob-card-title">{t.title}</span>
-            <span className="mob-card-sub">{t.titleId}</span>
-          </div>
-        </div>
-        <span className="mob-card-chevron">{expanded ? '\u25b2' : '\u25bc'}</span>
-      </button>
-      {expanded && (
-        <div className="mob-card-details">
-          <div className="mob-card-row"><span className="mob-card-label">Title ID</span><span className="mob-card-value mono">{t.titleId}</span></div>
-          <div className="mob-card-row"><span className="mob-card-label">Amount</span><span className="mob-card-value">{fmt(t.amount)}</span></div>
-          <div className="mob-card-row"><span className="mob-card-label">Discount</span><span className="mob-card-value" style={{ color: '#047857' }}>{t.discount > 0 ? `- ${fmt(t.discount)}` : '\u20b90'}</span></div>
-          <div className="mob-card-row"><span className="mob-card-label">Net payable</span><span className="mob-card-value" style={{ fontWeight: 700 }}>{fmt(t.amount - t.discount)}</span></div>
-        </div>
-      )}
-    </div>
-  );
-}
-
 export default function PaymentPage() {
 
   // ── Titles (paginated) ────────────────────────────────────────────────
@@ -197,7 +169,6 @@ export default function PaymentPage() {
   // ── Feedback ──────────────────────────────────────────────────────────
   const [success, setSuccess] = useState('');
   const [error,   setError]   = useState('');
-  const [payExpanded, setPayExpanded] = useState(null);
 
   useEffect(() => {
     if (!success && !error) return;
@@ -344,8 +315,6 @@ export default function PaymentPage() {
         {titlesLoading ? (
           <p className="books-loading">Loading payment titles...</p>
         ) : (
-          <>
-          <div className="pay-desk-table">
           <div className="books-table-wrap">
             <table className="books-table">
               <thead>
@@ -401,21 +370,6 @@ export default function PaymentPage() {
               </tbody>
             </table>
           </div>
-          </div>
-          <div className="pay-mob-list">
-            {titles.map((t) => (
-              <PayMobCard
-                key={t.titleId}
-                t={t}
-                fmt={fmt}
-                selected={selected.has(t.titleId)}
-                onToggle={() => toggleOne(t.titleId)}
-                expanded={payExpanded === t.titleId}
-                onCardToggle={() => setPayExpanded(prev => prev === t.titleId ? null : t.titleId)}
-              />
-            ))}
-          </div>
-          </>
         )}
 
         <Pagination
