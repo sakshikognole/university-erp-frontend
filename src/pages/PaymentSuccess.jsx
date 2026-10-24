@@ -14,8 +14,7 @@ import {
   Loader2,
 } from 'lucide-react';
 import { downloadFeeReceiptPDF } from '../utils/exportUtils';
-
-const _IS_PROD = window.location.hostname !== 'localhost';
+const _IS_PROD = typeof window !== 'undefined' && window.location.hostname !== 'localhost';
 const API_BASE_URL = _IS_PROD ? 'https://university-erp-node.onrender.com/api' : 'http://localhost:5000/api';
 
 const PaymentSuccess = () => {
@@ -324,7 +323,7 @@ const PaymentSuccess = () => {
         <table className="data-table" style={{ marginBottom: '1.75rem', width: '100%' }}>
           <thead>
             <tr>
-              <th>Fee breakdown / item description</th>
+              <th>Fee Breakdown / Item Description</th>
               <th style={{ width: '180px', textAlign: 'right' }}>Amount (INR)</th>
             </tr>
           </thead>

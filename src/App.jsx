@@ -124,6 +124,9 @@ import PasswordManagementPage from './pages/PasswordManagement/PasswordManagemen
 import PmOtpPage from './pages/PasswordManagement/PmOtpPage';
 import PmTestLogin from './pages/PasswordManagement/PmTestLogin';
 
+// --- Email Communication ---
+import EmailCommunication from './pages/EmailCommunication/EmailCommunication';
+
 import './index.css';
 
 function AppRoutes() {
@@ -627,6 +630,16 @@ function AppRoutes() {
         {/* ==================== ATTENDANCE ==================== */}
         <Route path="attendance" element={<Attendance />} />
         <Route path="attendance/review" element={<AttendanceReview />} />
+
+        {/* ==================== EMAIL COMMUNICATION ==================== */}
+        <Route
+          path="email-communication"
+          element={
+            <SuperAdminRoute>
+              <EmailCommunication />
+            </SuperAdminRoute>
+          }
+        />
 
         {/* ==================== ANNOUNCEMENTS ==================== */}
         <Route path="announcements" element={<Announcements />} />

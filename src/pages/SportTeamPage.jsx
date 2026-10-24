@@ -1,4 +1,4 @@
-import { springApi } from '../services/api';
+import { springApi, springGet } from '../services/api';
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { Eye, Edit, Trash2 } from 'lucide-react';
@@ -231,7 +231,7 @@ export default function SportTeamPage() {
   const load = useCallback(async (silent = false) => {
     if (!silent) setLoading(true);
     try {
-      const res = await springApi.get('/sport-teams');
+      const res = await springGet('/sport-teams');
       setTeams(Array.isArray(res) ? res : (res ?? []));
     } catch {
       setError('Failed to load sport teams.');

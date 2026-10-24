@@ -14,7 +14,7 @@ const EMPTY = {
     status: 'Active',
 };
 
-export default function ClubModal({ isOpen, mode, club, parentClubs, onSave, onClose, loading, existingClubs }) {
+export default function ClubModal({ isOpen, mode, club, parentClubs, onSave, onClose, loading }) {
     const [form, setForm] = useState(EMPTY);
     const [errors, setErrors] = useState({});
 
@@ -50,36 +50,9 @@ export default function ClubModal({ isOpen, mode, club, parentClubs, onSave, onC
 
     const validate = () => {
         const e = {};
-        
-        // Club ID validation - letters, numbers, or combination. No special chars or spaces.
-        if (!form.clubId.trim()) {
-            e.clubId = 'Required';
-        } else {
-            const clubIdTrimmed = form.clubId.trim();
-            if (!/^[A-Za-z0-9]+$/.test(clubIdTrimmed)) {
-                e.clubId = 'Invalid ID. Please enter a valid ID.';
-            }
-            // Check for duplicate Club ID (only in add mode)
-            else if (mode === 'add' && existingClubs) {
-                const isDuplicate = existingClubs.some(
-                    (c) => c.clubId.trim().toLowerCase() === clubIdTrimmed.toLowerCase()
-                );
-                if (isDuplicate) {
-                    e.clubId = `Club ID "${clubIdTrimmed}" already exists. Please use a different ID.`;
-                }
-            }
-        }
-        
-        // Club Name validation
-        // Defect #1 & #5: Club Name should only contain letters and spaces
-        if (!form.clubName.trim()) {
-            e.clubName = 'Required';
-        } else if (!/^[A-Za-z\s]+$/.test(form.clubName.trim())) {
-            e.clubName = 'Invalid Club Name. Please enter a valid name (e.g. Coding Club).';
-        }
-        
+        if (!form.clubId.trim()) e.clubId = 'Required';
+        if (!form.clubName.trim()) e.clubName = 'Required';
         if (!form.status) e.status = 'Required';
-        
         return e;
     };
 
@@ -109,29 +82,21 @@ export default function ClubModal({ isOpen, mode, club, parentClubs, onSave, onC
                         {/* Row 1 — Club ID + Club Name */}
                         <div className="club-form-row">
                             <div className="books-form-group">
-                                <label className="books-form-label">
-                                    Club ID *
-                                </label>
+                                <label className="books-form-label">Club ID *</label>
                                 <input
                                     className={`books-form-control ${errors.clubId ? 'err' : ''}`}
                                     name="clubId" value={form.clubId} onChange={change}
-                                    placeholder="e.g. CLB001, TECH-01"
+                                    placeholder="e.g. CLB001"
                                     disabled={mode === 'edit'}
-                                    style={mode === 'edit' ? {
-                                        background: '#f9fafb', color: '#6b7280',
-                                        cursor: 'not-allowed', fontFamily: 'monospace',
-                                    } : {}}
                                 />
                                 {errors.clubId && <p className="books-form-err">{errors.clubId}</p>}
                             </div>
                             <div className="books-form-group">
-                                <label className="books-form-label">
-                                    Club Name *
-                                </label>
+                                <label className="books-form-label">Club Name *</label>
                                 <input
                                     className={`books-form-control ${errors.clubName ? 'err' : ''}`}
                                     name="clubName" value={form.clubName} onChange={change}
-                                    placeholder="Enter club name"
+                                    placeholder="e.g. Coding Club"
                                 />
                                 {errors.clubName && <p className="books-form-err">{errors.clubName}</p>}
                             </div>

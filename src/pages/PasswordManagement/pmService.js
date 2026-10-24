@@ -8,8 +8,8 @@
  * To swap the test OTP for a real email/SMS provider later, only the
  * backend controller needs to change. This service layer stays the same.
  */
-
-const API_BASE = 'http://localhost:5000/api/password-mgmt';
+const _IS_PROD = typeof window !== 'undefined' && window.location.hostname !== 'localhost';
+const API_BASE = (_IS_PROD ? 'https://university-erp-node.onrender.com/api' : 'http://localhost:5000/api') + '/password-mgmt';
 
 /**
  * Generic fetch wrapper — throws an Error with the server's message on failure.

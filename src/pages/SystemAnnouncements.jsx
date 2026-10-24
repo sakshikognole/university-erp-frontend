@@ -12,40 +12,13 @@ import {
   ChevronRight,
   Trash2,
   Eye,
+  Edit,
   X,
 } from 'lucide-react';
 
-const _IS_PROD = window.location.hostname !== 'localhost';
+import SystemAnnouncementFormModal from './SystemAnnouncementForm';
+const _IS_PROD = typeof window !== 'undefined' && window.location.hostname !== 'localhost';
 const API_BASE_URL = _IS_PROD ? 'https://university-erp-node.onrender.com/api' : 'http://localhost:5000/api';
-
-// Mobile accordion card
-function AnnMobCard({ ann, num, formatDate, navigate, canDelete, onDelete, expanded, onToggle }) {
-  return (
-    <div className="mob-card">
-      <button type="button" className="mob-card-header" onClick={onToggle} aria-expanded={expanded}>
-        <div className="mob-card-summary">
-          <span className="mob-card-num">{num}</span>
-          <div className="mob-card-title-wrap">
-            <span className="mob-card-title">{ann.title}</span>
-            <span className="mob-card-sub">{ann.announcementId}</span>
-          </div>
-        </div>
-        <span className="mob-card-chevron">{expanded ? '▲' : '▼'}</span>
-      </button>
-      {expanded && (
-        <div className="mob-card-details">
-          <div className="mob-card-row"><span className="mob-card-label">ID</span><span className="mob-card-value mono">{ann.announcementId}</span></div>
-          <div className="mob-card-row"><span className="mob-card-label">Title</span><span className="mob-card-value">{ann.title}</span></div>
-          <div className="mob-card-row"><span className="mob-card-label">Date</span><span className="mob-card-value">{formatDate(ann.createdAt)}</span></div>
-          <div className="mob-card-actions">
-            <button type="button" className="action-btn view-btn" onClick={() => navigate(`/system-announcements/view/${ann._id}`)}><Eye size={15} /><span className="action-label">View</span></button>
-            {canDelete && <button type="button" className="action-btn delete-btn" onClick={() => onDelete(ann)}><Trash2 size={15} /><span className="action-label">Delete</span></button>}
-          </div>
-        </div>
-      )}
-    </div>
-  );
-}
 
 const SystemAnnouncements = () => {
   const navigate = useNavigate();
@@ -85,7 +58,12 @@ const SystemAnnouncements = () => {
   const [search, setSearch] = useState('');
   const [feedback, setFeedback] = useState({ type: '', message: '' });
   const [deleteConfirm, setDeleteConfirm] = useState(null);
-  const [annExpanded, setAnnExpanded] = useState(null);
+  const [modalOpen, setModalOpen] = useState(false);
+  const [editAnnId, setEditAnnId] = useState(null);
+  const openAddModal  = ()    => { setEditAnnId(null);  setModalOpen(true); };
+  const openEditModal = (id)  => { setEditAnnId(id);    setModalOpen(true); };
+  const closeModal    = ()    => { setModalOpen(false); setEditAnnId(null); };
+  const handleModalSuccess = () => { closeModal(); fetchAnnouncements(); };
 
   // Pagination state
   const [currentPage, setCurrentPage] = useState(1);
@@ -196,7 +174,7 @@ const SystemAnnouncements = () => {
             <button
               type="button"
               className="books-btn books-btn-primary"
-              onClick={() => navigate('/system-announcements/add')}
+              onClick={openAddModal}
             >
               <Plus size={16} />
               <span>Add Announcement</span>
@@ -268,7 +246,7 @@ const SystemAnnouncements = () => {
                   type="button"
                   className="books-btn books-btn-primary"
                   style={{ marginTop: '1rem' }}
-                  onClick={() => navigate('/system-announcements/add')}
+                  onClick={openAddModal}
                 >
                   <Plus size={16} />
                   <span>Add Announcement</span>
@@ -277,7 +255,6 @@ const SystemAnnouncements = () => {
             </div>
           ) : (
             <>
-              <div className="ann-desk-table">
               <table className="data-table">
                 <thead>
                   <tr>
@@ -285,7 +262,7 @@ const SystemAnnouncements = () => {
                     <th style={{ width: '130px' }}>ID</th>
                     <th>Title</th>
                     <th style={{ width: '130px' }}>Date</th>
-                    <th style={{ width: '140px', textAlign: 'right' }}>Actions</th>
+                    <th style={{ width: '175px', textAlign: 'right' }}>Actions</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -317,9 +294,20 @@ const SystemAnnouncements = () => {
                             title="View"
                             onClick={() => navigate(`/system-announcements/view/${ann._id}`)}
                           >
-                            <Eye size={15} />
+                            <Eye size={14} />
                             <span className="action-label">View</span>
                           </button>
+                          {canWrite() && (
+                            <button
+                              type="button"
+                              className="action-btn edit-btn"
+                              title="Edit"
+                              onClick={() => openEditModal(ann._id)}
+                            >
+                              <Edit size={14} />
+                              <span className="action-label">Edit</span>
+                            </button>
+                          )}
                           {canDelete() && (
                             <button
                               type="button"
@@ -327,7 +315,8 @@ const SystemAnnouncements = () => {
                               title="Delete"
                               onClick={() => setDeleteConfirm({ id: ann._id, title: ann.title })}
                             >
-                              <Trash2 size={15} /><span className="action-label">Delete</span>
+                              <Trash2 size={14} />
+                              <span className="action-label">Delete</span>
                             </button>
                           )}
                         </div>
@@ -336,22 +325,6 @@ const SystemAnnouncements = () => {
                   ))}
                 </tbody>
               </table>
-              </div>
-              <div className="ann-mob-list">
-                {announcements.map((ann, i) => (
-                  <AnnMobCard
-                    key={ann._id}
-                    ann={ann}
-                    num={startIndex + i + 1}
-                    formatDate={formatDate}
-                    navigate={navigate}
-                    canDelete={canDelete()}
-                    onDelete={(a) => setDeleteConfirm({ id: a._id, title: a.title })}
-                    expanded={annExpanded === ann._id}
-                    onToggle={() => setAnnExpanded(prev => prev === ann._id ? null : ann._id)}
-                  />
-                ))}
-              </div>
 
               {/* Pagination */}
               {totalPages > 1 && (
@@ -479,7 +452,7 @@ const SystemAnnouncements = () => {
                 ) : (
                   <>
                     <Trash2 size={16} />
-                    <span><span style={{display:"inline-flex",alignItems:"center",gap:4}}><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>Delete</span></span>
+                    <span>Delete</span>
                   </>
                 )}
               </button>
@@ -487,6 +460,13 @@ const SystemAnnouncements = () => {
           </div>
         </div>
       )}
+
+      <SystemAnnouncementFormModal
+        isOpen={modalOpen}
+        annId={editAnnId}
+        onClose={closeModal}
+        onSuccess={handleModalSuccess}
+      />
     </div>
   );
 };

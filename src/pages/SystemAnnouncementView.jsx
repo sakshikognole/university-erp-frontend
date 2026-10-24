@@ -9,11 +9,9 @@ import {
   User,
   Building2,
   Download,
-  Edit,
   ExternalLink,
 } from 'lucide-react';
-
-const _IS_PROD = window.location.hostname !== 'localhost';
+const _IS_PROD = typeof window !== 'undefined' && window.location.hostname !== 'localhost';
 const API_BASE_URL = _IS_PROD ? 'https://university-erp-node.onrender.com/api' : 'http://localhost:5000/api';
 
 const SystemAnnouncementView = () => {
@@ -30,21 +28,6 @@ const SystemAnnouncementView = () => {
     'Content-Type': 'application/json',
     Authorization: `Bearer ${localStorage.getItem('erp_token')}`,
   });
-
-  const getUser = () => {
-    try {
-      return JSON.parse(localStorage.getItem('erp_user') || 'null');
-    } catch {
-      return null;
-    }
-  };
-
-  const canEdit = () => {
-    const u = getUser();
-    if (!u) return false;
-    const role = (u.adminType || u.role || '').toUpperCase();
-    return ['SUPER_ADMIN', 'SUB_ADMIN', 'TEACHER', 'FACULTY'].includes(role);
-  };
 
   // ── fetch announcement ───────────────────────────────────────────────────────
   useEffect(() => {
@@ -428,19 +411,17 @@ const SystemAnnouncementView = () => {
             </div>
           )}
 
-          {/* ── Edit button (role-gated) ─────────────────────────────────────── */}
-          {canEdit() && (
-            <div style={{ marginTop: '2rem', paddingTop: '1.25rem', borderTop: '1px solid var(--border-color, #e5e7eb)', display: 'flex', gap: '0.75rem' }}>
-              <button
-                type="button"
-                className="books-btn books-btn-primary"
-                onClick={() => navigate(`/system-announcements/edit/${announcement._id}`)}
-              >
-                <Edit size={15} />
-                <span>Edit Announcement</span>
-              </button>
-            </div>
-          )}
+          {/* ── Back button footer ─────────────────────────────────────────── */}
+          <div style={{ marginTop: '2rem', paddingTop: '1.25rem', borderTop: '1px solid var(--border-color, #e5e7eb)', display: 'flex', gap: '0.75rem' }}>
+            <button
+              type="button"
+              className="books-btn books-btn-ghost"
+              onClick={() => navigate('/system-announcements')}
+            >
+              <ArrowLeft size={15} />
+              <span>Back to Announcements</span>
+            </button>
+          </div>
         </div>
       )}
     </div>

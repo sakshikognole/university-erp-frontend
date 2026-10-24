@@ -1,671 +1,200 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
-import {
-  ArrowLeft, Save, AlertCircle, CheckCircle2, Loader2, UserCheck, Search,
-} from 'lucide-react';
+import React, { useState, useEffect, useCallback } from 'react';
+import { X, Save, AlertCircle, CheckCircle2, Loader2, UserCheck, Search } from 'lucide-react';
 import { validateBusPassId, validateValidTill } from '../utils/transportValidation';
-
-const _IS_PROD = window.location.hostname !== 'localhost';
+const _IS_PROD = typeof window !== 'undefined' && window.location.hostname !== 'localhost';
 const API_BASE_URL = _IS_PROD ? 'https://university-erp-node.onrender.com/api' : 'http://localhost:5000/api';
+const authHeader = () => ({ 'Content-Type': 'application/json', Authorization: `Bearer ${localStorage.getItem('erp_token')}` });
 
-const AddBusPass = () => {
-  const { id } = useParams();
-  const navigate = useNavigate();
-  const isEditMode = Boolean(id);
+const FieldError = ({ msg }) => msg ? <p className="sf-field-error"><AlertCircle size={12} style={{ flexShrink: 0 }} />{msg}</p> : null;
 
-  const [loading,  setLoading]  = useState(false);
+const AddBusPassModal = ({ isOpen, passId: passIdProp, onClose, onSuccess }) => {
+  const isEdit = Boolean(passIdProp);
+  const [loading, setLoading] = useState(false);
   const [fetching, setFetching] = useState(false);
   const [feedback, setFeedback] = useState({ type: '', message: '' });
   const [fieldErrors, setFieldErrors] = useState({});
-  const feedbackTimerRef = useRef(null);
-
-  const showFeedback = (type, message) => {
-    if (feedbackTimerRef.current) clearTimeout(feedbackTimerRef.current);
-    setFeedback({ type, message });
-    if (type === 'success')
-      feedbackTimerRef.current = setTimeout(() => setFeedback({ type: '', message: '' }), 2000);
-  };
-
-  useEffect(() => {
-    return () => { if (feedbackTimerRef.current) clearTimeout(feedbackTimerRef.current); };
-  }, []);
-
   const [routes, setRoutes] = useState([]);
-  const [availableFromStops, setAvailableFromStops] = useState([]);
-
-  // Student verification states
-  const [verifyingStudent, setVerifyingStudent] = useState(false);
+  const [availableStops, setAvailableStops] = useState([]);
+  const [verifying, setVerifying] = useState(false);
   const [studentInfo, setStudentInfo] = useState(null);
   const [studentError, setStudentError] = useState('');
 
-  const [formData, setFormData] = useState({
-    passId: '',
-    studentId: '',
-    studentName: '',
-    routeId: '',
-    fromStop: '',
-    toStop: 'Main University Campus',
-    paymentStatus: 'PAID',
-    validTill: '',
-  });
+  const sixMonthsLater = () => { const d = new Date(); d.setMonth(d.getMonth() + 6); return d.toISOString().split('T')[0]; };
+  const emptyForm = { passId: '', studentId: '', studentName: '', routeId: '', fromStop: '', toStop: 'Main University Campus', paymentStatus: 'PAID', validTill: sixMonthsLater() };
+  const [form, setForm] = useState(emptyForm);
 
-  const authHeader = () => {
-    const token = localStorage.getItem('erp_token');
-    return {
-      'Content-Type': 'application/json',
-      Authorization: `Bearer ${token}`,
-    };
-  };
+  const reset = useCallback(() => { setForm({ ...emptyForm, validTill: sixMonthsLater() }); setFieldErrors({}); setFeedback({ type: '', message: '' }); setStudentInfo(null); setStudentError(''); setAvailableStops([]); }, []); // eslint-disable-line
 
   useEffect(() => {
+    if (!isOpen) return;
+    reset();
     fetchRoutes();
-    if (isEditMode) loadPassDetails();
-    else {
-      fetchNextPassId();
-      const sixMonthsLater = new Date();
-      sixMonthsLater.setMonth(sixMonthsLater.getMonth() + 6);
-      setFormData((prev) => ({ ...prev, validTill: sixMonthsLater.toISOString().split('T')[0] }));
-    }
-    return () => { if (feedbackTimerRef.current) clearTimeout(feedbackTimerRef.current); };
-  }, [id]); // eslint-disable-line react-hooks/exhaustive-deps
+    if (isEdit) loadPass(); else fetchNextPassId();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isOpen, passIdProp]);
+
+  useEffect(() => { document.body.style.overflow = isOpen ? 'hidden' : ''; return () => { document.body.style.overflow = ''; }; }, [isOpen]);
+  useEffect(() => { const f = (e) => { if (e.key === 'Escape' && isOpen && !loading) onClose(); }; document.addEventListener('keydown', f); return () => document.removeEventListener('keydown', f); }, [isOpen, loading, onClose]);
 
   const fetchRoutes = async () => {
-    try {
-      const res = await fetch(`${API_BASE_URL}/transport/routes`, {
-        headers: authHeader(),
-      });
-      if (res.ok) {
-        const data = await res.json();
-        setRoutes(data);
-      }
-    } catch (err) {
-      console.warn('Error loading routes:', err);
-    }
-  };
-
-  const loadPassDetails = async () => {
-    setFetching(true);
-    try {
-      const [passRes, routesRes] = await Promise.all([
-        fetch(`${API_BASE_URL}/transport/passes/${id}`, { headers: authHeader() }),
-        fetch(`${API_BASE_URL}/transport/routes`, { headers: authHeader() }),
-      ]);
-
-      let loadedRoutes = [];
-      if (routesRes.ok) {
-        loadedRoutes = await routesRes.json();
-        setRoutes(loadedRoutes);
-      }
-
-      if (passRes.ok) {
-        const pass = await passRes.json();
-        const dateStr = pass.validTill ? new Date(pass.validTill).toISOString().split('T')[0] : '';
-        setFormData({
-          passId: pass.passId || '',
-          studentId: pass.studentId || '',
-          studentName: pass.studentName || '',
-          routeId: pass.routeId !== undefined ? pass.routeId : '',
-          fromStop: pass.fromStop || '',
-          toStop: pass.toStop || 'Main University Campus',
-          paymentStatus: pass.paymentStatus || 'PAID',
-          validTill: dateStr,
-        });
-
-        // Verify loaded student
-        if (pass.studentId) {
-          verifyStudentPRN(pass.studentId);
-        }
-
-        // Set stops for current route
-        const activeRoute = loadedRoutes.find((r) => String(r.routeId) === String(pass.routeId));
-        if (activeRoute && activeRoute.stops) {
-          setAvailableFromStops(activeRoute.stops);
-        }
-      } else {
-        setFeedback({ type: 'error', message: 'Bus pass not found.' });
-      }
-    } catch (err) {
-      console.error('Error fetching pass details:', err);
-      setFeedback({ type: 'error', message: 'Unable to connect to server.' });
-    } finally {
-      setFetching(false);
-    }
+    try { const res = await fetch(`${API_BASE_URL}/transport/routes`, { headers: authHeader() }); if (res.ok) setRoutes(await res.json()); } catch { /* non-fatal */ }
   };
 
   const fetchNextPassId = async () => {
-    try {
-      const res = await fetch(`${API_BASE_URL}/transport/passes/next-id`, {
-        headers: authHeader(),
-      });
-      if (res.ok) {
-        const data = await res.json();
-        if (data.nextPassId) {
-          setFormData((prev) => ({ ...prev, passId: data.nextPassId }));
-        }
-      }
-    } catch (err) {
-      console.warn('Error fetching next pass ID:', err);
-    }
+    try { const res = await fetch(`${API_BASE_URL}/transport/passes/next-id`, { headers: authHeader() }); if (res.ok) { const d = await res.json(); if (d.nextPassId) setForm((p) => ({ ...p, passId: d.nextPassId })); } } catch { /* non-fatal */ }
   };
 
-  // Verify student PRN against database
-  const verifyStudentPRN = async (prnToVerify) => {
-    const prn = (prnToVerify || formData.studentId || '').trim();
-    if (!prn) {
-      setStudentInfo(null);
-      setStudentError('');
-      return null;
-    }
-
-    setVerifyingStudent(true);
-    setStudentError('');
-
+  const loadPass = async () => {
+    setFetching(true);
     try {
-      const res = await fetch(`${API_BASE_URL}/transport/verify-student/${encodeURIComponent(prn)}`, {
-        headers: authHeader(),
-      });
+      const [pr, rr] = await Promise.all([fetch(`${API_BASE_URL}/transport/passes/${passIdProp}`, { headers: authHeader() }), fetch(`${API_BASE_URL}/transport/routes`, { headers: authHeader() })]);
+      let loadedRoutes = [];
+      if (rr.ok) { loadedRoutes = await rr.json(); setRoutes(loadedRoutes); }
+      if (pr.ok) {
+        const p = await pr.json();
+        setForm({ passId: p.passId || '', studentId: p.studentId || '', studentName: p.studentName || '', routeId: p.routeId !== undefined ? p.routeId : '', fromStop: p.fromStop || '', toStop: p.toStop || 'Main University Campus', paymentStatus: p.paymentStatus || 'PAID', validTill: p.validTill ? new Date(p.validTill).toISOString().split('T')[0] : '' });
+        if (p.studentId) verifyStudent(p.studentId);
+        const route = loadedRoutes.find((r) => String(r.routeId) === String(p.routeId));
+        if (route?.stops) setAvailableStops(route.stops);
+      } else setFeedback({ type: 'error', message: 'Pass not found.' });
+    } catch { setFeedback({ type: 'error', message: 'Unable to connect.' }); }
+    finally { setFetching(false); }
+  };
 
+  const verifyStudent = async (prn) => {
+    const p = (prn || form.studentId || '').trim();
+    if (!p) { setStudentInfo(null); setStudentError(''); return null; }
+    setVerifying(true); setStudentError('');
+    try {
+      const res = await fetch(`${API_BASE_URL}/transport/verify-student/${encodeURIComponent(p)}`, { headers: authHeader() });
       const data = await res.json();
-      if (res.ok && data.valid && data.student) {
-        setStudentInfo(data.student);
-        setStudentError('');
-        setFormData((prev) => ({
-          ...prev,
-          studentId: data.student.prn,
-          studentName: data.student.name,
-        }));
-        return data.student;
-      } else {
-        setStudentInfo(null);
-        setStudentError(data.message || `No enrolled student found with PRN "${prn}".`);
-        return null;
-      }
-    } catch (err) {
-      console.error('Error checking student PRN:', err);
-      setStudentError('Failed to connect to server to verify student PRN.');
-      return null;
-    } finally {
-      setVerifyingStudent(false);
-    }
+      if (res.ok && data.valid && data.student) { setStudentInfo(data.student); setForm((f) => ({ ...f, studentId: data.student.prn, studentName: data.student.name })); return data.student; }
+      else { setStudentInfo(null); setStudentError(data.message || `No student with PRN "${p}".`); return null; }
+    } catch { setStudentError('Failed to verify student.'); return null; }
+    finally { setVerifying(false); }
   };
 
-  const handleInputChange = (e) => {
+  const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
-    if (name === 'studentId') {
-      setStudentInfo(null);
-      setStudentError('');
+    setForm((p) => ({ ...p, [name]: value }));
+    if (name === 'studentId') { setStudentInfo(null); setStudentError(''); }
+    if (name === 'routeId') {
+      const route = routes.find((r) => String(r.routeId) === String(value));
+      setAvailableStops(route?.stops || []);
+      setForm((p) => ({ ...p, routeId: value, fromStop: '' }));
     }
-  };
-
-  const handleStudentIdBlur = () => {
-    if (formData.studentId.trim()) {
-      verifyStudentPRN(formData.studentId);
-    }
-  };
-
-  const handleRouteChange = (e) => {
-    const selectedRouteId = e.target.value;
-    const selectedRoute = routes.find((r) => String(r.routeId) === String(selectedRouteId));
-
-    setFormData((prev) => ({
-      ...prev,
-      routeId: selectedRouteId,
-      fromStop: '', // reset from stop when route changes
-    }));
-
-    if (selectedRoute && selectedRoute.stops && selectedRoute.stops.length > 0) {
-      setAvailableFromStops(selectedRoute.stops);
-    } else {
-      setAvailableFromStops([]);
-    }
+    if (fieldErrors[name]) setFieldErrors((p) => ({ ...p, [name]: undefined }));
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setFeedback({ type: '', message: '' });
-
-    // D18/D19: Bus Pass ID format BP-XXXX
-    const passIdErr = validateBusPassId(formData.passId);
-    if (passIdErr) {
-      setFieldErrors(prev => ({ ...prev, passId: passIdErr }));
-      showFeedback('error', passIdErr);
-      return;
-    }
-
-    if (!formData.passId.trim()) {
-      setFeedback({ type: 'error', message: 'Pass ID is required.' });
-      return;
-    }
-
-    if (!formData.studentId.trim()) {
-      setFeedback({ type: 'error', message: 'Student PRN / ID is required.' });
-      return;
-    }
-
-    // Verify student PRN exists before saving
-    let validStudent = studentInfo;
-    if (!validStudent) {
-      validStudent = await verifyStudentPRN(formData.studentId);
-    }
-
-    if (!validStudent) {
-      setFeedback({
-        type: 'error',
-        message: `Student with PRN '${formData.studentId.trim()}' does not exist. Please enter a valid enrolled student PRN.`,
-      });
-      return;
-    }
-
-    if (!formData.routeId) {
-      setFeedback({ type: 'error', message: 'Please select a Bus Route.' });
-      return;
-    }
-
-    if (!formData.fromStop.trim()) {
-      setFeedback({ type: 'error', message: 'Please select or enter the "From" stop.' });
-      return;
-    }
-
-    if (!formData.toStop.trim()) {
-      setFeedback({ type: 'error', message: '"To" stop cannot be empty.' });
-      return;
-    }
-
-    if (!formData.validTill) {
-      setFeedback({ type: 'error', message: 'Please select validity expiry date.' });
-      return;
-    }
-
-    // D20: reject past dates
-    const dateErr = validateValidTill(formData.validTill);
-    if (dateErr) {
-      setFieldErrors(prev => ({ ...prev, validTill: dateErr }));
-      showFeedback('error', dateErr);
-      return;
-    }
+    const passErr = validateBusPassId(form.passId); if (passErr) { setFieldErrors((p) => ({ ...p, passId: passErr })); return; }
+    if (!form.studentId.trim()) { setFeedback({ type: 'error', message: 'Student PRN is required.' }); return; }
+    let student = studentInfo;
+    if (!student) student = await verifyStudent(form.studentId);
+    if (!student) { setFeedback({ type: 'error', message: `Student PRN '${form.studentId}' not found.` }); return; }
+    if (!form.routeId) { setFeedback({ type: 'error', message: 'Please select a route.' }); return; }
+    if (!form.fromStop.trim()) { setFeedback({ type: 'error', message: 'Please select a boarding stop.' }); return; }
+    const dateErr = validateValidTill(form.validTill); if (dateErr) { setFieldErrors((p) => ({ ...p, validTill: dateErr })); return; }
 
     setLoading(true);
-
     try {
-      const url = isEditMode
-        ? `${API_BASE_URL}/transport/passes/${id}`
-        : `${API_BASE_URL}/transport/passes`;
-      const method = isEditMode ? 'PUT' : 'POST';
-
-      const res = await fetch(url, {
-        method,
-        headers: authHeader(),
-        body: JSON.stringify({
-          passId: formData.passId.trim(),
-          studentId: validStudent.prn,
-          studentName: validStudent.name,
-          routeId: Number(formData.routeId),
-          fromStop: formData.fromStop.trim(),
-          toStop: formData.toStop.trim(),
-          paymentStatus: formData.paymentStatus,
-          validTill: formData.validTill,
-        }),
-      });
-
+      const url = isEdit ? `${API_BASE_URL}/transport/passes/${passIdProp}` : `${API_BASE_URL}/transport/passes`;
+      const res = await fetch(url, { method: isEdit ? 'PUT' : 'POST', headers: authHeader(), body: JSON.stringify({ passId: form.passId.trim(), studentId: student.prn, studentName: student.name, routeId: Number(form.routeId), fromStop: form.fromStop.trim(), toStop: form.toStop.trim(), paymentStatus: form.paymentStatus, validTill: form.validTill }) });
       const data = await res.json();
-      if (!res.ok) {
-        setFeedback({ type: 'error', message: data.message || 'Failed to save bus pass.' });
-        setLoading(false);
-        return;
-      }
-
-      showFeedback('success', isEditMode ? 'Bus Pass updated successfully!' : 'Bus Pass issued successfully!');
-      setTimeout(() => navigate('/transport'), 1200);
-    } catch (err) {
-      console.error('Error saving bus pass:', err);
-      setFeedback({ type: 'error', message: 'Unable to connect to server. Please try again.' });
-      setLoading(false);
-    }
+      if (!res.ok) { setFeedback({ type: 'error', message: data.message || 'Failed to save.' }); return; }
+      setFeedback({ type: 'success', message: data.message || (isEdit ? 'Pass updated.' : 'Pass issued.') });
+      setTimeout(() => onSuccess(), 900);
+    } catch { setFeedback({ type: 'error', message: 'Unable to connect.' }); }
+    finally { setLoading(false); }
   };
 
-  const FieldError = ({ name }) =>
-    fieldErrors[name]
-      ? <p className="form-field-error" style={{ marginTop: '0.25rem' }}>{fieldErrors[name]}</p>
-      : null;
+  const ic = (f) => `sf-input${fieldErrors[f] ? ' sf-input-error' : ''}`;
+  if (!isOpen) return null;
 
   return (
-    <div className="page-container">
-      <div className="page-header" style={{ marginBottom: '1.5rem' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-          <button
-            type="button"
-            className="btn-back"
-            onClick={() => navigate('/transport')}
-            title="Back to Transport"
-          >
-            <ArrowLeft size={18} />
-          </button>
-          <div>
-            <h1 className="page-title" style={{ fontSize: '1.5rem' }}>
-              {isEditMode ? 'Edit Bus Pass' : 'Add Bus Pass'}
-            </h1>
-            <p className="page-subtitle">
-              {isEditMode
-                ? 'Update bus pass route, validity date, and payment status'
-                : 'Issue a new transport bus pass for an enrolled student'}
-            </p>
+    <div className="sf-overlay" role="dialog" aria-modal="true" onClick={(e) => { if (e.target === e.currentTarget && !loading) onClose(); }}>
+      <div className="sf-modal">
+        <div className="sf-header">
+          <div className="sf-header-left">
+            <div className="sf-header-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg></div>
+            <div><h2 className="sf-title">{isEdit ? 'Edit Bus Pass' : 'Issue Bus Pass'}</h2><p className="sf-subtitle">{isEdit ? 'Update pass details' : 'Issue a bus pass for an enrolled student'}</p></div>
           </div>
+          <button type="button" className="sf-close-btn" onClick={onClose} disabled={loading} aria-label="Close"><X size={18} /></button>
         </div>
-      </div>
-
-      {feedback.message && (
-        <div
-          className={`feedback-banner ${
-            feedback.type === 'success' ? 'feedback-success' : 'feedback-error'
-          }`}
-          style={{ marginBottom: '1.5rem' }}
-        >
-          {feedback.type === 'success' ? (
-            <CheckCircle2 size={18} />
-          ) : (
-            <AlertCircle size={18} />
-          )}
-          <span>{feedback.message}</span>
-        </div>
-      )}
-
-      <div className="card" style={{ maxWidth: '720px' }}>
-        {fetching ? (
-          <div style={{ padding: '3rem', textAlign: 'center', color: 'var(--text-secondary)' }}>
-            <Loader2 size={28} className="spin-animate" style={{ margin: '0 auto 0.75rem auto' }} />
-            <p>Loading bus pass details...</p>
-          </div>
-        ) : (
-          <form onSubmit={handleSubmit} className="form-layout">
-            <div className="form-section">
-              <h3 className="form-section-title">Pass & Student Verification</h3>
-
-              <div className="form-row">
-                <div className="form-group">
-                  <label htmlFor="passId" className="form-label">
-                    Pass ID <span style={{ color: '#ef4444' }}>*</span>
-                  </label>
-                  <input
-                    type="text"
-                    id="passId"
-                    name="passId"
-                    className={`form-input${fieldErrors.passId ? ' input-error' : ''}`}
-                    placeholder="e.g. BP-1001"
-                    value={formData.passId}
-                    onChange={(e) => { handleInputChange(e); if (fieldErrors.passId) setFieldErrors(p => ({ ...p, passId: undefined })); }}
-                    required
-                  />
-                  <small className="form-field-hint">Format: BP- followed by 4 digits (e.g. BP-1001)</small>
-                  <FieldError name="passId" />
+        <div className="sf-body">
+          {feedback.message && <div className={`sf-feedback ${feedback.type === 'success' ? 'sf-feedback-success' : 'sf-feedback-error'}`}>{feedback.type === 'success' ? <CheckCircle2 size={16} style={{ flexShrink: 0 }} /> : <AlertCircle size={16} style={{ flexShrink: 0 }} />}<span>{feedback.message}</span></div>}
+          {fetching ? <div className="sf-loading"><Loader2 size={26} className="spin-animate" /><p>Loading…</p></div> : (
+            <form id="pass-form" onSubmit={handleSubmit} className="sf-form" noValidate>
+              <div className="sf-section-label">Pass &amp; Student</div>
+              <div className="sf-row">
+                <div className="sf-group">
+                  <label className="sf-label" htmlFor="bp-passId">Pass ID <span className="sf-required">*</span></label>
+                  <input id="bp-passId" name="passId" type="text" className={ic('passId')} placeholder="e.g. BP-1001" value={form.passId} onChange={handleChange} autoComplete="off" />
+                  <FieldError msg={fieldErrors.passId} />
                 </div>
-
-                <div className="form-group">
-                  <label htmlFor="studentId" className="form-label">
-                    Student PRN / ID <span style={{ color: '#ef4444' }}>*</span>
-                  </label>
+                <div className="sf-group">
+                  <label className="sf-label" htmlFor="bp-studentId">Student PRN <span className="sf-required">*</span></label>
                   <div style={{ position: 'relative' }}>
-                    <input
-                      type="text"
-                      id="studentId"
-                      name="studentId"
-                      className={`form-input ${studentError ? 'form-input-error' : ''}`}
-                      style={{
-                        paddingRight: '2.5rem',
-                        borderColor: studentInfo ? '#22c55e' : studentError ? '#ef4444' : undefined,
-                      }}
-                      placeholder="Enter Student PRN (e.g. PRN1001)"
-                      value={formData.studentId}
-                      onChange={handleInputChange}
-                      onBlur={handleStudentIdBlur}
-                      required
-                    />
-                    <div
-                      style={{
-                        position: 'absolute',
-                        right: '10px',
-                        top: '50%',
-                        transform: 'translateY(-50%)',
-                        display: 'flex',
-                        alignItems: 'center',
-                      }}
-                    >
-                      {verifyingStudent ? (
-                        <Loader2 size={16} className="spin-animate" style={{ color: '#6b7280' }} />
-                      ) : studentInfo ? (
-                        <CheckCircle2 size={18} style={{ color: '#22c55e' }} title="Student verified" />
-                      ) : (
-                        <button
-                          type="button"
-                          onClick={() => verifyStudentPRN(formData.studentId)}
-                          style={{
-                            background: 'none',
-                            border: 'none',
-                            cursor: 'pointer',
-                            color: '#2563eb',
-                            display: 'flex',
-                            alignItems: 'center',
-                            padding: '2px',
-                          }}
-                          title="Verify Student PRN"
-                        >
-                          <Search size={16} />
-                        </button>
-                      )}
+                    <input id="bp-studentId" name="studentId" type="text" className={`sf-input${studentError ? ' sf-input-error' : ''}`}
+                      style={{ paddingRight: '2.25rem', borderColor: studentInfo ? '#16a34a' : studentError ? '#ef4444' : undefined }}
+                      placeholder="e.g. PRN2024001" value={form.studentId} onChange={handleChange} onBlur={() => form.studentId.trim() && verifyStudent(form.studentId)} autoComplete="off" />
+                    <div style={{ position: 'absolute', right: '0.75rem', top: '50%', transform: 'translateY(-50%)' }}>
+                      {verifying ? <Loader2 size={15} className="spin-animate" style={{ color: '#9ca3af' }} /> : studentInfo ? <UserCheck size={15} style={{ color: '#16a34a' }} /> : <button type="button" onClick={() => verifyStudent(form.studentId)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#2563eb', display: 'flex', padding: 0 }}><Search size={15} /></button>}
                     </div>
                   </div>
-
-                  {studentError && (
-                    <div
-                      style={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: '4px',
-                        color: '#ef4444',
-                        fontSize: '0.8rem',
-                        marginTop: '4px',
-                      }}
-                    >
-                      <AlertCircle size={14} />
-                      <span>{studentError}</span>
-                    </div>
-                  )}
-
-                  {studentInfo && (
-                    <div
-                      style={{
-                        marginTop: '6px',
-                        padding: '6px 10px',
-                        backgroundColor: '#f0fdf4',
-                        border: '1px solid #bbf7d0',
-                        borderRadius: '6px',
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: '6px',
-                        fontSize: '0.82rem',
-                        color: '#15803d',
-                      }}
-                    >
-                      <UserCheck size={15} />
-                      <span>
-                        <strong>{studentInfo.name}</strong> • {studentInfo.degree || 'Student'} ({studentInfo.class || 'Enrolled'})
-                      </span>
-                    </div>
-                  )}
+                  {studentInfo && <p style={{ fontSize: '0.75rem', color: '#16a34a', marginTop: '0.2rem' }}>{studentInfo.name} — verified</p>}
+                  {studentError && <p style={{ fontSize: '0.75rem', color: '#b91c1c', marginTop: '0.2rem' }}>{studentError}</p>}
                 </div>
               </div>
-
-              <div className="form-group" style={{ marginTop: '1rem' }}>
-                <label htmlFor="studentName" className="form-label">
-                  Student Name (Auto-filled on PRN verification)
-                </label>
-                <input
-                  type="text"
-                  id="studentName"
-                  name="studentName"
-                  className="form-input"
-                  placeholder="Auto-populated from verified student record"
-                  value={formData.studentName}
-                  onChange={handleInputChange}
-                />
-              </div>
-            </div>
-
-            <div className="form-section" style={{ marginTop: '1.75rem' }}>
-              <h3 className="form-section-title">Route & Stops</h3>
-
-              <div className="form-group">
-                <label htmlFor="routeId" className="form-label">
-                  Select Route <span style={{ color: '#ef4444' }}>*</span>
-                </label>
-                <select
-                  id="routeId"
-                  name="routeId"
-                  className="form-input"
-                  value={formData.routeId}
-                  onChange={handleRouteChange}
-                  required
-                >
-                  <option value="">-- Choose Route --</option>
-                  {routes.map((r) => (
-                    <option key={r._id || r.routeId} value={r.routeId}>
-                      Route #{r.routeId}{r.routeName ? ` - ${r.routeName}` : ''} ({r.stops ? r.stops.length : 0} stops)
-                    </option>
-                  ))}
+              <div className="sf-section-label" style={{ marginTop: '0.25rem' }}>Route &amp; Stops</div>
+              <div className="sf-row"><div className="sf-group sf-group-full">
+                <label className="sf-label" htmlFor="bp-routeId">Route <span className="sf-required">*</span></label>
+                <select id="bp-routeId" name="routeId" className="sf-input" value={form.routeId} onChange={handleChange}>
+                  <option value="">— Select Route —</option>
+                  {routes.map((r) => <option key={r._id || r.routeId} value={r.routeId}>Route #{r.routeId}{r.routeName ? ` — ${r.routeName}` : ''} ({r.stops?.length || 0} stops)</option>)}
                 </select>
-              </div>
-
-              <div className="form-row" style={{ marginTop: '1rem' }}>
-                {/* From Stop */}
-                <div className="form-group">
-                  <label htmlFor="fromStop" className="form-label">
-                    Stops: From <span style={{ color: '#ef4444' }}>*</span>
-                  </label>
-                  {availableFromStops.length > 0 ? (
-                    <select
-                      id="fromStop"
-                      name="fromStop"
-                      className="form-input"
-                      value={formData.fromStop}
-                      onChange={handleInputChange}
-                      required
-                    >
-                      <option value="">-- Select Boarding Stop --</option>
-                      {availableFromStops.map((stop, idx) => (
-                        <option key={idx} value={stop}>
-                          {stop} (Stop #{idx + 1})
-                        </option>
-                      ))}
-                    </select>
-                  ) : (
-                    <input
-                      type="text"
-                      id="fromStop"
-                      name="fromStop"
-                      className="form-input"
-                      placeholder="Enter boarding stop"
-                      value={formData.fromStop}
-                      onChange={handleInputChange}
-                      required
-                    />
-                  )}
+              </div></div>
+              <div className="sf-row">
+                <div className="sf-group">
+                  <label className="sf-label" htmlFor="bp-fromStop">From Stop <span className="sf-required">*</span></label>
+                  {availableStops.length > 0
+                    ? <select id="bp-fromStop" name="fromStop" className="sf-input" value={form.fromStop} onChange={handleChange}><option value="">— Select —</option>{availableStops.map((s, i) => <option key={i} value={s}>{s}</option>)}</select>
+                    : <input id="bp-fromStop" name="fromStop" type="text" className="sf-input" placeholder="Boarding stop" value={form.fromStop} onChange={handleChange} />
+                  }
                 </div>
-
-                {/* To Stop (Default College Name) */}
-                <div className="form-group">
-                  <label htmlFor="toStop" className="form-label">
-                    Stops: To <span style={{ color: '#ef4444' }}>*</span>
-                  </label>
-                  <input
-                    type="text"
-                    id="toStop"
-                    name="toStop"
-                    className="form-input"
-                    placeholder="e.g. Main University Campus"
-                    value={formData.toStop}
-                    onChange={handleInputChange}
-                    required
-                  />
-                  <span className="form-helper" style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', marginTop: '4px', display: 'block' }}>
-                    Defaulted to College/University Campus.
-                  </span>
+                <div className="sf-group">
+                  <label className="sf-label" htmlFor="bp-toStop">To Stop <span className="sf-required">*</span></label>
+                  <input id="bp-toStop" name="toStop" type="text" className="sf-input" placeholder="Main University Campus" value={form.toStop} onChange={handleChange} />
                 </div>
               </div>
-            </div>
-
-            <div className="form-section" style={{ marginTop: '1.75rem' }}>
-              <h3 className="form-section-title">Validity & Payment</h3>
-
-              <div className="form-row">
-                <div className="form-group">
-                  <label htmlFor="paymentStatus" className="form-label">
-                    Payment Status <span style={{ color: '#ef4444' }}>*</span>
-                  </label>
-                  <select
-                    id="paymentStatus"
-                    name="paymentStatus"
-                    className="form-input"
-                    value={formData.paymentStatus}
-                    onChange={handleInputChange}
-                    required
-                  >
-                    <option value="PAID">Paid</option>
-                    <option value="PENDING">Pending</option>
-                    <option value="FAILED">Failed</option>
+              <div className="sf-section-label" style={{ marginTop: '0.25rem' }}>Validity &amp; Payment</div>
+              <div className="sf-row">
+                <div className="sf-group">
+                  <label className="sf-label" htmlFor="bp-paymentStatus">Payment Status <span className="sf-required">*</span></label>
+                  <select id="bp-paymentStatus" name="paymentStatus" className="sf-input" value={form.paymentStatus} onChange={handleChange}>
+                    <option value="PAID">Paid</option><option value="PENDING">Pending</option><option value="FAILED">Failed</option>
                   </select>
                 </div>
-
-                <div className="form-group">
-                  <label htmlFor="validTill" className="form-label">
-                    Valid Till Date <span style={{ color: '#ef4444' }}>*</span>
-                  </label>
-                  <input
-                    type="date"
-                    id="validTill"
-                    name="validTill"
-                    className={`form-input${fieldErrors.validTill ? ' input-error' : ''}`}
-                    value={formData.validTill}
-                    min={new Date().toISOString().split('T')[0]}
-                    onChange={(e) => { handleInputChange(e); if (fieldErrors.validTill) setFieldErrors(p => ({ ...p, validTill: undefined })); }}
-                    required
-                  />
-                  <FieldError name="validTill" />
+                <div className="sf-group">
+                  <label className="sf-label" htmlFor="bp-validTill">Valid Till <span className="sf-required">*</span></label>
+                  <input id="bp-validTill" name="validTill" type="date" className={ic('validTill')} min={new Date().toISOString().split('T')[0]} value={form.validTill} onChange={handleChange} />
+                  <FieldError msg={fieldErrors.validTill} />
                 </div>
               </div>
-            </div>
-
-            <div className="form-actions-row transport-form-actions" style={{ marginTop: '2rem' }}>
-              <button
-                type="button"
-                className="books-btn books-btn-ghost"
-                onClick={() => navigate('/transport')}
-                disabled={loading}
-              >
-                Cancel
-              </button>
-              <button
-                type="submit"
-                className="books-btn books-btn-primary"
-                disabled={loading}
-              >
-                {loading ? (
-                  <>
-                    <Loader2 size={16} className="spin-animate" />
-                    <span>Saving...</span>
-                  </>
-                ) : (
-                  <>
-                    <Save size={16} />
-                    <span>{isEditMode ? 'Update Bus Pass' : 'Issue Bus Pass'}</span>
-                  </>
-                )}
-              </button>
-            </div>
-          </form>
-        )}
+            </form>
+          )}
+        </div>
+        <div className="sf-footer">
+          <button type="button" className="sf-btn-cancel" onClick={onClose} disabled={loading}>Cancel</button>
+          <button type="submit" form="pass-form" className="sf-btn-save" disabled={loading || fetching}>
+            {loading ? <><Loader2 size={15} className="spin-animate" /><span>Saving…</span></> : <><Save size={15} /><span>{isEdit ? 'Update Pass' : 'Issue Pass'}</span></>}
+          </button>
+        </div>
       </div>
     </div>
   );
 };
 
-export default AddBusPass;
+export default AddBusPassModal;

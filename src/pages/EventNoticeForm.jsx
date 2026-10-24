@@ -14,10 +14,9 @@ import {
 
 import { getEventImage } from '../utils/eventImageUtils';
 import { uploadToCloudinary } from '../utils/cloudinaryUpload';
-
-const _IS_PROD_ENF = window.location.hostname !== 'localhost';
-const NODE_API_URL = _IS_PROD_ENF ? 'https://university-erp-node.onrender.com/api' : 'http://localhost:5000/api';
-const API_BASE_URL = NODE_API_URL;
+const _IS_PROD = typeof window !== 'undefined' && window.location.hostname !== 'localhost';
+const API_BASE_URL = _IS_PROD ? 'https://university-erp-node.onrender.com/api' : 'http://localhost:5000/api';
+const SPRING_API_URL = _IS_PROD ? 'https://university-erp-spring.onrender.com/api' : 'http://localhost:9090/api';
 
 // ─── Validation helpers ────────────────────────────────────────────────────────
 
@@ -158,8 +157,7 @@ const EventNoticeForm = () => {
 
   const loadBookedEvents = async () => {
     try {
-      const _IS_PROD_ENF = window.location.hostname !== 'localhost';
-      const res = await fetch(`${_IS_PROD_ENF ? 'https://university-erp-spring.onrender.com' : 'http://localhost:9090'}/api/events`);
+      const res = await fetch(`${SPRING_API_URL}/events`);
       if (res.ok) {
         const data = await res.json();
         if (Array.isArray(data)) setBookedEvents(data);

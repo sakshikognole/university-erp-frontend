@@ -22,10 +22,8 @@ import {
 } from 'lucide-react';
 
 import { getEventImage } from '../utils/eventImageUtils';
-
-const _IS_PROD_ENV = window.location.hostname !== 'localhost';
-const NODE_API_URL = _IS_PROD_ENV ? 'https://university-erp-node.onrender.com/api' : 'http://localhost:5000/api';
-const API_BASE_URL = NODE_API_URL;
+const _IS_PROD = typeof window !== 'undefined' && window.location.hostname !== 'localhost';
+const API_BASE_URL = _IS_PROD ? 'https://university-erp-node.onrender.com/api' : 'http://localhost:5000/api';
 
 const EventNoticeView = () => {
   const { id } = useParams();
@@ -202,43 +200,6 @@ const EventNoticeView = () => {
           </div>
         </div>
 
-        <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-          <button
-            type="button"
-            className="books-btn books-btn-secondary"
-            onClick={() => navigate(`/event-notices/edit/${event._id}`)}
-          >
-            <Edit size={16} />
-            <span>Edit Notice</span>
-          </button>
-          <button
-            type="button"
-            className="books-btn"
-            style={{
-              backgroundColor: '#fee2e2',
-              color: '#dc2626',
-              border: '1px solid #fca5a5',
-              padding: '0.5rem 1rem',
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: '0.5rem',
-              borderRadius: '6px',
-              fontWeight: 500,
-              cursor: 'pointer',
-              transition: 'all 0.2s',
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.backgroundColor = '#fecaca';
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.backgroundColor = '#fee2e2';
-            }}
-            onClick={() => setDeleteConfirm(true)}
-          >
-            <Trash2 size={16} />
-            <span>Delete</span>
-          </button>
-        </div>
       </div>
 
       {/* Feedback Banner */}

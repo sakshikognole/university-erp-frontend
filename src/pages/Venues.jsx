@@ -21,42 +21,10 @@ import {
   Upload,
 } from 'lucide-react';
 import { exportVenues } from '../utils/exportUtils';
+import VenueFormModal from './VenueForm';
 
-const _IS_PROD = window.location.hostname !== 'localhost';
+const _IS_PROD = typeof window !== 'undefined' && window.location.hostname !== 'localhost';
 const API_BASE_URL = _IS_PROD ? 'https://university-erp-node.onrender.com/api' : 'http://localhost:5000/api';
-
-// Mobile accordion card
-function VenMobCard({ venue, num, getStatusBadgeClass, onEdit, onDelete, expanded, onToggle }) {
-  const facilities = venue.facilities && venue.facilities.length > 0
-    ? venue.facilities.slice(0, 3).map(f => f.name || f).join(', ') + (venue.facilities.length > 3 ? ` +${venue.facilities.length - 3}` : '')
-    : 'None';
-  return (
-    <div className="mob-card">
-      <button type="button" className="mob-card-header" onClick={onToggle} aria-expanded={expanded}>
-        <div className="mob-card-summary">
-          <span className="mob-card-num">{num}</span>
-          <div className="mob-card-title-wrap">
-            <span className="mob-card-title">{venue.name}</span>
-            <span className="mob-card-sub">{venue.venueId}</span>
-          </div>
-        </div>
-        <span className="mob-card-chevron">{expanded ? '▲' : '▼'}</span>
-      </button>
-      {expanded && (
-        <div className="mob-card-details">
-          <div className="mob-card-row"><span className="mob-card-label">Venue ID</span><span className="mob-card-value mono">{venue.venueId}</span></div>
-          <div className="mob-card-row"><span className="mob-card-label">Capacity</span><span className="mob-card-value">{venue.capacity || 0}</span></div>
-          <div className="mob-card-row"><span className="mob-card-label">Facilities</span><span className="mob-card-value">{facilities}</span></div>
-          <div className="mob-card-row"><span className="mob-card-label">Status</span><span className="mob-card-value"><span className={getStatusBadgeClass(venue.status)}>{venue.status || 'N/A'}</span></span></div>
-          <div className="mob-card-actions">
-            <button type="button" className="action-btn edit-btn" onClick={onEdit}><Edit size={15} /><span className="action-label">Edit</span></button>
-            <button type="button" className="action-btn delete-btn" onClick={onDelete}><Trash2 size={15} /><span className="action-label">Delete</span></button>
-          </div>
-        </div>
-      )}
-    </div>
-  );
-}
 
 const Venues = () => {
   const navigate = useNavigate();
@@ -69,10 +37,13 @@ const Venues = () => {
   const [deleteConfirm, setDeleteConfirm] = useState(null);
   const downloadMenuRef = useRef(null);
 
+  // Modal state
+  const [modalOpen,   setModalOpen]   = useState(false);
+  const [editVenueId, setEditVenueId] = useState(null);
+
   // Pagination state
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(10);
-  const [venExpanded, setVenExpanded] = useState(null);
 
   const authHeader = () => {
     const token = localStorage.getItem('erp_token');
@@ -143,6 +114,12 @@ const Venues = () => {
     setShowDownloadMenu(false);
     exportVenues(filteredVenues, format);
   };
+
+  // Modal helpers
+  const openAddModal   = ()   => { setEditVenueId(null);  setModalOpen(true); };
+  const openEditModal  = (id) => { setEditVenueId(id);    setModalOpen(true); };
+  const closeModal     = ()   => { setModalOpen(false);   setEditVenueId(null); };
+  const handleModalSuccess = () => { closeModal(); fetchVenues(); };
 
   // Filter venues by search query
   const filteredVenues = venues.filter((v) => {
@@ -259,7 +236,7 @@ const Venues = () => {
           <button
             type="button"
             className="books-btn books-btn-primary"
-            onClick={() => navigate('/venues/add')}
+            onClick={openAddModal}
           >
             <Plus size={16} />
             <span>Add Venue</span>
@@ -329,7 +306,7 @@ const Venues = () => {
                   type="button"
                   className="books-btn books-btn-primary"
                   style={{ marginTop: '1rem' }}
-                  onClick={() => navigate('/venues/add')}
+                  onClick={openAddModal}
                 >
                   <Plus size={16} />
                   <span>Add Venue</span>
@@ -338,7 +315,6 @@ const Venues = () => {
             </div>
           ) : (
             <>
-              <div className="ven-desk-table">
               <table className="data-table">
                 <thead>
                   <tr>
@@ -379,9 +355,9 @@ const Venues = () => {
                             type="button"
                             className="action-btn edit-btn"
                             title="Edit Venue"
-                            onClick={() => navigate(`/venues/edit/${venue._id || venue.venueId}`)}
+                            onClick={() => openEditModal(venue._id || venue.venueId)}
                           >
-                            <Edit size={15} />
+                            <Edit size={14} />
                             <span className="action-label">Edit</span>
                           </button>
                           <button
@@ -396,7 +372,7 @@ const Venues = () => {
                               status: venue.status,
                             })}
                           >
-                            <Trash2 size={15} />
+                            <Trash2 size={14} />
                             <span className="action-label">Delete</span>
                           </button>
                         </div>
@@ -405,21 +381,6 @@ const Venues = () => {
                   ))}
                 </tbody>
               </table>
-              </div>
-              <div className="ven-mob-list">
-                {currentVenues.map((venue, index) => (
-                  <VenMobCard
-                    key={venue._id || venue.venueId || index}
-                    venue={venue}
-                    num={startIndex + index + 1}
-                    getStatusBadgeClass={getStatusBadgeClass}
-                    onEdit={() => navigate(`/venues/edit/${venue._id || venue.venueId}`)}
-                    onDelete={() => setDeleteConfirm({ id: venue._id || venue.venueId, venueId: venue.venueId, name: venue.name, capacity: venue.capacity, status: venue.status })}
-                    expanded={venExpanded === (venue._id || venue.venueId)}
-                    onToggle={() => setVenExpanded(prev => prev === (venue._id || venue.venueId) ? null : (venue._id || venue.venueId))}
-                  />
-                ))}
-              </div>
 
               {totalPages > 1 && (
                 <div className="pagination-controls">
@@ -562,6 +523,14 @@ const Venues = () => {
           </div>
         </div>
       )}
+
+      {/* Venue Form Modal */}
+      <VenueFormModal
+        isOpen={modalOpen}
+        venueId={editVenueId}
+        onClose={closeModal}
+        onSuccess={handleModalSuccess}
+      />
     </div>
   );
 };

@@ -1,642 +1,187 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
-import { ArrowLeft, Save, AlertCircle, CheckCircle2, Loader2, Plus, X, MapPin } from 'lucide-react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
+import { X, Save, AlertCircle, CheckCircle2, Loader2, Plus, MapPin } from 'lucide-react';
 import { validateRouteName } from '../utils/transportValidation';
-
-const _IS_PROD = window.location.hostname !== 'localhost';
+const _IS_PROD = typeof window !== 'undefined' && window.location.hostname !== 'localhost';
 const API_BASE_URL = _IS_PROD ? 'https://university-erp-node.onrender.com/api' : 'http://localhost:5000/api';
+const authHeader = () => ({ 'Content-Type': 'application/json', Authorization: `Bearer ${localStorage.getItem('erp_token')}` });
 
-const AddBusRoute = () => {
-  const { id } = useParams();
-  const navigate = useNavigate();
-  const isEditMode = Boolean(id);
+const FieldError = ({ msg }) => msg ? <p className="sf-field-error"><AlertCircle size={12} style={{ flexShrink: 0 }} />{msg}</p> : null;
 
+const AddBusRouteModal = ({ isOpen, routeId: routeIdProp, onClose, onSuccess }) => {
+  const isEdit = Boolean(routeIdProp);
   const [loading, setLoading] = useState(false);
   const [fetching, setFetching] = useState(false);
   const [feedback, setFeedback] = useState({ type: '', message: '' });
   const [routeNameError, setRouteNameError] = useState('');
-  const feedbackTimerRef = useRef(null);
-
-  const showFeedback = (type, message) => {
-    if (feedbackTimerRef.current) clearTimeout(feedbackTimerRef.current);
-    setFeedback({ type, message });
-    if (type === 'success') {
-      feedbackTimerRef.current = setTimeout(() => setFeedback({ type: '', message: '' }), 2000);
-    }
-  };
-
-  useEffect(() => {
-    return () => { if (feedbackTimerRef.current) clearTimeout(feedbackTimerRef.current); };
-  }, []);
-
   const [drivers, setDrivers] = useState([]);
   const [vehicles, setVehicles] = useState([]);
-
-  // Form State
-  const [formData, setFormData] = useState({
-    routeId: '',
-    hasCustomName: false,
-    routeName: '',
-    driverId: '',
-    driverName: '',
-    vehicleId: '',
-    vehicleName: '',
-    stops: [],
-    status: 'ACTIVE',
-  });
-
   const [stopInput, setStopInput] = useState('');
 
-  const authHeader = () => {
-    const token = localStorage.getItem('erp_token');
-    return {
-      'Content-Type': 'application/json',
-      Authorization: `Bearer ${token}`,
-    };
-  };
+  const emptyForm = { routeId: '', hasCustomName: false, routeName: '', driverId: '', driverName: '', vehicleId: '', vehicleName: '', stops: [], status: 'ACTIVE' };
+  const [form, setForm] = useState(emptyForm);
+
+  const reset = useCallback(() => { setForm(emptyForm); setRouteNameError(''); setFeedback({ type: '', message: '' }); setStopInput(''); }, []); // eslint-disable-line
 
   useEffect(() => {
-    fetchDriversAndVehicles();
-    if (isEditMode) loadRouteDetails();
-    else            fetchNextRouteId();
-    return () => { if (feedbackTimerRef.current) clearTimeout(feedbackTimerRef.current); };
-  }, [id]); // eslint-disable-line react-hooks/exhaustive-deps
+    if (!isOpen) return;
+    reset();
+    fetchDropdowns();
+    if (isEdit) loadRoute(); else fetchNextId();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isOpen, routeIdProp]);
 
-  const fetchDriversAndVehicles = async () => {
+  useEffect(() => { document.body.style.overflow = isOpen ? 'hidden' : ''; return () => { document.body.style.overflow = ''; }; }, [isOpen]);
+  useEffect(() => { const f = (e) => { if (e.key === 'Escape' && isOpen && !loading) onClose(); }; document.addEventListener('keydown', f); return () => document.removeEventListener('keydown', f); }, [isOpen, loading, onClose]);
+
+  const fetchDropdowns = async () => {
     try {
-      const [driversRes, vehiclesRes] = await Promise.all([
-        fetch(`${API_BASE_URL}/transport/drivers`, { headers: authHeader() }),
-        fetch(`${API_BASE_URL}/transport/vehicles`, { headers: authHeader() }),
-      ]);
-
-      if (driversRes.ok) {
-        const driversData = await driversRes.json();
-        setDrivers(driversData);
-      }
-      if (vehiclesRes.ok) {
-        const vehiclesData = await vehiclesRes.json();
-        setVehicles(vehiclesData);
-      }
-    } catch (err) {
-      console.warn('Error fetching dropdown data:', err);
-    }
+      const [dr, vr] = await Promise.all([fetch(`${API_BASE_URL}/transport/drivers`, { headers: authHeader() }), fetch(`${API_BASE_URL}/transport/vehicles`, { headers: authHeader() })]);
+      if (dr.ok) setDrivers(await dr.json());
+      if (vr.ok) setVehicles(await vr.json());
+    } catch { /* non-fatal */ }
   };
 
-  const fetchNextRouteId = async () => {
+  const fetchNextId = async () => {
     try {
-      const res = await fetch(`${API_BASE_URL}/transport/routes/next-id`, {
-        headers: authHeader(),
-      });
-      if (res.ok) {
-        const data = await res.json();
-        setFormData((prev) => ({ ...prev, routeId: data.nextId || 1 }));
-      }
-    } catch (err) {
-      console.warn('Could not auto-fetch route ID:', err);
-    }
+      const res = await fetch(`${API_BASE_URL}/transport/routes/next-id`, { headers: authHeader() });
+      if (res.ok) { const d = await res.json(); setForm((p) => ({ ...p, routeId: d.nextId || 1 })); }
+    } catch { /* non-fatal */ }
   };
 
-  const loadRouteDetails = async () => {
+  const loadRoute = async () => {
     setFetching(true);
     try {
-      const res = await fetch(`${API_BASE_URL}/transport/routes/${id}`, {
-        headers: authHeader(),
-      });
-
+      const res = await fetch(`${API_BASE_URL}/transport/routes/${routeIdProp}`, { headers: authHeader() });
       if (res.ok) {
-        const route = await res.json();
-        setFormData({
-          routeId: route.routeId || '',
-          hasCustomName: Boolean(route.hasCustomName || route.routeName),
-          routeName: route.routeName || '',
-          driverId: route.driverId || '',
-          driverName: route.driverName || '',
-          vehicleId: route.vehicleId || '',
-          vehicleName: route.vehicleName || '',
-          stops: route.stops || [],
-          status: route.status || 'ACTIVE',
-        });
-      } else {
-        setFeedback({ type: 'error', message: 'Bus route not found.' });
-      }
-    } catch (err) {
-      console.error('Error fetching route details:', err);
-      setFeedback({ type: 'error', message: 'Unable to connect to server.' });
-    } finally {
-      setFetching(false);
-    }
+        const r = await res.json();
+        setForm({ routeId: r.routeId || '', hasCustomName: Boolean(r.hasCustomName || r.routeName), routeName: r.routeName || '', driverId: r.driverId || '', driverName: r.driverName || '', vehicleId: r.vehicleId || '', vehicleName: r.vehicleName || '', stops: r.stops || [], status: r.status || 'ACTIVE' });
+      } else setFeedback({ type: 'error', message: 'Bus route not found.' });
+    } catch { setFeedback({ type: 'error', message: 'Unable to connect.' }); }
+    finally { setFetching(false); }
   };
 
-  const handleInputChange = (e) => {
+  const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
-    if (type === 'checkbox') {
-      setFormData((prev) => ({
-        ...prev,
-        [name]: checked,
-        routeName: checked ? prev.routeName : '',
-      }));
-    } else {
-      setFormData((prev) => ({ ...prev, [name]: value }));
-    }
+    if (type === 'checkbox') setForm((p) => ({ ...p, [name]: checked, routeName: checked ? p.routeName : '' }));
+    else setForm((p) => ({ ...p, [name]: value }));
   };
 
-  const handleDriverChange = (e) => {
-    const selectedDriverName = e.target.value;
-    const selectedDriver = drivers.find((d) => d.name === selectedDriverName);
-    setFormData((prev) => ({
-      ...prev,
-      driverName: selectedDriverName,
-      driverId: selectedDriver ? selectedDriver.driverId : '',
-    }));
-  };
-
-  const handleVehicleChange = (e) => {
-    const selectedVehicleName = e.target.value;
-    const selectedVehicle = vehicles.find((v) => v.name === selectedVehicleName);
-    setFormData((prev) => ({
-      ...prev,
-      vehicleName: selectedVehicleName,
-      vehicleId: selectedVehicle ? selectedVehicle.vehicleId : '',
-    }));
-  };
-
-  // Process stop addition helper
-  const addStopToList = (stopName) => {
-    const trimmed = stopName.trim();
-    if (trimmed && !formData.stops.includes(trimmed)) {
-      setFormData((prev) => ({
-        ...prev,
-        stops: [...prev.stops, trimmed],
-      }));
-    }
-  };
-
-  // Comma trigger & input change handler
-  const handleStopInputChange = (e) => {
-    const value = e.target.value;
-    // Check if the user typed a comma anywhere
-    if (value.includes(',')) {
-      const parts = value.split(',');
-      parts.forEach((part, index) => {
-        if (index < parts.length - 1) {
-          // If before the last comma, add immediately
-          if (part.trim()) addStopToList(part);
-        } else {
-          // The remainder after the last comma stays in input or gets added if empty
-          setStopInput(part.trim() ? part : '');
-        }
-      });
-      // If trailing comma was typed, clear input
-      if (value.endsWith(',')) {
-        setStopInput('');
-      }
-    } else {
-      setStopInput(value);
-    }
-  };
-
-  // Enter key or button click to add stop
-  const handleStopKeyDown = (e) => {
-    if (e.key === 'Enter') {
-      e.preventDefault();
-      if (stopInput.trim()) {
-        addStopToList(stopInput);
-        setStopInput('');
-      }
-    }
-  };
-
-  const handleAddStopClick = () => {
-    if (stopInput.trim()) {
-      addStopToList(stopInput);
-      setStopInput('');
-    }
-  };
-
-  const handleRemoveStop = (indexToRemove) => {
-    setFormData((prev) => ({
-      ...prev,
-      stops: prev.stops.filter((_, idx) => idx !== indexToRemove),
-    }));
+  const addStop = (s) => { const t = s.trim(); if (t && !form.stops.includes(t)) setForm((p) => ({ ...p, stops: [...p.stops, t] })); };
+  const handleStopInput = (e) => {
+    const v = e.target.value;
+    if (v.includes(',')) { v.split(',').forEach((p, i, arr) => { if (i < arr.length - 1 && p.trim()) addStop(p); else setStopInput(p.trim() ? p : ''); }); if (v.endsWith(',')) setStopInput(''); }
+    else setStopInput(v);
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setFeedback({ type: '', message: '' });
-
-    if (formData.routeId === '' || formData.routeId === null) {
-      setFeedback({ type: 'error', message: 'Route ID is required (numeric).' });
-      return;
-    }
-
-    if (!formData.driverName) {
-      setFeedback({ type: 'error', message: 'Please select or enter a Driver Name.' });
-      return;
-    }
-
-    if (!formData.vehicleName) {
-      setFeedback({ type: 'error', message: 'Please select or enter a Vehicle Name.' });
-      return;
-    }
-
-    if (formData.hasCustomName && !formData.routeName.trim()) {
-      setFeedback({ type: 'error', message: 'Please provide a Route Name or uncheck the custom Route Name option.' });
-      return;
-    }
-
-    // D2: validate route name format
-    if (formData.hasCustomName) {
-      const nameErr = validateRouteName(formData.routeName);
-      if (nameErr) {
-        setRouteNameError(nameErr);
-        setFeedback({ type: 'error', message: nameErr });
-        return;
-      }
-    }
+    if (form.routeId === '' || form.routeId === null) { setFeedback({ type: 'error', message: 'Route ID is required.' }); return; }
+    if (!form.driverName) { setFeedback({ type: 'error', message: 'Please select a Driver.' }); return; }
+    if (!form.vehicleName) { setFeedback({ type: 'error', message: 'Please select a Vehicle.' }); return; }
+    if (form.hasCustomName) { const err = validateRouteName(form.routeName); if (err) { setRouteNameError(err); return; } }
     setRouteNameError('');
-
     setLoading(true);
-
-    const payload = {
-      routeId: Number(formData.routeId),
-      hasCustomName: formData.hasCustomName,
-      routeName: formData.hasCustomName ? formData.routeName.trim() : '',
-      driverId: formData.driverId || null,
-      driverName: formData.driverName.trim(),
-      vehicleId: formData.vehicleId || '',
-      vehicleName: formData.vehicleName.trim(),
-      stops: formData.stops,
-      status: formData.status,
-    };
-
     try {
-      const url = isEditMode
-        ? `${API_BASE_URL}/transport/routes/${id}`
-        : `${API_BASE_URL}/transport/routes`;
-      const method = isEditMode ? 'PUT' : 'POST';
-
-      const res = await fetch(url, {
-        method,
-        headers: authHeader(),
-        body: JSON.stringify(payload),
-      });
-
+      const url = isEdit ? `${API_BASE_URL}/transport/routes/${routeIdProp}` : `${API_BASE_URL}/transport/routes`;
+      const res = await fetch(url, { method: isEdit ? 'PUT' : 'POST', headers: authHeader(), body: JSON.stringify({ routeId: Number(form.routeId), hasCustomName: form.hasCustomName, routeName: form.hasCustomName ? form.routeName.trim() : '', driverId: form.driverId || null, driverName: form.driverName.trim(), vehicleId: form.vehicleId || '', vehicleName: form.vehicleName.trim(), stops: form.stops, status: form.status }) });
       const data = await res.json();
-      if (!res.ok) {
-        setFeedback({ type: 'error', message: data.message || 'Failed to save bus route.' });
-        setLoading(false);
-        return;
-      }
-
-      showFeedback('success', isEditMode ? 'Bus route updated successfully!' : 'Bus route created successfully!');
-      setTimeout(() => navigate('/transport'), 1200);
-    } catch (err) {
-      console.error('Error submitting bus route:', err);
-      setFeedback({ type: 'error', message: 'Unable to connect to server. Please try again.' });
-      setLoading(false);
-    }
+      if (!res.ok) { setFeedback({ type: 'error', message: data.message || 'Failed to save.' }); return; }
+      setFeedback({ type: 'success', message: data.message || (isEdit ? 'Route updated.' : 'Route created.') });
+      setTimeout(() => onSuccess(), 900);
+    } catch { setFeedback({ type: 'error', message: 'Unable to connect.' }); }
+    finally { setLoading(false); }
   };
 
+  if (!isOpen) return null;
   return (
-    <div className="page-container">
-      <div className="page-header" style={{ marginBottom: '1.5rem' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-          <button
-            type="button"
-            className="btn-back"
-            onClick={() => navigate('/transport')}
-            title="Back to Transport"
-          >
-            <ArrowLeft size={18} />
-          </button>
-          <div>
-            <h1 className="page-title" style={{ fontSize: '1.5rem' }}>
-              {isEditMode ? 'Edit Bus Route' : 'Add Bus Route'}
-            </h1>
-            <p className="page-subtitle">Configure transport bus route, driver, vehicle, and sequential stops</p>
+    <div className="sf-overlay" role="dialog" aria-modal="true" onClick={(e) => { if (e.target === e.currentTarget && !loading) onClose(); }}>
+      <div className="sf-modal">
+        <div className="sf-header">
+          <div className="sf-header-left">
+            <div className="sf-header-icon"><MapPin size={18} /></div>
+            <div><h2 className="sf-title">{isEdit ? 'Edit Bus Route' : 'Add Bus Route'}</h2><p className="sf-subtitle">Configure route, driver, vehicle and stops</p></div>
           </div>
+          <button type="button" className="sf-close-btn" onClick={onClose} disabled={loading} aria-label="Close"><X size={18} /></button>
         </div>
-      </div>
-
-      {feedback.message && (
-        <div
-          className={`feedback-banner ${
-            feedback.type === 'success' ? 'feedback-success' : 'feedback-error'
-          }`}
-          style={{ marginBottom: '1.5rem' }}
-        >
-          {feedback.type === 'success' ? (
-            <CheckCircle2 size={18} />
-          ) : (
-            <AlertCircle size={18} />
-          )}
-          <span>{feedback.message}</span>
-        </div>
-      )}
-
-      <div className="card" style={{ maxWidth: '780px' }}>
-        {fetching ? (
-          <div style={{ padding: '3rem', textAlign: 'center', color: 'var(--text-secondary)' }}>
-            <Loader2 size={28} className="spin-animate" style={{ margin: '0 auto 0.75rem auto' }} />
-            <p>Loading route details...</p>
-          </div>
-        ) : (
-          <form onSubmit={handleSubmit} className="form-layout">
-            <div className="form-section">
-              <h3 className="form-section-title">Route Identification</h3>
-
-              {/* Route ID & Checkbox for Route Name */}
-              <div className="form-row" style={{ alignItems: 'flex-start' }}>
-                <div className="form-group" style={{ flex: 1 }}>
-                  <label htmlFor="routeId" className="form-label">
-                    Route ID (Numeric) <span style={{ color: '#ef4444' }}>*</span>
-                  </label>
-                  <input
-                    type="number"
-                    id="routeId"
-                    name="routeId"
-                    className="form-input"
-                    placeholder="e.g. 1, 2, 101"
-                    value={formData.routeId}
-                    onChange={handleInputChange}
-                    required
-                  />
+        <div className="sf-body">
+          {feedback.message && <div className={`sf-feedback ${feedback.type === 'success' ? 'sf-feedback-success' : 'sf-feedback-error'}`}>{feedback.type === 'success' ? <CheckCircle2 size={16} style={{ flexShrink: 0 }} /> : <AlertCircle size={16} style={{ flexShrink: 0 }} />}<span>{feedback.message}</span></div>}
+          {fetching ? <div className="sf-loading"><Loader2 size={26} className="spin-animate" /><p>Loading…</p></div> : (
+            <form id="route-form" onSubmit={handleSubmit} className="sf-form" noValidate>
+              <div className="sf-section-label">Route Identification</div>
+              <div className="sf-row">
+                <div className="sf-group">
+                  <label className="sf-label" htmlFor="r-routeId">Route ID (Numeric) <span className="sf-required">*</span></label>
+                  <input id="r-routeId" name="routeId" type="number" className="sf-input" placeholder="e.g. 1, 2, 101" value={form.routeId} onChange={handleChange} />
                 </div>
-
-                <div className="form-group" style={{ flex: 1.2, paddingTop: '1.8rem' }}>
-                  <label
-                    htmlFor="hasCustomName"
-                    style={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: '0.5rem',
-                      cursor: 'pointer',
-                      fontSize: '0.95rem',
-                      fontWeight: 500,
-                      userSelect: 'none',
-                    }}
-                  >
-                    <input
-                      type="checkbox"
-                      id="hasCustomName"
-                      name="hasCustomName"
-                      checked={formData.hasCustomName}
-                      onChange={handleInputChange}
-                      style={{ width: '18px', height: '18px', cursor: 'pointer', accentColor: '#2563eb' }}
-                    />
-                    <span>Add Custom Route Name</span>
+                <div className="sf-group" style={{ justifyContent: 'flex-end', paddingBottom: '0.25rem' }}>
+                  <label className="sf-label" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', cursor: 'pointer', marginTop: 'auto' }}>
+                    <input type="checkbox" name="hasCustomName" checked={form.hasCustomName} onChange={handleChange} style={{ width: 16, height: 16 }} />
+                    Add Custom Route Name
                   </label>
                 </div>
               </div>
-
-              {formData.hasCustomName && (
-                <div className="form-group" style={{ marginTop: '0.75rem' }}>
-                  <label htmlFor="routeName" className="form-label">
-                    Route Name (Letters &amp; Numbers) <span style={{ color: '#ef4444' }}>*</span>
-                  </label>
-                  <input
-                    type="text"
-                    id="routeName"
-                    name="routeName"
-                    className={`form-input${routeNameError ? ' input-error' : ''}`}
-                    placeholder="e.g. North City Express - Route 1A"
-                    value={formData.routeName}
-                    onChange={(e) => {
-                      handleInputChange(e);
-                      if (routeNameError) setRouteNameError(validateRouteName(e.target.value) || '');
-                    }}
-                    required={formData.hasCustomName}
-                  />
-                  {routeNameError && <p className="form-field-error" style={{ marginTop: '0.25rem' }}>{routeNameError}</p>}
-                </div>
+              {form.hasCustomName && (
+                <div className="sf-row"><div className="sf-group sf-group-full">
+                  <label className="sf-label" htmlFor="r-routeName">Route Name <span className="sf-required">*</span></label>
+                  <input id="r-routeName" name="routeName" type="text" className={`sf-input${routeNameError ? ' sf-input-error' : ''}`} placeholder="e.g. North City Express" value={form.routeName} onChange={(e) => { handleChange(e); if (routeNameError) setRouteNameError(validateRouteName(e.target.value) || ''); }} />
+                  <FieldError msg={routeNameError} />
+                </div></div>
               )}
-            </div>
-
-            <div className="form-section" style={{ marginTop: '1.75rem' }}>
-              <h3 className="form-section-title">Assignment (Driver & Vehicle)</h3>
-
-              <div className="form-row">
-                {/* Driver Name Dropdown */}
-                <div className="form-group">
-                  <label htmlFor="driverName" className="form-label">
-                    Driver Name <span style={{ color: '#ef4444' }}>*</span>
-                  </label>
-                  <select
-                    id="driverName"
-                    name="driverName"
-                    className="form-input"
-                    value={formData.driverName}
-                    onChange={handleDriverChange}
-                    required
-                  >
-                    <option value="">-- Select Driver --</option>
-                    {drivers.map((d) => (
-                      <option key={d._id || d.driverId} value={d.name}>
-                        {d.name} (ID: {d.driverId})
-                      </option>
-                    ))}
+              <div className="sf-section-label" style={{ marginTop: '0.25rem' }}>Assignment</div>
+              <div className="sf-row">
+                <div className="sf-group">
+                  <label className="sf-label" htmlFor="r-driverName">Driver <span className="sf-required">*</span></label>
+                  <select id="r-driverName" name="driverName" className="sf-input" value={form.driverName} onChange={(e) => { const d = drivers.find((x) => x.name === e.target.value); setForm((p) => ({ ...p, driverName: e.target.value, driverId: d ? d.driverId : '' })); }}>
+                    <option value="">— Select Driver —</option>
+                    {drivers.map((d) => <option key={d._id || d.driverId} value={d.name}>{d.name} ({d.driverId})</option>)}
                   </select>
-                  {drivers.length === 0 && (
-                    <span style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', marginTop: '4px', display: 'block' }}>
-                      No drivers found.{' '}
-                      <button
-                        type="button"
-                        style={{ color: '#2563eb', background: 'none', border: 'none', padding: 0, textDecoration: 'underline', cursor: 'pointer' }}
-                        onClick={() => navigate('/transport/add-driver')}
-                      >
-                        Add a driver first
-                      </button>
-                    </span>
-                  )}
                 </div>
-
-                {/* Vehicle Name Dropdown */}
-                <div className="form-group">
-                  <label htmlFor="vehicleName" className="form-label">
-                    Vehicle Name <span style={{ color: '#ef4444' }}>*</span>
-                  </label>
-                  <select
-                    id="vehicleName"
-                    name="vehicleName"
-                    className="form-input"
-                    value={formData.vehicleName}
-                    onChange={handleVehicleChange}
-                    required
-                  >
-                    <option value="">-- Select Vehicle --</option>
-                    {vehicles.map((v) => (
-                      <option key={v._id || v.vehicleId} value={v.name}>
-                        {v.name} ({v.vehicleId}{v.vehicleNumber ? ` - ${v.vehicleNumber}` : ''})
-                      </option>
-                    ))}
+                <div className="sf-group">
+                  <label className="sf-label" htmlFor="r-vehicleName">Vehicle <span className="sf-required">*</span></label>
+                  <select id="r-vehicleName" name="vehicleName" className="sf-input" value={form.vehicleName} onChange={(e) => { const v = vehicles.find((x) => x.name === e.target.value); setForm((p) => ({ ...p, vehicleName: e.target.value, vehicleId: v ? v.vehicleId : '' })); }}>
+                    <option value="">— Select Vehicle —</option>
+                    {vehicles.map((v) => <option key={v._id || v.vehicleId} value={v.name}>{v.name} ({v.vehicleId})</option>)}
                   </select>
-                  {vehicles.length === 0 && (
-                    <span style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', marginTop: '4px', display: 'block' }}>
-                      No vehicles found.{' '}
-                      <button
-                        type="button"
-                        style={{ color: '#2563eb', background: 'none', border: 'none', padding: 0, textDecoration: 'underline', cursor: 'pointer' }}
-                        onClick={() => navigate('/transport/add-vehicle')}
-                      >
-                        Add a vehicle first
-                      </button>
-                    </span>
-                  )}
                 </div>
               </div>
-            </div>
-
-            {/* Stops Section with Comma Trigger */}
-            <div className="form-section" style={{ marginTop: '1.75rem' }}>
-              <h3 className="form-section-title">Bus Route Stops</h3>
-              <p style={{ fontSize: '0.875rem', color: 'var(--text-secondary)', marginBottom: '0.75rem' }}>
-                Enter stop names below. Type a <strong>comma ( , )</strong> or press <strong>Enter</strong> to instantly add each stop to the route sequence.
-              </p>
-
-              <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
-                <div style={{ position: 'relative', flex: 1 }}>
-                  <MapPin
-                    size={18}
-                    style={{ position: 'absolute', left: '12px', top: '12px', color: '#6b7280' }}
-                  />
-                  <input
-                    type="text"
-                    className="form-input"
-                    style={{ paddingLeft: '2.5rem' }}
-                    placeholder="Type stop name and press ',' or Enter (e.g. City Center,)"
-                    value={stopInput}
-                    onChange={handleStopInputChange}
-                    onKeyDown={handleStopKeyDown}
-                  />
+              <div className="sf-row"><div className="sf-group">
+                <label className="sf-label" htmlFor="r-status">Status</label>
+                <select id="r-status" name="status" className="sf-input" value={form.status} onChange={handleChange}>
+                  <option value="ACTIVE">Active</option><option value="INACTIVE">Inactive</option>
+                </select>
+              </div></div>
+              <div className="sf-section-label" style={{ marginTop: '0.25rem' }}>Stops <span className="sf-optional">optional</span></div>
+              <div className="sf-custom-input-row">
+                <div className="sf-group" style={{ flex: 1 }}>
+                  <input type="text" className="sf-input" placeholder="Type stop name, press Enter or comma" value={stopInput}
+                    onChange={handleStopInput} onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); if (stopInput.trim()) { addStop(stopInput); setStopInput(''); } } }} />
                 </div>
-                <button
-                  type="button"
-                  className="btn btn-secondary"
-                  onClick={handleAddStopClick}
-                  disabled={!stopInput.trim()}
-                  style={{ height: '42px', padding: '0 1.25rem' }}
-                >
-                  <Plus size={16} />
-                  <span>Add Stop</span>
-                </button>
+                <button type="button" className="sf-add-custom-btn" onClick={() => { if (stopInput.trim()) { addStop(stopInput); setStopInput(''); } }}><Plus size={15} /><span>Add</span></button>
               </div>
-
-              {/* Stops list sequence */}
-              {formData.stops.length > 0 ? (
-                <div
-                  style={{
-                    marginTop: '1rem',
-                    display: 'flex',
-                    flexWrap: 'wrap',
-                    gap: '0.5rem',
-                    padding: '1rem',
-                    backgroundColor: 'rgba(243, 244, 246, 0.6)',
-                    borderRadius: '8px',
-                    border: '1px solid #e5e7eb',
-                  }}
-                >
-                  {formData.stops.map((stop, index) => (
-                    <div
-                      key={index}
-                      style={{
-                        display: 'inline-flex',
-                        alignItems: 'center',
-                        gap: '0.5rem',
-                        backgroundColor: '#ffffff',
-                        padding: '6px 12px',
-                        borderRadius: '20px',
-                        boxShadow: '0 1px 3px rgba(0,0,0,0.08)',
-                        border: '1px solid #d1d5db',
-                        fontSize: '0.875rem',
-                      }}
-                    >
-                      <span
-                        style={{
-                          backgroundColor: '#2563eb',
-                          color: '#ffffff',
-                          borderRadius: '50%',
-                          width: '20px',
-                          height: '20px',
-                          display: 'inline-flex',
-                          alignItems: 'center',
-                          justifyContent: 'center',
-                          fontSize: '0.75rem',
-                          fontWeight: 600,
-                        }}
-                      >
-                        {index + 1}
-                      </span>
-                      <span style={{ fontWeight: 500, color: '#1f2937' }}>{stop}</span>
-                      <button
-                        type="button"
-                        onClick={() => handleRemoveStop(index)}
-                        style={{
-                          background: 'none',
-                          border: 'none',
-                          color: '#9ca3af',
-                          cursor: 'pointer',
-                          display: 'flex',
-                          alignItems: 'center',
-                          padding: '2px',
-                          borderRadius: '50%',
-                        }}
-                        title={`Remove stop ${stop}`}
-                      >
-                        <X size={14} />
-                      </button>
-                    </div>
+              {form.stops.length > 0 && (
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.4rem', marginTop: '0.5rem' }}>
+                  {form.stops.map((s, i) => (
+                    <span key={i} style={{ display: 'inline-flex', alignItems: 'center', gap: '0.4rem', background: '#f3f4f6', border: '1px solid #d1d5db', borderRadius: '1rem', padding: '0.25rem 0.6rem', fontSize: '0.8125rem' }}>
+                      <span style={{ background: '#2563eb', color: '#fff', borderRadius: '50%', width: 18, height: 18, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.7rem', fontWeight: 700 }}>{i + 1}</span>
+                      {s}
+                      <button type="button" onClick={() => setForm((p) => ({ ...p, stops: p.stops.filter((_, j) => j !== i) }))} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#9ca3af', padding: 0, display: 'flex' }}><X size={13} /></button>
+                    </span>
                   ))}
                 </div>
-              ) : (
-                <div
-                  style={{
-                    marginTop: '0.75rem',
-                    padding: '0.75rem 1rem',
-                    backgroundColor: '#f9fafb',
-                    borderRadius: '6px',
-                    border: '1px dashed #d1d5db',
-                    color: '#6b7280',
-                    fontSize: '0.85rem',
-                    textAlign: 'center',
-                  }}
-                >
-                  No stops added yet. Type a stop name and comma above to add stops.
-                </div>
               )}
-            </div>
-
-            <div className="form-actions-row" style={{ marginTop: '2rem' }}>
-              <button
-                type="button"
-                className="books-btn books-btn-ghost"
-                onClick={() => navigate('/transport')}
-                disabled={loading}
-              >
-                Cancel
-              </button>
-              <button
-                type="submit"
-                className="books-btn books-btn-primary"
-                disabled={loading}
-              >
-                {loading ? (
-                  <>
-                    <Loader2 size={16} className="spin-animate" />
-                    <span>Saving...</span>
-                  </>
-                ) : (
-                  <>
-                    <Save size={16} />
-                    <span>{isEditMode ? 'Update Route' : 'Save Bus Route'}</span>
-                  </>
-                )}
-              </button>
-            </div>
-          </form>
-        )}
+            </form>
+          )}
+        </div>
+        <div className="sf-footer">
+          <button type="button" className="sf-btn-cancel" onClick={onClose} disabled={loading}>Cancel</button>
+          <button type="submit" form="route-form" className="sf-btn-save" disabled={loading || fetching}>
+            {loading ? <><Loader2 size={15} className="spin-animate" /><span>Saving…</span></> : <><Save size={15} /><span>{isEdit ? 'Update Route' : 'Save Route'}</span></>}
+          </button>
+        </div>
       </div>
     </div>
   );
 };
 
-export default AddBusRoute;
+export default AddBusRouteModal;

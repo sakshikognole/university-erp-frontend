@@ -6,10 +6,10 @@
  */
 
 // ---------------------------------------------------------------------------
-// Staff ID — must match "STF" + 4-digit year + 3-digit sequence
-// e.g. STF2024001
+// Staff ID — alphanumeric only, at least 2 characters, no spaces or symbols.
+// Accepts any format: STF2024001, 2024001, ABC123, etc.
 // ---------------------------------------------------------------------------
-export const STAFF_ID_REGEX = /^STF\d{4}\d{3}$/i;
+export const STAFF_ID_REGEX = /^[A-Za-z0-9]{2,}$/;
 
 // ---------------------------------------------------------------------------
 // Name — letters (including Unicode), spaces, hyphens, apostrophes, dots.
@@ -74,9 +74,9 @@ export function validateName(raw) {
 // ---------------------------------------------------------------------------
 export function validateStaffId(raw) {
   if (!raw || raw.trim().length === 0) return 'Staff ID is required.';
-  const id = raw.trim().toUpperCase();
+  const id = raw.trim();
   if (!STAFF_ID_REGEX.test(id))
-    return 'Invalid Staff ID. Expected format: STF followed by 4-digit year and 3-digit number (e.g. STF2024001).';
+    return 'Invalid Staff ID. Only letters and numbers are allowed (e.g. STF2024001, 2024001).';
   return '';
 }
 
