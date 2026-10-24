@@ -24,8 +24,8 @@ import {
 } from 'lucide-react';
 
 import AlumniFormModal from './AlumniForm';
-
-const API_BASE_URL = 'http://localhost:5000/api';
+const _IS_PROD = typeof window !== 'undefined' && window.location.hostname !== 'localhost';
+const API_BASE_URL = _IS_PROD ? 'https://university-erp-node.onrender.com/api' : 'http://localhost:5000/api';
 const NO_RECORDS_MSG = 'No Alumni records available to download.';
 
 // ── Export helpers ────────────────────────────────────────────────────────────

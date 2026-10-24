@@ -7,8 +7,8 @@ import {
 } from 'lucide-react';
 
 import AlumniJobFormModal from './AlumniJobForm';
-
-const API_BASE_URL = 'http://localhost:5000/api';
+const _IS_PROD = typeof window !== 'undefined' && window.location.hostname !== 'localhost';
+const API_BASE_URL = _IS_PROD ? 'https://university-erp-node.onrender.com/api' : 'http://localhost:5000/api';
 
 // ── Export helpers ─────────────────────────────────────────────────────────────
 const triggerDownload = (content, filename, mimeType) => {

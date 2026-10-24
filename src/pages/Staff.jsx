@@ -20,7 +20,8 @@ import {
 import { exportStaff } from '../utils/exportUtils';
 import StaffFormModal from './StaffForm';
 
-const API_BASE_URL = 'http://localhost:5000/api';
+const _IS_PROD = typeof window !== 'undefined' && window.location.hostname !== 'localhost';
+const API_BASE_URL = _IS_PROD ? 'https://university-erp-node.onrender.com/api' : 'http://localhost:5000/api';
 
 const authHeader = () => {
   const token = localStorage.getItem('erp_token');

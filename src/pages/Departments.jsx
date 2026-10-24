@@ -1,4 +1,4 @@
-﻿import React, { useState, useEffect, useRef, useCallback } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   Building2, Plus, Download, Search, Edit, Trash2, FileText, FileSpreadsheet,
@@ -8,7 +8,8 @@ import { exportDepartments } from '../utils/exportUtils';
 import { useAuth } from '../context/AuthContext';
 import DepartmentFormModal from './DepartmentForm';
 
-const API_BASE_URL = 'http://localhost:5000/api';
+const _IS_PROD = typeof window !== 'undefined' && window.location.hostname !== 'localhost';
+const API_BASE_URL = _IS_PROD ? 'https://university-erp-node.onrender.com/api' : 'http://localhost:5000/api';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Departments page — Super Admin view

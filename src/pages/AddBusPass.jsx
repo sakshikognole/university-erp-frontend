@@ -1,8 +1,8 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { X, Save, AlertCircle, CheckCircle2, Loader2, UserCheck, Search } from 'lucide-react';
 import { validateBusPassId, validateValidTill } from '../utils/transportValidation';
-
-const API_BASE_URL = 'http://localhost:5000/api';
+const _IS_PROD = typeof window !== 'undefined' && window.location.hostname !== 'localhost';
+const API_BASE_URL = _IS_PROD ? 'https://university-erp-node.onrender.com/api' : 'http://localhost:5000/api';
 const authHeader = () => ({ 'Content-Type': 'application/json', Authorization: `Bearer ${localStorage.getItem('erp_token')}` });
 
 const FieldError = ({ msg }) => msg ? <p className="sf-field-error"><AlertCircle size={12} style={{ flexShrink: 0 }} />{msg}</p> : null;

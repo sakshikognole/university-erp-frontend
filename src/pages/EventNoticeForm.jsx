@@ -14,8 +14,9 @@ import {
 
 import { getEventImage } from '../utils/eventImageUtils';
 import { uploadToCloudinary } from '../utils/cloudinaryUpload';
-
-const API_BASE_URL = 'http://localhost:5000/api';
+const _IS_PROD = typeof window !== 'undefined' && window.location.hostname !== 'localhost';
+const API_BASE_URL = _IS_PROD ? 'https://university-erp-node.onrender.com/api' : 'http://localhost:5000/api';
+const SPRING_API_URL = _IS_PROD ? 'https://university-erp-spring.onrender.com/api' : 'http://localhost:9090/api';
 
 // ─── Validation helpers ────────────────────────────────────────────────────────
 
@@ -156,7 +157,7 @@ const EventNoticeForm = () => {
 
   const loadBookedEvents = async () => {
     try {
-      const res = await fetch('http://localhost:9090/api/events');
+      const res = await fetch(`${SPRING_API_URL}/events`);
       if (res.ok) {
         const data = await res.json();
         if (Array.isArray(data)) setBookedEvents(data);
@@ -170,7 +171,7 @@ const EventNoticeForm = () => {
     try {
       let res = await fetch(`${API_BASE_URL}/venues`, { headers: authHeader() });
       if (!res.ok) {
-        res = await fetch('http://localhost:5000/api/super-admin/venues', {
+        res = await fetch(`${API_BASE_URL}/super-admin/venues`, {
           headers: authHeader(),
         });
       }

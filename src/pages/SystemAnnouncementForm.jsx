@@ -2,8 +2,8 @@ import React, { useState, useEffect, useRef } from 'react';
 import { X, Save, AlertCircle, CheckCircle2, Loader2, Upload, FileText, ChevronDown, Building2 } from 'lucide-react';
 import { uploadToCloudinary } from '../utils/cloudinaryUpload';
 import { validateAnnouncementTitle } from '../utils/announcementValidation';
-
-const API_BASE_URL = 'http://localhost:5000/api';
+const _IS_PROD = typeof window !== 'undefined' && window.location.hostname !== 'localhost';
+const API_BASE_URL = _IS_PROD ? 'https://university-erp-node.onrender.com/api' : 'http://localhost:5000/api';
 const MAX_FILE_BYTES = 10 * 1024 * 1024;
 const ALLOWED_TYPES = new Set(['image/jpeg','image/png','image/webp','image/gif','application/pdf','application/msword','application/vnd.openxmlformats-officedocument.wordprocessingml.document']);
 
