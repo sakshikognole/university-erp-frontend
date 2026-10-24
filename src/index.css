@@ -1,4 +1,4 @@
-﻿/* ==========================================
+/* ==========================================
    CSS VARIABLES - WHITE THEME (Black & White)
    ========================================== */
 :root {
@@ -12118,7 +12118,7 @@ input[type='password']::-webkit-inner-spin-button {
    Appended to support bug-fixed pages. Teammate CSS untouched.
    ================================================================ */
 
-Fix: scope the Alumni Jobs page with .alumni-jobs-page so the buttons keep
+/* Fix: scope the Alumni Jobs page with .alumni-jobs-page so the buttons keep */
 
 .alumni-jobs-page .page-header-row {
   align-items: flex-start;
@@ -12139,7 +12139,7 @@ Fix: scope the Alumni Jobs page with .alumni-jobs-page so the buttons keep
   line-height: 1.4;
 }
 
-Scoped to .en-form-* classes so zero impact on other modules.
+/* Scoped to .en-form-* classes so zero impact on other modules. */
 
 .en-form-header {
   display: flex;
@@ -12175,9 +12175,9 @@ Scoped to .en-form-* classes so zero impact on other modules.
   display: block;
 }
 
-All rules scoped to .events-page, .eb-*, or specific class names so they
+/* All rules scoped to .events-page, .eb-*, or specific class names so they */
 
-Fix: .events-header-actions overrides those rules so both buttons stay at
+/* Fix: .events-header-actions overrides those rules so both buttons stay at */
 
 .events-header-actions {
   display: flex;
@@ -12187,13 +12187,13 @@ Fix: .events-header-actions overrides those rules so both buttons stay at
   flex-shrink: 0;
 }
 
-and Save/Update stay right-aligned by default.  The .eb-form-actions class
+/* and Save/Update stay right-aligned by default.  The .eb-form-actions class */
 
 .eb-form-actions {
   justify-content: flex-end;
 }
 
-.eb-page-header is a flex container. On desktop the arrow sits inline with
+/* .eb-page-header is a flex container. On desktop the arrow sits inline with */
 
 .eb-page-header {
   display: flex;
@@ -12213,7 +12213,7 @@ and Save/Update stay right-aligned by default.  The .eb-form-actions class
   text-align: left;
 }
 
-.eb-form-dialog overrides the default max-width: 480px from .modal-content
+/* .eb-form-dialog overrides the default max-width: 480px from .modal-content */
 
 .eb-form-dialog {
   max-width: 860px;
@@ -12296,9 +12296,9 @@ and Save/Update stay right-aligned by default.  The .eb-form-actions class
   user-select: text;   /* still allow copying */
 }
 
-All rules scoped to .alumni-page, .alumni-form-card, .alumni-bulk-card,
+/* All rules scoped to .alumni-page, .alumni-form-card, .alumni-bulk-card, */
 
-Fix: .alumni-header-actions overrides that so Download, Bulk Upload, and
+/* Fix: .alumni-header-actions overrides that so Download, Bulk Upload, and */
 
 .alumni-header-actions {
   display: flex;
@@ -12308,7 +12308,7 @@ Fix: .alumni-header-actions overrides that so Download, Bulk Upload, and
   flex-shrink: 0;
 }
 
-.alumni-bulk-template-btn which constrains width and prevents overflow.
+/* .alumni-bulk-template-btn which constrains width and prevents overflow. */
 
 .alumni-bulk-card {
   box-sizing: border-box;
@@ -12328,7 +12328,7 @@ Fix: .alumni-header-actions overrides that so Download, Bulk Upload, and
   height: auto;
 }
 
-.transport-table is added to every <table> in Transport.jsx.
+/* .transport-table is added to every <table> in Transport.jsx. */
 
 .transport-table thead th {
   text-align: center;
@@ -12355,7 +12355,7 @@ Fix: .alumni-header-actions overrides that so Download, Bulk Upload, and
   white-space: nowrap;
 }
 
-.transport-tabs wraps the four tab buttons.  On screens too narrow to show
+/* .transport-tabs wraps the four tab buttons.  On screens too narrow to show */
 
 .transport-tabs {
   display: flex;
