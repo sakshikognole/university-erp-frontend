@@ -211,19 +211,31 @@ function ClassroomModal({ isOpen, mode, classroom, onSave, onClose, saving }) {
 
 // Main Page
 // Mobile accordion card for Classroom
-function ClsMobCard({ c, num, onEdit, onDelete, deleting, expanded, onToggle }) {
+function ClsMobCard({ c, num, onEdit, onDelete, deleting, expanded, onToggle, showCheckboxes, isSelected, onSelect }) {
   return (
     <div className="mob-card">
-      <button type="button" className="mob-card-header" onClick={onToggle} aria-expanded={expanded}>
-        <div className="mob-card-summary">
-          <span className="mob-card-num">{num}</span>
-          <div className="mob-card-title-wrap">
-            <span className="mob-card-title">{c.classroomName}</span>
-            <span className="mob-card-sub">{c.classroomId}</span>
+      <div style={{ display: 'flex', alignItems: 'center' }}>
+        {showCheckboxes && (
+          <div style={{ paddingLeft: 12 }} onClick={(e) => e.stopPropagation()}>
+            <input
+              type="checkbox"
+              checked={isSelected}
+              onChange={() => onSelect(c.classroomId)}
+              style={{ width: 18, height: 18, cursor: 'pointer' }}
+            />
           </div>
-        </div>
-        <span className="mob-card-chevron">{expanded ? '▲' : '▼'}</span>
-      </button>
+        )}
+        <button type="button" className="mob-card-header" onClick={onToggle} aria-expanded={expanded} style={{ flex: 1 }}>
+          <div className="mob-card-summary">
+            <span className="mob-card-num">{num}</span>
+            <div className="mob-card-title-wrap">
+              <span className="mob-card-title">{c.classroomName}</span>
+              <span className="mob-card-sub">{c.classroomId}</span>
+            </div>
+          </div>
+          <span className="mob-card-chevron">{expanded ? '▲' : '▼'}</span>
+        </button>
+      </div>
       {expanded && (
         <div className="mob-card-details">
           <div className="mob-card-row"><span className="mob-card-label">Classroom ID</span><span className="mob-card-value mono">{c.classroomId}</span></div>
@@ -260,6 +272,7 @@ export default function ClassroomPage() {
   
   // Bunch functionality
   const [selectedClassrooms, setSelectedClassrooms] = useState([]);
+  const [showCheckboxes, setShowCheckboxes] = useState(false);
   const [bunchModalOpen, setBunchModalOpen] = useState(false);
   const [bunchName, setBunchName] = useState('');
   const [bunches, setBunches] = useState([]);
@@ -396,6 +409,7 @@ export default function ClassroomPage() {
       setBunchModalOpen(false);
       setBunchName('');
       setSelectedClassrooms([]);
+      setShowCheckboxes(false);
       loadBunches();
     } catch (err) {
       setError(err.message || 'Failed to create bunch.');
@@ -473,13 +487,15 @@ export default function ClassroomPage() {
               <table className="books-table">
                 <thead>
                   <tr>
-                    <th style={{ width: 50 }}>
-                      <input 
-                        type="checkbox" 
-                        onChange={handleSelectAll}
-                        checked={selectedClassrooms.length === classrooms.length && classrooms.length > 0}
-                      />
-                    </th>
+                    {showCheckboxes && (
+                      <th style={{ width: 50 }}>
+                        <input 
+                          type="checkbox" 
+                          onChange={handleSelectAll}
+                          checked={selectedClassrooms.length === classrooms.length && classrooms.length > 0}
+                        />
+                      </th>
+                    )}
                     <th style={{ width: 42 }}>#</th>
                     <th>Classroom id</th>
                     <th>Name</th>
@@ -494,13 +510,15 @@ export default function ClassroomPage() {
                 <tbody>
                   {classrooms.map((c, i) => (
                     <tr key={c.classroomId}>
-                      <td>
-                        <input 
-                          type="checkbox" 
-                          checked={selectedClassrooms.includes(c.classroomId)}
-                          onChange={() => handleCheckbox(c.classroomId)}
-                        />
-                      </td>
+                      {showCheckboxes && (
+                        <td>
+                          <input 
+                            type="checkbox" 
+                            checked={selectedClassrooms.includes(c.classroomId)}
+                            onChange={() => handleCheckbox(c.classroomId)}
+                          />
+                        </td>
+                      )}
                       <td style={{ color: '#9ca3af', fontSize: 13 }}>{page * size + i + 1}</td>
                       <td>
                         <span style={{
@@ -558,6 +576,9 @@ export default function ClassroomPage() {
                 deleting={deleting}
                 expanded={clsExpanded === c.classroomId}
                 onToggle={() => setClsExpanded(prev => prev === c.classroomId ? null : c.classroomId)}
+                showCheckboxes={showCheckboxes}
+                isSelected={selectedClassrooms.includes(c.classroomId)}
+                onSelect={handleCheckbox}
               />
             ))}
           </div>
@@ -566,25 +587,45 @@ export default function ClassroomPage() {
           {/* Pagination */}
           <Pagination
             pageData={pageInfo}
-            onPageChange={setPage}
+            onPageChange={(p) => {
+              setPage(p);
+              setSelectedClassrooms([]);
+            }}
             onSizeChange={(newSize) => {
               setSize(newSize);
               setPage(0);
+              setSelectedClassrooms([]);
             }}
           />
 
-          {/* Create Bunch Button */}
-          {selectedClassrooms.length > 0 && (
-            <div style={{ marginTop: 16, textAlign: 'center' }}>
+          {/* Selection & Bunch Action Controls */}
+          <div style={{ marginTop: 16, display: 'flex', justifyContent: 'center', alignItems: 'center', gap: 12, flexWrap: 'wrap' }}>
+            <button 
+              type="button"
+              className={`books-btn ${showCheckboxes ? 'books-btn-secondary' : 'books-btn-primary'}`}
+              onClick={() => {
+                if (showCheckboxes) {
+                  setSelectedClassrooms([]);
+                  setShowCheckboxes(false);
+                } else {
+                  setShowCheckboxes(true);
+                }
+              }}
+            >
+              {showCheckboxes ? 'Hide Selection' : 'Select Multiple'}
+            </button>
+
+            {showCheckboxes && selectedClassrooms.length > 0 && (
               <button 
+                type="button"
                 className="books-btn books-btn-primary"
                 onClick={openBunchModal}
                 style={{ minWidth: 180 }}
               >
                 Create Bunch ({selectedClassrooms.length} selected)
               </button>
-            </div>
-          )}
+            )}
+          </div>
         </>
       )}
 

@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import axios from 'axios';
+import { Edit, Trash2 } from 'lucide-react';
 import ClubModal from './ClubModal';
 import ViewClubModal from './ViewClubModal';
 
@@ -219,17 +220,23 @@ export default function ClubsPage() {
                             {/* Card actions */}
                             <div className="club-card-footer" onClick={(e) => e.stopPropagation()}>
                                 <button
-                                    className="books-btn books-btn-sm books-btn-ghost"
+                                    type="button"
+                                    className="action-btn edit-btn"
                                     onClick={() => openEdit(club)}
+                                    title="Edit Club"
                                 >
-                                    Edit
+                                    <Edit size={14} />
+                                    <span className="action-label">Edit</span>
                                 </button>
                                 <button
-                                    className="books-btn books-btn-sm books-btn-danger"
+                                    type="button"
+                                    className="action-btn delete-btn"
                                     onClick={() => handleDelete(club)}
                                     disabled={deleting === club.id}
+                                    title="Delete Club"
                                 >
-                                    {deleting === club.id ? 'Deleting...' : 'Delete'}
+                                    <Trash2 size={14} />
+                                    <span className="action-label">{deleting === club.id ? 'Deleting...' : 'Delete'}</span>
                                 </button>
                             </div>
 

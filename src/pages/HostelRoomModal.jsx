@@ -7,8 +7,8 @@ const EMPTY = { roomNo: '', capacity: 1 };
 function validateRoomNo(val) {
   const trimmed = val.trim();
   if (!trimmed) return 'Room number is required.';
-  if (!/^[A-Za-z0-9\-]+$/.test(trimmed))
-    return 'Room number must contain only letters, numbers, and hyphens. e.g. 101, A-12';
+  if (!/^[A-Za-z0-9-]+$/.test(trimmed))
+    return 'Invalid room number. Please enter a valid room number(e.g).';
   if (trimmed.length > 20)
     return 'Room number must not exceed 20 characters.';
   return '';
@@ -46,49 +46,63 @@ export default function HostelRoomModal({ isOpen, blockId, onClose, onSaved }) {
     setErrors((er) => ({ ...er, [name]: '' }));
   };
 
-  // Capacity stepper
-  const stepCap = (delta) => {
-    setForm((f) => {
-      const next = Math.max(1, Number(f.capacity || 1) + delta);
-      return { ...f, capacity: next };
-    });
-    setErrors((er) => ({ ...er, capacity: '' }));
-  };
-
-  // D2: PRN lookup — handles both plain PRN and PRN-prefixed formats
+  // PRN lookup — checks Spring Boot and falls back to Node.js backend
   const lookupPrn = async (raw) => {
     const trimmed = raw.trim();
     if (!trimmed) { setNamePreview(''); setPrnStatus('idle'); return; }
     setPrnStatus('loading');
+
+    // 1. Check Spring Boot
     try {
       const res = await springApi.get(`/students/by-prn/${encodeURIComponent(trimmed)}`);
-      // springApi interceptor unwraps res.data → res is StudentResponse directly
-      const name = res?.studentName ?? res?.data?.studentName ?? '';
+      const name = res?.studentName || res?.name || res?.data?.studentName || res?.data?.name || '';
       if (name) {
         setNamePreview(name);
         setPrnStatus('found');
-      } else {
-        setNamePreview('');
-        setPrnStatus('notfound');
+        return;
       }
-    } catch {
-      // D2: try with/without PRN prefix if initial lookup fails
-      if (!trimmed.toUpperCase().startsWith('PRN')) {
-        try {
-          const res2 = await springApi.get(
-            `/students/by-prn/${encodeURIComponent('PRN' + trimmed)}`
-          );
-          const name2 = res2?.studentName ?? res2?.data?.studentName ?? '';
-          if (name2) {
-            setNamePreview(name2);
-            setPrnStatus('found');
-            return;
-          }
-        } catch { /* fall through */ }
+    } catch { /* continue */ }
+
+    // 2. Try with/without PRN prefix
+    try {
+      const alt = trimmed.toUpperCase().startsWith('PRN') ? trimmed.substring(3) : 'PRN' + trimmed;
+      const res2 = await springApi.get(`/students/by-prn/${encodeURIComponent(alt)}`);
+      const name2 = res2?.studentName || res2?.name || res2?.data?.studentName || res2?.data?.name || '';
+      if (name2) {
+        setNamePreview(name2);
+        setPrnStatus('found');
+        return;
       }
-      setNamePreview('');
-      setPrnStatus('notfound');
-    }
+    } catch { /* continue */ }
+
+    // 3. Fallback to Node.js backend
+    try {
+      const isProd = window.location.hostname !== 'localhost';
+      const nodeUrl = isProd ? 'https://university-erp-node.onrender.com/api' : 'http://localhost:5000/api';
+      const token = localStorage.getItem('erp_token');
+      const resNode = await fetch(`${nodeUrl}/super-admin/students`, {
+        headers: token ? { Authorization: `Bearer ${token}` } : {},
+      });
+      if (resNode.ok) {
+        const students = await resNode.json();
+        const found = Array.isArray(students)
+          ? students.find((s) => {
+              const sp = (s.prn || '').toLowerCase().trim();
+              const tp = trimmed.toLowerCase();
+              return sp === tp || sp === ('prn' + tp) || ('prn' + sp) === tp;
+            })
+          : null;
+        const nameNode = found?.name || found?.studentName || '';
+        if (nameNode) {
+          setNamePreview(nameNode);
+          setPrnStatus('found');
+          return;
+        }
+      }
+    } catch { /* not found */ }
+
+    setNamePreview('');
+    setPrnStatus('notfound');
   };
 
   const handlePrnChange = (e) => {
@@ -208,49 +222,25 @@ export default function HostelRoomModal({ isOpen, blockId, onClose, onSaved }) {
                   name="roomNo"
                   value={form.roomNo}
                   onChange={change}
-                  placeholder="e.g. 101, A-12"
+                  placeholder="Example: 101, A-12"
                   maxLength={20}
                 />
                 {errors.roomNo && <p className="books-form-err">{errors.roomNo}</p>}
               </div>
 
-              {/* UI improvement: Capacity with stepper (+/-) for mobile */}
+              {/* Standard Capacity number input without duplicate external buttons */}
               <div className="books-form-group">
                 <label className="books-form-label">
                   Capacity <span style={{ color: '#dc2626' }}>*</span>
                 </label>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                  <button
-                    type="button"
-                    onClick={() => stepCap(-1)}
-                    style={{
-                      width: 32, height: 36, borderRadius: 6,
-                      border: '1px solid #d1d5db', background: '#f9fafb',
-                      fontSize: 18, cursor: 'pointer', flexShrink: 0,
-                      display: 'flex', alignItems: 'center', justifyContent: 'center',
-                    }}
-                  >−</button>
-                  <input
-                    className={`books-form-control ${errors.capacity ? 'err' : ''}`}
-                    name="capacity"
-                    type="number"
-                    min="1"
-                    value={form.capacity}
-                    onChange={change}
-                    style={{ textAlign: 'center', flex: 1 }}
-                  />
-                  <button
-                    type="button"
-                    onClick={() => stepCap(1)}
-                    style={{
-                      width: 32, height: 36, borderRadius: 6,
-                      border: '1px solid #d1d5db', background: '#f9fafb',
-                      fontSize: 18, cursor: 'pointer', flexShrink: 0,
-                      display: 'flex', alignItems: 'center', justifyContent: 'center',
-                    }}
-                  >+</button>
-                </div>
-                {/* UI improvement: consistent validation message */}
+                <input
+                  className={`books-form-control ${errors.capacity ? 'err' : ''}`}
+                  name="capacity"
+                  type="number"
+                  min="1"
+                  value={form.capacity}
+                  onChange={change}
+                />
                 {errors.capacity && (
                   <p className="books-form-err">{errors.capacity}</p>
                 )}

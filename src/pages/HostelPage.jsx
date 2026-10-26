@@ -1,7 +1,7 @@
 import { springApi } from '../services/api';
 import { useState, useEffect, useCallback } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import { Eye, Edit, Trash2 } from 'lucide-react';
+import { Eye, Edit, Trash2, Plus } from 'lucide-react';
 import Pagination from '../components/Pagination';
 import HostelBlockModal from './HostelBlockModal';
 import HostelBlockDetails from './HostelBlockDetails';
@@ -99,20 +99,22 @@ export default function HostelPage() {
   return (
     <div className="page-container">
 
-      {/* UI improvement: button always right-aligned on mobile */}
-      <div className="books-page-header" style={{
-        display: 'flex', alignItems: 'center',
-        justifyContent: 'space-between', flexWrap: 'nowrap', gap: 12,
-      }}>
-        <div style={{ minWidth: 0 }}>
+      {/* ── Page Header ── */}
+      <div className="page-header-row">
+        <div>
           <h1 className="page-title">Hostel Management</h1>
           <p className="page-subtitle">Manage hostel blocks, rooms and student allotments</p>
         </div>
-        <button className="books-btn books-btn-primary"
-                style={{ flexShrink: 0 }}
-                onClick={openAdd}>
-          + Add Hostel Block
-        </button>
+        <div className="header-actions-group">
+          <button
+            type="button"
+            className="books-btn books-btn-primary"
+            onClick={openAdd}
+          >
+            <Plus size={16} />
+            <span>Add Hostel Block</span>
+          </button>
+        </div>
       </div>
 
       {success && (
@@ -167,10 +169,11 @@ export default function HostelPage() {
               <div className="hst-card-id">{block.blockId}</div>
               <div className="hst-card-name">{block.hostelName}</div>
 
-              <div className="hst-card-footer">
+              <div className="hst-card-footer" style={{ display: 'flex', gap: 8, marginTop: 'auto', paddingTop: 12 }}>
                 <button
                   type="button"
                   className="action-btn view-btn"
+                  style={{ flex: 1, justifyContent: 'center' }}
                   title="View Details"
                   onClick={() => openView(block)}
                 >
@@ -179,6 +182,7 @@ export default function HostelPage() {
                 <button
                   type="button"
                   className="action-btn edit-btn"
+                  style={{ flex: 1, justifyContent: 'center' }}
                   title="Edit Block"
                   onClick={() => openEdit(block)}
                 >
@@ -187,6 +191,7 @@ export default function HostelPage() {
                 <button
                   type="button"
                   className="action-btn delete-btn"
+                  style={{ flex: 1, justifyContent: 'center' }}
                   title="Delete Block"
                   onClick={() => handleDelete(block)}
                 >
