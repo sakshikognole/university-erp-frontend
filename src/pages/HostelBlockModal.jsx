@@ -9,7 +9,7 @@ function validateHostelName(name) {
   if (!trimmed)
     return 'Hostel name is required.';
   if (!/^[A-Za-z\s]+$/.test(trimmed))
-    return 'Hostel name must contain only letters and spaces. No numbers or special characters.';
+    return 'Invalid hostel name. Please enter a valid hostel name(e.g).';
   if (/\s{2,}/.test(trimmed))
     return 'Hostel name must not contain double spaces.';
   if (trimmed.length < 2)

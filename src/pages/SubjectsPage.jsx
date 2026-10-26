@@ -1,9 +1,11 @@
 import { useState, useEffect, useCallback } from 'react';
+import { Plus, Eye, Edit, Trash2 } from 'lucide-react';
 import { springApi, springGet } from '../services/api';
 import PageError from '../components/PageError';
 
 // ── Empty form ─────────────────────────────────────────────────────────────
 const EMPTY = { subjectName: '', description: '' };
+const MAX_NAME_LENGTH = 50;
 
 // ── Add / Edit Modal ───────────────────────────────────────────────────────
 function SubjectModal({ isOpen, mode, subject, onSave, onClose, saving }) {
@@ -26,15 +28,32 @@ function SubjectModal({ isOpen, mode, subject, onSave, onClose, saving }) {
   if (!isOpen) return null;
 
   const change = (e) => {
-    setForm((f) => ({ ...f, [e.target.name]: e.target.value }));
-    setErrors((er) => ({ ...er, [e.target.name]: '' }));
+    const { name, value } = e.target;
+    setForm((f) => ({ ...f, [name]: value }));
+    if (name === 'subjectName') {
+      if (value.trim().length > MAX_NAME_LENGTH) {
+        setErrors((er) => ({
+          ...er,
+          subjectName: `Subject name must not exceed ${MAX_NAME_LENGTH} characters.`,
+        }));
+      } else {
+        setErrors((er) => ({ ...er, subjectName: '' }));
+      }
+    } else {
+      setErrors((er) => ({ ...er, [name]: '' }));
+    }
   };
 
   const validate = () => {
     const e = {};
-    if (!form.subjectName.trim()) e.subjectName = 'Subject name is required.';
-    else if (!/^[A-Za-z\s]+$/.test(form.subjectName.trim()))
+    const trimmed = form.subjectName.trim();
+    if (!trimmed) {
+      e.subjectName = 'Subject name is required.';
+    } else if (!/^[A-Za-z\s]+$/.test(trimmed)) {
       e.subjectName = 'Subject name must contain only letters and spaces.';
+    } else if (trimmed.length > MAX_NAME_LENGTH) {
+      e.subjectName = `Subject name must not exceed ${MAX_NAME_LENGTH} characters.`;
+    }
     return e;
   };
 
@@ -76,13 +95,22 @@ function SubjectModal({ isOpen, mode, subject, onSave, onClose, saving }) {
 
             {/* Subject Name */}
             <div className="books-form-group">
-              <label className="books-form-label">Subject Name *</label>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <label className="books-form-label">Subject Name *</label>
+                <span style={{
+                  fontSize: '0.75rem',
+                  color: form.subjectName.trim().length > MAX_NAME_LENGTH ? 'var(--color-danger, #ef4444)' : 'var(--text-secondary, #6b7280)',
+                }}>
+                  {form.subjectName.length}/{MAX_NAME_LENGTH}
+                </span>
+              </div>
               <input
                 className={`books-form-control ${errors.subjectName ? 'err' : ''}`}
                 name="subjectName"
                 value={form.subjectName}
                 onChange={change}
                 placeholder="e.g. Data Structures"
+                maxLength={MAX_NAME_LENGTH + 50}
                 autoFocus
               />
               {errors.subjectName && (
@@ -282,14 +310,21 @@ export default function SubjectsPage() {
     <div className="page-container">
 
       {/* ── Header ── */}
-      <div className="books-page-header">
+      <div className="page-header-row">
         <div>
           <h1 className="page-title">Subjects</h1>
           <p className="page-subtitle">Manage university subjects</p>
         </div>
-        <button className="books-btn books-btn-primary" onClick={openAdd}>
-          + Add Subject
-        </button>
+        <div className="header-actions-group">
+          <button
+            type="button"
+            className="books-btn books-btn-primary"
+            onClick={openAdd}
+          >
+            <Plus size={16} />
+            <span>Add Subject</span>
+          </button>
+        </div>
       </div>
 
       {/* ── Alerts ── */}
@@ -309,13 +344,16 @@ export default function SubjectsPage() {
       {/* ── Content ── */}
       {loading ? (
         /* Skeleton loader — no blank screen while loading */
-        <div className="card">
+        <div className="card table-card" style={{ marginTop: '1.25rem' }}>
           <div className="books-table-wrap">
             <table className="books-table">
               <thead>
                 <tr>
-                  <th>#</th><th>Subject id</th><th>Subject name</th>
-                  <th>Description</th><th>Actions</th>
+                  <th style={{ width: '50px', textAlign: 'left' }}>#</th>
+                  <th style={{ width: '140px', textAlign: 'left' }}>Subject ID</th>
+                  <th style={{ minWidth: '180px', width: '220px', textAlign: 'left' }}>Subject Name</th>
+                  <th style={{ textAlign: 'left' }}>Description</th>
+                  <th style={{ width: '230px', textAlign: 'right' }}>Actions</th>
                 </tr>
               </thead>
               <tbody>
@@ -341,7 +379,14 @@ export default function SubjectsPage() {
       ) : pageError ? (
         <PageError message={pageError} onRetry={load} />
       ) : (
-        <div className="card">
+        <div className="card table-card" style={{ marginTop: '1.25rem' }}>
+          {/* Total Subjects Count Badge — top-right corner */}
+          <div className="table-controls-bar" style={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center' }}>
+            <div className="table-stats-badge" style={{ marginLeft: 'auto', alignSelf: 'flex-end', width: 'fit-content' }}>
+              Total: <strong>{subjects.length}</strong> {subjects.length === 1 ? 'Subject' : 'Subjects'}
+            </div>
+          </div>
+
           {subjects.length === 0 ? (
             /* Empty state */
             <div style={{
@@ -353,7 +398,8 @@ export default function SubjectsPage() {
                 No subjects added yet.
               </p>
               <button className="books-btn books-btn-primary" onClick={openAdd}>
-                + Add First Subject
+                <Plus size={16} />
+                <span>Add First Subject</span>
               </button>
             </div>
           ) : (
@@ -364,11 +410,11 @@ export default function SubjectsPage() {
                   <table className="books-table">
                     <thead>
                       <tr>
-                        <th style={{ width: 45 }}>#</th>
-                        <th style={{ width: 110 }}>Subject id</th>
-                        <th>Subject name</th>
-                        <th>Description</th>
-                        <th style={{ width: 160 }}>Actions</th>
+                        <th style={{ width: '50px', textAlign: 'left' }}>#</th>
+                        <th style={{ width: '140px', textAlign: 'left' }}>Subject ID</th>
+                        <th style={{ minWidth: '180px', width: '220px', textAlign: 'left' }}>Subject Name</th>
+                        <th style={{ textAlign: 'left' }}>Description</th>
+                        <th style={{ width: '230px', textAlign: 'right' }}>Actions</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -378,44 +424,51 @@ export default function SubjectsPage() {
                           style={{ cursor: 'pointer' }}
                           onClick={() => openView(sub)}
                         >
-                          <td style={{ color: 'var(--text-secondary)', fontSize: 13 }}>
+                          <td style={{ color: 'var(--text-secondary)', fontSize: 13, textAlign: 'left', verticalAlign: 'middle', width: '50px' }}>
                             {i + 1}
                           </td>
-                          <td>
-                            <span style={{
-                              fontFamily: 'monospace', fontSize: '0.78rem',
-                              background: 'var(--bg-secondary,#f9fafb)',
-                              padding: '2px 8px', borderRadius: 6,
-                              color: 'var(--text-secondary)',
-                            }}>
+                          <td style={{ textAlign: 'left', verticalAlign: 'middle', width: '140px' }}>
+                            <span className="code-badge">
                               {sub.subjectId}
                             </span>
                           </td>
-                          <td style={{ fontWeight: 600 }}>{sub.subjectName}</td>
+                          <td style={{ fontWeight: 600, textAlign: 'left', verticalAlign: 'middle', width: '220px' }}>
+                            <span className="dept-name-cell">{sub.subjectName}</span>
+                          </td>
                           <td style={{
                             fontSize: 13, color: 'var(--text-secondary)',
-                            maxWidth: 300, overflow: 'hidden',
+                            textAlign: 'left', verticalAlign: 'middle',
+                            maxWidth: 350, overflow: 'hidden',
                             textOverflow: 'ellipsis', whiteSpace: 'nowrap',
                           }}>
                             {sub.description || '—'}
                           </td>
-                          <td onClick={(e) => e.stopPropagation()}>
-                            <div className="books-actions">
+                          <td style={{ textAlign: 'right', verticalAlign: 'middle', width: '230px' }} onClick={(e) => e.stopPropagation()}>
+                            <div className="action-buttons-cell" style={{ justifyContent: 'flex-end', gap: '6px' }}>
                               <button
-                                className="books-btn books-btn-sm books-btn-ghost"
+                                type="button"
+                                className="action-btn view-btn"
+                                title="View Details"
                                 onClick={() => openView(sub)}
-                                style={{ border: '1px solid #d1d5db' }}
-                              ><span style={{display:"inline-flex",alignItems:"center",gap:4}}><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg> View</span></button>
+                              >
+                                <Eye size={14} /><span className="action-label">View</span>
+                              </button>
                               <button
-                                className="books-btn books-btn-sm books-btn-warning"
+                                type="button"
+                                className="action-btn edit-btn"
+                                title="Edit Subject"
                                 onClick={() => openEdit(sub)}
-                              ><span style={{display:"inline-flex",alignItems:"center",gap:4}}><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg> Edit</span></button>
+                              >
+                                <Edit size={14} /><span className="action-label">Edit</span>
+                              </button>
                               <button
-                                className="books-btn books-btn-sm books-btn-danger"
+                                type="button"
+                                className="action-btn delete-btn"
+                                title="Delete Subject"
                                 onClick={() => handleDelete(sub)}
                                 disabled={deleting === sub.subjectId}
                               >
-                                {deleting === sub.subjectId ? '...' : <span style={{display:"inline-flex",alignItems:"center",gap:4}}><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>Delete</span>}
+                                <Trash2 size={14} /><span className="action-label">{deleting === sub.subjectId ? 'Deleting...' : 'Delete'}</span>
                               </button>
                             </div>
                           </td>
@@ -439,8 +492,7 @@ export default function SubjectsPage() {
                         <span className="book-mob-num">{i + 1}</span>
                         <div className="book-mob-title-wrap">
                           <span className="book-mob-title">{sub.subjectName}</span>
-                          <span className="book-mob-author"
-                                style={{ fontFamily: 'monospace', fontSize: '0.75rem' }}>
+                          <span className="code-badge" style={{ fontSize: '0.75rem', marginTop: 2 }}>
                             {sub.subjectId}
                           </span>
                         </div>
@@ -452,36 +504,37 @@ export default function SubjectsPage() {
                         <span className="book-mob-label">Description</span>
                         <span className="book-mob-value">{sub.description || '—'}</span>
                       </div>
-                      <div className="book-mob-actions">
+                      <div className="book-mob-actions" style={{ display: 'flex', gap: '8px', marginTop: '10px' }}>
                         <button
-                          className="books-btn books-btn-sm books-btn-ghost"
+                          type="button"
+                          className="action-btn view-btn"
+                          style={{ flex: 1, justifyContent: 'center' }}
                           onClick={() => openView(sub)}
-                         style={{border:'1px solid #d1d5db'}}><span style={{display:"inline-flex",alignItems:"center",gap:4}}><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg> View</span></button>
+                        >
+                          <Eye size={14} /><span className="action-label">View</span>
+                        </button>
                         <button
-                          className="books-btn books-btn-sm books-btn-warning"
+                          type="button"
+                          className="action-btn edit-btn"
+                          style={{ flex: 1, justifyContent: 'center' }}
                           onClick={() => openEdit(sub)}
-                        ><span style={{display:"inline-flex",alignItems:"center",gap:4}}><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg> Edit</span></button>
+                        >
+                          <Edit size={14} /><span className="action-label">Edit</span>
+                        </button>
                         <button
-                          className="books-btn books-btn-sm books-btn-danger"
+                          type="button"
+                          className="action-btn delete-btn"
+                          style={{ flex: 1, justifyContent: 'center' }}
                           onClick={() => handleDelete(sub)}
                           disabled={deleting === sub.subjectId}
                         >
-                          {deleting === sub.subjectId ? '...' : <span style={{display:"inline-flex",alignItems:"center",gap:4}}><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>Delete</span>}
+                          <Trash2 size={14} /><span className="action-label">{deleting === sub.subjectId ? 'Deleting...' : 'Delete'}</span>
                         </button>
                       </div>
                     </div>
                   </div>
                 ))}
               </div>
-
-              {/* Total count */}
-              <p style={{
-                fontSize: 13, color: 'var(--text-secondary)',
-                padding: '10px 16px', borderTop: '1px solid var(--border-primary,#e5e7eb)',
-                margin: 0,
-              }}>
-                Total: {subjects.length} subject{subjects.length !== 1 ? 's' : ''}
-              </p>
             </>
           )}
         </div>

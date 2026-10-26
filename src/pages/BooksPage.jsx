@@ -213,7 +213,7 @@ export default function BooksPage() {
       <Alert type={alert.type} message={alert.message} onClose={dismiss} />
 
       <div className="card">
-        <div className="books-toolbar">
+        <div className="books-toolbar" style={{ justifyContent: 'space-between', alignItems: 'center' }}>
           <div className="search-box-wrapper">
             <Search size={16} className="search-icon" />
             <input
@@ -221,6 +221,10 @@ export default function BooksPage() {
               placeholder="Search by Title, Author, or ID..."
               onChange={onSearch}
             />
+          </div>
+          <div className="table-stats-badge" style={{ marginLeft: 'auto' }}>
+            Total: <strong>{pageData.totalElements ?? books.length}</strong>{' '}
+            {(pageData.totalElements ?? books.length) === 1 ? 'Book' : 'Books'}
           </div>
         </div>
 
