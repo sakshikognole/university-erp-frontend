@@ -136,11 +136,6 @@ export default function BookModal({ isOpen, mode, book, onSave, onClose, loading
             <div className="books-form-group">
               <label className="books-form-label">
                 Book ID *
-                {mode === 'add' && (
-                  <span style={{ fontWeight: 400, color: '#9ca3af', fontSize: '0.78rem', marginLeft: 6 }}>
-                    e.g. BK-001, CS-101
-                  </span>
-                )}
               </label>
               <input
                 className={`books-form-control ${errors.bookId || duplicateIdError ? 'err' : ''}`}
