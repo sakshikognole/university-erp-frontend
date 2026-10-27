@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Search, Eye, Edit, Trash2 } from 'lucide-react';
+import { Search, Eye, Edit, Trash2, Plus } from 'lucide-react';
 import { springApi, springGet } from '../services/api';
 import PageError from '../components/PageError';
 import ExamModal from './ExamModal';
@@ -108,24 +108,24 @@ export default function ExamsPage() {
   return (
     <div className="page-container">
 
-      {/* D1/D2/D5: title + description left-aligned, button right-aligned on mobile */}
-      <div className="books-page-header" style={{
-        display: 'flex', alignItems: 'center',
-        justifyContent: 'space-between', flexWrap: 'nowrap', gap: 12,
-      }}>
-        <div style={{ minWidth: 0 }}>
-          <h1 className="page-title" style={{ textAlign: 'left' }}>Exam Management</h1>
-          <p className="page-subtitle" style={{ textAlign: 'left' }}>
+      {/* Header consistent with Students, Staff, and Departments */}
+      <div className="page-header-row">
+        <div>
+          <h1 className="page-title">Exam Management</h1>
+          <p className="page-subtitle">
             Manage exams and student marks
           </p>
         </div>
-        <button
-          className="books-btn books-btn-primary"
-          style={{ flexShrink: 0 }}
-          onClick={openAdd}
-        >
-          + Add Exam
-        </button>
+        <div className="header-actions-group">
+          <button
+            type="button"
+            className="btn btn-primary"
+            onClick={openAdd}
+          >
+            <Plus size={16} />
+            <span>Add Exam</span>
+          </button>
+        </div>
       </div>
 
       {/* Notifications */}
@@ -168,7 +168,7 @@ export default function ExamsPage() {
           </p>
         </div>
       ) : (
-        <div className="card" style={{ padding: '1rem' }}>
+        <div className="card table-card" style={{ padding: '1rem', marginTop: '1.25rem' }}>
           {/* Search + count INSIDE the card */}
           <div className="table-controls-bar">
             <div className="search-box-wrapper">
@@ -180,13 +180,20 @@ export default function ExamsPage() {
                 onChange={(e) => setSearch(e.target.value)}
               />
               {search && (
-                <button type="button" onClick={() => setSearch('')} title="Clear search"
-                  style={{ position: 'absolute', right: 8, top: '50%', transform: 'translateY(-50%)',
-                    background: 'none', border: 'none', cursor: 'pointer', color: '#9ca3af',
-                    fontSize: 18, lineHeight: 1, padding: '2px 4px' }}>×</button>
+                <button
+                  type="button"
+                  className="search-clear-btn"
+                  onClick={() => setSearch('')}
+                  aria-label="Clear search"
+                >
+                  Clear
+                </button>
               )}
             </div>
-            <div className="table-stats-badge">
+            <div
+              className="table-stats-badge"
+              style={{ width: 'fit-content', alignSelf: 'flex-end', marginLeft: 'auto' }}
+            >
               Total: <strong>{filtered.length}</strong>{' '}
               {filtered.length === 1 ? 'Exam' : 'Exams'}
             </div>
@@ -194,47 +201,38 @@ export default function ExamsPage() {
 
           {/* Desktop table */}
           <div className="book-desk-table">
-            <div className="books-table-wrap">
-              <table className="books-table">
+            <div className="table-container">
+              <table className="data-table">
                 <thead>
                   <tr>
-                    {/* D4: all headers left-aligned, data aligned with headers */}
-                    <th style={{ width: 48 }}>#</th>
-                    <th>Exam id</th>
+                    <th style={{ width: '52px' }}>#</th>
+                    <th style={{ width: '160px' }}>Exam ID</th>
                     <th>Subject</th>
-                    <th>Academic year</th>
-                    <th style={{ textAlign: 'center' }}>Students</th>
-                    <th>Actions</th>
+                    <th style={{ width: '150px' }}>Academic Year</th>
+                    <th style={{ width: '110px', textAlign: 'center' }}>Students</th>
+                    <th style={{ width: '220px', textAlign: 'right' }}>Actions</th>
                   </tr>
                 </thead>
                 <tbody>
                   {filtered.map((exam, i) => (
                     <tr key={exam.examId}>
-                      <td style={{ color: '#9ca3af', verticalAlign: 'middle' }}>{i + 1}</td>
-                      {/* D4: each data cell aligned to match its header */}
-                      <td style={{ verticalAlign: 'middle' }}>
-                        <span style={{ fontFamily: 'monospace', fontSize: '0.82rem',
-                          fontWeight: 700, color: '#1e3a5f' }}>
-                          {exam.examId}
-                        </span>
+                      <td className="text-secondary">{i + 1}</td>
+                      <td>
+                        <span className="code-badge">{exam.examId}</span>
                       </td>
-                      <td style={{ fontWeight: 500, verticalAlign: 'middle' }}>
-                        {exam.subject}
+                      <td>
+                        <span className="dept-name-cell">{exam.subject}</span>
                       </td>
-                      <td style={{ color: '#6b7280', verticalAlign: 'middle' }}>
+                      <td className="text-secondary">
                         {exam.academicYear || '—'}
                       </td>
-                      <td style={{ textAlign: 'center', verticalAlign: 'middle' }}>
-                        <span style={{
-                          background: '#f1f5f9', color: '#374151',
-                          borderRadius: 9999, padding: '2px 12px',
-                          fontSize: '0.82rem', fontWeight: 600,
-                        }}>
+                      <td style={{ textAlign: 'center' }}>
+                        <span className="status-badge status-active">
                           {totalStudents(exam)}
                         </span>
                       </td>
-                      <td style={{ verticalAlign: 'middle' }}>
-                        <div className="books-actions">
+                      <td style={{ textAlign: 'right' }}>
+                        <div className="action-buttons-cell" style={{ justifyContent: 'flex-end' }}>
                           <button
                             type="button"
                             className="action-btn view-btn"
@@ -271,66 +269,46 @@ export default function ExamsPage() {
           {/* Mobile cards */}
           <div className="book-mob-list">
             {filtered.map((exam, i) => (
-              <div key={exam.examId} className="book-mob-card">
-                <div style={{ padding: '10px 14px' }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between',
-                                alignItems: 'flex-start', marginBottom: 6 }}>
-                    <div>
-                      <span style={{ fontFamily: 'monospace', fontSize: '0.82rem',
-                                     fontWeight: 700, color: '#1e3a5f' }}>
-                        {exam.examId}
-                      </span>
-                      <span style={{ marginLeft: 8, fontSize: 12, color: '#9ca3af' }}>
-                        #{i + 1}
-                      </span>
-                    </div>
-                    <span style={{
-                      background: '#f1f5f9', color: '#374151',
-                      borderRadius: 9999, padding: '2px 10px',
-                      fontSize: '0.78rem', fontWeight: 600,
-                    }}>
-                      {totalStudents(exam)} students
-                    </span>
+              <div key={exam.examId} className="mob-card" style={{ marginBottom: 12, padding: 14 }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                    <span className="mob-card-num" style={{ fontSize: '0.85rem', color: '#6b7280', fontWeight: 600 }}>#{i + 1}</span>
+                    <span className="code-badge">{exam.examId}</span>
                   </div>
-                  {[
-                    ['Subject',   exam.subject],
-                    ['Acad. Year', exam.academicYear || '—'],
-                  ].map(([label, val]) => (
-                    <div key={label} style={{ display: 'flex', gap: 8,
-                                              fontSize: 13, marginBottom: 3 }}>
-                      <span style={{ fontWeight: 600, color: '#6b7280',
-                                     minWidth: 80, flexShrink: 0 }}>
-                        {label}
-                      </span>
-                      <span style={{ color: '#111827' }}>{val}</span>
-                    </div>
-                  ))}
-                  <div style={{ display: 'flex', gap: 8, marginTop: 10 }}>
-                    <button
-                      type="button"
-                      className="action-btn view-btn"
-                      style={{ flex: 1, justifyContent: 'center' }}
-                      onClick={() => navigate(`/exam-marks?examId=${exam.examId}`)}
-                    >
-                      <Eye size={14} /><span className="action-label">Marks</span>
-                    </button>
-                    <button
-                      type="button"
-                      className="action-btn edit-btn"
-                      style={{ flex: 1, justifyContent: 'center' }}
-                      onClick={() => openEdit(exam)}
-                    >
-                      <Edit size={14} /><span className="action-label">Edit</span>
-                    </button>
-                    <button
-                      type="button"
-                      className="action-btn delete-btn"
-                      style={{ flex: 1, justifyContent: 'center' }}
-                      onClick={() => handleDelete(exam)}
-                    >
-                      <Trash2 size={14} /><span className="action-label">Delete</span>
-                    </button>
-                  </div>
+                  <span className="status-badge status-active" style={{ fontSize: '0.75rem' }}>
+                    {totalStudents(exam)} students
+                  </span>
+                </div>
+                <div className="mob-card-row" style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.875rem', marginBottom: 4 }}>
+                  <span className="mob-card-label">Subject</span>
+                  <span className="mob-card-value" style={{ fontWeight: 600, color: '#111827' }}>{exam.subject}</span>
+                </div>
+                <div className="mob-card-row" style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.875rem', marginBottom: 10 }}>
+                  <span className="mob-card-label">Academic Year</span>
+                  <span className="mob-card-value text-secondary">{exam.academicYear || '—'}</span>
+                </div>
+                <div className="mob-card-actions">
+                  <button
+                    type="button"
+                    className="action-btn view-btn"
+                    onClick={() => navigate(`/exam-marks?examId=${exam.examId}`)}
+                  >
+                    <Eye size={15} /><span className="action-label">Marks</span>
+                  </button>
+                  <button
+                    type="button"
+                    className="action-btn edit-btn"
+                    onClick={() => openEdit(exam)}
+                  >
+                    <Edit size={15} /><span className="action-label">Edit</span>
+                  </button>
+                  <button
+                    type="button"
+                    className="action-btn delete-btn"
+                    onClick={() => handleDelete(exam)}
+                  >
+                    <Trash2 size={15} /><span className="action-label">Delete</span>
+                  </button>
                 </div>
               </div>
             ))}

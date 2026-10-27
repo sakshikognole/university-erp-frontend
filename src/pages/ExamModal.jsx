@@ -61,8 +61,8 @@ export default function ExamModal({
       e.examId = 'Exam ID is required.';
     } else if (id.length > 20) {
       e.examId = 'Exam ID must not exceed 20 characters.';
-    } else if (!/^[A-Za-z0-9]+$/.test(id)) {
-      e.examId = 'Invalid ID. Please enter a valid ID.';
+    } else if (!/^[A-Za-z0-9_-]+$/.test(id)) {
+      e.examId = 'Exam ID can contain letters, numbers, hyphens, and underscores.';
     }
 
     // Subject — required (selected from dropdown)
@@ -175,12 +175,13 @@ export default function ExamModal({
               </label>
               <input
                 className={`books-form-control ${errors.academicYear ? 'err' : ''}`}
-                name="academicYear" value={form.academicYear} onChange={change}
+                name="academicYear"
+                value={form.academicYear}
+                onChange={change}
                 placeholder="e.g. 2026-27"
-                style={{ maxWidth: 160 }}
               />
-              <span style={{ fontSize: 11, color: '#9ca3af' }}>
-                Format: YYYY-YY (e.g. 2026-27)
+              <span style={{ display: 'block', fontSize: 11, color: '#6b7280', marginTop: 4 }}>
+                Format: YYYY-YY (Example: 2026-27)
               </span>
               {errors.academicYear && <p className="books-form-err">{errors.academicYear}</p>}
             </div>

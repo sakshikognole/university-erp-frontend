@@ -1,6 +1,13 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import { springApi } from '../services/api';
+import * as XLSX from 'xlsx';
+
+// ── Node.js backend URL (Students module source) ──────────────────────────────
+const _IS_PROD = typeof window !== 'undefined' && !window.location.hostname.includes('localhost') && !window.location.hostname.includes('127.0.0.1');
+const NODE_API = _IS_PROD
+  ? 'https://university-erp-node.onrender.com/api'
+  : 'http://localhost:5000/api';
 
 // ── Constants ─────────────────────────────────────────────────────────────────
 const TABS     = ['T1', 'T2', 'SEE'];
@@ -130,15 +137,135 @@ function validateRow(row, tab, allRows, idx) {
   return errs;
 }
 
+// ── Mobile-compatible PDF generator ──────────────────────────────────────────
+function generateMarksPdfBlob(exam, activeTab, max, currentRows, isFraction, fracScale, pctScale) {
+  const safeExamId = (exam?.examId || 'EXAM').replace(/[^a-zA-Z0-9_-]/g, '_');
+  const safeSubject = (exam?.subject || 'Subject');
+  const acadYear = exam?.academicYear ? ` | Academic Year: ${exam.academicYear}` : '';
+  const title = `${safeSubject} - ${activeTab} Marks Sheet`;
+  const subtitle = `Exam ID: ${safeExamId} | Max Marks: ${max}${acadYear}`;
+
+  const isT1T2 = activeTab !== 'SEE';
+  const headers = isT1T2
+    ? ['#', 'PRN', 'Student Name', `Raw /${max}`, isFraction ? `/${fracScale}` : `% /${pctScale}`, 'Status']
+    : ['#', 'PRN', 'Student Name', `Raw /50`, `% /${pctScale}`, 'Status'];
+
+  const colX = [40, 75, 180, 360, 440, 500];
+
+  const sanitize = (str) =>
+    String(str ?? '')
+      .replace(/[^\x20-\x7E]/g, ' ')
+      .replace(/[()\\\\]/g, '\\$&');
+
+  const rowsPerPage = 26;
+  const pagesData = [];
+  for (let i = 0; i < currentRows.length; i += rowsPerPage) {
+    pagesData.push(currentRows.slice(i, i + rowsPerPage));
+  }
+  if (pagesData.length === 0) pagesData.push([]);
+
+  const numPages = pagesData.length;
+  const font1Obj = 3 + numPages;
+  const font2Obj = font1Obj + 1;
+  const firstStreamObj = font2Obj + 1;
+
+  const objects = [];
+  objects.push('<< /Type /Catalog /Pages 2 0 R >>');
+  const pageKids = [];
+  for (let p = 0; p < numPages; p++) {
+    pageKids.push(`${3 + p} 0 R`);
+  }
+  objects.push(`<< /Type /Pages /Kids [${pageKids.join(' ')}] /Count ${numPages} >>`);
+
+  for (let p = 0; p < numPages; p++) {
+    const streamObjIdx = firstStreamObj + p;
+    objects.push(
+      `<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595.28 841.89] /Resources << /Font << /F1 ${font1Obj} 0 R /F2 ${font2Obj} 0 R >> >> /Contents ${streamObjIdx} 0 R >>`
+    );
+  }
+
+  objects.push('<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>');
+  objects.push('<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Bold >>');
+
+  pagesData.forEach((pageRows, pIdx) => {
+    let stream = '';
+    let y = 800;
+    stream += `BT\n/F2 16 Tf\n40 ${y} Td\n(${sanitize(title)}) Tj\nET\n`;
+    y -= 18;
+    stream += `BT\n/F1 10 Tf\n40 ${y} Td\n(${sanitize(subtitle)}) Tj\nET\n`;
+    y -= 14;
+    stream += `BT\n/F1 8 Tf\n40 ${y} Td\n(Page ${pIdx + 1} of ${numPages} | Total Records: ${currentRows.length}) Tj\nET\n`;
+    y -= 22;
+
+    stream += `0.92 0.94 0.96 rg\n40 ${y - 4} 515 20 re\nf\n0 g\n`;
+    headers.forEach((h, hIdx) => {
+      stream += `BT\n/F2 9 Tf\n${colX[hIdx]} ${y + 2} Td\n(${sanitize(h)}) Tj\nET\n`;
+    });
+    stream += `0.8 w\n40 ${y - 4} m 555 ${y - 4} l S\n`;
+    y -= 18;
+
+    pageRows.forEach((row, rIdx) => {
+      const globalIdx = pIdx * rowsPerPage + rIdx;
+      const comp = computeMark(row.marks, activeTab);
+      const convertedVal = comp
+        ? (isFraction
+            ? `${+((comp.raw / max) * fracScale).toFixed(2)}/${fracScale}`
+            : `${+((comp.raw / max) * pctScale).toFixed(2)}%`)
+        : '-';
+      const statusText = row.marks != null ? 'Present' : 'Absent';
+
+      const rowValues = [
+        globalIdx + 1,
+        row.prn || '-',
+        row.studentName || '-',
+        row.marks != null ? String(row.marks) : '-',
+        convertedVal,
+        statusText,
+      ];
+
+      if (rIdx % 2 === 1) {
+        stream += `0.98 0.98 0.98 rg\n40 ${y - 4} 515 16 re\nf\n0 g\n`;
+      }
+
+      rowValues.forEach((val, cIdx) => {
+        stream += `BT\n/F1 9 Tf\n${colX[cIdx]} ${y} Td\n(${sanitize(val)}) Tj\nET\n`;
+      });
+
+      stream += `0.3 w [1 2] 0 d\n40 ${y - 4} m 555 ${y - 4} l S\n[] 0 d\n`;
+      y -= 18;
+    });
+
+    const streamLen = stream.length;
+    objects.push(`<< /Length ${streamLen} >>\nstream\n${stream}\nendstream`);
+  });
+
+  let pdfStr = '%PDF-1.4\n';
+  const xref = [0];
+  objects.forEach((obj, idx) => {
+    xref.push(pdfStr.length);
+    pdfStr += `${idx + 1} 0 obj\n${obj}\nendobj\n`;
+  });
+
+  const startxref = pdfStr.length;
+  pdfStr += `xref\n0 ${objects.length + 1}\n0000000000 65535 f \n`;
+  for (let i = 1; i <= objects.length; i++) {
+    pdfStr += `${String(xref[i]).padStart(10, '0')} 00000 n \n`;
+  }
+  pdfStr += `trailer\n<< /Size ${objects.length + 1} /Root 1 0 R >>\nstartxref\n${startxref}\n%%EOF\n`;
+
+  return new Blob([pdfStr], { type: 'application/pdf' });
+}
+
 export default function ExamMarksPage() {
   const [searchParams] = useSearchParams();
   const navigate       = useNavigate();
   const examId         = searchParams.get('examId');
 
-  const [exam,     setExam]     = useState(null);
-  const [loading,  setLoading]  = useState(true);
-  const [error,    setError]    = useState('');
-  const [success,  setSuccess]  = useState('');
+  const [exam,         setExam]         = useState(null);
+  const [loading,      setLoading]      = useState(true);
+  const [error,        setError]        = useState('');
+  const [success,      setSuccess]      = useState('');
+  const [studentsList, setStudentsList] = useState([]);
 
   const [activeTab, setActiveTab]   = useState('T1');
   const [tabData,   setTabData]     = useState({ T1: [], T2: [], SEE: [] });
@@ -146,7 +273,7 @@ export default function ExamMarksPage() {
   const [rowErrors, setRowErrors]   = useState({ T1: [], T2: [], SEE: [] });
   const [saving,    setSaving]      = useState(false);
 
-  // D17/Obs4: PRN lookup for auto-name
+  // PRN lookup status for auto-name
   const [prnLookupStatus, setPrnLookupStatus] = useState({});
   const prnTimers = useRef({});
 
@@ -157,6 +284,20 @@ export default function ExamMarksPage() {
     const t = setTimeout(() => { setSuccess(''); setError(''); }, 5000);
     return () => clearTimeout(t);
   }, [success, error]);
+
+  // Preload students from Students module for instant reliable PRN lookup
+  useEffect(() => {
+    const token = localStorage.getItem('erp_token');
+    fetch(`${NODE_API}/super-admin/students`, {
+      headers: token ? { Authorization: `Bearer ${token}` } : {},
+    })
+      .then((res) => (res.ok ? res.json() : []))
+      .then((data) => {
+        const arr = Array.isArray(data) ? data : (data.students ?? data.content ?? []);
+        setStudentsList(arr);
+      })
+      .catch((err) => console.warn('Could not preload students for PRN lookup:', err));
+  }, []);
 
   useEffect(() => {
     if (!examId) { navigate('/exams'); return; }
@@ -186,7 +327,6 @@ export default function ExamMarksPage() {
   }, [activeTab]);
 
   // ── Add row ────────────────────────────────────────────────────────────────
-  // Improvement: single Add Row button (in toolbar only when rows exist)
   const addRow = () => {
     setCurrentRows((prev) => [...prev, blankRow(prev.length + 1)]);
   };
@@ -199,43 +339,123 @@ export default function ExamMarksPage() {
     }));
   };
 
-  // Obs4/D17: PRN lookup → auto-fill student name
+  // PRN lookup → auto-fill student name from Students module (consistent across T1, T2, SEE)
   const lookupPrn = useCallback(async (prn, idx) => {
-    if (!prn.trim()) return;
+    const clean = (prn || '').trim();
+    if (!clean) return;
+
     setPrnLookupStatus(p => ({ ...p, [`${activeTab}-${idx}`]: 'loading' }));
+
+    const cleanLower = clean.toLowerCase();
+    const cleanNoPrefix = cleanLower.startsWith('prn') ? cleanLower.slice(3) : cleanLower;
+
+    // 1. Search in preloaded Students module list
+    const foundLocal = studentsList.find(s => {
+      const sPrn = (s.prn || '').trim().toLowerCase();
+      const sPrnNoPrefix = sPrn.startsWith('prn') ? sPrn.slice(3) : sPrn;
+      const sId = (s._id || s.studentId || '').toString().toLowerCase();
+      return (
+        sPrn === cleanLower ||
+        sPrnNoPrefix === cleanNoPrefix ||
+        sPrn === 'prn' + cleanNoPrefix ||
+        sId === cleanLower
+      );
+    });
+
+    if (foundLocal && (foundLocal.name || foundLocal.studentName)) {
+      const studentName = foundLocal.name || foundLocal.studentName;
+      setCurrentRows(prev => {
+        const copy = [...prev];
+        copy[idx] = { ...copy[idx], studentName };
+        return copy;
+      });
+      setRowErrors(prev => {
+        const tabErrs = [...(prev[activeTab] || [])];
+        if (tabErrs[idx]) tabErrs[idx] = { ...tabErrs[idx], studentName: undefined };
+        return { ...prev, [activeTab]: tabErrs };
+      });
+      setPrnLookupStatus(p => ({ ...p, [`${activeTab}-${idx}`]: 'found' }));
+      return;
+    }
+
+    // 2. Query Students module directly via search
     try {
-      const res = await springApi.get(`/students/by-prn/${encodeURIComponent(prn.trim())}`);
-      const name = res?.studentName ?? res?.data?.studentName ?? '';
+      const token = localStorage.getItem('erp_token');
+      const res = await fetch(`${NODE_API}/super-admin/students?search=${encodeURIComponent(clean)}`, {
+        headers: token ? { Authorization: `Bearer ${token}` } : {},
+      });
+      if (res.ok) {
+        const list = await res.json();
+        if (Array.isArray(list) && list.length > 0) {
+          const match = list.find(s => {
+            const sPrn = (s.prn || '').trim().toLowerCase();
+            const sPrnNoPrefix = sPrn.startsWith('prn') ? sPrn.slice(3) : sPrn;
+            return sPrn === cleanLower || sPrnNoPrefix === cleanNoPrefix || sPrn === 'prn' + cleanNoPrefix;
+          }) || list[0];
+          const name = match.name || match.studentName;
+          if (name) {
+            setCurrentRows(prev => {
+              const copy = [...prev];
+              copy[idx] = { ...copy[idx], studentName: name };
+              return copy;
+            });
+            setRowErrors(prev => {
+              const tabErrs = [...(prev[activeTab] || [])];
+              if (tabErrs[idx]) tabErrs[idx] = { ...tabErrs[idx], studentName: undefined };
+              return { ...prev, [activeTab]: tabErrs };
+            });
+            setPrnLookupStatus(p => ({ ...p, [`${activeTab}-${idx}`]: 'found' }));
+            return;
+          }
+        }
+      }
+    } catch {
+      /* fall through to spring */
+    }
+
+    // 3. Fallback to Spring Boot
+    try {
+      const res = await springApi.get(`/students/by-prn/${encodeURIComponent(clean)}`);
+      const name = res?.studentName ?? res?.name ?? res?.data?.studentName ?? res?.data?.name ?? '';
       if (name) {
         setCurrentRows(prev => {
           const copy = [...prev];
           copy[idx] = { ...copy[idx], studentName: name };
           return copy;
         });
+        setRowErrors(prev => {
+          const tabErrs = [...(prev[activeTab] || [])];
+          if (tabErrs[idx]) tabErrs[idx] = { ...tabErrs[idx], studentName: undefined };
+          return { ...prev, [activeTab]: tabErrs };
+        });
         setPrnLookupStatus(p => ({ ...p, [`${activeTab}-${idx}`]: 'found' }));
-      } else {
-        setPrnLookupStatus(p => ({ ...p, [`${activeTab}-${idx}`]: 'notfound' }));
+        return;
       }
     } catch {
-      // Try with PRN prefix
-      if (!prn.trim().toUpperCase().startsWith('PRN')) {
+      if (!cleanLower.startsWith('prn')) {
         try {
-          const res2 = await springApi.get(`/students/by-prn/${encodeURIComponent('PRN' + prn.trim())}`);
-          const name2 = res2?.studentName ?? res2?.data?.studentName ?? '';
+          const res2 = await springApi.get(`/students/by-prn/${encodeURIComponent('PRN' + clean)}`);
+          const name2 = res2?.studentName ?? res2?.name ?? res2?.data?.studentName ?? '';
           if (name2) {
             setCurrentRows(prev => {
               const copy = [...prev];
               copy[idx] = { ...copy[idx], studentName: name2 };
               return copy;
             });
+            setRowErrors(prev => {
+              const tabErrs = [...(prev[activeTab] || [])];
+              if (tabErrs[idx]) tabErrs[idx] = { ...tabErrs[idx], studentName: undefined };
+              return { ...prev, [activeTab]: tabErrs };
+            });
             setPrnLookupStatus(p => ({ ...p, [`${activeTab}-${idx}`]: 'found' }));
             return;
           }
         } catch { /* fall through */ }
       }
-      setPrnLookupStatus(p => ({ ...p, [`${activeTab}-${idx}`]: 'notfound' }));
     }
-  }, [activeTab, setCurrentRows]);
+
+    setPrnLookupStatus(p => ({ ...p, [`${activeTab}-${idx}`]: 'notfound' }));
+  }, [activeTab, studentsList, setCurrentRows]);
 
   const updateCell = (idx, field, value) => {
     setCurrentRows((prev) => {
@@ -322,12 +542,18 @@ export default function ExamMarksPage() {
     }
   };
 
-  const dl = (blob, name) => {
+  // Safe mobile-friendly download helper with delayed revocation
+  const triggerDownload = (blob, filename) => {
     const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url; a.download = name;
-    document.body.appendChild(a); a.click(); a.remove();
-    URL.revokeObjectURL(url);
+    const link = document.createElement('a');
+    link.href = url;
+    link.setAttribute('download', filename);
+    document.body.appendChild(link);
+    link.click();
+    setTimeout(() => {
+      if (document.body.contains(link)) document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+    }, 2500);
   };
 
   const buildRows = () => currentRows.map((m, i) => {
@@ -335,74 +561,90 @@ export default function ExamMarksPage() {
     return { ...m, idx: i, c };
   });
 
+  const getSafeFilenames = () => {
+    const safeExamId = (exam?.examId || 'EXAM').replace(/[^a-zA-Z0-9_-]/g, '_');
+    const safeSubject = (exam?.subject || 'Subject').replace(/[^a-zA-Z0-9_-]/g, '_');
+    return { safeExamId, safeSubject };
+  };
+
+  // CSV export with UTF-8 BOM, proper quotes, and CRLF for mobile spreadsheet viewers
   const exportCSV = () => {
     if (!exam || currentRows.length === 0) return;
-    const isT1T2 = activeTab !== 'SEE';
-    const hdr = isT1T2
-      ? `S.No,PRN,Student Name,${activeTab} Raw /${MAX[activeTab]},${activeTab} /10,${activeTab} %`
-      : `S.No,PRN,Student Name,SEE Raw /50,SEE %`;
-    const rows = buildRows().map(({ idx, prn, studentName, marks, c }) =>
-      isT1T2
-        ? [idx+1, prn, studentName, marks??'', c?.converted??'', c?.percentage??''].join(',')
-        : [idx+1, prn, studentName, marks??'', c?.percentage??''].join(',')
-    );
-    dl(new Blob([[hdr,...rows].join('\n')],{type:'text/csv'}),
-      `${exam.examId}_${exam.subject}_${activeTab}.csv`);
-  };
-
-  // D21/D22: Excel export — use proper xlsx MIME for better mobile compatibility
-  const exportExcel = () => {
-    if (!exam || currentRows.length === 0) return;
-    const isT1T2 = activeTab !== 'SEE';
-    const hdr = isT1T2
-      ? `S.No\tPRN\tStudent Name\t${activeTab} Raw /${MAX[activeTab]}\t${activeTab} /10\t${activeTab} %`
-      : `S.No\tPRN\tStudent Name\tSEE Raw /50\tSEE %`;
-    const rows = buildRows().map(({ idx, prn, studentName, marks, c }) =>
-      isT1T2
-        ? [idx+1, prn, studentName, marks??'', c?.converted??'', c?.percentage??''].join('\t')
-        : [idx+1, prn, studentName, marks??'', c?.percentage??''].join('\t')
-    );
-    // Use BOM + proper MIME type for better mobile support
-    const bom = '\uFEFF';
-    dl(new Blob([bom + [hdr,...rows].join('\n')],
-      { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' }),
-      `${exam.examId}_${exam.subject}_${activeTab}.xlsx`);
-  };
-
-  const exportPDF = () => {
-    if (!exam) return;
+    const { safeExamId, safeSubject } = getSafeFilenames();
     const isT1T2 = activeTab !== 'SEE';
     const max = MAX[activeTab];
-    const ths = isT1T2
-      ? ['S.No','PRN','Student Name',`${activeTab} Raw /${max}`,`${activeTab} /10`,`${activeTab} %`]
-      : ['S.No','PRN','Student Name','SEE Raw /50','SEE %'];
-    const trs = buildRows().map(({ idx, prn, studentName, marks, c }, i) => {
-      const cells = isT1T2
-        ? [i+1, prn, studentName, marks??'-', c?.converted??'-', c?`${c.percentage}%`:'-']
-        : [i+1, prn, studentName, marks??'-', c?`${c.percentage}%`:'-'];
-      return `<tr style="background:${i%2===0?'#fff':'#f9fafb'}">
-        ${cells.map(v=>`<td style="padding:6px 10px;border:1px solid #e5e7eb">${v}</td>`).join('')}
-      </tr>`;
-    }).join('');
-    const html = `<!DOCTYPE html><html><head><meta charset="UTF-8">
-<title>${exam.examId} ${activeTab}</title>
-<style>body{font-family:Arial,sans-serif;padding:24px;color:#111}
-h1{font-size:15pt;margin-bottom:4px}.meta{font-size:10pt;color:#6b7280;margin-bottom:14px}
-table{width:100%;border-collapse:collapse;font-size:9pt}
-th{background:#1e3a5f;color:#fff;padding:7px 10px;text-align:left;border:1px solid #1e3a5f}
-</style></head><body>
-<h1>${exam.subject} — ${activeTab} Marks Sheet</h1>
-<p class="meta">Exam ID: ${exam.examId} | Max: ${max}${exam.academicYear?` | ${exam.academicYear}`:''}</p>
-<table><thead><tr>${ths.map(h=>`<th>${h}</th>`).join('')}</tr></thead>
-<tbody>${trs}</tbody></table></body></html>`;
-    const w = window.open('','_blank');
-    w.document.write(html); w.document.close(); w.focus(); w.print();
+    const headers = isT1T2
+      ? ['S.No', 'PRN', 'Student Name', `${activeTab} Raw /${max}`, `${activeTab} /10`, `${activeTab} %`]
+      : ['S.No', 'PRN', 'Student Name', 'SEE Raw /50', 'SEE %'];
+
+    const escapeCSV = (val) => {
+      if (val === null || val === undefined) return '';
+      const str = String(val);
+      if (str.includes(',') || str.includes('"') || str.includes('\n') || str.includes('\r')) {
+        return `"${str.replace(/"/g, '""')}"`;
+      }
+      return str;
+    };
+
+    const rows = buildRows().map(({ idx, prn, studentName, marks, c }) =>
+      isT1T2
+        ? [idx + 1, prn || '', studentName || '', marks ?? '', c?.converted ?? '', c?.percentage != null ? `${c.percentage}%` : ''].map(escapeCSV).join(',')
+        : [idx + 1, prn || '', studentName || '', marks ?? '', c?.percentage != null ? `${c.percentage}%` : ''].map(escapeCSV).join(',')
+    );
+
+    const csvContent = '\uFEFF' + [headers.map(escapeCSV).join(','), ...rows].join('\r\n');
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    triggerDownload(blob, `${safeExamId}_${safeSubject}_${activeTab}.csv`);
+  };
+
+  // Excel export using true OpenXML .xlsx binary workbook (100% mobile compatible)
+  const exportExcel = () => {
+    if (!exam || currentRows.length === 0) return;
+    const { safeExamId, safeSubject } = getSafeFilenames();
+    const isT1T2 = activeTab !== 'SEE';
+    const max = MAX[activeTab];
+    const headers = isT1T2
+      ? ['S.No', 'PRN', 'Student Name', `${activeTab} Raw /${max}`, `${activeTab} /10`, `${activeTab} %`]
+      : ['S.No', 'PRN', 'Student Name', 'SEE Raw /50', 'SEE %'];
+
+    const dataRows = buildRows().map(({ idx, prn, studentName, marks, c }) =>
+      isT1T2
+        ? [idx + 1, prn || '', studentName || '', marks ?? '', c?.converted ?? '', c?.percentage != null ? `${c.percentage}%` : '']
+        : [idx + 1, prn || '', studentName || '', marks ?? '', c?.percentage != null ? `${c.percentage}%` : '']
+    );
+
+    const ws = XLSX.utils.aoa_to_sheet([headers, ...dataRows]);
+    ws['!cols'] = headers.map(() => ({ wch: 18 }));
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, `${activeTab}_Marks`);
+    const wbout = XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
+    const blob = new Blob([wbout], {
+      type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+    });
+    triggerDownload(blob, `${safeExamId}_${safeSubject}_${activeTab}.xlsx`);
+  };
+
+  // PDF export generating true .pdf binary file for mobile opening + print preview
+  const exportPDF = () => {
+    if (!exam) return;
+    const { safeExamId, safeSubject } = getSafeFilenames();
+    const pdfBlob = generateMarksPdfBlob(
+      exam,
+      activeTab,
+      MAX[activeTab],
+      currentRows,
+      (exam?.displayMode ?? 'PERCENTAGE') === 'FRACTION',
+      Number(exam?.fractionScale ?? 10) || 10,
+      Number(exam?.percentageScale ?? 100) || 100
+    );
+    triggerDownload(pdfBlob, `${safeExamId}_${safeSubject}_${activeTab}.pdf`);
   };
 
   const downloadTemplate = () => {
     const hdr  = `Serial No.,PRN,Name,${activeTab}`;
     const samp = activeTab !== 'SEE' ? `1,PRN001,Student Name,15` : '1,PRN001,Student Name,42';
-    dl(new Blob([[hdr,samp].join('\n')],{type:'text/csv'}),`exam_${activeTab}_template.csv`);
+    const content = '\uFEFF' + [hdr, samp].join('\r\n');
+    triggerDownload(new Blob([content], { type: 'text/csv;charset=utf-8;' }), `exam_${activeTab}_template.csv`);
   };
 
   // D13/14/15: count only rows with student data
@@ -440,18 +682,47 @@ th{background:#1e3a5f;color:#fff;padding:7px 10px;text-align:left;border:1px sol
           onClick={() => navigate('/exams')}>← Back</button>
       </div>
 
-      {/* D12: header left-aligned on mobile */}
-      <div style={{
-        display:'flex', alignItems:'flex-start',
-        justifyContent:'space-between', flexWrap:'nowrap',
-        gap:12, marginBottom:16, textAlign:'left',
-      }}>
-        <div style={{ minWidth:0 }}>
-          <h1 className="page-title" style={{ textAlign:'left' }}>{exam.subject}</h1>
-          <p className="page-subtitle" style={{ textAlign:'left' }}>
-            <span style={{ fontFamily:'monospace', fontWeight:700 }}>{exam.examId}</span>
-            {exam.academicYear && <>&nbsp;·&nbsp;{exam.academicYear}</>}
-          </p>
+      {/* Header and prominent information cards / badges for Subject ID and Academic Year */}
+      <div style={{ marginBottom: 16 }}>
+        <h1 className="page-title" style={{ textAlign: 'left', marginBottom: 10 }}>
+          {exam.subject}
+        </h1>
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 10, alignItems: 'center' }}>
+          <div style={{
+            display: 'inline-flex', alignItems: 'center', gap: 6,
+            background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: 6,
+            padding: '5px 12px', fontSize: '0.85rem'
+          }}>
+            <span style={{ color: '#64748b', fontSize: '0.75rem', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.04em' }}>
+              Subject:
+            </span>
+            <strong style={{ color: '#0f172a' }}>{exam.subject}</strong>
+          </div>
+          <div style={{
+            display: 'inline-flex', alignItems: 'center', gap: 6,
+            background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: 6,
+            padding: '5px 12px', fontSize: '0.85rem'
+          }}>
+            <span style={{ color: '#64748b', fontSize: '0.75rem', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.04em' }}>
+              Subject / Exam ID:
+            </span>
+            <span className="code-badge" style={{ fontWeight: 700 }}>{exam.examId}</span>
+          </div>
+          <div style={{
+            display: 'inline-flex', alignItems: 'center', gap: 6,
+            background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: 6,
+            padding: '5px 12px', fontSize: '0.85rem'
+          }}>
+            <span style={{ color: '#64748b', fontSize: '0.75rem', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.04em' }}>
+              Academic Year:
+            </span>
+            <span style={{
+              background: '#eff6ff', color: '#1e3a5f', border: '1px solid #bfdbfe',
+              borderRadius: 4, padding: '2px 8px', fontSize: '0.8rem', fontWeight: 600
+            }}>
+              {exam.academicYear || 'Not Specified'}
+            </span>
+          </div>
         </div>
       </div>
 
@@ -643,26 +914,6 @@ th{background:#1e3a5f;color:#fff;padding:7px 10px;text-align:left;border:1px sol
           </div>
         )}
       </div>
-
-      {/* Unsaved changes — single Save button at bottom */}
-      {edited[activeTab] && (
-        <div style={{
-          position:'fixed', bottom:24, right:24, zIndex:999,
-          background:'#1e3a5f', color:'#fff',
-          padding:'12px 20px', borderRadius:10,
-          display:'flex', alignItems:'center', gap:12,
-          boxShadow:'0 4px 16px rgba(0,0,0,0.25)',
-        }}>
-          <span style={{ fontSize:'0.9rem' }}>
-            Unsaved changes in <strong>{activeTab}</strong>
-          </span>
-          <button className="books-btn books-btn-primary"
-            onClick={saveTab} disabled={saving}
-            style={{ padding:'6px 16px', fontSize:'0.85rem' }}>
-            {saving ? 'Saving...' : '💾 Save'}
-          </button>
-        </div>
-      )}
 
     </div>
   );

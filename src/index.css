@@ -10305,6 +10305,9 @@ input[type='password']::-webkit-inner-spin-button {
 
   .table-stats-badge {
     text-align: right;
+    width: fit-content;
+    align-self: flex-end;
+    margin-left: auto;
   }
 
   /* Ensure action buttons stay readable on mobile */
