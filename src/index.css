@@ -13405,20 +13405,6 @@ input[type='password']::-webkit-inner-spin-button {
   align-items: center;
   min-width: 0;
 }
-/* Make the student list card horizontally scrollable on small screens */
-.attendance-table-header {
-  overflow-x: auto;
-  -webkit-overflow-scrolling: touch;
-  min-width: 460px;
-}
-.attendance-row {
-  min-width: 460px;
-}
-/* Wrap the card content in a scrollable container */
-.card:has(.attendance-table-header) {
-  overflow-x: auto;
-  -webkit-overflow-scrolling: touch;
-}
 
 /* Fix 6: Event Booking modal — make it scrollable, not full-viewport height.
    The eb-form-dialog was taking 100vh on mobile. Set max-height + overflow-y. */

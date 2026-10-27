@@ -249,6 +249,43 @@ function AddPaymentModal({ isOpen, onClose, onSaved }) {
 // PaymentPage — Admin payment title + combination management
 // Accessible at /payment-management (Super Admin only)
 // ══════════════════════════════════════════════════════════════════════════
+// Mobile accordion card for Payment Titles
+function PayMobCard({ t, fmt, showCheckboxes, isSelected, onToggle, expanded, onCardToggle, getAcademicYear }) {
+  const yr = getAcademicYear ? getAcademicYear(t.title) : null;
+  const netPayable = Math.max(0, t.amount - t.discount);
+  return (
+    <div className="mob-card" style={{ border: isSelected ? '2px solid #2563eb' : undefined }}>
+      <button type="button" className="mob-card-header" onClick={onCardToggle} aria-expanded={expanded}>
+        <div className="mob-card-summary">
+          {showCheckboxes && (
+            <input
+              type="checkbox"
+              checked={isSelected}
+              onChange={onToggle}
+              onClick={e => e.stopPropagation()}
+              style={{ flexShrink: 0 }}
+            />
+          )}
+          <div className="mob-card-title-wrap" style={{ marginLeft: showCheckboxes ? 6 : 0 }}>
+            <span className="mob-card-title">{t.title}</span>
+            <span className="mob-card-sub">{t.titleId} {yr ? `• ${yr}` : ''}</span>
+          </div>
+        </div>
+        <span className="mob-card-chevron">{expanded ? '▲' : '▼'}</span>
+      </button>
+      {expanded && (
+        <div className="mob-card-details">
+          <div className="mob-card-row"><span className="mob-card-label">Title ID</span><span className="mob-card-value mono">{t.titleId}</span></div>
+          {yr && <div className="mob-card-row"><span className="mob-card-label">Academic year</span><span className="mob-card-value">{yr}</span></div>}
+          <div className="mob-card-row"><span className="mob-card-label">Amount</span><span className="mob-card-value">{fmt(t.amount)}</span></div>
+          <div className="mob-card-row"><span className="mob-card-label">Discount</span><span className="mob-card-value" style={{ color: '#047857' }}>{t.discount > 0 ? `- ${fmt(t.discount)}` : '₹0'}</span></div>
+          <div className="mob-card-row"><span className="mob-card-label">Net payable</span><span className="mob-card-value" style={{ fontWeight: 700, color: '#16a34a' }}>{fmt(netPayable)}</span></div>
+        </div>
+      )}
+    </div>
+  );
+}
+
 export default function PaymentPage() {
 
   // ── Titles (paginated) ────────────────────────────────────────────────
@@ -257,6 +294,7 @@ export default function PaymentPage() {
   const [page,          setPage]          = useState(0);
   const [size,          setSize]          = useState(10);
   const [titlesLoading, setTitlesLoading] = useState(true);
+  const [payExpanded,   setPayExpanded]   = useState(null);
 
   // ── Modal ─────────────────────────────────────────────────────────────
   const [modalOpen, setModalOpen] = useState(false);
@@ -604,120 +642,144 @@ export default function PaymentPage() {
         {titlesLoading ? (
           <p className="books-loading">Loading payment titles...</p>
         ) : (
-          <div className="books-table-wrap">
-            <table className="books-table" style={{ width: '100%', tableLayout: 'fixed' }}>
-              <thead>
-                <tr>
-                  {showCheckboxes && (
-                    <th style={{ width: 85, textAlign: 'center' }}>
-                      <div
-                        style={{
-                          display: 'inline-flex',
-                          alignItems: 'center',
-                          justifyContent: 'center',
-                          gap: 6,
-                          cursor: 'pointer',
-                          userSelect: 'none',
-                        }}
-                        onClick={toggleAll}
-                      >
-                        <input
-                          type="checkbox"
-                          className="pay-checkbox"
-                          checked={isAllOnPageSelected}
-                          onChange={toggleAll}
-                          title="Select all on this page"
-                          style={{ cursor: 'pointer' }}
-                        />
-                        <span style={{ fontWeight: 600 }}>Select</span>
-                      </div>
-                    </th>
-                  )}
-                  <th style={{ width: 110, textAlign: 'center' }}>Title ID</th>
-                  <th style={{ textAlign: 'left' }}>Payment Title</th>
-                  <th style={{ width: 130, textAlign: 'right' }}>Amount</th>
-                  <th style={{ width: 130, textAlign: 'right' }}>Discount</th>
-                  <th style={{ width: 140, textAlign: 'right' }}>Net Payable</th>
-                </tr>
-              </thead>
-              <tbody>
-                {titles.length === 0 ? (
-                  <tr>
-                    <td colSpan={showCheckboxes ? 6 : 5} style={{ textAlign: 'center', padding: '2rem' }}>
-                      <div className="books-empty">No payment titles found.</div>
-                    </td>
-                  </tr>
-                ) : (
-                  titles.map((t) => {
-                    const yr = getAcademicYear(t.title);
-                    const isSelected = selected.has(t.titleId);
-                    const netPayable = Math.max(0, t.amount - t.discount);
-
-                    return (
-                      <tr
-                        key={t.titleId}
-                        style={{
-                          cursor: showCheckboxes ? 'pointer' : 'default',
-                          background: isSelected ? 'rgba(59, 130, 246, 0.06)' : undefined,
-                        }}
-                        onClick={() => {
-                          if (showCheckboxes) toggleOneWithValidation(t.titleId);
-                        }}
-                      >
-                        {showCheckboxes && (
-                          <td
-                            style={{ textAlign: 'center', verticalAlign: 'middle' }}
-                            onClick={(e) => e.stopPropagation()}
+          <>
+            <div className="pay-desk-table">
+              <div className="books-table-wrap">
+                <table className="books-table" style={{ width: '100%', tableLayout: 'fixed' }}>
+                  <thead>
+                    <tr>
+                      {showCheckboxes && (
+                        <th style={{ width: 85, textAlign: 'center' }}>
+                          <div
+                            style={{
+                              display: 'inline-flex',
+                              alignItems: 'center',
+                              justifyContent: 'center',
+                              gap: 6,
+                              cursor: 'pointer',
+                              userSelect: 'none',
+                            }}
+                            onClick={toggleAll}
                           >
                             <input
                               type="checkbox"
                               className="pay-checkbox"
-                              checked={isSelected}
-                              onChange={() => toggleOneWithValidation(t.titleId)}
+                              checked={isAllOnPageSelected}
+                              onChange={toggleAll}
+                              title="Select all on this page"
                               style={{ cursor: 'pointer' }}
                             />
-                          </td>
-                        )}
-                        <td style={{ textAlign: 'center', verticalAlign: 'middle' }}>
-                          <span className="code-badge">{t.titleId}</span>
-                        </td>
-                        <td style={{ textAlign: 'left', verticalAlign: 'middle' }}>
-                          <span style={{ fontWeight: 600, color: 'var(--text-primary)' }}>
-                            {t.title}
-                          </span>
-                          {yr && (
-                            <span
-                              style={{
-                                marginLeft: 8,
-                                display: 'inline-block',
-                                fontSize: '0.75rem',
-                                padding: '2px 8px',
-                                borderRadius: 12,
-                                background: '#e0e7ff',
-                                color: '#3730a3',
-                                fontWeight: 600,
-                              }}
-                            >
-                              {yr}
-                            </span>
-                          )}
-                        </td>
-                        <td style={{ textAlign: 'right', verticalAlign: 'middle', fontWeight: 500 }}>
-                          {fmt(t.amount)}
-                        </td>
-                        <td style={{ textAlign: 'right', verticalAlign: 'middle', color: '#047857', fontWeight: 500 }}>
-                          {t.discount > 0 ? `- ${fmt(t.discount)}` : '₹0'}
-                        </td>
-                        <td style={{ textAlign: 'right', verticalAlign: 'middle', fontWeight: 700, color: '#16a34a' }}>
-                          {fmt(netPayable)}
+                            <span style={{ fontWeight: 600 }}>Select</span>
+                          </div>
+                        </th>
+                      )}
+                      <th style={{ width: 110, textAlign: 'center' }}>Title ID</th>
+                      <th style={{ textAlign: 'left' }}>Payment Title</th>
+                      <th style={{ width: 130, textAlign: 'right' }}>Amount</th>
+                      <th style={{ width: 130, textAlign: 'right' }}>Discount</th>
+                      <th style={{ width: 140, textAlign: 'right' }}>Net Payable</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {titles.length === 0 ? (
+                      <tr>
+                        <td colSpan={showCheckboxes ? 6 : 5} style={{ textAlign: 'center', padding: '2rem' }}>
+                          <div className="books-empty">No payment titles found.</div>
                         </td>
                       </tr>
-                    );
-                  })
-                )}
-              </tbody>
-            </table>
-          </div>
+                    ) : (
+                      titles.map((t) => {
+                        const yr = getAcademicYear(t.title);
+                        const isSelected = selected.has(t.titleId);
+                        const netPayable = Math.max(0, t.amount - t.discount);
+
+                        return (
+                          <tr
+                            key={t.titleId}
+                            style={{
+                              cursor: showCheckboxes ? 'pointer' : 'default',
+                              background: isSelected ? 'rgba(59, 130, 246, 0.06)' : undefined,
+                            }}
+                            onClick={() => {
+                              if (showCheckboxes) toggleOneWithValidation(t.titleId);
+                            }}
+                          >
+                            {showCheckboxes && (
+                              <td
+                                style={{ textAlign: 'center', verticalAlign: 'middle' }}
+                                onClick={(e) => e.stopPropagation()}
+                              >
+                                <input
+                                  type="checkbox"
+                                  className="pay-checkbox"
+                                  checked={isSelected}
+                                  onChange={() => toggleOneWithValidation(t.titleId)}
+                                  style={{ cursor: 'pointer' }}
+                                />
+                              </td>
+                            )}
+                            <td style={{ textAlign: 'center', verticalAlign: 'middle' }}>
+                              <span className="code-badge">{t.titleId}</span>
+                            </td>
+                            <td style={{ textAlign: 'left', verticalAlign: 'middle' }}>
+                              <span style={{ fontWeight: 600, color: 'var(--text-primary)' }}>
+                                {t.title}
+                              </span>
+                              {yr && (
+                                <span
+                                  style={{
+                                    marginLeft: 8,
+                                    display: 'inline-block',
+                                    fontSize: '0.75rem',
+                                    padding: '2px 8px',
+                                    borderRadius: 12,
+                                    background: '#e0e7ff',
+                                    color: '#3730a3',
+                                    fontWeight: 600,
+                                  }}
+                                >
+                                  {yr}
+                                </span>
+                              )}
+                            </td>
+                            <td style={{ textAlign: 'right', verticalAlign: 'middle', fontWeight: 500 }}>
+                              {fmt(t.amount)}
+                            </td>
+                            <td style={{ textAlign: 'right', verticalAlign: 'middle', color: '#047857', fontWeight: 500 }}>
+                              {t.discount > 0 ? `- ${fmt(t.discount)}` : '₹0'}
+                            </td>
+                            <td style={{ textAlign: 'right', verticalAlign: 'middle', fontWeight: 700, color: '#16a34a' }}>
+                              {fmt(netPayable)}
+                            </td>
+                          </tr>
+                        );
+                      })
+                    )}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            <div className="pay-mob-list">
+              {titles.length === 0 ? (
+                <div className="books-empty" style={{ padding: '2rem', textAlign: 'center' }}>No payment titles found.</div>
+              ) : (
+                titles.map((t) => (
+                  <PayMobCard
+                    key={t.titleId}
+                    t={t}
+                    fmt={fmt}
+                    showCheckboxes={showCheckboxes}
+                    isSelected={selected.has(t.titleId)}
+                    onToggle={() => toggleOneWithValidation(t.titleId)}
+                    expanded={payExpanded === t.titleId}
+                    onCardToggle={() => setPayExpanded(prev => prev === t.titleId ? null : t.titleId)}
+                    getAcademicYear={getAcademicYear}
+                  />
+                ))
+              )}
+            </div>
+          </>
         )}
 
         <Pagination

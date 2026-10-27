@@ -236,9 +236,12 @@ const Attendance = () => {
       <div className="card" style={{ marginBottom: '1rem', overflow: 'hidden' }}>
         {/* Table header */}
         <div className="attendance-table-header">
-          <span style={{ flex: '0 0 120px' }}>Roll No</span>
-          <span style={{ flex: 1 }}>Student Name</span>
-          <span style={{ flex: '0 0 140px', textAlign: 'center' }}>Attendance</span>
+          <span className="attendance-col-roll">Roll No</span>
+          <span className="attendance-col-name">
+            <span className="attendance-header-desktop">Student Name</span>
+            <span className="attendance-header-mobile">Student Details</span>
+          </span>
+          <span className="attendance-col-action" style={{ textAlign: 'center' }}>Attendance</span>
         </div>
 
         {/* Rows */}
@@ -249,13 +252,14 @@ const Attendance = () => {
               index % 2 === 0 ? 'attendance-row--even' : ''
             }`}
           >
-            <span className="attendance-roll" style={{ flex: '0 0 120px' }}>
+            <span className="attendance-col-roll attendance-roll">
               {student.rollNo}
             </span>
-            <span style={{ flex: 1, fontWeight: '500', color: 'var(--text-primary)', fontSize: '0.9rem' }}>
-              {student.name}
+            <span className="attendance-col-name">
+              <span className="attendance-student-name">{student.name}</span>
+              <span className="attendance-roll-mobile">Roll No: {student.rollNo}</span>
             </span>
-            <span style={{ flex: '0 0 140px', display: 'flex', justifyContent: 'center' }}>
+            <span className="attendance-col-action">
               <button
                 type="button"
                 className={`attendance-toggle-btn ${

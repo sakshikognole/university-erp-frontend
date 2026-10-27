@@ -24,6 +24,65 @@ import {
 const _IS_PROD = typeof window !== 'undefined' && window.location.hostname !== 'localhost';
 const API_BASE_URL = _IS_PROD ? 'https://university-erp-node.onrender.com/api' : 'http://localhost:5000/api';
 
+// Mobile accordion card for Transport
+function TrnMobCard({ item, tab, num, openModal, setDeleteConfirm, expanded, onToggle }) {
+  const fmtDate = (d) => {
+    if (!d) return '—';
+    try { return new Date(d).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' }); }
+    catch { return '—'; }
+  };
+  const title = tab === 'routes' ? item.routeName : tab === 'drivers' ? item.name : tab === 'vehicles' ? item.name : (item.studentName || item.studentId);
+  const sub = tab === 'routes' ? `Route #${item.routeId}` : tab === 'drivers' ? item.driverId : tab === 'vehicles' ? item.vehicleNumber : `Pass: ${item.passId}`;
+  return (
+    <div className="mob-card">
+      <button type="button" className="mob-card-header" onClick={onToggle} aria-expanded={expanded}>
+        <div className="mob-card-summary">
+          <span className="mob-card-num">{num}</span>
+          <div className="mob-card-title-wrap">
+            <span className="mob-card-title">{title}</span>
+            <span className="mob-card-sub">{sub}</span>
+          </div>
+        </div>
+        <span className="mob-card-chevron">{expanded ? '▲' : '▼'}</span>
+      </button>
+      {expanded && (
+        <div className="mob-card-details">
+          {tab === 'routes' && <>
+            <div className="mob-card-row"><span className="mob-card-label">Route ID</span><span className="mob-card-value mono">{item.routeId}</span></div>
+            <div className="mob-card-row"><span className="mob-card-label">Driver</span><span className="mob-card-value">{item.driverName || '—'}</span></div>
+            <div className="mob-card-row"><span className="mob-card-label">Vehicle</span><span className="mob-card-value">{item.vehicleName || '—'}</span></div>
+            <div className="mob-card-row"><span className="mob-card-label">Stops</span><span className="mob-card-value">{(item.stops||[]).join(', ') || '—'}</span></div>
+          </>}
+          {tab === 'drivers' && <>
+            <div className="mob-card-row"><span className="mob-card-label">Driver ID</span><span className="mob-card-value mono">{item.driverId}</span></div>
+            <div className="mob-card-row"><span className="mob-card-label">Phone</span><span className="mob-card-value">{item.phone || '—'}</span></div>
+            <div className="mob-card-row"><span className="mob-card-label">License</span><span className="mob-card-value">{item.licenseNumber || '—'}</span></div>
+            <div className="mob-card-row"><span className="mob-card-label">Status</span><span className="mob-card-value"><span style={{padding:'2px 8px',borderRadius:'12px',fontSize:'0.78rem',fontWeight:600,backgroundColor:item.status==='ACTIVE'?'#dcfce7':'#fee2e2',color:item.status==='ACTIVE'?'#15803d':'#b91c1c'}}>{item.status}</span></span></div>
+          </>}
+          {tab === 'vehicles' && <>
+            <div className="mob-card-row"><span className="mob-card-label">Vehicle ID</span><span className="mob-card-value mono">{item.vehicleId}</span></div>
+            <div className="mob-card-row"><span className="mob-card-label">Plate</span><span className="mob-card-value">{item.vehicleNumber || '—'}</span></div>
+            <div className="mob-card-row"><span className="mob-card-label">Capacity</span><span className="mob-card-value">{item.capacity || '—'}</span></div>
+            <div className="mob-card-row"><span className="mob-card-label">Status</span><span className="mob-card-value"><span style={{padding:'2px 8px',borderRadius:'12px',fontSize:'0.78rem',fontWeight:600,backgroundColor:item.status==='ACTIVE'?'#dcfce7':'#fef3c7',color:item.status==='ACTIVE'?'#15803d':'#b45309'}}>{item.status}</span></span></div>
+          </>}
+          {tab === 'passes' && <>
+            <div className="mob-card-row"><span className="mob-card-label">Pass ID</span><span className="mob-card-value mono">{item.passId}</span></div>
+            <div className="mob-card-row"><span className="mob-card-label">Student ID</span><span className="mob-card-value">{item.studentId}</span></div>
+            <div className="mob-card-row"><span className="mob-card-label">Route</span><span className="mob-card-value mono">Route #{item.routeId}</span></div>
+            <div className="mob-card-row"><span className="mob-card-label">Stops</span><span className="mob-card-value">{item.fromStop} → {item.toStop}</span></div>
+            <div className="mob-card-row"><span className="mob-card-label">Payment</span><span className="mob-card-value"><span style={{padding:'2px 8px',borderRadius:'12px',fontSize:'0.78rem',fontWeight:600,backgroundColor:item.paymentStatus==='PAID'?'#dcfce7':'#fee2e2',color:item.paymentStatus==='PAID'?'#15803d':'#b91c1c'}}>{item.paymentStatus}</span></span></div>
+            <div className="mob-card-row"><span className="mob-card-label">Valid till</span><span className="mob-card-value">{fmtDate(item.validTill)}</span></div>
+          </>}
+          <div className="mob-card-actions">
+            <button type="button" className="action-btn edit-btn" onClick={() => openModal(tab === 'passes' ? 'pass' : tab === 'routes' ? 'route' : tab === 'drivers' ? 'driver' : 'vehicle', item._id || (tab === 'routes' ? item.routeId : tab === 'drivers' ? item.driverId : tab === 'vehicles' ? item.vehicleId : item.passId))}><Edit size={14} /><span className="action-label">Edit</span></button>
+            <button type="button" className="action-btn delete-btn" onClick={() => setDeleteConfirm({ type: tab === 'passes' ? 'pass' : tab === 'routes' ? 'route' : tab === 'drivers' ? 'driver' : 'vehicle', item })}><Trash2 size={14} /><span className="action-label">Delete</span></button>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
 const Transport = () => {
   const navigate = useNavigate();
 
@@ -35,6 +94,7 @@ const Transport = () => {
   const [loading,  setLoading]  = useState(true);
   const [deleting, setDeleting] = useState(false);
   const [deleteConfirm, setDeleteConfirm] = useState(null);
+  const [trnExpanded, setTrnExpanded] = useState(null);
 
   // Modal state — one modal open at a time, type = 'route'|'driver'|'vehicle'|'pass'
   const [modalType,   setModalType]   = useState(null);
@@ -294,6 +354,7 @@ const Transport = () => {
           ) : (
             <>
               {/* D1: transport-table gives centered <th> to route + vehicle tables */}
+              <div className="trn-desk-table">
               {activeTab === 'routes' && (
                 <table className="data-table transport-table">
                   <thead>
@@ -486,6 +547,25 @@ const Transport = () => {
                   </tbody>
                 </table>
               )}
+              </div>
+
+              <div className="trn-mob-list">
+                {paginatedData.map((item, i) => {
+                  const id = item._id || item.routeId || item.driverId || item.vehicleId || item.passId || i;
+                  return (
+                    <TrnMobCard
+                      key={id}
+                      item={item}
+                      tab={activeTab}
+                      num={startIndex + i + 1}
+                      openModal={openModal}
+                      setDeleteConfirm={setDeleteConfirm}
+                      expanded={trnExpanded === id}
+                      onToggle={() => setTrnExpanded(p => p === id ? null : id)}
+                    />
+                  );
+                })}
+              </div>
 
               {totalPages > 1 && (
                 <div className="pagination-controls">
