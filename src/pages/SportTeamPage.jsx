@@ -1,7 +1,7 @@
 import { springApi, springGet } from '../services/api';
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import { Eye, Edit, Trash2 } from 'lucide-react';
+import { Eye, Edit, Trash2, Search } from 'lucide-react';
 import TeamForm from './TeamForm';
 import TeamDetails from './TeamDetails';
 
@@ -223,10 +223,23 @@ export default function SportTeamPage() {
   const [dupError, setDupError] = useState('');
   const [rosterOpen,   setRosterOpen]   = useState(false);
   const [rosterTeamId, setRosterTeamId] = useState('');
+  const [search,       setSearch]       = useState('');
 
   // Mobile accordion — only one team expanded at a time (same as BooksPage)
   const [expandedId, setExpandedId] = useState(null);
   const toggleExpand = (id) => setExpandedId(prev => prev === id ? null : id);
+
+  // Filter teams based on search input
+  const filteredTeams = teams.filter((t) => {
+    if (!search.trim()) return true;
+    const q = search.toLowerCase();
+    return (
+      (t.teamId || '').toLowerCase().includes(q) ||
+      (t.sportName || '').toLowerCase().includes(q) ||
+      (t.coachName || '').toLowerCase().includes(q) ||
+      (t.captainName || '').toLowerCase().includes(q)
+    );
+  });
 
   const load = useCallback(async (silent = false) => {
     if (!silent) setLoading(true);
@@ -344,114 +357,136 @@ export default function SportTeamPage() {
         </div>
       )}
 
-      {loading ? (
-        /* Skeleton loader — same layout as table */
-        <div className="books-table-wrap">
-          <table className="books-table">
-            <thead>
-              <tr>
-                <th>Team id</th><th>Sport name</th><th>Coach name</th>
-                <th>Captain name</th><th>Roster</th><th>Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {Array.from({ length: 5 }).map((_, i) => (
-                <tr key={i}>
-                  {[80, 110, 120, 120, 60, 120].map((w, j) => (
-                    <td key={j}>
-                      <div style={{
-                        width: w, height: 13, borderRadius: 4,
-                        background: 'linear-gradient(90deg,#f3f4f6 25%,#e5e7eb 50%,#f3f4f6 75%)',
-                        backgroundSize: '200% 100%',
-                        animation: 'books-shimmer 1.4s infinite',
-                      }} />
-                    </td>
-                  ))}
-                </tr>
-              ))}
-            </tbody>
-          </table>
+      {/* ── Table Card Container (border & styling matching Book feature) ── */}
+      <div className="card">
+        {/* ── Toolbar: Search + Total Count Badge (like Book feature) ── */}
+        <div className="books-toolbar" style={{ justifyContent: 'space-between', alignItems: 'center' }}>
+          <div className="search-box-wrapper">
+            <Search size={16} className="search-icon" />
+            <input
+              className="search-input"
+              placeholder="Search by Team ID, Sport, Coach, or Captain..."
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+            />
+          </div>
+          <div className="table-stats-badge" style={{ marginLeft: 'auto' }}>
+            Total: <strong>{filteredTeams.length}</strong>{' '}
+            {filteredTeams.length === 1 ? 'Team' : 'Teams'}
+          </div>
         </div>
-      ) : teams.length === 0 ? (
-        <p className="st-empty">No sport teams yet. Click "+ Add Team" to get started.</p>
-      ) : (
-        <>
-          {/* ── Mobile view — accordion cards (same as BooksPage, hidden on tablet/desktop) ── */}
-          <div className="book-mob-list">
-            {teams.map((team, i) => (
-              <SportTeamMobileCard
-                key={team.teamId}
-                team={team}
-                index={i}
-                isExpanded={expandedId === team.teamId}
-                onToggle={() => toggleExpand(team.teamId)}
-                onView={openView}
-                onEdit={openEdit}
-                onDelete={handleDelete}
-                deleting={deleting}
-              />
-            ))}
-          </div>
 
-          {/* ── Desktop/tablet view — full table (hidden on mobile) ── */}
-          <div className="book-desk-table">
-            <div className="books-table-wrap">
-              <table className="books-table">
-                <thead>
-                  <tr>
-                    <th>Team id</th>
-                    <th>Sport name</th>
-                    <th>Coach name</th>
-                    <th>Captain name</th>
-                    <th>Roster</th>
-                    <th>Actions</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {teams.map((team) => (
-                    <tr key={team.teamId}>
-                      <td>{team.teamId}</td>
-                      <td>{team.sportName}</td>
-                      <td>{team.coachName}</td>
-                      <td>{team.captainName}</td>
-                      <td>{team.roster ? team.roster.length : 0} student(s)</td>
-                      <td>
-                        <div className="books-actions">
-                          <button
-                            type="button"
-                            className="action-btn view-btn"
-                            title="View Team"
-                            onClick={() => openView(team)}
-                          >
-                            <Eye size={14} /><span className="action-label">View</span>
-                          </button>
-                          <button
-                            type="button"
-                            className="action-btn edit-btn"
-                            title="Edit Team"
-                            onClick={() => openEdit(team)}
-                          >
-                            <Edit size={14} /><span className="action-label">Edit</span>
-                          </button>
-                          <button
-                            type="button"
-                            className="action-btn delete-btn"
-                            title="Delete Team"
-                            onClick={() => handleDelete(team)}
-                            disabled={deleting === team.teamId}
-                          >
-                            <Trash2 size={14} /><span className="action-label">{deleting === team.teamId ? 'Deleting...' : 'Delete'}</span>
-                          </button>
-                        </div>
+        {loading ? (
+          /* Skeleton loader — same layout as table */
+          <div className="books-table-wrap">
+            <table className="books-table">
+              <thead>
+                <tr>
+                  <th>Team id</th><th>Sport name</th><th>Coach name</th>
+                  <th>Captain name</th><th>Roster</th><th>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {Array.from({ length: 5 }).map((_, i) => (
+                  <tr key={i}>
+                    {[80, 110, 120, 120, 60, 120].map((w, j) => (
+                      <td key={j}>
+                        <div style={{
+                          width: w, height: 13, borderRadius: 4,
+                          background: 'linear-gradient(90deg,#f3f4f6 25%,#e5e7eb 50%,#f3f4f6 75%)',
+                          backgroundSize: '200% 100%',
+                          animation: 'books-shimmer 1.4s infinite',
+                        }} />
                       </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
+                    ))}
+                  </tr>
+                ))}
+              </tbody>
+            </table>
           </div>
-        </>
-      )}
+        ) : filteredTeams.length === 0 ? (
+          <p className="st-empty" style={{ textAlign: 'center', padding: '2.5rem 0', color: '#9ca3af' }}>
+            {search ? `No teams matched "${search}".` : 'No sport teams yet. Click "+ Add Team" to get started.'}
+          </p>
+        ) : (
+          <>
+            {/* ── Mobile view — accordion cards (same as BooksPage, hidden on tablet/desktop) ── */}
+            <div className="book-mob-list">
+              {filteredTeams.map((team, i) => (
+                <SportTeamMobileCard
+                  key={team.teamId}
+                  team={team}
+                  index={i}
+                  isExpanded={expandedId === team.teamId}
+                  onToggle={() => toggleExpand(team.teamId)}
+                  onView={openView}
+                  onEdit={openEdit}
+                  onDelete={handleDelete}
+                  deleting={deleting}
+                />
+              ))}
+            </div>
+
+            {/* ── Desktop/tablet view — full table (hidden on mobile) ── */}
+            <div className="book-desk-table">
+              <div className="books-table-wrap">
+                <table className="books-table">
+                  <thead>
+                    <tr>
+                      <th>Team id</th>
+                      <th>Sport name</th>
+                      <th>Coach name</th>
+                      <th>Captain name</th>
+                      <th>Roster</th>
+                      <th>Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {filteredTeams.map((team) => (
+                      <tr key={team.teamId}>
+                        <td>{team.teamId}</td>
+                        <td>{team.sportName}</td>
+                        <td>{team.coachName}</td>
+                        <td>{team.captainName}</td>
+                        <td>{team.roster ? team.roster.length : 0} student(s)</td>
+                        <td>
+                          <div className="books-actions">
+                            <button
+                              type="button"
+                              className="action-btn view-btn"
+                              title="View Team"
+                              onClick={() => openView(team)}
+                            >
+                              <Eye size={14} /><span className="action-label">View</span>
+                            </button>
+                            <button
+                              type="button"
+                              className="action-btn edit-btn"
+                              title="Edit Team"
+                              onClick={() => openEdit(team)}
+                            >
+                              <Edit size={14} /><span className="action-label">Edit</span>
+                            </button>
+                            <button
+                              type="button"
+                              className="action-btn delete-btn"
+                              title="Delete Team"
+                              onClick={() => handleDelete(team)}
+                              disabled={deleting === team.teamId}
+                            >
+                              <Trash2 size={14} /><span className="action-label">{deleting === team.teamId ? 'Deleting...' : 'Delete'}</span>
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </>
+        )}
+      </div>
 
       <TeamForm
         isOpen={formOpen}
