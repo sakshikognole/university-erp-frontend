@@ -173,29 +173,37 @@ export default function TeamDetails({ teamId, onBack }) {
       )}
 
       {/* Team Details */}
-      <div className="books-table-wrap">
-        <table className="books-table">
-          <thead>
-            <tr>
-              <th>Team id</th>
-              <th>Sport name</th>
-              <th>Coach name</th>
-              <th>Captain name</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td>{team.teamId}</td>
-              <td>{team.sportName}</td>
-              <td>{team.coachName}</td>
-              <td>{team.captainName}</td>
-            </tr>
-          </tbody>
-        </table>
+      <div className="card" style={{ marginBottom: '1.5rem' }}>
+        <div className="books-table-wrap">
+          <table className="books-table">
+            <thead>
+              <tr>
+                <th>Team id</th>
+                <th>Sport name</th>
+                <th>Coach name</th>
+                <th>Captain name</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>{team.teamId}</td>
+                <td>{team.sportName}</td>
+                <td>{team.coachName}</td>
+                <td>{team.captainName}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
       </div>
 
       {/* ── Roster Section ── */}
-      <p className="st-section-title">Roster</p>
+      <div className="card" style={{ marginBottom: '1.5rem' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 14 }}>
+          <p className="st-section-title" style={{ margin: 0 }}>Roster</p>
+          <div className="table-stats-badge">
+            Total: <strong>{team.roster?.length || 0}</strong> {team.roster?.length === 1 ? 'Student' : 'Students'}
+          </div>
+        </div>
 
       {/* Add student by PRN */}
       <div style={{ marginBottom: 14 }}>
@@ -337,57 +345,65 @@ export default function TeamDetails({ teamId, onBack }) {
           </table>
         </div>
       )}
+      </div>
 
       {/* ── Student Requests Section ── */}
-      <p className="st-section-title">Student Requests</p>
-
-      {requests.length === 0 ? (
-        <p className="st-empty">No requests for this team.</p>
-      ) : (
-        <div className="books-table-wrap">
-          <table className="books-table">
-            <thead>
-              <tr>
-                <th>Prn</th>
-                <th>Student name</th>
-                <th>Status</th>
-                <th>Action</th>
-              </tr>
-            </thead>
-            <tbody>
-              {requests.map((req) => (
-                <tr key={req.requestId}>
-                  <td>{req.studentName}</td>
-                  <td>{req.studentPrn}</td>
-                  <td>
-                    <span className={`st-badge st-badge-${req.status.toLowerCase()}`}>
-                      {req.status}
-                    </span>
-                  </td>
-                  <td>
-                    {req.status === 'PENDING' && (
-                      <div className="books-actions">
-                        <button
-                          className="books-btn books-btn-sm books-btn-primary"
-                          onClick={() => acceptRequest(req.requestId)}
-                        >
-                          Accept
-                        </button>
-                        <button
-                          className="books-btn books-btn-sm books-btn-ghost"
-                          onClick={() => ignoreRequest(req.requestId)}
-                        >
-                          Ignore
-                        </button>
-                      </div>
-                    )}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+      <div className="card">
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 14 }}>
+          <p className="st-section-title" style={{ margin: 0 }}>Student Requests</p>
+          <div className="table-stats-badge">
+            Total: <strong>{requests.length}</strong> {requests.length === 1 ? 'Request' : 'Requests'}
+          </div>
         </div>
-      )}
+
+        {requests.length === 0 ? (
+          <p className="st-empty">No requests for this team.</p>
+        ) : (
+          <div className="books-table-wrap">
+            <table className="books-table">
+              <thead>
+                <tr>
+                  <th>Prn</th>
+                  <th>Student name</th>
+                  <th>Status</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody>
+                {requests.map((req) => (
+                  <tr key={req.requestId}>
+                    <td>{req.studentName}</td>
+                    <td>{req.studentPrn}</td>
+                    <td>
+                      <span className={`st-badge st-badge-${req.status.toLowerCase()}`}>
+                        {req.status}
+                      </span>
+                    </td>
+                    <td>
+                      {req.status === 'PENDING' && (
+                        <div className="books-actions">
+                          <button
+                            className="books-btn books-btn-sm books-btn-primary"
+                            onClick={() => acceptRequest(req.requestId)}
+                          >
+                            Accept
+                          </button>
+                          <button
+                            className="books-btn books-btn-sm books-btn-ghost"
+                            onClick={() => ignoreRequest(req.requestId)}
+                          >
+                            Ignore
+                          </button>
+                        </div>
+                      )}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </div>
 
     </div>
   );
