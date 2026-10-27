@@ -40,6 +40,35 @@ const API_BASE_URL = _IS_PROD ? 'https://university-erp-node.onrender.com/api' :
 //     optimistic display while real fetch is in flight).
 // ─────────────────────────────────────────────────────────────────────────────
 
+// Mobile accordion card
+function DptMobCard({ dept, num, onEdit, onDelete, expanded, onToggle }) {
+  const deptId = dept.departmentId || dept.code || 'N/A';
+  return (
+    <div className="mob-card">
+      <button type="button" className="mob-card-header" onClick={onToggle} aria-expanded={expanded}>
+        <div className="mob-card-summary">
+          <span className="mob-card-num">{num}</span>
+          <div className="mob-card-title-wrap">
+            <span className="mob-card-title">{dept.name}</span>
+            <span className="mob-card-sub">{deptId}</span>
+          </div>
+        </div>
+        <span className="mob-card-chevron">{expanded ? '\u25b2' : '\u25bc'}</span>
+      </button>
+      {expanded && (
+        <div className="mob-card-details">
+          <div className="mob-card-row"><span className="mob-card-label">Department ID</span><span className="mob-card-value mono">{deptId}</span></div>
+          <div className="mob-card-row"><span className="mob-card-label">Name</span><span className="mob-card-value">{dept.name}</span></div>
+          <div className="mob-card-actions">
+            <button type="button" className="action-btn edit-btn" onClick={onEdit}><Edit size={14} /><span className="action-label">Edit</span></button>
+            <button type="button" className="action-btn delete-btn" onClick={onDelete}><Trash2 size={14} /><span className="action-label">Delete</span></button>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
 const Departments = () => {
   const navigate = useNavigate();
   const { user, authLoading } = useAuth();
@@ -51,6 +80,7 @@ const Departments = () => {
   const [feedback, setFeedback] = useState({ type: '', message: '' });
   const [showDownloadMenu, setShowDownloadMenu] = useState(false);
   const [deleteConfirm, setDeleteConfirm] = useState(null);
+  const [dptExpanded, setDptExpanded] = useState(null);
   const downloadMenuRef = useRef(null);
   const feedbackTimerRef = useRef(null);
 
@@ -438,6 +468,8 @@ const Departments = () => {
               )}
             </div>
           ) : (
+            <>
+            <div className="dpt-desk-table">
             <table className="data-table">
               <thead>
                 <tr>
@@ -486,6 +518,25 @@ const Departments = () => {
                 })}
               </tbody>
             </table>
+            </div>
+
+            <div className="dpt-mob-list">
+              {filteredDepartments.map((dept, index) => {
+                const deptIdDisplay = dept.departmentId || dept.code || 'N/A';
+                return (
+                  <DptMobCard
+                    key={dept._id || deptIdDisplay || index}
+                    dept={dept}
+                    num={index + 1}
+                    onEdit={() => openEditModal(dept._id || deptIdDisplay)}
+                    onDelete={() => setDeleteConfirm(dept)}
+                    expanded={dptExpanded === (dept._id || deptIdDisplay)}
+                    onToggle={() => setDptExpanded(prev => prev === (dept._id || deptIdDisplay) ? null : (dept._id || deptIdDisplay))}
+                  />
+                );
+              })}
+            </div>
+            </>
           )}
         </div>
       </div>
