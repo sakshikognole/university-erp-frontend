@@ -99,10 +99,14 @@ export default function SelectStudent() {
 
   return (
     <div className="page-container">
-      <h1 className="page-title">Generate Certificate</h1>
-      <p className="page-subtitle">
-        Search and select a student, then click Continue.
-      </p>
+      <div className="feature-page-header">
+        <div className="feature-page-header-info">
+          <h1 className="page-title">Generate Certificate</h1>
+          <p className="page-subtitle">
+            Search and select a student, then click Continue.
+          </p>
+        </div>
+      </div>
 
       {/* Observation: warm-up hint for Render cold start */}
       {loading && (
@@ -133,10 +137,29 @@ export default function SelectStudent() {
             />
           </div>
           {selected && (
-            <span className="stu-selected-tag">
-              Selected: <strong>{selected.studentName}</strong> ({selected.studentId})
-              <button onClick={() => setSelected(null)}>x</button>
-            </span>
+            <div className="stu-selected-tag">
+              <span className="stu-selected-tag-text">
+                Selected: <strong>{selected.studentName}</strong> ({selected.studentId})
+              </span>
+              <div className="stu-selected-tag-actions">
+                <button
+                  type="button"
+                  className="stu-btn stu-btn-primary stu-btn-sm"
+                  onClick={handleContinue}
+                  style={{ padding: '3px 10px', fontSize: 12, height: 'auto', whiteSpace: 'nowrap' }}
+                >
+                  Continue →
+                </button>
+                <button
+                  type="button"
+                  className="stu-selected-clear-btn"
+                  onClick={() => setSelected(null)}
+                  title="Clear selection"
+                >
+                  ✕
+                </button>
+              </div>
+            </div>
           )}
         </div>
 
@@ -182,8 +205,8 @@ export default function SelectStudent() {
                           <td style={{ color: 'var(--text-secondary)', fontSize: 13 }}>
                             {pageData.pageNumber * size + i + 1}
                           </td>
-                          <td style={{ fontFamily: 'monospace', fontSize: '0.82rem' }}>
-                            {s.studentId}
+                          <td>
+                            <span className="code-badge">{s.studentId}</span>
                           </td>
                           <td style={{ fontWeight: 500 }}>{s.studentName}</td>
                           <td><span className="books-badge">{s.gender}</span></td>
@@ -215,6 +238,7 @@ export default function SelectStudent() {
                     <div style={{
                       display: 'flex', alignItems: 'center', gap: 10,
                       padding: '10px 14px',
+                      maxWidth: '100%', boxSizing: 'border-box', overflow: 'hidden',
                     }}>
                       <span style={{
                         width: 28, height: 28, borderRadius: '50%',
@@ -225,15 +249,17 @@ export default function SelectStudent() {
                       }}>
                         {pageData.pageNumber * size + i + 1}
                       </span>
-                      <div style={{ flex: 1, minWidth: 0 }}>
+                      <div style={{ flex: 1, minWidth: 0, overflow: 'hidden' }}>
                         <p style={{ margin: 0, fontWeight: 700, fontSize: 14,
                                     overflow: 'hidden', textOverflow: 'ellipsis',
                                     whiteSpace: 'nowrap' }}>
                           {s.studentName}
                         </p>
-                        <p style={{ margin: 0, fontSize: 12,
-                                    color: 'var(--text-secondary)' }}>
-                          {s.studentId} &nbsp;·&nbsp; {s.studyingYear}
+                        <p style={{ margin: '4px 0 2px 0', fontSize: 12,
+                                    color: 'var(--text-secondary)', display: 'flex', alignItems: 'center', gap: 6 }}>
+                          <span className="code-badge">{s.studentId}</span>
+                          <span>·</span>
+                          <span>{s.studyingYear}</span>
                         </p>
                         <p style={{ margin: 0, fontSize: 12,
                                     color: 'var(--text-secondary)',
@@ -244,9 +270,9 @@ export default function SelectStudent() {
                       </div>
                       <span style={{
                         fontSize: 11, color: 'var(--text-secondary)',
-                        flexShrink: 0,
+                        flexShrink: 0, textAlign: 'right', whiteSpace: 'nowrap',
                       }}>
-                        {s.gender} · {s.academicYear}
+                        {s.gender ? `${s.gender} · ` : ''}{s.academicYear}
                       </span>
                     </div>
                   </div>

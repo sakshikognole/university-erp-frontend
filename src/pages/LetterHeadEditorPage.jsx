@@ -238,10 +238,14 @@ export default function LetterHeadEditorPage() {
 
   return (
     <div className="page-container">
-      <h1 className="page-title">Letterhead Editor</h1>
-      <p className="page-subtitle">
-        These details appear on every generated certificate PDF.
-      </p>
+      <div className="feature-page-header">
+        <div className="feature-page-header-info">
+          <h1 className="page-title">Letterhead Editor</h1>
+          <p className="page-subtitle">
+            These details appear on every generated certificate PDF.
+          </p>
+        </div>
+      </div>
 
       <div style={{ display: 'flex', gap: 24, flexWrap: 'wrap', alignItems: 'flex-start' }}>
 

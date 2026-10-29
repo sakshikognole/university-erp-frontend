@@ -122,14 +122,16 @@ export default function SportsPage() {
     <div className="page-container">
 
       {/* Header */}
-      <div className="books-page-header">
-        <div>
+      <div className="feature-page-header">
+        <div className="feature-page-header-info">
           <h1 className="page-title">Sports</h1>
           <p className="page-subtitle">Manage all university sports</p>
         </div>
-        <button className="books-btn books-btn-primary" onClick={openAdd}>
-          + Add Sport
-        </button>
+        <div className="feature-page-header-actions">
+          <button className="books-btn books-btn-primary" onClick={openAdd}>
+            + Add Sport
+          </button>
+        </div>
       </div>
 
       {/* Notifications */}

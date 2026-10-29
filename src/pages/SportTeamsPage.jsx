@@ -38,7 +38,7 @@ function MobileTeamCard({ team, index, onView, onEdit, onDelete, deleting }) {
       </button>
       {open && (
         <div className="book-mob-details">
-          <div className="book-mob-row"><span className="book-mob-label">Team ID</span><span className="book-mob-value mono">{team.teamId}</span></div>
+          <div className="book-mob-row"><span className="book-mob-label">Team ID</span><span className="code-badge">{team.teamId}</span></div>
           <div className="book-mob-row"><span className="book-mob-label">Sport ID</span><span className="book-mob-value">{team.sportId}</span></div>
           <div className="book-mob-row"><span className="book-mob-label">Coach</span><span className="book-mob-value">{team.coachName}</span></div>
           <div className="book-mob-row"><span className="book-mob-label">Members</span><span className="book-mob-value">{Array.isArray(team.members) ? team.members.length : 0}</span></div>
@@ -185,14 +185,16 @@ export default function SportTeamsPage() {
     <div className="page-container">
 
       {/* Header */}
-      <div className="books-page-header">
-        <div>
+      <div className="feature-page-header">
+        <div className="feature-page-header-info">
           <h1 className="page-title">Sport Teams</h1>
           <p className="page-subtitle">Manage all university sport teams</p>
         </div>
-        <button className="books-btn books-btn-primary" onClick={openAdd}>
-          + Add Team
-        </button>
+        <div className="feature-page-header-actions">
+          <button className="books-btn books-btn-primary" onClick={openAdd}>
+            + Add Team
+          </button>
+        </div>
       </div>
 
       {/* Notifications */}
@@ -279,7 +281,7 @@ export default function SportTeamsPage() {
                       <tr key={team.teamId}>
                         <td style={{ color: '#9ca3af' }}>{idx + 1}</td>
                         <td>
-                          <span style={{ fontFamily: 'monospace', fontSize: '0.82rem', fontWeight: 600 }}>
+                          <span className="code-badge">
                             {team.teamId}
                           </span>
                         </td>

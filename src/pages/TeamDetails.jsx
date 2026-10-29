@@ -151,8 +151,8 @@ export default function TeamDetails({ teamId, onBack }) {
       </button>
 
       {/* Page title */}
-      <div className="st-page-header">
-        <div>
+      <div className="feature-page-header">
+        <div className="feature-page-header-info">
           <h1 className="page-title">{team.teamId}</h1>
           <p className="page-subtitle">{team.sportName} Team</p>
         </div>
@@ -213,7 +213,7 @@ export default function TeamDetails({ teamId, onBack }) {
           <div className="books-form-group" style={{ flex: 1 }}>
             <label className="books-form-label">PRN number</label>
             <input
-              className="books-form-control"
+              className="books-form-control roster-form-control"
               placeholder="Enter PRN"
               value={prnInput}
               onChange={handlePrnInput}
@@ -222,7 +222,7 @@ export default function TeamDetails({ teamId, onBack }) {
           <div className="books-form-group" style={{ flex: 1 }}>
             <label className="books-form-label">Student name</label>
             <input
-              className="books-form-control"
+              className="books-form-control roster-form-control"
               value={
                 namePreview === 'Looking up...' ? 'Looking up...' :
                 namePreview === 'Not found' ? 'Student not found' :
@@ -252,15 +252,17 @@ export default function TeamDetails({ teamId, onBack }) {
             <table className="books-table">
               <thead>
                 <tr>
+                  <th>#</th>
                   <th>Prn</th>
                   <th>Student name</th>
                   <th>Action</th>
                 </tr>
               </thead>
               <tbody>
-                {prnList.map((p) => (
+                {prnList.map((p, index) => (
                   <tr key={p.prn}>
-                    <td>{p.prn}</td>
+                    <td>{index + 1}</td>
+                    <td><span className="code-badge">{p.prn}</span></td>
                     <td style={{ fontWeight: 500 }}>{p.studentName}</td>
                     <td>
                       <div className="books-actions">
@@ -321,15 +323,17 @@ export default function TeamDetails({ teamId, onBack }) {
           <table className="books-table">
             <thead>
               <tr>
+                <th>#</th>
                 <th>Prn</th>
                 <th>Student name</th>
                 <th>Action</th>
               </tr>
             </thead>
             <tbody>
-              {team.roster.map((entry) => (
+              {team.roster.map((entry, index) => (
                 <tr key={entry.studentPrn}>
-                  <td>{entry.studentPrn}</td>
+                  <td>{index + 1}</td>
+                  <td><span className="code-badge">{entry.studentPrn}</span></td>
                   <td>{entry.studentName}</td>
                   <td>
                     <button
@@ -363,6 +367,7 @@ export default function TeamDetails({ teamId, onBack }) {
             <table className="books-table">
               <thead>
                 <tr>
+                  <th>#</th>
                   <th>Prn</th>
                   <th>Student name</th>
                   <th>Status</th>
@@ -370,10 +375,11 @@ export default function TeamDetails({ teamId, onBack }) {
                 </tr>
               </thead>
               <tbody>
-                {requests.map((req) => (
+                {requests.map((req, index) => (
                   <tr key={req.requestId}>
+                    <td>{index + 1}</td>
+                    <td><span className="code-badge">{req.studentPrn}</span></td>
                     <td>{req.studentName}</td>
-                    <td>{req.studentPrn}</td>
                     <td>
                       <span className={`st-badge st-badge-${req.status.toLowerCase()}`}>
                         {req.status}

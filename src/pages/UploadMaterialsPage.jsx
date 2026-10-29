@@ -461,8 +461,8 @@ export default function UploadMaterialsPage() {
     <div className="page-container">
 
       {/* Header */}
-      <div className="dm-page-header">
-        <div>
+      <div className="feature-page-header">
+        <div className="feature-page-header-info">
           <h1 className="page-title">Upload Materials</h1>
           <p className="page-subtitle">
             Select a folder and upload study materials for students

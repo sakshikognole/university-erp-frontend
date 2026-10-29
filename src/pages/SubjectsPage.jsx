@@ -220,6 +220,10 @@ export default function SubjectsPage() {
   const [success, setSuccess] = useState('');
   const [error,   setError]   = useState('');
 
+  // Mobile accordion state
+  const [expandedId, setExpandedId] = useState(null);
+  const toggleExpand = (id) => setExpandedId(prev => prev === id ? null : id);
+
   useEffect(() => {
     if (!success && !error) return;
     const t = setTimeout(() => { setSuccess(''); setError(''); }, 4000);
@@ -310,12 +314,12 @@ export default function SubjectsPage() {
     <div className="page-container">
 
       {/* ── Header ── */}
-      <div className="page-header-row">
-        <div>
+      <div className="feature-page-header">
+        <div className="feature-page-header-info">
           <h1 className="page-title">Subjects</h1>
           <p className="page-subtitle">Manage university subjects</p>
         </div>
-        <div className="header-actions-group">
+        <div className="feature-page-header-actions">
           <button
             type="button"
             className="books-btn books-btn-primary"
@@ -481,59 +485,71 @@ export default function SubjectsPage() {
 
               {/* ── Mobile cards ── */}
               <div className="book-mob-list">
-                {subjects.map((sub, i) => (
-                  <div key={sub.subjectId} className="book-mob-card">
-                    <button
-                      type="button"
-                      className="book-mob-header"
-                      onClick={() => openView(sub)}
-                    >
-                      <div className="book-mob-summary">
-                        <span className="book-mob-num">{i + 1}</span>
-                        <div className="book-mob-title-wrap">
-                          <span className="book-mob-title">{sub.subjectName}</span>
-                          <span className="code-badge" style={{ fontSize: '0.75rem', marginTop: 2 }}>
-                            {sub.subjectId}
-                          </span>
+                {subjects.map((sub, i) => {
+                  const isExpanded = expandedId === sub.subjectId;
+                  return (
+                    <div key={sub.subjectId} className="book-mob-card">
+                      <button
+                        type="button"
+                        className="book-mob-header"
+                        onClick={() => toggleExpand(sub.subjectId)}
+                        aria-expanded={isExpanded}
+                      >
+                        <div className="book-mob-summary">
+                          <span className="book-mob-num">{i + 1}</span>
+                          <div className="book-mob-title-wrap">
+                            <span className="book-mob-title">{sub.subjectName}</span>
+                            <span className="book-mob-author">{sub.subjectId}</span>
+                          </div>
                         </div>
-                      </div>
-                      <span className="book-mob-chevron">▼</span>
-                    </button>
-                    <div className="book-mob-details">
-                      <div className="book-mob-row">
-                        <span className="book-mob-label">Description</span>
-                        <span className="book-mob-value">{sub.description || '—'}</span>
-                      </div>
-                      <div className="book-mob-actions" style={{ display: 'flex', gap: '8px', marginTop: '10px' }}>
-                        <button
-                          type="button"
-                          className="action-btn view-btn"
-                          style={{ flex: 1, justifyContent: 'center' }}
-                          onClick={() => openView(sub)}
-                        >
-                          <Eye size={14} /><span className="action-label">View</span>
-                        </button>
-                        <button
-                          type="button"
-                          className="action-btn edit-btn"
-                          style={{ flex: 1, justifyContent: 'center' }}
-                          onClick={() => openEdit(sub)}
-                        >
-                          <Edit size={14} /><span className="action-label">Edit</span>
-                        </button>
-                        <button
-                          type="button"
-                          className="action-btn delete-btn"
-                          style={{ flex: 1, justifyContent: 'center' }}
-                          onClick={() => handleDelete(sub)}
-                          disabled={deleting === sub.subjectId}
-                        >
-                          <Trash2 size={14} /><span className="action-label">{deleting === sub.subjectId ? 'Deleting...' : 'Delete'}</span>
-                        </button>
-                      </div>
+                        <span className="book-mob-chevron">{isExpanded ? '▲' : '▼'}</span>
+                      </button>
+                      {isExpanded && (
+                        <div className="book-mob-details">
+                          <div className="book-mob-row">
+                            <span className="book-mob-label">Subject ID</span>
+                            <span className="book-mob-value mono">{sub.subjectId}</span>
+                          </div>
+                          <div className="book-mob-row">
+                            <span className="book-mob-label">Subject Name</span>
+                            <span className="book-mob-value">{sub.subjectName}</span>
+                          </div>
+                          <div className="book-mob-row">
+                            <span className="book-mob-label">Description</span>
+                            <span className="book-mob-value">{sub.description || '—'}</span>
+                          </div>
+                          <div className="book-mob-actions" style={{ display: 'flex', gap: '8px', marginTop: '10px' }}>
+                            <button
+                              type="button"
+                              className="action-btn view-btn"
+                              style={{ flex: 1, justifyContent: 'center' }}
+                              onClick={() => openView(sub)}
+                            >
+                              <Eye size={14} /><span className="action-label">View</span>
+                            </button>
+                            <button
+                              type="button"
+                              className="action-btn edit-btn"
+                              style={{ flex: 1, justifyContent: 'center' }}
+                              onClick={() => openEdit(sub)}
+                            >
+                              <Edit size={14} /><span className="action-label">Edit</span>
+                            </button>
+                            <button
+                              type="button"
+                              className="action-btn delete-btn"
+                              style={{ flex: 1, justifyContent: 'center' }}
+                              onClick={() => handleDelete(sub)}
+                              disabled={deleting === sub.subjectId}
+                            >
+                              <Trash2 size={14} /><span className="action-label">{deleting === sub.subjectId ? 'Deleting...' : 'Delete'}</span>
+                            </button>
+                          </div>
+                        </div>
+                      )}
                     </div>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             </>
           )}

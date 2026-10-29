@@ -96,11 +96,12 @@ function AddRosterModal({ isOpen, teamId, onClose, onSuccess }) {
           {prnList.length > 0 && (
             <div className="books-table-wrap" style={{ marginTop: 8 }}>
               <table className="books-table">
-                <thead><tr><th>Prn</th><th>Student name</th><th style={{width:60}}>Del</th></tr></thead>
+                <thead><tr><th>#</th><th>Prn</th><th>Student name</th><th style={{width:60}}>Del</th></tr></thead>
                 <tbody>
-                  {prnList.map((p) => (
+                  {prnList.map((p, i) => (
                     <tr key={p.prn}>
-                      <td style={{ fontFamily: 'monospace' }}>{p.prn}</td>
+                      <td>{i + 1}</td>
+                      <td><span className="code-badge">{p.prn}</span></td>
                       <td style={{ fontWeight: 500 }}>{p.studentName}</td>
                       <td>
                         <button className="books-btn books-btn-sm books-btn-danger"
@@ -152,7 +153,7 @@ function SportTeamMobileCard({ team, index, isExpanded, onToggle, onView, onEdit
         <div className="book-mob-details">
           <div className="book-mob-row">
             <span className="book-mob-label">Team ID</span>
-            <span className="book-mob-value mono">{team.teamId}</span>
+            <span className="code-badge">{team.teamId}</span>
           </div>
           <div className="book-mob-row">
             <span className="book-mob-label">Sport Name</span>
@@ -334,14 +335,16 @@ export default function SportTeamPage() {
   return (
     <div className="page-container">
 
-      <div className="st-page-header">
-        <div>
+      <div className="feature-page-header">
+        <div className="feature-page-header-info">
           <h1 className="page-title">Sport Teams</h1>
           <p className="page-subtitle">Manage university sport teams and rosters</p>
         </div>
-        <button className="books-btn books-btn-primary" onClick={openAdd}>
-          + Add Team
-        </button>
+        <div className="feature-page-header-actions">
+          <button className="books-btn books-btn-primary" onClick={openAdd}>
+            + Add Team
+          </button>
+        </div>
       </div>
 
       {success && (
@@ -382,14 +385,14 @@ export default function SportTeamPage() {
             <table className="books-table">
               <thead>
                 <tr>
-                  <th>Team id</th><th>Sport name</th><th>Coach name</th>
+                  <th>#</th><th>Team id</th><th>Sport name</th><th>Coach name</th>
                   <th>Captain name</th><th>Roster</th><th>Actions</th>
                 </tr>
               </thead>
               <tbody>
                 {Array.from({ length: 5 }).map((_, i) => (
                   <tr key={i}>
-                    {[80, 110, 120, 120, 60, 120].map((w, j) => (
+                    {[40, 80, 110, 120, 120, 60, 120].map((w, j) => (
                       <td key={j}>
                         <div style={{
                           width: w, height: 13, borderRadius: 4,
@@ -433,6 +436,7 @@ export default function SportTeamPage() {
                 <table className="books-table">
                   <thead>
                     <tr>
+                      <th>#</th>
                       <th>Team id</th>
                       <th>Sport name</th>
                       <th>Coach name</th>
@@ -442,9 +446,10 @@ export default function SportTeamPage() {
                     </tr>
                   </thead>
                   <tbody>
-                    {filteredTeams.map((team) => (
+                    {filteredTeams.map((team, index) => (
                       <tr key={team.teamId}>
-                        <td>{team.teamId}</td>
+                        <td>{index + 1}</td>
+                        <td><span className="code-badge">{team.teamId}</span></td>
                         <td>{team.sportName}</td>
                         <td>{team.coachName}</td>
                         <td>{team.captainName}</td>

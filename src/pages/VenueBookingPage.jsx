@@ -470,14 +470,16 @@ export default function VenueBookingPage() {
     <div className="page-container">
 
       {/* Header with button top right like Books */}
-      <div className="books-page-header">
-        <div>
+      <div className="feature-page-header">
+        <div className="feature-page-header-info">
           <h1 className="page-title">Venue Booking</h1>
           <p className="page-subtitle">Submit and manage venue booking requests</p>
         </div>
-        <button className="books-btn books-btn-primary" onClick={() => { setShowForm(true); setFormErrs({}); }}>
-          + New Booking
-        </button>
+        <div className="feature-page-header-actions">
+          <button className="books-btn books-btn-primary" onClick={() => { setShowForm(true); setFormErrs({}); }}>
+            + New Booking
+          </button>
+        </div>
       </div>
 
       {/* Alerts */}
@@ -653,8 +655,7 @@ export default function VenueBookingPage() {
                           {idx + 1}
                         </td>
                         <td style={{ textAlign: 'center' }}>
-                          <span style={{ fontFamily: 'monospace', fontSize: '0.8rem',
-                                         fontWeight: 600 }}>
+                          <span className="code-badge">
                             {b.bookingId}
                           </span>
                         </td>
@@ -723,8 +724,7 @@ export default function VenueBookingPage() {
                     <div style={{ display: 'flex', justifyContent: 'space-between',
                                   alignItems: 'flex-start', marginBottom: 8 }}>
                       <div>
-                        <span style={{ fontFamily: 'monospace', fontSize: '0.82rem',
-                                       fontWeight: 700, color: '#1e3a5f' }}>
+                        <span className="code-badge">
                           {b.bookingId}
                         </span>
                         <span style={{ marginLeft: 8, fontSize: 12,

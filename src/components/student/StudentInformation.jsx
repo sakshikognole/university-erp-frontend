@@ -13,14 +13,14 @@ export default function StudentInformation({ student }) {
   ];
 
   return (
-    <div className="stu-info-card">
-      <table className="stu-info-table">
+    <div className="stu-info-card" style={{ maxWidth: '100%', boxSizing: 'border-box', overflow: 'hidden' }}>
+      <table className="stu-info-table" style={{ tableLayout: 'fixed', width: '100%' }}>
         <tbody>
           {fields.map(({ label, value }) => (
             <tr key={label}>
-              <td className="stu-info-label">{label}</td>
-              <td className="stu-info-sep">:</td>
-              <td className="stu-info-value">{value}</td>
+              <td className="stu-info-label" style={{ verticalAlign: 'top', boxSizing: 'border-box' }}>{label}</td>
+              <td className="stu-info-sep" style={{ verticalAlign: 'top', textAlign: 'center', width: 16 }}>:</td>
+              <td className="stu-info-value" style={{ verticalAlign: 'top', wordBreak: 'break-word', overflowWrap: 'anywhere', boxSizing: 'border-box' }}>{value}</td>
             </tr>
           ))}
         </tbody>
