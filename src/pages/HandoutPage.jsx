@@ -95,11 +95,8 @@ export default function HandoutPage() {
     <div className="page-container">
 
       {/* Header */}
-      <div className="books-page-header" style={{
-        display: 'flex', alignItems: 'center',
-        justifyContent: 'space-between', flexWrap: 'nowrap', gap: 12,
-      }}>
-        <div style={{ minWidth: 0 }}>
+      <div className="feature-page-header">
+        <div className="feature-page-header-info">
           <h1 className="page-title">Handout</h1>
           <p className="page-subtitle">
             Select students and certificate types, then download all as a ZIP.

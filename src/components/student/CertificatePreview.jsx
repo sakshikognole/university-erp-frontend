@@ -13,7 +13,10 @@ export default function CertificatePreview({ student, customContent, docType }) 
   const [mobile,      setMobile]      = useState(false);
 
   useEffect(() => {
-    setMobile(isMobile());
+    const check = () => setMobile(isMobile());
+    check();
+    window.addEventListener('resize', check);
+    return () => window.removeEventListener('resize', check);
   }, []);
 
   useEffect(() => {

@@ -100,12 +100,12 @@ export default function HostelPage() {
     <div className="page-container">
 
       {/* ── Page Header ── */}
-      <div className="page-header-row">
-        <div>
+      <div className="feature-page-header">
+        <div className="feature-page-header-info">
           <h1 className="page-title">Hostel Management</h1>
           <p className="page-subtitle">Manage hostel blocks, rooms and student allotments</p>
         </div>
-        <div className="header-actions-group">
+        <div className="feature-page-header-actions">
           <button
             type="button"
             className="books-btn books-btn-primary"

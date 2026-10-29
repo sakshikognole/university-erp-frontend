@@ -109,14 +109,14 @@ export default function ExamsPage() {
     <div className="page-container">
 
       {/* Header consistent with Students, Staff, and Departments */}
-      <div className="page-header-row">
-        <div>
+      <div className="feature-page-header">
+        <div className="feature-page-header-info">
           <h1 className="page-title">Exam Management</h1>
           <p className="page-subtitle">
             Manage exams and student marks
           </p>
         </div>
-        <div className="header-actions-group">
+        <div className="feature-page-header-actions">
           <button
             type="button"
             className="btn btn-primary"

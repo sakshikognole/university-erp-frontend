@@ -40,7 +40,7 @@ function BookMobileCard({ book, index, page, size, isExpanded, onToggle, onView,
         <div className="book-mob-details">
           <div className="book-mob-row">
             <span className="book-mob-label">Book ID</span>
-            <span className="book-mob-value mono">{book.bookId || '—'}</span>
+            <span className="code-badge">{book.bookId || '—'}</span>
           </div>
           <div className="book-mob-row">
             <span className="book-mob-label">Total Copies</span>
@@ -200,14 +200,16 @@ export default function BooksPage() {
 
   return (
     <div className="page-container">
-      <div className="books-page-header">
-        <div>
+      <div className="feature-page-header">
+        <div className="feature-page-header-info">
           <h1 className="page-title">Books</h1>
           <p className="page-subtitle">Manage all library books</p>
         </div>
-        <button className="books-btn books-btn-primary" onClick={openAdd}>
-          + Add Book
-        </button>
+        <div className="feature-page-header-actions">
+          <button className="books-btn books-btn-primary" onClick={openAdd}>
+            + Add Book
+          </button>
+        </div>
       </div>
 
       <Alert type={alert.type} message={alert.message} onClose={dismiss} />
@@ -311,7 +313,7 @@ export default function BooksPage() {
                     ) : books.map((b, i) => (
                       <tr key={b.id}>
                         <td>{page * size + i + 1}</td>
-                        <td><span style={{fontFamily:'monospace',fontSize:'0.78rem',color:'#6b7280'}}>{b.bookId || '—'}</span></td>
+                        <td><span className="code-badge">{b.bookId || '—'}</span></td>
                         <td>{b.bookTitle}</td>
                         <td>{b.authorName}</td>
                         <td>{b.totalCopies}</td>

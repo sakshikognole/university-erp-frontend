@@ -296,8 +296,8 @@ export default function HostelBlockDetails({ block: blockProp, onBack }) {
     <div className="page-container">
 
       {/* ── Page Header ── */}
-      <div className="page-header-row" style={{ marginBottom: '1.5rem' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+      <div className="feature-page-header">
+        <div className="feature-page-header-info" style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
           <button
             type="button"
             className="btn-back"
@@ -323,7 +323,7 @@ export default function HostelBlockDetails({ block: blockProp, onBack }) {
             </p>
           </div>
         </div>
-        <div className="header-actions-group">
+        <div className="feature-page-header-actions">
           <button
             type="button"
             className="books-btn books-btn-primary"

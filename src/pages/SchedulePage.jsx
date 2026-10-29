@@ -572,7 +572,7 @@ function ScheduleMobileCard({ sch, index, activeTab, isExpanded, onToggle, onEdi
           {/* Schedule ID */}
           <div className="sch-mob-row">
             <span className="sch-mob-label">Schedule id</span>
-            <span className="sch-mob-value mono">{sch.scheduleId || '—'}</span>
+            <span className="code-badge">{sch.scheduleId || '—'}</span>
           </div>
 
           {isExam ? (
@@ -583,7 +583,7 @@ function ScheduleMobileCard({ sch, index, activeTab, isExpanded, onToggle, onEdi
               </div>
               <div className="sch-mob-row">
                 <span className="sch-mob-label">Exam id</span>
-                <span className="sch-mob-value mono">{sch.examId || '—'}</span>
+                {sch.examId ? <span className="code-badge">{sch.examId}</span> : <span className="sch-mob-value">—</span>}
               </div>
               <div className="sch-mob-row">
                 <span className="sch-mob-label">Start time</span>
@@ -797,17 +797,19 @@ export default function SchedulePage() {
   return (
     <div className="page-container">
       {/* Header */}
-      <div className="books-page-header" style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 12, flexWrap: 'wrap' }}>
-        <div style={{ minWidth: 0 }}>
+      <div className="feature-page-header">
+        <div className="feature-page-header-info">
           <h1 className="page-title">Schedule</h1>
           <p className="page-subtitle">Manage exam and class schedules</p>
         </div>
-        <div style={{ display: 'flex', gap: 8, flexShrink: 0, flexWrap: 'nowrap' }}>
+        <div className="feature-page-header-actions">
           <button className="books-btn books-btn-primary" onClick={openExamAdd}>
-            + Add Exam Schedule
+            <span className="desk-only-text">+ Add Exam Schedule</span>
+            <span className="mob-only-text">+ Add Exam</span>
           </button>
           <button className="books-btn books-btn-primary" onClick={() => setClassModalOpen(true)}>
-            + Add Class Schedule
+            <span className="desk-only-text">+ Add Class Schedule</span>
+            <span className="mob-only-text">+ Add Class</span>
           </button>
         </div>
       </div>
@@ -922,18 +924,14 @@ export default function SchedulePage() {
                   <tr key={sch.scheduleId}>
                     <td style={{ color: '#9ca3af', fontSize: 13 }}>{i + 1}</td>
                     <td>
-                      <span style={{
-                        fontFamily: 'monospace', fontSize: '0.78rem',
-                        background: '#f9fafb', padding: '2px 8px',
-                        borderRadius: 6, color: '#6b7280',
-                      }}>
+                      <span className="code-badge">
                         {sch.scheduleId}
                       </span>
                     </td>
                     {activeTab === 'exam' ? (
                       <>
                         <td style={{ fontWeight: 500 }}>{sch.examName || sch.subjectName}</td>
-                        <td style={{ fontSize: 13 }}>{sch.examId || '—'}</td>
+                        <td>{sch.examId ? <span className="code-badge">{sch.examId}</span> : '—'}</td>
                         <td style={{ fontSize: 13, whiteSpace: 'nowrap' }}>
                           {sch.daySlots?.[0]?.startTime || '—'}
                         </td>

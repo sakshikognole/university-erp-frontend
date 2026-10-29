@@ -238,7 +238,7 @@ function ClsMobCard({ c, num, onEdit, onDelete, deleting, expanded, onToggle, sh
       </div>
       {expanded && (
         <div className="mob-card-details">
-          <div className="mob-card-row"><span className="mob-card-label">Classroom ID</span><span className="mob-card-value mono">{c.classroomId}</span></div>
+          <div className="mob-card-row"><span className="mob-card-label">Classroom ID</span><span className="code-badge">{c.classroomId}</span></div>
           <div className="mob-card-row"><span className="mob-card-label">Rows</span><span className="mob-card-value">{c.rows}</span></div>
           <div className="mob-card-row"><span className="mob-card-label">Columns</span><span className="mob-card-value">{c.columns}</span></div>
           <div className="mob-card-row"><span className="mob-card-label">Extra</span><span className="mob-card-value">{c.extra}</span></div>
@@ -389,6 +389,7 @@ export default function ClassroomPage() {
       setError('Please select at least one classroom.');
       return;
     }
+    setError('');
     setBunchName('');
     setBunchModalOpen(true);
   };
@@ -433,21 +434,39 @@ export default function ClassroomPage() {
   return (
     <div className="page-container">
       {/* Header */}
-      <div className="books-page-header" style={{
-        display: 'flex', alignItems: 'center',
-        justifyContent: 'space-between', flexWrap: 'wrap', gap: 12,
-      }}>
-        <div style={{ minWidth: 0 }}>
+      <div className="feature-page-header">
+        <div className="feature-page-header-info">
           <h1 className="page-title">Classrooms</h1>
           <p className="page-subtitle">Manage classrooms with capacity and examiners</p>
         </div>
-        <button
-          className="books-btn books-btn-primary"
-          style={{ flexShrink: 0 }}
-          onClick={openAdd}
-        >
-          + Add Classroom
-        </button>
+        <div className="feature-page-header-actions">
+          <button
+            type="button"
+            className="books-btn books-btn-primary"
+            onClick={() => {
+              if (!showCheckboxes) {
+                setShowCheckboxes(true);
+              } else if (selectedClassrooms.length > 0) {
+                openBunchModal();
+              } else {
+                setSelectedClassrooms([]);
+                setShowCheckboxes(false);
+              }
+            }}
+          >
+            {!showCheckboxes
+              ? 'Create bunch'
+              : selectedClassrooms.length > 0
+              ? `Create bunch (${selectedClassrooms.length})`
+              : 'Cancel bunch'}
+          </button>
+          <button
+            className="books-btn books-btn-primary"
+            onClick={openAdd}
+          >
+            + Add Classroom
+          </button>
+        </div>
       </div>
 
       {/* Alerts */}
@@ -488,12 +507,16 @@ export default function ClassroomPage() {
                 <thead>
                   <tr>
                     {showCheckboxes && (
-                      <th style={{ width: 50 }}>
-                        <input 
-                          type="checkbox" 
-                          onChange={handleSelectAll}
-                          checked={selectedClassrooms.length === classrooms.length && classrooms.length > 0}
-                        />
+                      <th style={{ width: 95, whiteSpace: 'nowrap' }}>
+                        <label style={{ display: 'inline-flex', alignItems: 'center', gap: 6, cursor: 'pointer', margin: 0, fontWeight: 600 }}>
+                          <span>Select</span>
+                          <input 
+                            type="checkbox" 
+                            onChange={handleSelectAll}
+                            checked={selectedClassrooms.length === classrooms.length && classrooms.length > 0}
+                            style={{ cursor: 'pointer', margin: 0 }}
+                          />
+                        </label>
                       </th>
                     )}
                     <th style={{ width: 42 }}>#</th>
@@ -521,11 +544,7 @@ export default function ClassroomPage() {
                       )}
                       <td style={{ color: '#9ca3af', fontSize: 13 }}>{page * size + i + 1}</td>
                       <td>
-                        <span style={{
-                          fontFamily: 'monospace', fontSize: '0.78rem',
-                          background: '#f9fafb', padding: '2px 8px',
-                          borderRadius: 6, color: '#6b7280',
-                        }}>
+                        <span className="code-badge">
                           {c.classroomId}
                         </span>
                       </td>
@@ -598,34 +617,6 @@ export default function ClassroomPage() {
             }}
           />
 
-          {/* Selection & Bunch Action Controls */}
-          <div style={{ marginTop: 16, display: 'flex', justifyContent: 'center', alignItems: 'center', gap: 12, flexWrap: 'wrap' }}>
-            <button 
-              type="button"
-              className={`books-btn ${showCheckboxes ? 'books-btn-secondary' : 'books-btn-primary'}`}
-              onClick={() => {
-                if (showCheckboxes) {
-                  setSelectedClassrooms([]);
-                  setShowCheckboxes(false);
-                } else {
-                  setShowCheckboxes(true);
-                }
-              }}
-            >
-              {showCheckboxes ? 'Hide Selection' : 'Select Multiple'}
-            </button>
-
-            {showCheckboxes && selectedClassrooms.length > 0 && (
-              <button 
-                type="button"
-                className="books-btn books-btn-primary"
-                onClick={openBunchModal}
-                style={{ minWidth: 180 }}
-              >
-                Create Bunch ({selectedClassrooms.length} selected)
-              </button>
-            )}
-          </div>
         </>
       )}
 
@@ -638,21 +629,15 @@ export default function ClassroomPage() {
               const bunchClassrooms = classrooms.filter(c => bunch.classroomIds.includes(c.classroomId));
               return (
                 <div key={bunch.bunchId} className="card" style={{ padding: 16 }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'start', marginBottom: 12 }}>
-                    <div>
-                      <h3 style={{ fontSize: 16, fontWeight: 600, marginBottom: 4 }}>{bunch.bunchName}</h3>
-                      <span style={{
-                        fontFamily: 'monospace', fontSize: '0.75rem',
-                        background: '#f9fafb', padding: '2px 6px',
-                        borderRadius: 4, color: '#6b7280',
-                      }}>
-                        {bunch.bunchId}
-                      </span>
-                    </div>
-                    <button
-                      className="books-btn books-btn-sm books-btn-danger"
-                      onClick={() => handleDeleteBunch(bunch.bunchId)}
-                    ><span style={{display:"inline-flex",alignItems:"center",gap:4}}><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg> Delete</span></button>
+                  <div style={{ marginBottom: 12 }}>
+                    <h3 style={{ fontSize: 16, fontWeight: 600, marginBottom: 4 }}>{bunch.bunchName}</h3>
+                    <span style={{
+                      fontFamily: 'monospace', fontSize: '0.75rem',
+                      background: '#f9fafb', padding: '2px 6px',
+                      borderRadius: 4, color: '#6b7280',
+                    }}>
+                      {bunch.bunchId}
+                    </span>
                   </div>
                   
                   <div style={{ marginBottom: 12 }}>
@@ -677,6 +662,24 @@ export default function ClassroomPage() {
                         </span>
                       ))}
                     </div>
+                  </div>
+
+                  <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: 14 }}>
+                    <button
+                      className="books-btn books-btn-sm books-btn-danger"
+                      onClick={() => handleDeleteBunch(bunch.bunchId)}
+                    >
+                      <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}>
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                          <polyline points="3 6 5 6 21 6"/>
+                          <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/>
+                          <path d="M10 11v6"/>
+                          <path d="M14 11v6"/>
+                          <path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/>
+                        </svg>
+                        Delete
+                      </span>
+                    </button>
                   </div>
                 </div>
               );

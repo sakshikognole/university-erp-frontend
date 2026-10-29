@@ -77,14 +77,18 @@ export default function StudentDetails() {
 
   return (
     <div className="page-container">
-      <h1 className="page-title">Student Details</h1>
-      <p className="page-subtitle">Review student information and select a certificate type.</p>
+      <div className="feature-page-header">
+        <div className="feature-page-header-info">
+          <h1 className="page-title">Student Details</h1>
+          <p className="page-subtitle">Review student information and select a certificate type.</p>
+        </div>
+      </div>
 
-      <div className="card stu-form-card">
+      <div className="card stu-form-card" style={{ maxWidth: '100%', boxSizing: 'border-box' }}>
         <StudentInformation student={student} />
       </div>
 
-      <div className="card stu-form-card">
+      <div className="card stu-form-card" style={{ maxWidth: '100%', boxSizing: 'border-box' }}>
         <p className="stu-form-label" style={{ marginBottom: '0.75rem' }}>
           Select Certificate Type
         </p>
@@ -106,7 +110,7 @@ export default function StudentDetails() {
               >
                 <span className="stu-doctype-name">{d.documentName}</span>
                 {d.defaultContent ? (
-                  <span className="stu-doctype-desc">
+                  <span className="stu-doctype-desc" style={{ wordBreak: 'break-all', overflowWrap: 'anywhere' }}>
                     {d.defaultContent.slice(0, 60)}
                     {d.defaultContent.length > 60 ? '...' : ''}
                   </span>

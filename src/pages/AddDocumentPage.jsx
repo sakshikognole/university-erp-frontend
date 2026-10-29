@@ -148,10 +148,14 @@ export default function AddDocumentPage() {
 
   return (
     <div className="page-container">
-      <h1 className="page-title">Add Document Type</h1>
-      <p className="page-subtitle">
-        Add certificate types and write their default content template.
-      </p>
+      <div className="feature-page-header">
+        <div className="feature-page-header-info">
+          <h1 className="page-title">Add Document Type</h1>
+          <p className="page-subtitle">
+            Add certificate types and write their default content template.
+          </p>
+        </div>
+      </div>
 
       {/* D1: consistent spacing between description and form */}
       <div style={{ marginTop: '1.5rem' }}>
@@ -266,7 +270,7 @@ export default function AddDocumentPage() {
                 <div key={doc.id} className="stu-doc-item">
                   <div className="stu-doc-header">
                     <span className="stu-doc-name">{doc.documentName}</span>
-                    <div style={{ display: 'flex', gap: '0.5rem' }}>
+                    <div className="stu-doc-actions">
                       <button
                         type="button"
                         className="action-btn edit-btn"
@@ -285,6 +289,15 @@ export default function AddDocumentPage() {
                       </button>
                     </div>
                   </div>
+
+                  {editingId !== doc.id && (
+                    <p className="stu-doc-preview">
+                      {doc.defaultContent
+                        ? doc.defaultContent.slice(0, 120) +
+                          (doc.defaultContent.length > 120 ? '...' : '')
+                        : 'No content template set — click Edit Content to add one.'}
+                    </p>
+                  )}
 
                   {editingId === doc.id && (
                     <div className="stu-doc-editor">
@@ -318,15 +331,6 @@ export default function AddDocumentPage() {
                         </button>
                       </div>
                     </div>
-                  )}
-
-                  {editingId !== doc.id && (
-                    <p className="stu-doc-preview">
-                      {doc.defaultContent
-                        ? doc.defaultContent.slice(0, 120) +
-                          (doc.defaultContent.length > 120 ? '...' : '')
-                        : 'No content template set — click Edit Content to add one.'}
-                    </p>
                   )}
                 </div>
               ))}

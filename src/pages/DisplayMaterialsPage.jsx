@@ -296,8 +296,8 @@ export default function DisplayMaterialsPage() {
     <div className="page-container">
 
       {/* Header */}
-      <div className="st-page-header">
-        <div>
+      <div className="feature-page-header">
+        <div className="feature-page-header-info">
           <h1 className="page-title">Study Materials</h1>
           <p className="page-subtitle">Select a subject to view its study materials</p>
         </div>

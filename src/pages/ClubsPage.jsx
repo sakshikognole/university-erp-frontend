@@ -111,14 +111,16 @@ export default function ClubsPage() {
         <div className="page-container">
 
             {/* Page header */}
-            <div className="books-page-header">
-                <div>
+            <div className="feature-page-header">
+                <div className="feature-page-header-info">
                     <h1 className="page-title">Clubs</h1>
                     <p className="stu-page-sub">Manage clubs and sub-clubs</p>
                 </div>
-                <button className="books-btn books-btn-primary" onClick={openAdd}>
-                    + Add Club
-                </button>
+                <div className="feature-page-header-actions">
+                    <button className="books-btn books-btn-primary" onClick={openAdd}>
+                        + Add Club
+                    </button>
+                </div>
             </div>
 
             {/* Notifications */}

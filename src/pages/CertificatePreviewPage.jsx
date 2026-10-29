@@ -40,12 +40,16 @@ export default function CertificatePreviewPage() {
 
   return (
     <div className="page-container">
-      <h1 className="page-title">Certificate Preview</h1>
-      <p className="page-subtitle">
-        {student.studentName}{docType ? ` — ${docType}` : ''}
-      </p>
+      <div className="feature-page-header">
+        <div className="feature-page-header-info">
+          <h1 className="page-title">Certificate Preview</h1>
+          <p className="page-subtitle">
+            {student.studentName}{docType ? ` — ${docType}` : ''}
+          </p>
+        </div>
+      </div>
 
-      <div className="card stu-form-card" style={{ maxWidth: 800 }}>
+      <div className="card stu-form-card" style={{ maxWidth: 800, width: '100%', boxSizing: 'border-box' }}>
         <CertificatePreview student={student} customContent={customContent} docType={docType} />
 
         <div className="stu-button-row" style={{ marginTop: '0.5rem' }}>

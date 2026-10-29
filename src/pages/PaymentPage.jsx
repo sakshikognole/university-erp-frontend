@@ -512,18 +512,17 @@ export default function PaymentPage() {
     <div className="page-container">
 
       {/* Header — Defect 4: Create Combination button beside Add Payment Title button */}
-      <div className="books-page-header">
-        <div>
+      <div className="feature-page-header">
+        <div className="feature-page-header-info">
           <h1 className="page-title">Payment Management</h1>
           <p className="stu-page-sub">
             Manage fee titles and create payment combinations for students
           </p>
         </div>
-        <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'center', flexWrap: 'wrap' }}>
+        <div className="feature-page-header-actions">
           <button
             type="button"
-            className={`books-btn ${showCheckboxes ? 'books-btn-secondary' : 'books-btn-primary'}`}
-            style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem' }}
+            className="books-btn books-btn-primary"
             onClick={() => {
               if (showCheckboxes) {
                 setShowCheckboxes(false);
@@ -536,15 +535,20 @@ export default function PaymentPage() {
             }}
             id="btn-create-payment-combination"
           >
-            <span style={{ fontSize: '1rem' }}>🔗</span>
-            {showCheckboxes ? 'Cancel Combination Mode' : 'Create Payment Combination'}
+            <span className="desk-only-text">
+              {showCheckboxes ? 'Cancel Combination Mode' : 'Create Payment Combination'}
+            </span>
+            <span className="mob-only-text">
+              {showCheckboxes ? 'Cancel combination' : 'Create combination'}
+            </span>
           </button>
           <button
             className="books-btn books-btn-primary"
             onClick={() => setModalOpen(true)}
             id="btn-add-payment-title"
           >
-            + Add Payment Title
+            <span className="desk-only-text">+ Add Payment Title</span>
+            <span className="mob-only-text">+ Add Payment</span>
           </button>
         </div>
       </div>
