@@ -95,16 +95,13 @@ export default function BooksPage() {
   const [expandedId, setExpandedId] = useState(null);
   const toggleExpand = (id) => setExpandedId(prev => prev === id ? null : id);
 
+  const [searchInput, setSearchInput] = useState('');
   const timer = useRef(null);
 
   const load = useCallback(async () => {
     setLoading(true);
     setPageError('');
     try {
-      // BookController returns ApiResponse<PageResponse<Book>>:
-      // { success, message, data: { content:[], pageNumber, ... } }
-      // springApi interceptor unwraps axios res.data → res = { success, message, data:{...} }
-      // So the PageResponse is at res.data
       const res = await bookService.getAll(search, page, size);
       const pd  = res?.data ?? res;   // handle both wrapped and unwrapped shapes
       setBooks(pd?.content ?? []);
@@ -127,8 +124,15 @@ export default function BooksPage() {
 
   const onSearch = (e) => {
     const val = e.target.value;
+    setSearchInput(val);
     clearTimeout(timer.current);
     timer.current = setTimeout(() => { setSearch(val); setPage(0); }, 400);
+  };
+
+  const clearSearch = () => {
+    setSearchInput('');
+    setSearch('');
+    setPage(0);
   };
 
   const onSizeChange = (s) => { setSize(s); setPage(0); };
@@ -221,8 +225,19 @@ export default function BooksPage() {
             <input
               className="search-input"
               placeholder="Search by Title, Author, or ID..."
+              value={searchInput}
               onChange={onSearch}
             />
+            {searchInput && (
+              <button
+                type="button"
+                className="search-clear-btn"
+                onClick={clearSearch}
+                aria-label="Clear search"
+              >
+                Clear
+              </button>
+            )}
           </div>
           <div className="table-stats-badge" style={{ marginLeft: 'auto' }}>
             Total: <strong>{pageData.totalElements ?? books.length}</strong>{' '}
@@ -361,7 +376,11 @@ export default function BooksPage() {
       />
       <ConfirmDialog
         isOpen={delOpen}
-        message={`Delete "${delBook?.bookTitle}"?`}
+        title="Delete Book"
+        description="Are you sure you want to delete this library book? This action will permanently remove the record."
+        itemName={delBook?.bookTitle}
+        itemSubtext={delBook?.authorName ? `by ${delBook.authorName}` : 'Library Book Record'}
+        itemBadge={delBook?.bookId}
         onConfirm={handleDelete}
         onCancel={() => setDelOpen(false)}
         loading={deleting}

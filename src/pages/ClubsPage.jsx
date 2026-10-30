@@ -1,8 +1,9 @@
 import { useState, useEffect, useCallback } from 'react';
 import axios from 'axios';
-import { Edit, Trash2 } from 'lucide-react';
+import { Edit, Trash2, Eye } from 'lucide-react';
 import ClubModal from './ClubModal';
 import ViewClubModal from './ViewClubModal';
+import ConfirmDialog from '../components/ConfirmDialog';
 
 const _IS_PROD_SP = typeof window !== 'undefined' && window.location.hostname !== 'localhost';
 const _SPRING_URL = _IS_PROD_SP ? 'https://university-erp-spring.onrender.com' : 'http://localhost:9090';
@@ -13,6 +14,7 @@ export default function ClubsPage() {
     const [loading, setLoading] = useState(true);
     const [saving, setSaving] = useState(false);
     const [deleting, setDeleting] = useState(null);
+    const [delClub, setDelClub] = useState(null);
     const [modalOpen, setModalOpen] = useState(false);
     const [modalMode, setModalMode] = useState('add');
     const [selClub, setSelClub] = useState(null);
@@ -64,12 +66,17 @@ export default function ClubsPage() {
         }
     };
 
-    const handleDelete = async (club) => {
-        if (!window.confirm(`Delete "${club.clubName}"?`)) return;
-        setDeleting(club.id);
+    const handleDelete = (club) => {
+        setDelClub(club);
+    };
+
+    const confirmDeleteClub = async () => {
+        if (!delClub) return;
+        setDeleting(delClub.id);
         try {
-            await axios.delete(`${SPRING_API}/clubs/${club.id}`);
+            await axios.delete(`${SPRING_API}/clubs/${delClub.id}`);
             setSuccess('Club deleted successfully.');
+            setDelClub(null);
             load(true);
         } catch {
             setError('Failed to delete club.');
@@ -223,6 +230,15 @@ export default function ClubsPage() {
                             <div className="club-card-footer" onClick={(e) => e.stopPropagation()}>
                                 <button
                                     type="button"
+                                    className="action-btn view-btn"
+                                    onClick={() => openView(club)}
+                                    title="View Club"
+                                >
+                                    <Eye size={14} />
+                                    <span className="action-label">View</span>
+                                </button>
+                                <button
+                                    type="button"
                                     className="action-btn edit-btn"
                                     onClick={() => openEdit(club)}
                                     title="Edit Club"
@@ -262,6 +278,18 @@ export default function ClubsPage() {
                 club={viewClub}
                 parentClubs={clubs}
                 onClose={() => setViewOpen(false)}
+            />
+
+            <ConfirmDialog
+                isOpen={!!delClub}
+                title="Delete Club"
+                description="Are you sure you want to delete this club? This action will permanently remove the record."
+                itemName={delClub?.clubName}
+                itemSubtext={delClub?.parentClubId ? `Sub-club of ${getParentName(delClub.parentClubId)}` : 'Independent Club Record'}
+                itemBadge={delClub?.clubId}
+                onConfirm={confirmDeleteClub}
+                onCancel={() => setDelClub(null)}
+                loading={!!deleting}
             />
         </div>
     );

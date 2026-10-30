@@ -67,14 +67,24 @@ export default function SelectStudent() {
     });
   }, [allStudents, search, page, size]);
 
+  const [searchInput, setSearchInput] = useState('');
+
   const onSearch = (e) => {
     clearTimeout(timer.current);
     const val = e.target.value;
+    setSearchInput(val);
     timer.current = setTimeout(() => {
       setSearch(val);
       setPage(0);       // reset to page 0 on search
       setSelected(null);
     }, 400);
+  };
+
+  const clearSearch = () => {
+    setSearchInput('');
+    setSearch('');
+    setPage(0);
+    setSelected(null);
   };
 
   // D6: reset to page 0 when size changes so serial numbers start from 1
@@ -133,8 +143,19 @@ export default function SelectStudent() {
             <input
               className="search-input"
               placeholder="Search by Name, PRN, Class or Degree..."
+              value={searchInput}
               onChange={onSearch}
             />
+            {searchInput && (
+              <button
+                type="button"
+                className="search-clear-btn"
+                onClick={clearSearch}
+                aria-label="Clear search"
+              >
+                Clear
+              </button>
+            )}
           </div>
           {selected && (
             <div className="stu-selected-tag">

@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import ConfirmDialog from '../components/ConfirmDialog';
 
 const _IS_PROD_ANN = window.location.hostname !== 'localhost';
 const NODE_URL = _IS_PROD_ANN ? 'https://university-erp-node.onrender.com/api' : 'http://localhost:5000/api';
@@ -23,6 +24,8 @@ const Announcements = () => {
   const [loadingSubmissions, setLoadingSubmissions] = useState(false);
   const [marksInput, setMarksInput] = useState({});
   const [savingMarksId, setSavingMarksId] = useState(null);
+  const [delAnn, setDelAnn] = useState(null);
+  const [deleting, setDeleting] = useState(false);
 
   useEffect(() => {
     fetch(`${NODE_URL}/announcements`)
@@ -116,15 +119,22 @@ const Announcements = () => {
     finally { setSavingMarksId(null); }
   };
 
-  const handleDelete = async (id) => {
-    if (!window.confirm('Are you sure you want to delete this announcement?')) return;
+  const handleDelete = (ann) => {
+    setDelAnn(ann);
+  };
+
+  const confirmDelete = async () => {
+    if (!delAnn) return;
+    setDeleting(true);
     try {
-      const res = await fetch(`${NODE_URL}/announcements/${id}`, { method: 'DELETE' });
+      const res = await fetch(`${NODE_URL}/announcements/${delAnn._id}`, { method: 'DELETE' });
       const data = await res.json();
       if (!res.ok) throw new Error(data.message || 'Failed to delete');
-      setAnnouncements((prev) => prev.filter((a) => a._id !== id));
+      setAnnouncements((prev) => prev.filter((a) => a._id !== delAnn._id));
       setSuccess('Announcement deleted successfully!');
+      setDelAnn(null);
     } catch (err) { setError(err.message); }
+    finally { setDeleting(false); }
   };
 
   return (
@@ -249,7 +259,7 @@ const Announcements = () => {
               <button className="books-btn books-btn-sm books-btn-ghost" onClick={() => handleViewSubmissions(ann._id)}>
                 {viewingSubmissionsId === ann._id ? 'Hide Submissions' : 'View Submissions'}
               </button>
-              <button className="books-btn books-btn-sm books-btn-danger" onClick={() => handleDelete(ann._id)}><span style={{display:"inline-flex",alignItems:"center",gap:4}}><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg> Delete</span></button>
+              <button className="books-btn books-btn-sm books-btn-danger" onClick={() => handleDelete(ann)}><span style={{display:"inline-flex",alignItems:"center",gap:4}}><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg> Delete</span></button>
             </div>
 
             {/* Submissions Section */}
@@ -308,6 +318,17 @@ const Announcements = () => {
           </div>
         ))
       )}
+      <ConfirmDialog
+        isOpen={!!delAnn}
+        title="Delete Announcement"
+        description="Are you sure you want to delete this announcement? This action will permanently remove the record."
+        itemName={delAnn?.title}
+        itemSubtext={delAnn?.subject ? `Subject: ${delAnn.subject}` : 'Announcement Record'}
+        itemBadge={delAnn?.subject}
+        onConfirm={confirmDelete}
+        onCancel={() => setDelAnn(null)}
+        loading={deleting}
+      />
     </div>
   );
 };

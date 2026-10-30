@@ -19,15 +19,17 @@ import {
   Trash2,
   X,
   Upload,
+  Eye,
 } from 'lucide-react';
 import { exportVenues } from '../utils/exportUtils';
 import VenueFormModal from './VenueForm';
+import ViewDetailModal from '../components/ViewDetailModal';
 
 const _IS_PROD = typeof window !== 'undefined' && window.location.hostname !== 'localhost';
 const API_BASE_URL = _IS_PROD ? 'https://university-erp-node.onrender.com/api' : 'http://localhost:5000/api';
 
 // Mobile accordion card
-function VenMobCard({ venue, num, getStatusBadgeClass, onEdit, onDelete, expanded, onToggle }) {
+function VenMobCard({ venue, num, getStatusBadgeClass, onView, onEdit, onDelete, expanded, onToggle }) {
   const facilities = venue.facilities && venue.facilities.length > 0
     ? venue.facilities.slice(0, 3).map(f => f.name || f).join(', ') + (venue.facilities.length > 3 ? ` +${venue.facilities.length - 3}` : '')
     : 'None';
@@ -50,6 +52,7 @@ function VenMobCard({ venue, num, getStatusBadgeClass, onEdit, onDelete, expande
           <div className="mob-card-row"><span className="mob-card-label">Facilities</span><span className="mob-card-value">{facilities}</span></div>
           <div className="mob-card-row"><span className="mob-card-label">Status</span><span className="mob-card-value"><span className={getStatusBadgeClass(venue.status)}>{venue.status || 'N/A'}</span></span></div>
           <div className="mob-card-actions">
+            <button type="button" className="action-btn view-btn" onClick={onView}><Eye size={14} /><span className="action-label">View</span></button>
             <button type="button" className="action-btn edit-btn" onClick={onEdit}><Edit size={14} /><span className="action-label">Edit</span></button>
             <button type="button" className="action-btn delete-btn" onClick={onDelete}><Trash2 size={14} /><span className="action-label">Delete</span></button>
           </div>
@@ -73,6 +76,7 @@ const Venues = () => {
   // Modal state
   const [modalOpen,   setModalOpen]   = useState(false);
   const [editVenueId, setEditVenueId] = useState(null);
+  const [viewVenue,   setViewVenue]   = useState(null);
 
   // Pagination state
   const [currentPage, setCurrentPage] = useState(1);
@@ -359,7 +363,7 @@ const Venues = () => {
                     <th style={{ width: '100px' }}>Capacity</th>
                     <th>Facilities</th>
                     <th style={{ width: '120px' }}>Status</th>
-                    <th style={{ width: '140px', textAlign: 'right' }}>Actions</th>
+                    <th style={{ width: '220px', textAlign: 'right' }}>Actions</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -386,6 +390,15 @@ const Venues = () => {
                       </td>
                       <td style={{ textAlign: 'right' }}>
                         <div className="action-buttons-cell" style={{ justifyContent: 'flex-end' }}>
+                          <button
+                            type="button"
+                            className="action-btn view-btn"
+                            title="View Venue"
+                            onClick={() => setViewVenue(venue)}
+                          >
+                            <Eye size={14} />
+                            <span className="action-label">View</span>
+                          </button>
                           <button
                             type="button"
                             className="action-btn edit-btn"
@@ -425,6 +438,7 @@ const Venues = () => {
                     venue={venue}
                     num={startIndex + index + 1}
                     getStatusBadgeClass={getStatusBadgeClass}
+                    onView={() => setViewVenue(venue)}
                     onEdit={() => openEditModal(venue._id || venue.venueId)}
                     onDelete={() => setDeleteConfirm({
                       id: venue._id || venue.venueId,
@@ -587,6 +601,20 @@ const Venues = () => {
         venueId={editVenueId}
         onClose={closeModal}
         onSuccess={handleModalSuccess}
+      />
+
+      <ViewDetailModal
+        isOpen={!!viewVenue}
+        title={viewVenue?.name || 'Venue Details'}
+        subtitle={viewVenue?.venueId}
+        rows={viewVenue ? [
+          { label: 'Venue ID', value: viewVenue.venueId },
+          { label: 'Venue Name', value: viewVenue.name },
+          { label: 'Capacity', value: viewVenue.capacity },
+          { label: 'Status', value: viewVenue.status },
+          { label: 'Facilities', value: Array.isArray(viewVenue.facilities) ? viewVenue.facilities.map(f => f.name || f).join(', ') : viewVenue.facilities },
+        ] : []}
+        onClose={() => setViewVenue(null)}
       />
     </div>
   );

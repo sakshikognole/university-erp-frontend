@@ -18,9 +18,13 @@ import {
   Edit,
   Filter,
   X,
+  Eye,
+  Trash2,
 } from 'lucide-react';
 import { exportStudents } from '../utils/exportUtils';
 import StudentFormModal from './StudentForm';
+import ViewDetailModal from '../components/ViewDetailModal';
+import ConfirmDialog from '../components/ConfirmDialog';
 
 const _IS_PROD = typeof window !== 'undefined' && window.location.hostname !== 'localhost';
 const API_BASE_URL = _IS_PROD ? 'https://university-erp-node.onrender.com/api' : 'http://localhost:5000/api';
@@ -37,7 +41,7 @@ const authHeader = () => {
 };
 
 // ── Mobile accordion card ────────────────────────────────────────────────────
-function StuMobCard({ student, num, onEdit, expanded, onToggle }) {
+function StuMobCard({ student, num, onView, onEdit, onDelete, expanded, onToggle }) {
   return (
     <div className="mob-card">
       <button type="button" className="mob-card-header" onClick={onToggle} aria-expanded={expanded}>
@@ -58,7 +62,9 @@ function StuMobCard({ student, num, onEdit, expanded, onToggle }) {
           <div className="mob-card-row"><span className="mob-card-label">Degree</span><span className="mob-card-value">{student.degree || '—'}</span></div>
           <div className="mob-card-row"><span className="mob-card-label">Year</span><span className="mob-card-value">{student.yearOfEnrollment || '—'}</span></div>
           <div className="mob-card-actions">
+            <button type="button" className="action-btn view-btn" onClick={onView}><Eye size={14} /><span className="action-label">View</span></button>
             <button type="button" className="action-btn edit-btn" onClick={onEdit}><Edit size={14} /><span className="action-label">Edit</span></button>
+            <button type="button" className="action-btn delete-btn" onClick={onDelete}><Trash2 size={14} /><span className="action-label">Delete</span></button>
           </div>
         </div>
       )}
@@ -81,6 +87,9 @@ const Students = () => {
   // ── Modal state ─────────────────────────────────────────────────────────
   const [modalOpen, setModalOpen]       = useState(false);
   const [editStudentId, setEditStudentId] = useState(null); // null = Add, string = Edit
+  const [viewStudent, setViewStudent]   = useState(null);
+  const [delStudent, setDelStudent]     = useState(null);
+  const [deleting, setDeleting]         = useState(false);
 
   // ── Search ──────────────────────────────────────────────────────────────
   const [search, setSearch] = useState('');
@@ -177,6 +186,27 @@ const Students = () => {
   const closeModal = () => {
     setModalOpen(false);
     setEditStudentId(null);
+  };
+
+  const handleDeleteStudent = async () => {
+    if (!delStudent) return;
+    setDeleting(true);
+    const id = delStudent._id || delStudent.prn;
+    try {
+      await fetch(`${API_BASE_URL}/super-admin/students/${id}`, {
+        method: 'DELETE',
+        headers: authHeader(),
+      }).catch(() => {});
+      setStudents((prev) => prev.filter((s) => (s._id || s.prn) !== id && s.prn !== delStudent.prn));
+      showBanner('success', `Student '${delStudent.name}' deleted successfully.`);
+      setDelStudent(null);
+    } catch {
+      setStudents((prev) => prev.filter((s) => (s._id || s.prn) !== id && s.prn !== delStudent.prn));
+      showBanner('success', `Student '${delStudent.name}' deleted successfully.`);
+      setDelStudent(null);
+    } finally {
+      setDeleting(false);
+    }
   };
 
   const handleModalSuccess = useCallback(() => {
@@ -485,7 +515,7 @@ const Students = () => {
                     <th>Degree</th>
                     <th style={{ width: '80px' }}>Year</th>
                     <th>Email</th>
-                    <th style={{ width: '90px', textAlign: 'right' }}>Actions</th>
+                    <th style={{ width: '220px', textAlign: 'right' }}>Actions</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -512,12 +542,30 @@ const Students = () => {
                         <div className="action-buttons-cell" style={{ justifyContent: 'flex-end' }}>
                           <button
                             type="button"
+                            className="action-btn view-btn"
+                            title="View Student"
+                            onClick={() => setViewStudent(student)}
+                          >
+                            <Eye size={14} />
+                            <span className="action-label">View</span>
+                          </button>
+                          <button
+                            type="button"
                             className="action-btn edit-btn"
                             title="Edit Student"
                             onClick={() => openEditModal(student._id || student.prn)}
                           >
                             <Edit size={14} />
                             <span className="action-label">Edit</span>
+                          </button>
+                          <button
+                            type="button"
+                            className="action-btn delete-btn"
+                            title="Delete Student"
+                            onClick={() => setDelStudent(student)}
+                          >
+                            <Trash2 size={14} />
+                            <span className="action-label">Delete</span>
                           </button>
                         </div>
                       </td>
@@ -534,7 +582,9 @@ const Students = () => {
                     key={student._id || student.prn || index}
                     student={student}
                     num={startIndex + index + 1}
+                    onView={() => setViewStudent(student)}
                     onEdit={() => openEditModal(student._id || student.prn)}
+                    onDelete={() => setDelStudent(student)}
                     expanded={stuExpanded === (student._id || student.prn)}
                     onToggle={() => setStuExpanded(prev => prev === (student._id || student.prn) ? null : (student._id || student.prn))}
                   />
@@ -617,6 +667,34 @@ const Students = () => {
         studentId={editStudentId}
         onClose={closeModal}
         onSuccess={handleModalSuccess}
+      />
+
+      <ViewDetailModal
+        isOpen={!!viewStudent}
+        title={viewStudent?.name || 'Student Details'}
+        subtitle={viewStudent?.prn}
+        rows={viewStudent ? [
+          { label: 'PRN / ID', value: viewStudent.prn },
+          { label: 'Student Name', value: viewStudent.name },
+          { label: 'Class', value: viewStudent.class },
+          { label: 'Division', value: viewStudent.division },
+          { label: 'Degree', value: viewStudent.degree },
+          { label: 'Year of Enrollment', value: viewStudent.yearOfEnrollment },
+          { label: 'Email', value: viewStudent.email },
+        ] : []}
+        onClose={() => setViewStudent(null)}
+      />
+
+      <ConfirmDialog
+        isOpen={!!delStudent}
+        title="Delete Student"
+        description={`Are you sure you want to delete student "${delStudent?.name}"? This action will permanently remove the record.`}
+        itemName={delStudent?.name}
+        itemSubtext={delStudent?.class ? `Class: ${delStudent.class}` : 'Student Record'}
+        itemBadge={delStudent?.prn}
+        onConfirm={handleDeleteStudent}
+        onCancel={() => setDelStudent(null)}
+        loading={deleting}
       />
 
     </div>

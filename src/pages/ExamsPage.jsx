@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { Search, Eye, Edit, Trash2, Plus } from 'lucide-react';
 import { springApi, springGet } from '../services/api';
 import PageError from '../components/PageError';
+import ConfirmDialog from '../components/ConfirmDialog';
 import ExamModal from './ExamModal';
 
 export default function ExamsPage() {
@@ -16,6 +17,8 @@ export default function ExamsPage() {
   const [modalOpen, setModalOpen] = useState(false);
   const [modalMode, setModalMode] = useState('add');
   const [selExam,   setSelExam]   = useState(null);
+  const [delExam,   setDelExam]   = useState(null);
+  const [deleting,  setDeleting]  = useState(false);
   const [success,   setSuccess]   = useState('');
   const [error,     setError]     = useState('');
   const [search,    setSearch]    = useState('');
@@ -80,14 +83,22 @@ export default function ExamsPage() {
     }
   };
 
-  const handleDelete = async (exam) => {
-    if (!window.confirm(`Delete exam "${exam.examId} — ${exam.subject}"?`)) return;
+  const handleDelete = (exam) => {
+    setDelExam(exam);
+  };
+
+  const confirmDelete = async () => {
+    if (!delExam) return;
+    setDeleting(true);
     try {
-      await springApi.delete(`/exams/${exam.examId}`);
+      await springApi.delete(`/exams/${delExam.examId}`);
       setSuccess('Exam deleted.');
+      setDelExam(null);
       load(true);
     } catch {
       setError('Failed to delete exam.');
+    } finally {
+      setDeleting(false);
     }
   };
 
@@ -325,6 +336,18 @@ export default function ExamsPage() {
         loading={saving}
         dupError={dupError}
         onDupOk={() => setDupError('')}
+      />
+
+      <ConfirmDialog
+        isOpen={!!delExam}
+        title="Delete Exam"
+        description={`Are you sure you want to delete exam "${delExam?.examId} — ${delExam?.subject}"? This action will permanently remove the record.`}
+        itemName={delExam?.subject}
+        itemSubtext={delExam?.academicYear ? `Academic Year: ${delExam.academicYear}` : 'Exam Schedule'}
+        itemBadge={delExam?.examId}
+        onConfirm={confirmDelete}
+        onCancel={() => setDelExam(null)}
+        loading={deleting}
       />
     </div>
   );

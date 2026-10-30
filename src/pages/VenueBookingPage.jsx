@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import { Eye, Edit, Trash2 } from 'lucide-react';
+import { Eye, Edit, Trash2, Search } from 'lucide-react';
 import {
   venueBookingService,
   fetchEvents,
@@ -8,6 +8,7 @@ import {
 } from '../services/venueBookingService';
 import PageLoader from '../components/PageLoader';
 import PageError  from '../components/PageError';
+import ConfirmDialog from '../components/ConfirmDialog';
 
 // ── Status badge ──────────────────────────────────────────────────────────────
 const STATUS_STYLE = {
@@ -351,6 +352,9 @@ export default function VenueBookingPage() {
   const [submitting,setSubmitting]= useState(false);
   const [viewBooking, setViewBooking] = useState(null);
   const [editBooking, setEditBooking] = useState(null);
+  const [delBooking, setDelBooking] = useState(null);
+  const [deleting,  setDeleting]  = useState(false);
+  const [search,    setSearch]    = useState('');
   const [saving,    setSaving]    = useState(false);
   const [success,   setSuccess]   = useState('');
   const [error,     setError]     = useState('');
@@ -445,14 +449,22 @@ export default function VenueBookingPage() {
     }
   };
 
-  const handleDelete = async (b) => {
-    if (!window.confirm(`Delete booking "${b.bookingId}"?`)) return;
+  const handleDelete = (b) => {
+    setDelBooking(b);
+  };
+
+  const confirmDeleteBooking = async () => {
+    if (!delBooking) return;
+    setDeleting(true);
     try {
-      await venueBookingService.remove(b.bookingId);
-      setSuccess('Booking deleted.');
+      await venueBookingService.remove(delBooking.bookingId);
+      setSuccess('Booking deleted successfully.');
+      setDelBooking(null);
       loadBookings(true);
     } catch (err) {
       setError(err.message || 'Failed to delete booking.');
+    } finally {
+      setDeleting(false);
     }
   };
 
@@ -464,6 +476,17 @@ export default function VenueBookingPage() {
     const vn = venues.find(v => v.venueId === id);
     return vn ? `${vn.venueId} — ${vn.name}` : id;
   };
+
+  const filteredBookings = bookings.filter((b) => {
+    if (!search.trim()) return true;
+    const q = search.toLowerCase();
+    return (
+      (b.bookingId || '').toLowerCase().includes(q) ||
+      (eventLabel(b.eventId) || '').toLowerCase().includes(q) ||
+      (venueLabel(b.venueId) || '').toLowerCase().includes(q) ||
+      (b.requestedBy || '').toLowerCase().includes(q)
+    );
+  });
 
   // ── Render ─────────────────────────────────────────────────────────────────
   return (
@@ -615,13 +638,29 @@ export default function VenueBookingPage() {
       {/* ── All Booking Requests ─────────────────────────────────────────────── */}
       <div className="card" style={{ padding: '1.5rem' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between',
-                      alignItems: 'center', marginBottom: '1rem' }}>
-          <h2 style={{ fontSize: '1rem', fontWeight: 700, color: '#111827', margin: 0 }}>
-            All Booking Requests
-          </h2>
-          <div className="table-stats-badge">
-            Total: <strong>{bookings.length}</strong>{' '}
-            {bookings.length === 1 ? 'Booking' : 'Bookings'}
+                      alignItems: 'center', marginBottom: '1rem', flexWrap: 'wrap', gap: '1rem' }}>
+          <div className="search-box-wrapper" style={{ maxWidth: 360 }}>
+            <Search size={16} className="search-icon" />
+            <input
+              className="search-input"
+              placeholder="Search by Booking ID, Event, Venue, or Requester..."
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+            />
+            {search && (
+              <button
+                type="button"
+                className="search-clear-btn"
+                onClick={() => setSearch('')}
+                aria-label="Clear search"
+              >
+                Clear
+              </button>
+            )}
+          </div>
+          <div className="table-stats-badge" style={{ marginLeft: 'auto' }}>
+            Total: <strong>{filteredBookings.length}</strong>{' '}
+            {filteredBookings.length === 1 ? 'Booking' : 'Bookings'}
           </div>
         </div>
 
@@ -629,9 +668,9 @@ export default function VenueBookingPage() {
           <PageLoader message="Loading bookings..." />
         ) : pageError ? (
           <PageError message={pageError} onRetry={() => loadBookings()} />
-        ) : bookings.length === 0 ? (
+        ) : filteredBookings.length === 0 ? (
           <div style={{ textAlign: 'center', padding: '2.5rem 0', color: '#9ca3af' }}>
-            <p>No booking requests yet.</p>
+            <p>{search ? `No bookings matching "${search}".` : 'No booking requests yet.'}</p>
           </div>
         ) : (
           <>
@@ -649,7 +688,7 @@ export default function VenueBookingPage() {
                     </tr>
                   </thead>
                   <tbody>
-                    {bookings.map((b, idx) => (
+                    {filteredBookings.map((b, idx) => (
                       <tr key={b.bookingId}>
                         <td style={{ textAlign: 'center', color: '#9ca3af', fontSize: 13 }}>
                           {idx + 1}
@@ -718,7 +757,7 @@ export default function VenueBookingPage() {
 
             {/* D3: Mobile cards — no horizontal scroll */}
             <div className="book-mob-list">
-              {bookings.map((b, idx) => (
+              {filteredBookings.map((b, idx) => (
                 <div key={b.bookingId} className="book-mob-card">
                   <div style={{ padding: '10px 14px' }}>
                     <div style={{ display: 'flex', justifyContent: 'space-between',
@@ -803,6 +842,18 @@ export default function VenueBookingPage() {
           saving={saving}
         />
       )}
+
+      <ConfirmDialog
+        isOpen={!!delBooking}
+        title="Delete Venue Booking"
+        description="Are you sure you want to delete this venue booking request? This action will permanently remove the record."
+        itemName={delBooking ? `${eventLabel(delBooking.eventId)} at ${venueLabel(delBooking.venueId)}` : ''}
+        itemSubtext={delBooking ? `Date: ${fmtDate(delBooking.bookingDate)} (${fmt12(delBooking.startTime)} - ${fmt12(delBooking.endTime)})` : 'Booking Record'}
+        itemBadge={delBooking?.bookingId}
+        onConfirm={confirmDeleteBooking}
+        onCancel={() => setDelBooking(null)}
+        loading={deleting}
+      />
 
     </div>
   );

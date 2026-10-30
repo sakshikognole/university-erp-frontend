@@ -5,6 +5,7 @@ import PageLoader from '../components/PageLoader';
 import PageError  from '../components/PageError';
 import SportTeamModal from './SportTeamModal';
 import ViewSportTeamModal from './ViewSportTeamModal';
+import ConfirmDialog from '../components/ConfirmDialog';
 // ── Status badge ──────────────────────────────────────────────────────────────
 function StatusBadge({ status }) {
   const styles = {
@@ -87,6 +88,7 @@ export default function SportTeamsPage() {
   const [pageError, setPageError] = useState('');
   const [saving,    setSaving]    = useState(false);
   const [deleting,  setDeleting]  = useState(null);
+  const [delTeam,   setDelTeam]   = useState(null);
   const [search,    setSearch]    = useState('');
   const [modalOpen, setModalOpen] = useState(false);
   const [modalMode, setModalMode] = useState('add');
@@ -157,12 +159,17 @@ export default function SportTeamsPage() {
     }
   };
 
-  const handleDelete = async (team) => {
-    if (!window.confirm(`Delete team "${team.teamName}"?`)) return;
-    setDeleting(team.teamId);
+  const handleDelete = (team) => {
+    setDelTeam(team);
+  };
+
+  const confirmDeleteTeam = async () => {
+    if (!delTeam) return;
+    setDeleting(delTeam.teamId);
     try {
-      await springApi.delete(`/sport-teams/${team.teamId}`);
+      await springApi.delete(`/sport-teams/${delTeam.teamId}`);
       setSuccess('Team deleted successfully.');
+      setDelTeam(null);
       load(true);
     } catch {
       setError('Failed to delete team.');
@@ -225,6 +232,16 @@ export default function SportTeamsPage() {
               value={search}
               onChange={(e) => setSearch(e.target.value)}
             />
+            {search && (
+              <button
+                type="button"
+                className="search-clear-btn"
+                onClick={() => setSearch('')}
+                aria-label="Clear search"
+              >
+                Clear
+              </button>
+            )}
           </div>
           <div className="table-stats-badge">
             Total: <strong>{filtered.length}</strong>{' '}
@@ -351,6 +368,18 @@ export default function SportTeamsPage() {
         isOpen={viewOpen}
         team={viewTeam}
         onClose={() => setViewOpen(false)}
+      />
+
+      <ConfirmDialog
+        isOpen={!!delTeam}
+        title="Delete Sport Team"
+        description="Are you sure you want to delete this sport team? This action will permanently remove the record."
+        itemName={delTeam?.teamName}
+        itemSubtext={delTeam?.coachName ? `Coach: ${delTeam.coachName}` : 'Sport Team Record'}
+        itemBadge={delTeam?.teamId}
+        onConfirm={confirmDeleteTeam}
+        onCancel={() => setDelTeam(null)}
+        loading={!!deleting}
       />
 
     </div>

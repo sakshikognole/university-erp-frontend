@@ -4,6 +4,7 @@ import { useSearchParams } from 'react-router-dom';
 import { Eye, Edit, Trash2, Search } from 'lucide-react';
 import TeamForm from './TeamForm';
 import TeamDetails from './TeamDetails';
+import ConfirmDialog from '../components/ConfirmDialog';
 
 // ── Inline Add Roster Modal ────────────────────────────────────────────────────
 function AddRosterModal({ isOpen, teamId, onClose, onSuccess }) {
@@ -216,6 +217,7 @@ export default function SportTeamPage() {
   const [loading,  setLoading]  = useState(true);
   const [saving,   setSaving]   = useState(false);
   const [deleting, setDeleting] = useState(null);
+  const [delTeam,  setDelTeam]  = useState(null);
   const [formOpen, setFormOpen] = useState(false);
   const [formMode, setFormMode] = useState('add');
   const [selTeam,  setSelTeam]  = useState(null);
@@ -301,17 +303,22 @@ export default function SportTeamPage() {
     }
   };
 
-  const handleDelete = async (team) => {
-    if (!window.confirm(`Delete team "${team.teamId} — ${team.sportName}"?`)) return;
-    setDeleting(team.teamId);
+  const handleDelete = (team) => {
+    setDelTeam(team);
+  };
+
+  const confirmDeleteTeam = async () => {
+    if (!delTeam) return;
+    setDeleting(delTeam.teamId);
     const slowTimer = setTimeout(() => {
       setError('Server is processing deletion, please wait...');
     }, 4000);
     try {
-      await springApi.delete(`/sport-teams/${team.teamId}`);
+      await springApi.delete(`/sport-teams/${delTeam.teamId}`);
       clearTimeout(slowTimer);
       setError('');
       setSuccess('Team deleted successfully.');
+      setDelTeam(null);
       load(true);
     } catch {
       clearTimeout(slowTimer);
@@ -372,6 +379,16 @@ export default function SportTeamPage() {
               value={search}
               onChange={(e) => setSearch(e.target.value)}
             />
+            {search && (
+              <button
+                type="button"
+                className="search-clear-btn"
+                onClick={() => setSearch('')}
+                aria-label="Clear search"
+              >
+                Clear
+              </button>
+            )}
           </div>
           <div className="table-stats-badge" style={{ marginLeft: 'auto' }}>
             Total: <strong>{filteredTeams.length}</strong>{' '}
@@ -512,6 +529,18 @@ export default function SportTeamPage() {
           setSuccess(`${count} student(s) added to roster successfully.`);
           load(true);
         }}
+      />
+
+      <ConfirmDialog
+        isOpen={!!delTeam}
+        title="Delete Sport Team"
+        description="Are you sure you want to delete this sport team? This action will permanently remove the record."
+        itemName={delTeam?.sportName ? `${delTeam.sportName} (${delTeam.teamId})` : delTeam?.teamId}
+        itemSubtext={delTeam?.coachName ? `Coach: ${delTeam.coachName}` : 'Sport Team Record'}
+        itemBadge={delTeam?.teamId}
+        onConfirm={confirmDeleteTeam}
+        onCancel={() => setDelTeam(null)}
+        loading={!!deleting}
       />
 
     </div>
