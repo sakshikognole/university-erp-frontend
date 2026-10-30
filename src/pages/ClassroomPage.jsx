@@ -1,7 +1,9 @@
 import { useState, useEffect, useCallback } from 'react';
+import { Search } from 'lucide-react';
 import { springApi, springGet } from '../services/api';
 import Pagination from '../components/Pagination';
 import PageError from '../components/PageError';
+import ConfirmDialog from '../components/ConfirmDialog';
 
 // URL helpers for Node backend (Faculty data)
 const onLocalhost = window.location.hostname === 'localhost';
@@ -266,6 +268,8 @@ export default function ClassroomPage() {
   const [selClassroom, setSelClassroom] = useState(null);
   const [saving, setSaving] = useState(false);
   const [deleting, setDeleting] = useState(null);
+  const [delItem, setDelItem] = useState(null);
+  const [search, setSearch] = useState('');
   const [clsExpanded, setClsExpanded] = useState(null);
   const [success, setSuccess] = useState('');
   const [error, setError] = useState('');
@@ -350,19 +354,28 @@ export default function ClassroomPage() {
     }
   };
 
-  const handleDelete = async (c) => {
-    if (!window.confirm(`Delete classroom "${c.classroomName}"?`)) return;
-    setDeleting(c.classroomId);
-    try {
-      await springApi.delete(`/classrooms/${c.classroomId}`);
-      setSuccess('Classroom deleted.');
-      if (classrooms.length === 1 && page > 0) setPage(page - 1);
-      else load(true);
-    } catch {
-      setError('Failed to delete classroom.');
-    } finally {
-      setDeleting(null);
-    }
+  const handleDelete = (c) => {
+    setDelItem({
+      title: 'Delete Classroom',
+      description: `Are you sure you want to delete classroom "${c.classroomName}"? This action will permanently remove the record.`,
+      itemName: c.classroomName,
+      itemSubtext: c.examinerName ? `Examiner: ${c.examinerName}` : 'Classroom',
+      itemBadge: c.classroomId,
+      action: async () => {
+        setDeleting(c.classroomId);
+        try {
+          await springApi.delete(`/classrooms/${c.classroomId}`);
+          setSuccess('Classroom deleted.');
+          setDelItem(null);
+          if (classrooms.length === 1 && page > 0) setPage(page - 1);
+          else load(true);
+        } catch {
+          setError('Failed to delete classroom.');
+        } finally {
+          setDeleting(null);
+        }
+      }
+    });
   };
 
   // Handle checkbox selection
@@ -420,16 +433,37 @@ export default function ClassroomPage() {
   };
 
   // Delete bunch
-  const handleDeleteBunch = async (bunchId) => {
-    if (!window.confirm('Delete this bunch?')) return;
-    try {
-      await springApi.delete(`/classroom-bunches/${bunchId}`);
-      setSuccess('Bunch deleted.');
-      loadBunches();
-    } catch {
-      setError('Failed to delete bunch.');
-    }
+  const handleDeleteBunch = (bunch) => {
+    const bunchId = typeof bunch === 'object' ? bunch.bunchId : bunch;
+    const bunchName = typeof bunch === 'object' ? bunch.bunchName : `Bunch ${bunchId}`;
+    setDelItem({
+      title: 'Delete Bunch',
+      description: `Are you sure you want to delete bunch "${bunchName}"? This action will permanently remove the record.`,
+      itemName: bunchName,
+      itemSubtext: 'Classroom Bunch',
+      itemBadge: bunchId,
+      action: async () => {
+        try {
+          await springApi.delete(`/classroom-bunches/${bunchId}`);
+          setSuccess('Bunch deleted.');
+          setDelItem(null);
+          loadBunches();
+        } catch {
+          setError('Failed to delete bunch.');
+        }
+      }
+    });
   };
+
+  const filteredClassrooms = classrooms.filter((c) => {
+    const q = search.toLowerCase();
+    if (!q) return true;
+    return (
+      (c.classroomId && c.classroomId.toLowerCase().includes(q)) ||
+      (c.classroomName && c.classroomName.toLowerCase().includes(q)) ||
+      (c.examinerName && c.examinerName.toLowerCase().includes(q))
+    );
+  });
 
   return (
     <div className="page-container">
@@ -500,7 +534,37 @@ export default function ClassroomPage() {
         </div>
       ) : (
         <>
-          <div className="card" style={{ padding: '1rem' }}>
+          <div className="card table-card" style={{ padding: '1rem', marginTop: '1.25rem' }}>
+          {/* Search + count INSIDE the card */}
+          <div className="table-controls-bar">
+            <div className="search-box-wrapper">
+              <Search size={16} className="search-icon" />
+              <input
+                className="search-input"
+                placeholder="Search by Classroom ID, Name, or Examiner..."
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+              />
+              {search && (
+                <button
+                  type="button"
+                  className="search-clear-btn"
+                  onClick={() => setSearch('')}
+                  aria-label="Clear search"
+                >
+                  Clear
+                </button>
+              )}
+            </div>
+            <div
+              className="table-stats-badge"
+              style={{ width: 'fit-content', alignSelf: 'flex-end', marginLeft: 'auto' }}
+            >
+              Total: <strong>{filteredClassrooms.length}</strong>{' '}
+              {filteredClassrooms.length === 1 ? 'Classroom' : 'Classrooms'}
+            </div>
+          </div>
+
           <div className="cls-desk-table">
             <div className="books-table-wrap">
               <table className="books-table">
@@ -531,7 +595,7 @@ export default function ClassroomPage() {
                   </tr>
                 </thead>
                 <tbody>
-                  {classrooms.map((c, i) => (
+                  {filteredClassrooms.map((c, i) => (
                     <tr key={c.classroomId}>
                       {showCheckboxes && (
                         <td>
@@ -585,7 +649,7 @@ export default function ClassroomPage() {
             </div>
           </div>
           <div className="cls-mob-list">
-            {classrooms.map((c, i) => (
+            {filteredClassrooms.map((c, i) => (
               <ClsMobCard
                 key={c.classroomId}
                 c={c}
@@ -667,7 +731,7 @@ export default function ClassroomPage() {
                   <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: 14 }}>
                     <button
                       className="books-btn books-btn-sm books-btn-danger"
-                      onClick={() => handleDeleteBunch(bunch.bunchId)}
+                      onClick={() => handleDeleteBunch(bunch)}
                     >
                       <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}>
                         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -759,6 +823,18 @@ export default function ClassroomPage() {
         onSave={handleSave}
         onClose={() => setModalOpen(false)}
         saving={saving}
+      />
+
+      <ConfirmDialog
+        isOpen={!!delItem}
+        title={delItem?.title}
+        description={delItem?.description}
+        itemName={delItem?.itemName}
+        itemSubtext={delItem?.itemSubtext}
+        itemBadge={delItem?.itemBadge}
+        onConfirm={() => delItem?.action && delItem.action()}
+        onCancel={() => setDelItem(null)}
+        loading={!!deleting}
       />
     </div>
   );

@@ -2,11 +2,12 @@ import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   Building2, Plus, Download, Search, Edit, Trash2, FileText, FileSpreadsheet,
-  Printer, ChevronDown, AlertCircle, AlertTriangle, CheckCircle2, Loader2, X,
+  Printer, ChevronDown, AlertCircle, AlertTriangle, CheckCircle2, Loader2, X, Eye,
 } from 'lucide-react';
 import { exportDepartments } from '../utils/exportUtils';
 import { useAuth } from '../context/AuthContext';
 import DepartmentFormModal from './DepartmentForm';
+import ViewDetailModal from '../components/ViewDetailModal';
 
 const _IS_PROD = typeof window !== 'undefined' && window.location.hostname !== 'localhost';
 const API_BASE_URL = _IS_PROD ? 'https://university-erp-node.onrender.com/api' : 'http://localhost:5000/api';
@@ -41,7 +42,7 @@ const API_BASE_URL = _IS_PROD ? 'https://university-erp-node.onrender.com/api' :
 // ─────────────────────────────────────────────────────────────────────────────
 
 // Mobile accordion card
-function DptMobCard({ dept, num, onEdit, onDelete, expanded, onToggle }) {
+function DptMobCard({ dept, num, onView, onEdit, onDelete, expanded, onToggle }) {
   const deptId = dept.departmentId || dept.code || 'N/A';
   return (
     <div className="mob-card">
@@ -60,6 +61,7 @@ function DptMobCard({ dept, num, onEdit, onDelete, expanded, onToggle }) {
           <div className="mob-card-row"><span className="mob-card-label">Department ID</span><span className="mob-card-value mono">{deptId}</span></div>
           <div className="mob-card-row"><span className="mob-card-label">Name</span><span className="mob-card-value">{dept.name}</span></div>
           <div className="mob-card-actions">
+            <button type="button" className="action-btn view-btn" onClick={onView}><Eye size={14} /><span className="action-label">View</span></button>
             <button type="button" className="action-btn edit-btn" onClick={onEdit}><Edit size={14} /><span className="action-label">Edit</span></button>
             <button type="button" className="action-btn delete-btn" onClick={onDelete}><Trash2 size={14} /><span className="action-label">Delete</span></button>
           </div>
@@ -73,6 +75,7 @@ const Departments = () => {
   const navigate = useNavigate();
   const { user, authLoading } = useAuth();
   const [departments, setDepartments] = useState([]);
+  const [viewDept, setViewDept] = useState(null);
   const [loading, setLoading] = useState(false);
   const [fetchError, setFetchError] = useState('');
   const [deleting, setDeleting] = useState(false);
@@ -476,7 +479,7 @@ const Departments = () => {
                   <th style={{ width: '60px' }}>#</th>
                   <th style={{ width: '200px' }}>Department ID</th>
                   <th>Department Name</th>
-                  <th style={{ width: '140px', textAlign: 'right' }}>Actions</th>
+                  <th style={{ width: '220px', textAlign: 'right' }}>Actions</th>
                 </tr>
               </thead>
               <tbody>
@@ -493,6 +496,15 @@ const Departments = () => {
                       </td>
                       <td style={{ textAlign: 'right' }}>
                         <div className="action-buttons-cell" style={{ justifyContent: 'flex-end' }}>
+                          <button
+                            type="button"
+                            className="action-btn view-btn"
+                            title="View Department"
+                            onClick={() => setViewDept(dept)}
+                          >
+                            <Eye size={14} />
+                            <span className="action-label">View</span>
+                          </button>
                           <button
                             type="button"
                             className="action-btn edit-btn"
@@ -528,6 +540,7 @@ const Departments = () => {
                     key={dept._id || deptIdDisplay || index}
                     dept={dept}
                     num={index + 1}
+                    onView={() => setViewDept(dept)}
                     onEdit={() => openEditModal(dept._id || deptIdDisplay)}
                     onDelete={() => setDeleteConfirm(dept)}
                     expanded={dptExpanded === (dept._id || deptIdDisplay)}
@@ -621,6 +634,17 @@ const Departments = () => {
         deptId={editDeptId}
         onClose={closeModal}
         onSuccess={handleModalSuccess}
+      />
+
+      <ViewDetailModal
+        isOpen={!!viewDept}
+        title={viewDept?.name || 'Department Details'}
+        subtitle={viewDept?.departmentId || viewDept?.code}
+        rows={viewDept ? [
+          { label: 'Department ID', value: viewDept.departmentId || viewDept.code },
+          { label: 'Department Name', value: viewDept.name },
+        ] : []}
+        onClose={() => setViewDept(null)}
       />
     </div>
   );

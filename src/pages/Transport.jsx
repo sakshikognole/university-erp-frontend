@@ -19,13 +19,14 @@ import AddVehicleModal from './AddVehicle';
 import AddBusPassModal from './AddBusPass';
 import {
   Bus, Plus, Search, AlertCircle, AlertTriangle, CheckCircle2, Loader2,
-  ChevronLeft, ChevronRight, Edit, Trash2, UserCheck, Truck, Ticket, X,
+  ChevronLeft, ChevronRight, Edit, Trash2, UserCheck, Truck, Ticket, X, Eye,
 } from 'lucide-react';
+import ViewDetailModal from '../components/ViewDetailModal';
 const _IS_PROD = typeof window !== 'undefined' && window.location.hostname !== 'localhost';
 const API_BASE_URL = _IS_PROD ? 'https://university-erp-node.onrender.com/api' : 'http://localhost:5000/api';
 
 // Mobile accordion card for Transport
-function TrnMobCard({ item, tab, num, openModal, setDeleteConfirm, expanded, onToggle }) {
+function TrnMobCard({ item, tab, num, openModal, setDeleteConfirm, onView, expanded, onToggle }) {
   const fmtDate = (d) => {
     if (!d) return '—';
     try { return new Date(d).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' }); }
@@ -74,6 +75,7 @@ function TrnMobCard({ item, tab, num, openModal, setDeleteConfirm, expanded, onT
             <div className="mob-card-row"><span className="mob-card-label">Valid till</span><span className="mob-card-value">{fmtDate(item.validTill)}</span></div>
           </>}
           <div className="mob-card-actions">
+            <button type="button" className="action-btn view-btn" onClick={onView}><Eye size={14} /><span className="action-label">View</span></button>
             <button type="button" className="action-btn edit-btn" onClick={() => openModal(tab === 'passes' ? 'pass' : tab === 'routes' ? 'route' : tab === 'drivers' ? 'driver' : 'vehicle', item._id || (tab === 'routes' ? item.routeId : tab === 'drivers' ? item.driverId : tab === 'vehicles' ? item.vehicleId : item.passId))}><Edit size={14} /><span className="action-label">Edit</span></button>
             <button type="button" className="action-btn delete-btn" onClick={() => setDeleteConfirm({ type: tab === 'passes' ? 'pass' : tab === 'routes' ? 'route' : tab === 'drivers' ? 'driver' : 'vehicle', item })}><Trash2 size={14} /><span className="action-label">Delete</span></button>
           </div>
@@ -94,6 +96,7 @@ const Transport = () => {
   const [loading,  setLoading]  = useState(true);
   const [deleting, setDeleting] = useState(false);
   const [deleteConfirm, setDeleteConfirm] = useState(null);
+  const [viewItem, setViewItem] = useState(null);
   const [trnExpanded, setTrnExpanded] = useState(null);
 
   // Modal state — one modal open at a time, type = 'route'|'driver'|'vehicle'|'pass'
@@ -399,6 +402,9 @@ const Transport = () => {
                         </td>
                         <td style={{ textAlign: 'right' }}>
                           <div className="action-buttons-cell" style={{ justifyContent: 'flex-end' }}>
+                            <button type="button" className="action-btn view-btn" title="View" onClick={() => setViewItem({ type: 'route', data: route })}>
+                              <Eye size={14} /><span className="action-label">View</span>
+                            </button>
                             <button type="button" className="action-btn edit-btn" title="Edit" onClick={() => openModal('route', route._id || route.routeId)}>
                               <Edit size={14} /><span className="action-label">Edit</span>
                             </button>
@@ -423,7 +429,7 @@ const Transport = () => {
                       <th>Phone</th>
                       <th>License Number</th>
                       <th style={{ width: '110px' }}>Status</th>
-                      <th style={{ width: '130px', textAlign: 'right' }}>Actions</th>
+                      <th style={{ width: '220px', textAlign: 'right' }}>Actions</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -441,6 +447,9 @@ const Transport = () => {
                         </td>
                         <td style={{ textAlign: 'right' }}>
                           <div className="action-buttons-cell" style={{ justifyContent: 'flex-end' }}>
+                            <button type="button" className="action-btn view-btn" title="View" onClick={() => setViewItem({ type: 'driver', data: driver })}>
+                              <Eye size={14} /><span className="action-label">View</span>
+                            </button>
                             <button type="button" className="action-btn edit-btn" title="Edit" onClick={() => openModal('driver', driver._id || driver.driverId)}>
                               <Edit size={14} /><span className="action-label">Edit</span>
                             </button>
@@ -466,7 +475,7 @@ const Transport = () => {
                       <th>Registration / Plate</th>
                       <th style={{ width: '90px' }}>Capacity</th>
                       <th style={{ width: '110px' }}>Status</th>
-                      <th style={{ width: '130px', textAlign: 'right' }}>Actions</th>
+                      <th style={{ width: '220px', textAlign: 'right' }}>Actions</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -484,6 +493,9 @@ const Transport = () => {
                         </td>
                         <td style={{ textAlign: 'right' }}>
                           <div className="action-buttons-cell" style={{ justifyContent: 'flex-end' }}>
+                            <button type="button" className="action-btn view-btn" title="View" onClick={() => setViewItem({ type: 'vehicle', data: vehicle })}>
+                              <Eye size={14} /><span className="action-label">View</span>
+                            </button>
                             <button type="button" className="action-btn edit-btn" title="Edit" onClick={() => openModal('vehicle', vehicle._id || vehicle.vehicleId)}>
                               <Edit size={14} /><span className="action-label">Edit</span>
                             </button>
@@ -510,7 +522,7 @@ const Transport = () => {
                       <th>Stops (From → To)</th>
                       <th style={{ width: '110px' }}>Payment</th>
                       <th style={{ width: '110px' }}>Valid Till</th>
-                      <th style={{ width: '130px', textAlign: 'right' }}>Actions</th>
+                      <th style={{ width: '220px', textAlign: 'right' }}>Actions</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -534,6 +546,9 @@ const Transport = () => {
                         <td>{pass.validTill ? new Date(pass.validTill).toLocaleDateString() : '—'}</td>
                         <td style={{ textAlign: 'right' }}>
                           <div className="action-buttons-cell" style={{ justifyContent: 'flex-end' }}>
+                            <button type="button" className="action-btn view-btn" title="View" onClick={() => setViewItem({ type: 'pass', data: pass })}>
+                              <Eye size={14} /><span className="action-label">View</span>
+                            </button>
                             <button type="button" className="action-btn edit-btn" title="Edit" onClick={() => openModal('pass', pass._id || pass.passId)}>
                               <Edit size={14} /><span className="action-label">Edit</span>
                             </button>
@@ -560,6 +575,7 @@ const Transport = () => {
                       num={startIndex + i + 1}
                       openModal={openModal}
                       setDeleteConfirm={setDeleteConfirm}
+                      onView={() => setViewItem({ type: activeTab === 'passes' ? 'pass' : activeTab === 'routes' ? 'route' : activeTab === 'drivers' ? 'driver' : 'vehicle', data: item })}
                       expanded={trnExpanded === id}
                       onToggle={() => setTrnExpanded(p => p === id ? null : id)}
                     />
@@ -654,6 +670,56 @@ const Transport = () => {
       <AddDriverModal   isOpen={modalType === 'driver'}  driverId={modalItemId}  onClose={closeModal} onSuccess={handleModalSuccess} />
       <AddVehicleModal  isOpen={modalType === 'vehicle'} vehicleId={modalItemId} onClose={closeModal} onSuccess={handleModalSuccess} />
       <AddBusPassModal  isOpen={modalType === 'pass'}    passId={modalItemId}    onClose={closeModal} onSuccess={handleModalSuccess} />
+
+      <ViewDetailModal
+        isOpen={!!viewItem}
+        title={
+          viewItem?.type === 'route' ? (viewItem.data.routeName || `Route #${viewItem.data.routeId}`) :
+          viewItem?.type === 'driver' ? `Driver: ${viewItem.data.name}` :
+          viewItem?.type === 'vehicle' ? `Vehicle: ${viewItem.data.name}` :
+          `Bus Pass: ${viewItem?.data.passId}`
+        }
+        subtitle={
+          viewItem?.type === 'route' ? `Route #${viewItem.data.routeId}` :
+          viewItem?.type === 'driver' ? viewItem.data.driverId :
+          viewItem?.type === 'vehicle' ? viewItem.data.vehicleId :
+          viewItem?.data.studentId
+        }
+        rows={
+          viewItem?.type === 'route' ? [
+            { label: 'Route ID', value: viewItem.data.routeId },
+            { label: 'Route Name', value: viewItem.data.routeName },
+            { label: 'Driver', value: viewItem.data.driverName },
+            { label: 'Vehicle', value: viewItem.data.vehicleName },
+            { label: 'Stops', value: Array.isArray(viewItem.data.stops) ? viewItem.data.stops.join(', ') : 'None' },
+          ] :
+          viewItem?.type === 'driver' ? [
+            { label: 'Driver ID', value: viewItem.data.driverId },
+            { label: 'Name', value: viewItem.data.name },
+            { label: 'Phone', value: viewItem.data.phone },
+            { label: 'License Number', value: viewItem.data.licenseNumber },
+            { label: 'Status', value: viewItem.data.status },
+          ] :
+          viewItem?.type === 'vehicle' ? [
+            { label: 'Vehicle ID', value: viewItem.data.vehicleId },
+            { label: 'Name', value: viewItem.data.name },
+            { label: 'Plate Number', value: viewItem.data.vehicleNumber },
+            { label: 'Capacity', value: viewItem.data.capacity },
+            { label: 'Status', value: viewItem.data.status },
+          ] :
+          viewItem?.type === 'pass' ? [
+            { label: 'Pass ID', value: viewItem.data.passId },
+            { label: 'Student ID', value: viewItem.data.studentId },
+            { label: 'Student Name', value: viewItem.data.studentName },
+            { label: 'Route ID', value: viewItem.data.routeId },
+            { label: 'From Stop', value: viewItem.data.fromStop },
+            { label: 'To Stop', value: viewItem.data.toStop },
+            { label: 'Payment Status', value: viewItem.data.paymentStatus },
+            { label: 'Valid Till', value: viewItem.data.validTill ? new Date(viewItem.data.validTill).toLocaleDateString() : '—' },
+          ] : []
+        }
+        onClose={() => setViewItem(null)}
+      />
     </div>
   );
 };

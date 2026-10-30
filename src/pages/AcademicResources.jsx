@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { FileText } from 'lucide-react';
+import ConfirmDialog from '../components/ConfirmDialog';
 
 const _IS_PROD_AR = window.location.hostname !== 'localhost';
 const NODE_URL = _IS_PROD_AR ? 'https://university-erp-node.onrender.com/api' : 'http://localhost:5000/api';
@@ -34,7 +35,7 @@ function ResMobCard({ res, num, nodeUrl, onDelete, expanded, onToggle }) {
           <div className="mob-card-row"><span className="mob-card-label">Uploaded on</span><span className="mob-card-value">{fmtDate(res.createdAt)}</span></div>
           <div className="mob-card-actions">
             <button className="books-btn books-btn-sm books-btn-ghost" onClick={openFile}><span style={{display:"inline-flex",alignItems:"center",gap:4}}><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>Open</span></button>
-            <button className="books-btn books-btn-sm books-btn-danger" onClick={() => onDelete(res._id)}><span style={{display:"inline-flex",alignItems:"center",gap:4}}><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg><span className="action-label">Delete</span></span></button>
+            <button className="books-btn books-btn-sm books-btn-danger" onClick={() => onDelete(res)}><span style={{display:"inline-flex",alignItems:"center",gap:4}}><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg><span className="action-label">Delete</span></span></button>
           </div>
         </div>
       )}
@@ -52,6 +53,8 @@ const AcademicResources = () => {
   const [success, setSuccess] = useState('');
   const [resExpanded, setResExpanded] = useState(null);
   const [error, setError] = useState('');
+  const [delRes, setDelRes] = useState(null);
+  const [deleting, setDeleting] = useState(false);
 
   useEffect(() => { fetchResources(); }, []);
 
@@ -94,15 +97,22 @@ const AcademicResources = () => {
     finally { setLoading(false); }
   };
 
-  const handleDelete = async (id) => {
-    if (!window.confirm('Are you sure you want to delete this resource?')) return;
+  const handleDelete = (res) => {
+    setDelRes(res);
+  };
+
+  const confirmDelete = async () => {
+    if (!delRes) return;
+    setDeleting(true);
     try {
-      const res = await fetch(`${NODE_URL}/resources/${id}`, { method: 'DELETE' });
+      const res = await fetch(`${NODE_URL}/resources/${delRes._id}`, { method: 'DELETE' });
       const data = await res.json();
       if (!res.ok) throw new Error(data.message || 'Failed to delete resource');
-      setResources((prev) => prev.filter((r) => r._id !== id));
+      setResources((prev) => prev.filter((r) => r._id !== delRes._id));
       setSuccess('Academic resource deleted successfully!');
+      setDelRes(null);
     } catch (err) { setError(err.message); }
+    finally { setDeleting(false); }
   };
 
   return (
@@ -246,7 +256,7 @@ const AcademicResources = () => {
                             }
                           }}
                         >Open</button>
-                        <button className="books-btn books-btn-sm books-btn-danger" onClick={() => handleDelete(res._id)}><span style={{display:"inline-flex",alignItems:"center",gap:4}}><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>Delete</span></button>
+                        <button className="books-btn books-btn-sm books-btn-danger" onClick={() => handleDelete(res)}><span style={{display:"inline-flex",alignItems:"center",gap:4}}><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>Delete</span></button>
                       </div>
                     </td>
                   </tr>
@@ -270,6 +280,17 @@ const AcademicResources = () => {
           </div>
         </div>
       )}
+      <ConfirmDialog
+        isOpen={!!delRes}
+        title="Delete Academic Resource"
+        description="Are you sure you want to delete this academic resource? This action will permanently remove the record."
+        itemName={delRes?.title}
+        itemSubtext={delRes?.subject ? `Subject: ${delRes.subject}` : 'Academic Resource'}
+        itemBadge={delRes?.subject}
+        onConfirm={confirmDelete}
+        onCancel={() => setDelRes(null)}
+        loading={deleting}
+      />
     </div>
   );
 };

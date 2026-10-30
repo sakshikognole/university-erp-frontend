@@ -3,6 +3,7 @@ import { Edit, Trash2 } from 'lucide-react';
 import { springApi, springGet } from '../services/api';
 import PageLoader from '../components/PageLoader';
 import PageError  from '../components/PageError';
+import ConfirmDialog from '../components/ConfirmDialog';
 
 const INSERT_FIELDS = [
   { label: 'Name',               token: '{{name}}' },
@@ -26,6 +27,8 @@ export default function AddDocumentPage() {
   // D3: field-level error shown directly below the Document Name input
   const [nameError,    setNameError]    = useState('');
   const [loading,      setLoading]      = useState(false);
+  const [delDoc,       setDelDoc]       = useState(null);
+  const [deletingDoc,  setDeletingDoc]  = useState(false);
   const textareaRef = useRef();
   const editAreaRef = useRef();
 
@@ -122,14 +125,23 @@ export default function AddDocumentPage() {
     } finally { setLoading(false); }
   }
 
-  async function handleDelete(id, name) {
-    if (!window.confirm(`Delete "${name}"?`)) return;
+  function handleDelete(doc) {
+    setDelDoc(doc);
+  }
+
+  async function confirmDeleteDoc() {
+    if (!delDoc) return;
+    setDeletingDoc(true);
     try {
-      await springApi.delete(`/document-types/${id}`);
-      // D7: show success message after deletion
-      setSuccess(`"${name}" deleted successfully.`);
+      await springApi.delete(`/document-types/${delDoc.id}`);
+      setSuccess(`"${delDoc.documentName}" deleted successfully.`);
+      setDelDoc(null);
       fetchDocuments();
-    } catch { setError('Delete failed.'); }
+    } catch {
+      setError('Delete failed.');
+    } finally {
+      setDeletingDoc(false);
+    }
   }
 
   function startEditing(doc) {
@@ -193,20 +205,15 @@ export default function AddDocumentPage() {
                   value={documentName}
                   onChange={(e) => handleNameChange(e.target.value)}
                 />
-                {/* Clear (x) button — only shown when there is text */}
+                {/* Clear button — only shown when there is text */}
                 {documentName && (
                   <button
                     type="button"
+                    className="search-clear-btn"
                     onClick={clearName}
-                    title="Clear"
-                    style={{
-                      position: 'absolute', right: 8,
-                      background: 'none', border: 'none',
-                      cursor: 'pointer', color: '#9ca3af',
-                      fontSize: 16, lineHeight: 1, padding: '2px 4px',
-                    }}
+                    aria-label="Clear document name"
                   >
-                    ×
+                    Clear
                   </button>
                 )}
               </div>
@@ -283,7 +290,7 @@ export default function AddDocumentPage() {
                       <button
                         type="button"
                         className="action-btn delete-btn"
-                        onClick={() => handleDelete(doc.id, doc.documentName)}
+                        onClick={() => handleDelete(doc)}
                       >
                         <Trash2 size={14} /><span className="action-label">Delete</span>
                       </button>
@@ -339,6 +346,18 @@ export default function AddDocumentPage() {
         </div>
 
       </div>
+
+      <ConfirmDialog
+        isOpen={!!delDoc}
+        title="Delete Document Type"
+        description="Are you sure you want to delete this document type template? This action will permanently remove the record."
+        itemName={delDoc?.documentName}
+        itemSubtext="Certificate Document Type Template"
+        itemBadge={delDoc?.id ? `ID: ${delDoc.id}` : ''}
+        onConfirm={confirmDeleteDoc}
+        onCancel={() => setDelDoc(null)}
+        loading={deletingDoc}
+      />
     </div>
   );
 }

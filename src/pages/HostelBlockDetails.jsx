@@ -1,6 +1,7 @@
 import { springApi } from '../services/api';
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { ArrowLeft, Plus, Trash2, Users } from 'lucide-react';
+import ConfirmDialog from '../components/ConfirmDialog';
 import HostelRoomModal from './HostelRoomModal';
 
 const _IS_PROD = window.location.hostname !== 'localhost';
@@ -16,6 +17,8 @@ export default function HostelBlockDetails({ block: blockProp, onBack }) {
   const [loadError,     setLoadError]     = useState('');
   const [roomModalOpen, setRoomModalOpen] = useState(false);
   const [selRoom,       setSelRoom]       = useState(null);
+  const [delItem,       setDelItem]       = useState(null);
+  const [deleting,      setDeleting]      = useState(false);
 
   // PRN input state
   const [prnInput,    setPrnInput]    = useState('');
@@ -73,28 +76,52 @@ export default function HostelBlockDetails({ block: blockProp, onBack }) {
   };
 
   // ── Delete room ───────────────────────────────────────────────────────
-  const handleDeleteRoom = async (room) => {
-    if (!window.confirm(`Delete room "${room.roomNo}"?`)) return;
-    try {
-      await springApi.delete(`/hostel-rooms/${room.roomId}`);
-      setSuccess('Room deleted.');
-      if (selRoom?.roomId === room.roomId) setSelRoom(null);
-      loadAll(true);
-    } catch (err) {
-      setError(err.message || 'Failed to delete room.');
-    }
+  const handleDeleteRoom = (room) => {
+    setDelItem({
+      title: 'Delete Room',
+      description: `Are you sure you want to delete room "${room.roomNo}"? This action will permanently remove the record.`,
+      itemName: `Room ${room.roomNo}`,
+      itemSubtext: `${block?.hostelName || 'Hostel'} - Floor ${room.floor || 1}`,
+      itemBadge: room.roomId,
+      action: async () => {
+        setDeleting(true);
+        try {
+          await springApi.delete(`/hostel-rooms/${room.roomId}`);
+          setSuccess('Room deleted.');
+          if (selRoom?.roomId === room.roomId) setSelRoom(null);
+          setDelItem(null);
+          loadAll(true);
+        } catch (err) {
+          setError(err.message || 'Failed to delete room.');
+        } finally {
+          setDeleting(false);
+        }
+      }
+    });
   };
 
   // ── Remove student from room ──────────────────────────────────────────
-  const handleRemoveStudent = async (roomId, prn) => {
-    if (!window.confirm('Remove this student from the room?')) return;
-    try {
-      await springApi.delete(`/hostel-rooms/${roomId}/students/${prn}`);
-      setSuccess('Student removed.');
-      loadAll(true);
-    } catch (err) {
-      setError(err.message || 'Failed to remove student.');
-    }
+  const handleRemoveStudent = (roomId, prn, studentName) => {
+    setDelItem({
+      title: 'Remove Student',
+      description: 'Are you sure you want to remove this student from the room? This action will permanently remove the record.',
+      itemName: studentName || prn,
+      itemSubtext: `PRN: ${prn}`,
+      itemBadge: roomId,
+      action: async () => {
+        setDeleting(true);
+        try {
+          await springApi.delete(`/hostel-rooms/${roomId}/students/${prn}`);
+          setSuccess('Student removed.');
+          setDelItem(null);
+          loadAll(true);
+        } catch (err) {
+          setError(err.message || 'Failed to remove student.');
+        } finally {
+          setDeleting(false);
+        }
+      }
+    });
   };
 
   // ── PRN lookup — robust check across Spring Boot and Node.js backend ──
@@ -508,7 +535,7 @@ export default function HostelBlockDetails({ block: blockProp, onBack }) {
                           type="button"
                           className="action-btn delete-btn"
                           style={{ padding: '0.25rem 0.5rem', fontSize: '0.75rem' }}
-                          onClick={() => handleRemoveStudent(selRoom.roomId, s.studentPrn)}
+                          onClick={() => handleRemoveStudent(selRoom.roomId, s.studentPrn, s.studentName)}
                         >
                           <Trash2 size={12} />
                           <span>Remove</span>
@@ -667,6 +694,18 @@ export default function HostelBlockDetails({ block: blockProp, onBack }) {
         blockId={blockId}
         onClose={() => setRoomModalOpen(false)}
         onSaved={handleRoomSaved}
+      />
+
+      <ConfirmDialog
+        isOpen={!!delItem}
+        title={delItem?.title}
+        description={delItem?.description}
+        itemName={delItem?.itemName}
+        itemSubtext={delItem?.itemSubtext}
+        itemBadge={delItem?.itemBadge}
+        onConfirm={() => delItem?.action && delItem.action()}
+        onCancel={() => setDelItem(null)}
+        loading={deleting}
       />
 
     </div>

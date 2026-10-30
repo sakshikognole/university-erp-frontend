@@ -20,10 +20,11 @@ import { useNavigate } from 'react-router-dom';
 import {
   Users, Plus, Download, Search, ChevronDown, FileText, FileSpreadsheet,
   Printer, AlertCircle, CheckCircle2, Loader2, ChevronLeft, ChevronRight,
-  Upload, Edit, Trash2, X, AlertTriangle, RefreshCw,
+  Upload, Eye, Edit, Trash2, X, AlertTriangle, RefreshCw,
 } from 'lucide-react';
 
 import AlumniFormModal from './AlumniForm';
+import ViewDetailModal from '../components/ViewDetailModal';
 const _IS_PROD = typeof window !== 'undefined' && window.location.hostname !== 'localhost';
 const API_BASE_URL = _IS_PROD ? 'https://university-erp-node.onrender.com/api' : 'http://localhost:5000/api';
 const NO_RECORDS_MSG = 'No Alumni records available to download.';
@@ -117,7 +118,7 @@ const exportPDF = (rows, setFeedback) => {
 // ─────────────────────────────────────────────────────────────────────────────
 
 // Mobile accordion card
-function AlmMobCard({ a, num, onEdit, onDelete, expanded, onToggle }) {
+function AlmMobCard({ a, num, onView, onEdit, onDelete, expanded, onToggle }) {
   return (
     <div className="mob-card">
       <button type="button" className="mob-card-header" onClick={onToggle} aria-expanded={expanded}>
@@ -139,6 +140,7 @@ function AlmMobCard({ a, num, onEdit, onDelete, expanded, onToggle }) {
           <div className="mob-card-row"><span className="mob-card-label">Email</span><span className="mob-card-value">{a.email || '—'}</span></div>
           <div className="mob-card-row"><span className="mob-card-label">Phone</span><span className="mob-card-value">{a.phone || '—'}</span></div>
           <div className="mob-card-actions">
+            <button type="button" className="action-btn view-btn" onClick={onView}><Eye size={14} /><span className="action-label">View</span></button>
             <button type="button" className="action-btn edit-btn" onClick={onEdit}><Edit size={14} /><span className="action-label">Edit</span></button>
             <button type="button" className="action-btn delete-btn" onClick={onDelete}><Trash2 size={14} /><span className="action-label">Delete</span></button>
           </div>
@@ -152,6 +154,7 @@ const Alumni = () => {
   const navigate = useNavigate();
 
   const [alumni,    setAlumni]    = useState([]);
+  const [viewAlumni, setViewAlumni] = useState(null);
   const [loading,   setLoading]   = useState(true);
   const [loadError, setLoadError] = useState(null);
   const [deleting,  setDeleting]  = useState(false);
@@ -390,7 +393,7 @@ const Alumni = () => {
                     {/* Improvement C: Email + Phone instead of Profile Links */}
                     <th style={{ width: '170px' }}>Email</th>
                     <th style={{ width: '120px' }}>Phone</th>
-                    <th style={{ width: '110px', textAlign: 'right' }}>Actions</th>
+                    <th style={{ width: '220px', textAlign: 'right' }}>Actions</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -415,6 +418,10 @@ const Alumni = () => {
                       </td>
                       <td style={{ textAlign: 'right' }}>
                         <div className="action-buttons-cell" style={{ justifyContent: 'flex-end' }}>
+                          <button type="button" className="action-btn view-btn" title="View"
+                            onClick={() => setViewAlumni(a)}>
+                            <Eye size={14} /><span className="action-label">View</span>
+                          </button>
                           <button type="button" className="action-btn edit-btn" title="Edit"
                             onClick={() => openEditModal(a._id || a.alumniId)}>
                             <Edit size={14} /><span className="action-label">Edit</span>
@@ -437,6 +444,7 @@ const Alumni = () => {
                     key={a._id || a.alumniId}
                     a={a}
                     num={startIndex + i + 1}
+                    onView={() => setViewAlumni(a)}
                     onEdit={() => openEditModal(a._id || a.alumniId)}
                     onDelete={() => setDeleteConfirm({ id: a._id || a.alumniId, name: a.name })}
                     expanded={almExpanded === (a._id || a.alumniId)}
@@ -528,6 +536,26 @@ const Alumni = () => {
         alumniId={editAlumniId}
         onClose={closeModal}
         onSuccess={handleModalSuccess}
+      />
+
+      {/* View Alumni Modal */}
+      <ViewDetailModal
+        isOpen={!!viewAlumni}
+        title={viewAlumni?.name || 'Alumni Details'}
+        subtitle={viewAlumni?.alumniId}
+        rows={viewAlumni ? [
+          { label: 'Alumni ID', value: viewAlumni.alumniId },
+          { label: 'Name', value: viewAlumni.name },
+          { label: 'Graduation Year', value: viewAlumni.graduationYear },
+          { label: 'Job Title', value: viewAlumni.jobTitle },
+          { label: 'Company', value: viewAlumni.currentCompany },
+          { label: 'Email', value: viewAlumni.email },
+          { label: 'Phone', value: viewAlumni.phone },
+          { label: 'LinkedIn', value: viewAlumni.socialLinks?.linkedin },
+          { label: 'GitHub', value: viewAlumni.socialLinks?.github },
+          { label: 'Portfolio', value: viewAlumni.socialLinks?.portfolio },
+        ] : []}
+        onClose={() => setViewAlumni(null)}
       />
     </div>
   );

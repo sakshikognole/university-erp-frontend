@@ -5,6 +5,7 @@ import PageLoader from '../components/PageLoader';
 import PageError  from '../components/PageError';
 import SportModal from './SportModal';
 import ViewSportModal from './ViewSportModal';
+import ConfirmDialog from '../components/ConfirmDialog';
 
 const _IS_PROD_SP = window.location.hostname !== 'localhost';
 const NODE_API = _IS_PROD_SP ? 'https://university-erp-node.onrender.com/api' : 'http://localhost:5000/api';
@@ -16,6 +17,7 @@ export default function SportsPage() {
   const [pageError,  setPageError]  = useState('');
   const [saving,     setSaving]     = useState(false);
   const [deleting,   setDeleting]   = useState(null);
+  const [delSport,   setDelSport]   = useState(null);
   const [modalOpen,  setModalOpen]  = useState(false);
   const [modalMode,  setModalMode]  = useState('add');
   const [selSport,   setSelSport]   = useState(null);
@@ -98,12 +100,17 @@ export default function SportsPage() {
     }
   };
 
-  const handleDelete = async (sport) => {
-    if (!window.confirm(`Delete "${sport.sportName}"?`)) return;
-    setDeleting(sport.sportId);
+  const handleDelete = (sport) => {
+    setDelSport(sport);
+  };
+
+  const confirmDeleteSport = async () => {
+    if (!delSport) return;
+    setDeleting(delSport.sportId);
     try {
-      await springApi.delete(`/sports/${sport.sportId}`);
+      await springApi.delete(`/sports/${delSport.sportId}`);
       setSuccess('Sport deleted successfully.');
+      setDelSport(null);
       load(true); // silent refresh — no flicker
     } catch {
       setError('Failed to delete sport.');
@@ -250,6 +257,18 @@ export default function SportsPage() {
         isOpen={viewOpen}
         sport={viewSport}
         onClose={() => setViewOpen(false)}
+      />
+
+      <ConfirmDialog
+        isOpen={!!delSport}
+        title="Delete Sport"
+        description="Are you sure you want to delete this sport? This action will permanently remove the record."
+        itemName={delSport?.sportName}
+        itemSubtext={delSport?.venueId ? `Venue: ${delSport.venueId}` : 'Sport Record'}
+        itemBadge={delSport?.sportId}
+        onConfirm={confirmDeleteSport}
+        onCancel={() => setDelSport(null)}
+        loading={!!deleting}
       />
 
     </div>

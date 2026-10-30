@@ -3,6 +3,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { Eye, Edit, Trash2, Plus } from 'lucide-react';
 import Pagination from '../components/Pagination';
+import ConfirmDialog from '../components/ConfirmDialog';
 import HostelBlockModal from './HostelBlockModal';
 import HostelBlockDetails from './HostelBlockDetails';
 
@@ -23,6 +24,8 @@ export default function HostelPage() {
   const [loading,   setLoading]   = useState(true);
   const [modalOpen, setModalOpen] = useState(false);
   const [editBlock, setEditBlock] = useState(null);
+  const [delBlock,  setDelBlock]  = useState(null);
+  const [deleting,  setDeleting]  = useState(false);
   const [success,   setSuccess]   = useState('');
   const [error,     setError]     = useState('');
 
@@ -63,14 +66,22 @@ export default function HostelPage() {
   const openView = (block) => setSearchParams({ block: block.blockId });
   const goBack   = ()      => { setSearchParams({}); load(true); };
 
-  const handleDelete = async (block) => {
-    if (!window.confirm(`Delete "${block.hostelName}"?`)) return;
+  const handleDelete = (block) => {
+    setDelBlock(block);
+  };
+
+  const confirmDelete = async () => {
+    if (!delBlock) return;
+    setDeleting(true);
     try {
-      await springApi.delete(`/hostel-blocks/${block.blockId}`);
+      await springApi.delete(`/hostel-blocks/${delBlock.blockId}`);
       setSuccess('Hostel block deleted.');
+      setDelBlock(null);
       load(true);
     } catch (err) {
       setError(err.message || 'Failed to delete block.');
+    } finally {
+      setDeleting(false);
     }
   };
 
@@ -215,6 +226,18 @@ export default function HostelPage() {
         block={editBlock}
         onClose={() => setModalOpen(false)}
         onSaved={handleSaved}
+      />
+
+      <ConfirmDialog
+        isOpen={!!delBlock}
+        title="Delete Hostel Block"
+        description={`Are you sure you want to delete hostel block "${delBlock?.hostelName}"? This action will permanently remove the record.`}
+        itemName={delBlock?.hostelName}
+        itemSubtext={`${delBlock?.type || 'Hostel'} Block`}
+        itemBadge={delBlock?.blockId}
+        onConfirm={confirmDelete}
+        onCancel={() => setDelBlock(null)}
+        loading={deleting}
       />
 
     </div>

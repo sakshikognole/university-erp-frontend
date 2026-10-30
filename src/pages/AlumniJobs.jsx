@@ -3,10 +3,11 @@ import { useNavigate } from 'react-router-dom';
 import {
   Briefcase, Plus, Download, Search, ChevronDown, FileText, FileSpreadsheet,
   Printer, AlertCircle, CheckCircle2, Loader2, ChevronLeft, ChevronRight,
-  Edit, Trash2, X, AlertTriangle, ExternalLink,
+  Eye, Edit, Trash2, X, AlertTriangle, ExternalLink,
 } from 'lucide-react';
 
 import AlumniJobFormModal from './AlumniJobForm';
+import ViewDetailModal from '../components/ViewDetailModal';
 const _IS_PROD = typeof window !== 'undefined' && window.location.hostname !== 'localhost';
 const API_BASE_URL = _IS_PROD ? 'https://university-erp-node.onrender.com/api' : 'http://localhost:5000/api';
 
@@ -105,7 +106,7 @@ const STATUS_CLASSES = {
 };
 
 // Mobile accordion card for AlumniJobs
-function AjbMobCard({ j, num, fmtDate, isExpired, getJobStatus, STATUS_CLASSES, onEdit, onDelete, expanded, onToggle }) {
+function AjbMobCard({ j, num, fmtDate, isExpired, getJobStatus, STATUS_CLASSES, onView, onEdit, onDelete, expanded, onToggle }) {
   const status = getJobStatus(j);
   return (
     <div className="mob-card">
@@ -130,6 +131,7 @@ function AjbMobCard({ j, num, fmtDate, isExpired, getJobStatus, STATUS_CLASSES, 
           <div className="mob-card-row"><span className="mob-card-label">Expiry</span><span className="mob-card-value" style={{color: isExpired(j.dateOfExpiry) ? '#ef4444' : 'inherit'}}>{fmtDate(j.dateOfExpiry)}</span></div>
           {j.applicationLink && <div className="mob-card-row"><span className="mob-card-label">Apply</span><span className="mob-card-value"><a href={j.applicationLink} target="_blank" rel="noopener noreferrer">Link</a></span></div>}
           <div className="mob-card-actions">
+            <button type="button" className="action-btn view-btn" onClick={onView}><Eye size={14} /><span className="action-label">View</span></button>
             <button type="button" className="action-btn edit-btn" onClick={onEdit}><Edit size={14} /><span className="action-label">Edit</span></button>
             <button type="button" className="action-btn delete-btn" onClick={onDelete}><Trash2 size={14} /><span className="action-label">Delete</span></button>
           </div>
@@ -142,6 +144,7 @@ function AjbMobCard({ j, num, fmtDate, isExpired, getJobStatus, STATUS_CLASSES, 
 const AlumniJobs = () => {
   const navigate = useNavigate();
   const [jobs, setJobs] = useState([]);
+  const [viewJob, setViewJob] = useState(null);
   const [loadError, setLoadError] = useState(null);
   const [loading, setLoading] = useState(true);
   const [deleting, setDeleting] = useState(false);
@@ -385,7 +388,7 @@ const AlumniJobs = () => {
                     <th style={{ width: '120px' }}>Posted</th>
                     <th style={{ width: '120px' }}>Expiry</th>
                     <th style={{ width: '160px' }}>Application Link</th>
-                    <th style={{ width: '100px', textAlign: 'right' }}>Actions</th>
+                    <th style={{ width: '220px', textAlign: 'right' }}>Actions</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -437,6 +440,14 @@ const AlumniJobs = () => {
                         <div className="action-buttons-cell" style={{ justifyContent: 'flex-end' }}>
                           <button
                             type="button"
+                            className="action-btn view-btn"
+                            title="View"
+                            onClick={() => setViewJob(j)}
+                          >
+                            <Eye size={14} /><span className="action-label">View</span>
+                          </button>
+                          <button
+                            type="button"
                             className="action-btn edit-btn"
                             title="Edit"
                             onClick={() => openEditModal(j._id || j.jobId)}
@@ -469,6 +480,7 @@ const AlumniJobs = () => {
                     isExpired={isExpired}
                     getJobStatus={getJobStatus}
                     STATUS_CLASSES={STATUS_CLASSES}
+                    onView={() => setViewJob(j)}
                     onEdit={() => openEditModal(j._id || j.jobId)}
                     onDelete={() => setDeleteConfirm({ id: j._id || j.jobId, label: `${j.role} @ ${j.company}` })}
                     expanded={ajbExpanded === (j._id || j.jobId)}
@@ -589,6 +601,25 @@ const AlumniJobs = () => {
         jobId={editJobId}
         onClose={closeModal}
         onSuccess={handleModalSuccess}
+      />
+
+      {/* View Job Modal */}
+      <ViewDetailModal
+        isOpen={!!viewJob}
+        title={viewJob?.role ? `${viewJob.role} @ ${viewJob.company}` : 'Job Details'}
+        subtitle={viewJob?.jobId}
+        rows={viewJob ? [
+          { label: 'Job ID', value: viewJob.jobId },
+          { label: 'Alumni ID', value: viewJob.alumniId },
+          { label: 'Company', value: viewJob.company },
+          { label: 'Role', value: viewJob.role },
+          { label: 'Status', value: getJobStatus(viewJob) },
+          { label: 'Date Posted', value: fmtDate(viewJob.datePosted) },
+          { label: 'Expiry Date', value: fmtDate(viewJob.dateOfExpiry) },
+          { label: 'Application Link', value: viewJob.applicationLink },
+          { label: 'Description', value: viewJob.description },
+        ] : []}
+        onClose={() => setViewJob(null)}
       />
     </div>
   );

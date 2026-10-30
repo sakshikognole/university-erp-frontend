@@ -1,6 +1,9 @@
 import { useState, useEffect, useCallback } from 'react';
+import { Search } from 'lucide-react';
 import { springApi, springGet } from '../services/api';
 import PageError from '../components/PageError';
+import ViewDetailModal from '../components/ViewDetailModal';
+import ConfirmDialog from '../components/ConfirmDialog';
 
 // URL helpers
 const onLocalhost = window.location.hostname === 'localhost';
@@ -308,7 +311,7 @@ function ExamScheduleModal({ isOpen, mode, schedule, onSave, onClose, saving }) 
 }
 
 // Class Schedule Modal
-function ClassScheduleModal({ isOpen, onSave, onClose, saving }) {
+function ClassScheduleModal({ isOpen, mode = 'add', schedule = null, onSave, onClose, saving }) {
   const [form, setForm] = useState(EMPTY_CLASS_FORM);
   const [errors, setErrors] = useState({});
   const [subjects, setSubjects] = useState([]);
@@ -319,7 +322,22 @@ function ClassScheduleModal({ isOpen, onSave, onClose, saving }) {
 
   useEffect(() => {
     if (!isOpen) return;
-    setForm(EMPTY_CLASS_FORM);
+    if (mode === 'edit' && schedule) {
+      setForm({
+        department: schedule.department || '',
+        semester: schedule.semester || '',
+        subjectId: schedule.subjectId || '',
+        subjectName: schedule.subjectName || '',
+        facultyId: schedule.facultyId || '',
+        facultyName: schedule.facultyName || '',
+        venueId: schedule.venueId || '',
+        venueName: schedule.venueName || '',
+        scheduleDate: schedule.scheduleDate ? schedule.scheduleDate.split('T')[0] : '',
+        daySlots: schedule.daySlots || [],
+      });
+    } else {
+      setForm(EMPTY_CLASS_FORM);
+    }
     setErrors({});
     setLoading(true);
     Promise.all([
@@ -392,7 +410,7 @@ function ClassScheduleModal({ isOpen, onSave, onClose, saving }) {
     <div className="books-overlay">
       <div className="books-modal" style={{ maxWidth: 560 }}>
         <div className="books-modal-head">
-          <h3>Add Class Schedule</h3>
+          <h3>{mode === 'edit' ? 'Edit Class Schedule' : 'Add Class Schedule'}</h3>
           <button className="books-modal-close" onClick={onClose} disabled={saving}>×</button>
         </div>
         {loading ? (
@@ -528,7 +546,7 @@ function ClassScheduleModal({ isOpen, onSave, onClose, saving }) {
             <div className="books-modal-foot">
               <button type="button" className="books-btn books-btn-ghost" onClick={onClose} disabled={saving}>Cancel</button>
               <button type="submit" className="books-btn books-btn-primary" disabled={saving}>
-                {saving ? 'Saving...' : 'Add Class Schedule'}
+                {saving ? 'Saving...' : mode === 'edit' ? 'Update Class Schedule' : 'Add Class Schedule'}
               </button>
             </div>
           </form>
@@ -539,7 +557,7 @@ function ClassScheduleModal({ isOpen, onSave, onClose, saving }) {
 }
 
 // Schedule Mobile Card (accordion — same pattern as BookMobileCard)
-function ScheduleMobileCard({ sch, index, activeTab, isExpanded, onToggle, onEdit, onDelete, deleting }) {
+function ScheduleMobileCard({ sch, index, activeTab, isExpanded, onToggle, onView, onEdit, onDelete, deleting }) {
   const isExam = activeTab === 'exam';
 
   // Header title and subtitle
@@ -640,17 +658,23 @@ function ScheduleMobileCard({ sch, index, activeTab, isExpanded, onToggle, onEdi
           )}
 
           <div className="sch-mob-actions">
-            {isExam && (
-              <button className="books-btn books-btn-sm books-btn-warning" onClick={() => onEdit(sch)}>
-                <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}>
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
-                    <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
-                  </svg>
-                  Edit
-                </span>
-              </button>
-            )}
+            <button className="books-btn books-btn-sm books-btn-ghost" onClick={() => onView(sch)}>
+              <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>
+                </svg>
+                View
+              </span>
+            </button>
+            <button className="books-btn books-btn-sm books-btn-warning" onClick={() => onEdit(sch)}>
+              <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+                  <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+                </svg>
+                Edit
+              </span>
+            </button>
             <button
               className="books-btn books-btn-sm books-btn-danger"
               onClick={() => onDelete(sch)}
@@ -683,10 +707,15 @@ export default function SchedulePage() {
   const [pageError, setPageError] = useState('');
   const [saving, setSaving] = useState(false);
   const [deleting, setDeleting] = useState(null);
+  const [delSch, setDelSch] = useState(null);
+  const [search, setSearch] = useState('');
   const [examModalOpen, setExamModalOpen] = useState(false);
   const [examModalMode, setExamModalMode] = useState('add');
   const [selectedSchedule, setSelectedSchedule] = useState(null);
   const [classModalOpen, setClassModalOpen] = useState(false);
+  const [classModalMode, setClassModalMode] = useState('add');
+  const [selectedClassSchedule, setSelectedClassSchedule] = useState(null);
+  const [viewSchedule, setViewSchedule] = useState(null);
   const [success, setSuccess] = useState('');
   const [error, setError] = useState('');
   const [expandedId, setExpandedId] = useState(null); // mobile accordion
@@ -722,6 +751,18 @@ export default function SchedulePage() {
     setSelectedSchedule(schedule);
     setExamModalMode('edit');
     setExamModalOpen(true);
+  };
+
+  const openClassAdd = () => {
+    setSelectedClassSchedule(null);
+    setClassModalMode('add');
+    setClassModalOpen(true);
+  };
+
+  const openClassEdit = (schedule) => {
+    setSelectedClassSchedule(schedule);
+    setClassModalMode('edit');
+    setClassModalOpen(true);
   };
 
   const handleExamSave = async (form) => {
@@ -761,8 +802,13 @@ export default function SchedulePage() {
   const handleClassSave = async (form) => {
     setSaving(true);
     try {
-      await springApi.post('/schedules', form);
-      setSuccess('Class schedule added successfully.');
+      if (classModalMode === 'edit' && selectedClassSchedule) {
+        await springApi.put(`/schedules/${selectedClassSchedule.scheduleId}`, form);
+        setSuccess('Class schedule updated successfully.');
+      } else {
+        await springApi.post('/schedules', form);
+        setSuccess('Class schedule added successfully.');
+      }
       setClassModalOpen(false);
       await load(true);
     } catch (err) {
@@ -772,12 +818,17 @@ export default function SchedulePage() {
     }
   };
 
-  const handleDelete = async (sch) => {
-    if (!window.confirm(`Delete schedule "${sch.scheduleId}"?`)) return;
-    setDeleting(sch.scheduleId);
+  const handleDelete = (sch) => {
+    setDelSch(sch);
+  };
+
+  const confirmDelete = async () => {
+    if (!delSch) return;
+    setDeleting(delSch.scheduleId);
     try {
-      await springApi.delete(`/schedules/${sch.scheduleId}`);
+      await springApi.delete(`/schedules/${delSch.scheduleId}`);
       setSuccess('Schedule deleted.');
+      setDelSch(null);
       await load(true);
     } catch {
       setError('Failed to delete schedule.');
@@ -789,9 +840,24 @@ export default function SchedulePage() {
   // Filter schedules based on active tab
   // Exam schedules: examId is a non-empty string
   // Class schedules: examId is null, undefined, or empty string
-  const filteredSchedules = schedules.filter(s => {
+  const tabSchedules = schedules.filter(s => {
     if (activeTab === 'exam') return s.examId && s.examId.trim() !== '';
     return !s.examId || s.examId.trim() === '';
+  });
+
+  const filteredSchedules = tabSchedules.filter(s => {
+    const q = search.toLowerCase();
+    if (!q) return true;
+    return (
+      (s.scheduleId && s.scheduleId.toLowerCase().includes(q)) ||
+      (s.examName && s.examName.toLowerCase().includes(q)) ||
+      (s.examId && s.examId.toLowerCase().includes(q)) ||
+      (s.subjectName && s.subjectName.toLowerCase().includes(q)) ||
+      (s.department && s.department.toLowerCase().includes(q)) ||
+      (s.facultyName && s.facultyName.toLowerCase().includes(q)) ||
+      (s.classroom && s.classroom.toLowerCase().includes(q)) ||
+      (s.venueName && s.venueName.toLowerCase().includes(q))
+    );
   });
 
   return (
@@ -807,7 +873,7 @@ export default function SchedulePage() {
             <span className="desk-only-text">+ Add Exam Schedule</span>
             <span className="mob-only-text">+ Add Exam</span>
           </button>
-          <button className="books-btn books-btn-primary" onClick={() => setClassModalOpen(true)}>
+          <button className="books-btn books-btn-primary" onClick={openClassAdd}>
             <span className="desk-only-text">+ Add Class Schedule</span>
             <span className="mob-only-text">+ Add Class</span>
           </button>
@@ -870,7 +936,7 @@ export default function SchedulePage() {
         <div className="card"><p style={{ padding: 32, textAlign: 'center' }}>Loading...</p></div>
       ) : pageError ? (
         <PageError message={pageError} onRetry={load} />
-      ) : filteredSchedules.length === 0 ? (
+      ) : tabSchedules.length === 0 ? (
         <div className="card" style={{ padding: '48px 24px', textAlign: 'center' }}>
           <div style={{ fontSize: 48, marginBottom: 12 }}>
             {activeTab === 'exam' ? '📝' : '🗓️'}
@@ -880,17 +946,53 @@ export default function SchedulePage() {
           </p>
           <button
             className="books-btn books-btn-primary"
-            onClick={() => activeTab === 'exam' ? openExamAdd() : setClassModalOpen(true)}
+            onClick={() => activeTab === 'exam' ? openExamAdd() : openClassAdd()}
           >
             + Add {activeTab === 'exam' ? 'Exam Schedule' : 'Class Schedule'}
           </button>
         </div>
       ) : (
-        <div className="card" style={{ padding: '1rem' }}>
-          {/* ── Desktop table (hidden on mobile) ── */}
-          <div className="sch-desk-table">
-          <div className="books-table-wrap">
-            <table className="books-table">
+        <div className="card table-card" style={{ padding: '1rem', marginTop: '1.25rem' }}>
+          {/* Search + count INSIDE the card */}
+          <div className="table-controls-bar">
+            <div className="search-box-wrapper">
+              <Search size={16} className="search-icon" />
+              <input
+                className="search-input"
+                placeholder={activeTab === 'exam' ? "Search by Schedule ID, Exam, or Venue..." : "Search by Schedule ID, Dept, Subject, Faculty, Venue..."}
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+              />
+              {search && (
+                <button
+                  type="button"
+                  className="search-clear-btn"
+                  onClick={() => setSearch('')}
+                  aria-label="Clear search"
+                >
+                  Clear
+                </button>
+              )}
+            </div>
+            <div
+              className="table-stats-badge"
+              style={{ width: 'fit-content', alignSelf: 'flex-end', marginLeft: 'auto' }}
+            >
+              Total: <strong>{filteredSchedules.length}</strong>{' '}
+              {filteredSchedules.length === 1 ? 'Schedule' : 'Schedules'}
+            </div>
+          </div>
+
+          {filteredSchedules.length === 0 ? (
+            <div style={{ textAlign: 'center', padding: '40px 24px', color: 'var(--text-secondary)' }}>
+              <p>No schedules matched your search.</p>
+            </div>
+          ) : (
+            <>
+              {/* ── Desktop table (hidden on mobile) ── */}
+              <div className="sch-desk-table">
+              <div className="books-table-wrap">
+                <table className="books-table">
               <thead>
                 <tr>
                   <th style={{ width: 42 }}>#</th>
@@ -993,18 +1095,63 @@ export default function SchedulePage() {
                     )}
                     <td>
                       <div className="books-actions" style={{ display: 'flex', gap: 6, flexWrap: 'nowrap', alignItems: 'center' }}>
-                        {activeTab === 'exam' && (
+                        <button
+                          type="button"
+                          className="books-btn books-btn-sm books-btn-ghost"
+                          onClick={() => setViewSchedule(sch)}
+                          title="View"
+                        >
+                          <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}>
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                              <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>
+                            </svg>
+                            View
+                          </span>
+                        </button>
+                        {activeTab === 'exam' ? (
                           <button
+                            type="button"
                             className="books-btn books-btn-sm books-btn-warning"
                             onClick={() => openExamEdit(sch)}
-                          ><span style={{display:"inline-flex",alignItems:"center",gap:4}}><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg> Edit</span></button>
+                            title="Edit"
+                          >
+                            <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}>
+                              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+                              </svg>
+                              Edit
+                            </span>
+                          </button>
+                        ) : (
+                          <button
+                            type="button"
+                            className="books-btn books-btn-sm books-btn-warning"
+                            onClick={() => openClassEdit(sch)}
+                            title="Edit"
+                          >
+                            <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}>
+                              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+                              </svg>
+                              Edit
+                            </span>
+                          </button>
                         )}
                         <button
+                          type="button"
                           className="books-btn books-btn-sm books-btn-danger"
                           onClick={() => handleDelete(sch)}
                           disabled={deleting === sch.scheduleId}
+                          title="Delete"
                         >
-                          {deleting === sch.scheduleId ? '...' : <span style={{display:"inline-flex",alignItems:"center",gap:4}}><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>Delete</span>}
+                          {deleting === sch.scheduleId ? '...' : (
+                            <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}>
+                              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                <polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/>
+                              </svg>
+                              Delete
+                            </span>
+                          )}
                         </button>
                       </div>
                     </td>
@@ -1025,12 +1172,15 @@ export default function SchedulePage() {
                 activeTab={activeTab}
                 isExpanded={expandedId === sch.scheduleId}
                 onToggle={() => setExpandedId(expandedId === sch.scheduleId ? null : sch.scheduleId)}
-                onEdit={openExamEdit}
+                onView={() => setViewSchedule(sch)}
+                onEdit={() => activeTab === 'exam' ? openExamEdit(sch) : openClassEdit(sch)}
                 onDelete={handleDelete}
                 deleting={deleting}
               />
             ))}
           </div>
+          </>
+        )}
         </div>
       )}
 
@@ -1042,7 +1192,52 @@ export default function SchedulePage() {
         onClose={() => setExamModalOpen(false)} 
         saving={saving} 
       />
-      <ClassScheduleModal isOpen={classModalOpen} onSave={handleClassSave} onClose={() => setClassModalOpen(false)} saving={saving} />
+      <ClassScheduleModal
+        isOpen={classModalOpen}
+        mode={classModalMode}
+        schedule={selectedClassSchedule}
+        onSave={handleClassSave}
+        onClose={() => setClassModalOpen(false)}
+        saving={saving}
+      />
+
+      <ViewDetailModal
+        isOpen={!!viewSchedule}
+        title={viewSchedule?.examId ? 'Exam Schedule Details' : 'Class Schedule Details'}
+        subtitle={viewSchedule?.scheduleId}
+        rows={viewSchedule ? (viewSchedule.examId ? [
+          { label: 'Schedule ID', value: viewSchedule.scheduleId },
+          { label: 'Exam Name', value: viewSchedule.examName || viewSchedule.subjectName },
+          { label: 'Exam ID', value: viewSchedule.examId },
+          { label: 'Start Time', value: viewSchedule.daySlots?.[0]?.startTime },
+          { label: 'Date', value: viewSchedule.scheduleDate ? new Date(viewSchedule.scheduleDate).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' }) : '—' },
+          { label: 'Days', value: viewSchedule.daySlots?.map(d => d.day).join(', ') },
+          { label: 'Classroom', value: viewSchedule.classroom || viewSchedule.venueName || 'TBA' },
+        ] : [
+          { label: 'Schedule ID', value: viewSchedule.scheduleId },
+          { label: 'Department', value: viewSchedule.department },
+          { label: 'Semester', value: viewSchedule.semester },
+          { label: 'Subject', value: viewSchedule.subjectName },
+          { label: 'Faculty', value: viewSchedule.facultyName },
+          { label: 'Start Time', value: viewSchedule.daySlots?.[0]?.startTime },
+          { label: 'Date', value: viewSchedule.scheduleDate ? new Date(viewSchedule.scheduleDate).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' }) : '—' },
+          { label: 'Days', value: viewSchedule.daySlots?.map(d => d.day).join(', ') },
+          { label: 'Venue', value: viewSchedule.venueName || viewSchedule.venueId || '—' },
+        ]) : []}
+        onClose={() => setViewSchedule(null)}
+      />
+
+      <ConfirmDialog
+        isOpen={!!delSch}
+        title="Delete Schedule"
+        description={`Are you sure you want to delete schedule "${delSch?.scheduleId}"? This action will permanently remove the record.`}
+        itemName={delSch?.examName || delSch?.subjectName || delSch?.scheduleId}
+        itemSubtext={delSch?.examId ? `Exam: ${delSch.examId}` : `Dept: ${delSch?.department || 'Class'}`}
+        itemBadge={delSch?.scheduleId}
+        onConfirm={confirmDelete}
+        onCancel={() => setDelSch(null)}
+        loading={!!deleting}
+      />
     </div>
   );
 }

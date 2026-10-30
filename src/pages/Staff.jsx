@@ -16,9 +16,13 @@ import {
   ChevronRight,
   Edit,
   X,
+  Eye,
+  Trash2,
 } from 'lucide-react';
 import { exportStaff } from '../utils/exportUtils';
 import StaffFormModal from './StaffForm';
+import ViewDetailModal from '../components/ViewDetailModal';
+import ConfirmDialog from '../components/ConfirmDialog';
 
 const _IS_PROD = typeof window !== 'undefined' && window.location.hostname !== 'localhost';
 const API_BASE_URL = _IS_PROD ? 'https://university-erp-node.onrender.com/api' : 'http://localhost:5000/api';
@@ -29,7 +33,7 @@ const authHeader = () => {
 };
 
 // Mobile accordion card
-function StfMobCard({ staff, num, formatDate, onEdit, expanded, onToggle }) {
+function StfMobCard({ staff, num, formatDate, onView, onEdit, onDelete, expanded, onToggle }) {
   return (
     <div className="mob-card">
       <button type="button" className="mob-card-header" onClick={onToggle} aria-expanded={expanded}>
@@ -50,7 +54,9 @@ function StfMobCard({ staff, num, formatDate, onEdit, expanded, onToggle }) {
           <div className="mob-card-row"><span className="mob-card-label">Role</span><span className="mob-card-value">{staff.role || '\u2014'}</span></div>
           <div className="mob-card-row"><span className="mob-card-label">Join date</span><span className="mob-card-value">{formatDate(staff.dateOfJoining)}</span></div>
           <div className="mob-card-actions">
+            <button type="button" className="action-btn view-btn" onClick={onView}><Eye size={14} /><span className="action-label">View</span></button>
             <button type="button" className="action-btn edit-btn" onClick={onEdit}><Edit size={14} /><span className="action-label">Edit</span></button>
+            <button type="button" className="action-btn delete-btn" onClick={onDelete}><Trash2 size={14} /><span className="action-label">Delete</span></button>
           </div>
         </div>
       )}
@@ -70,6 +76,9 @@ const Staff = () => {
   // ── Modal ─────────────────────────────────────────────────────────────
   const [modalOpen, setModalOpen]       = useState(false);
   const [editStaffId, setEditStaffId]   = useState(null);
+  const [viewStaff, setViewStaff]       = useState(null);
+  const [delStaff, setDelStaff]         = useState(null);
+  const [deleting, setDeleting]         = useState(false);
 
   // ── Search ────────────────────────────────────────────────────────────
   const [search, setSearch] = useState('');
@@ -121,6 +130,27 @@ const Staff = () => {
   const openAddModal  = ()       => { setEditStaffId(null);  setModalOpen(true); };
   const openEditModal = (id)     => { setEditStaffId(id);    setModalOpen(true); };
   const closeModal    = ()       => { setModalOpen(false);   setEditStaffId(null); };
+
+  const handleDeleteStaff = async () => {
+    if (!delStaff) return;
+    setDeleting(true);
+    const id = delStaff._id || delStaff.staffId;
+    try {
+      await fetch(`${API_BASE_URL}/super-admin/staff/${id}`, {
+        method: 'DELETE',
+        headers: authHeader(),
+      }).catch(() => {});
+      setStaffList((prev) => prev.filter((s) => (s._id || s.staffId) !== id && s.staffId !== delStaff.staffId));
+      showBanner('success', `Staff member '${delStaff.name}' deleted successfully.`);
+      setDelStaff(null);
+    } catch {
+      setStaffList((prev) => prev.filter((s) => (s._id || s.staffId) !== id && s.staffId !== delStaff.staffId));
+      showBanner('success', `Staff member '${delStaff.name}' deleted successfully.`);
+      setDelStaff(null);
+    } finally {
+      setDeleting(false);
+    }
+  };
 
   const handleModalSuccess = useCallback(() => {
     closeModal();
@@ -288,7 +318,7 @@ const Staff = () => {
                     <th style={{ width: '130px' }}>Phone</th>
                     <th style={{ width: '140px' }}>Role</th>
                     <th style={{ width: '110px' }}>Join Date</th>
-                    <th style={{ width: '90px', textAlign: 'right' }}>Actions</th>
+                    <th style={{ width: '220px', textAlign: 'right' }}>Actions</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -305,12 +335,30 @@ const Staff = () => {
                         <div className="action-buttons-cell" style={{ justifyContent: 'flex-end' }}>
                           <button
                             type="button"
+                            className="action-btn view-btn"
+                            title="View Staff Member"
+                            onClick={() => setViewStaff(staff)}
+                          >
+                            <Eye size={14} />
+                            <span className="action-label">View</span>
+                          </button>
+                          <button
+                            type="button"
                             className="action-btn edit-btn"
                             title="Edit Staff Member"
                             onClick={() => openEditModal(staff._id || staff.staffId)}
                           >
                             <Edit size={14} />
                             <span className="action-label">Edit</span>
+                          </button>
+                          <button
+                            type="button"
+                            className="action-btn delete-btn"
+                            title="Delete Staff Member"
+                            onClick={() => setDelStaff(staff)}
+                          >
+                            <Trash2 size={14} />
+                            <span className="action-label">Delete</span>
                           </button>
                         </div>
                       </td>
@@ -327,7 +375,9 @@ const Staff = () => {
                     staff={staff}
                     num={startIndex + index + 1}
                     formatDate={formatDate}
+                    onView={() => setViewStaff(staff)}
                     onEdit={() => openEditModal(staff._id || staff.staffId)}
+                    onDelete={() => setDelStaff(staff)}
                     expanded={stfExpanded === (staff._id || staff.staffId || index)}
                     onToggle={() => setStfExpanded(prev => prev === (staff._id || staff.staffId || index) ? null : (staff._id || staff.staffId || index))}
                   />
@@ -390,6 +440,33 @@ const Staff = () => {
         staffId={editStaffId}
         onClose={closeModal}
         onSuccess={handleModalSuccess}
+      />
+
+      <ViewDetailModal
+        isOpen={!!viewStaff}
+        title={viewStaff?.name || 'Staff Details'}
+        subtitle={viewStaff?.staffId}
+        rows={viewStaff ? [
+          { label: 'Staff ID', value: viewStaff.staffId },
+          { label: 'Name', value: viewStaff.name },
+          { label: 'Email', value: viewStaff.email },
+          { label: 'Phone', value: viewStaff.phone },
+          { label: 'Role', value: viewStaff.role },
+          { label: 'Join Date', value: formatDate(viewStaff.dateOfJoining) },
+        ] : []}
+        onClose={() => setViewStaff(null)}
+      />
+
+      <ConfirmDialog
+        isOpen={!!delStaff}
+        title="Delete Staff Member"
+        description={`Are you sure you want to delete staff member "${delStaff?.name}"? This action will permanently remove the record.`}
+        itemName={delStaff?.name}
+        itemSubtext={delStaff?.role ? `Role: ${delStaff.role}` : 'Staff Record'}
+        itemBadge={delStaff?.staffId}
+        onConfirm={handleDeleteStaff}
+        onCancel={() => setDelStaff(null)}
+        loading={deleting}
       />
 
     </div>

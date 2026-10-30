@@ -1,5 +1,6 @@
 import { springApi } from '../services/api';
 import { useState, useEffect, useRef, useCallback } from 'react';
+import ConfirmDialog from '../components/ConfirmDialog';
 
 // ── Constants ──────────────────────────────────────────────────────────────
 const ALLOWED_EXT    = ['pdf', 'jpg', 'jpeg', 'png', 'xls', 'xlsx'];
@@ -148,8 +149,9 @@ export default function UploadMaterialsPage() {
   const [creatingFolder, setCreatingFolder] = useState(false);
   const [folderError,    setFolderError]    = useState('');
 
-  // Delete folder
+  // Delete folder / file confirmation
   const [deletingFolderId, setDeletingFolderId] = useState(null);
+  const [delItem,          setDelItem]          = useState(null);
 
   // ── File state ────────────────────────────────────────────────────────
   const [pendingFiles, setPendingFiles] = useState([]);
@@ -248,25 +250,31 @@ export default function UploadMaterialsPage() {
   };
 
   // ── Delete folder ─────────────────────────────────────────────────────
-  const handleDeleteFolder = async (folder) => {
-    if (!window.confirm(
-      `Delete folder "${folder.folderName}" and all its files?\nThis action cannot be undone.`
-    )) return;
-
-    setDeletingFolderId(folder.folderId);
-    try {
-      await springApi.delete(`/material-folders/${folder.folderId}`, { headers: HEADERS });
-      setFolders((prev) => prev.filter((f) => f.folderId !== folder.folderId));
-      if (selectedFolderId === folder.folderId) {
-        setSelectedFolderId('');
-        setFolderFiles([]);
+  const handleDeleteFolder = (folder) => {
+    setDelItem({
+      title: 'Delete Folder',
+      description: `Are you sure you want to delete folder "${folder.folderName}" and all its files? This action will permanently remove the record.`,
+      itemName: folder.folderName,
+      itemSubtext: 'Study Material Folder',
+      itemBadge: folder.folderId,
+      action: async () => {
+        setDeletingFolderId(folder.folderId);
+        try {
+          await springApi.delete(`/material-folders/${folder.folderId}`, { headers: HEADERS });
+          setFolders((prev) => prev.filter((f) => f.folderId !== folder.folderId));
+          if (selectedFolderId === folder.folderId) {
+            setSelectedFolderId('');
+            setFolderFiles([]);
+          }
+          setSuccess(`Folder "${folder.folderName}" deleted.`);
+          setDelItem(null);
+        } catch (err) {
+          setError(err.message || 'Failed to delete folder.');
+        } finally {
+          setDeletingFolderId(null);
+        }
       }
-      setSuccess(`Folder "${folder.folderName}" deleted.`);
-    } catch (err) {
-      setError(err.message || 'Failed to delete folder.');
-    } finally {
-      setDeletingFolderId(null);
-    }
+    });
   };
 
   // ── Validate and queue files ──────────────────────────────────────────
@@ -435,18 +443,27 @@ export default function UploadMaterialsPage() {
   };
 
   // ── Delete file ───────────────────────────────────────────────────────
-  const handleDeleteFile = async (material) => {
-    if (!window.confirm(`Delete "${material.fileName}"?`)) return;
-    setDeletingFileId(material.materialId);
-    try {
-      await springApi.delete(`/materials/${material.materialId}`, { headers: HEADERS });
-      setSuccess(`"${material.fileName}" deleted.`);
-      loadFolderFiles(selectedFolderId);
-    } catch (err) {
-      setError(err.message || 'Failed to delete file.');
-    } finally {
-      setDeletingFileId(null);
-    }
+  const handleDeleteFile = (material) => {
+    setDelItem({
+      title: 'Delete Material',
+      description: `Are you sure you want to delete "${material.fileName}"? This action will permanently remove the record.`,
+      itemName: material.fileName,
+      itemSubtext: `Folder: ${selectedFolder?.folderName || 'Selected Folder'}`,
+      itemBadge: material.materialId,
+      action: async () => {
+        setDeletingFileId(material.materialId);
+        try {
+          await springApi.delete(`/materials/${material.materialId}`, { headers: HEADERS });
+          setSuccess(`"${material.fileName}" deleted.`);
+          loadFolderFiles(selectedFolderId);
+          setDelItem(null);
+        } catch (err) {
+          setError(err.message || 'Failed to delete file.');
+        } finally {
+          setDeletingFileId(null);
+        }
+      }
+    });
   };
 
   // ── Derived ───────────────────────────────────────────────────────────
@@ -920,6 +937,19 @@ export default function UploadMaterialsPage() {
           onClose={() => setPreviewFile(null)}
         />
       )}
+
+      {/* Delete confirmation dialog */}
+      <ConfirmDialog
+        isOpen={!!delItem}
+        title={delItem?.title}
+        description={delItem?.description}
+        itemName={delItem?.itemName}
+        itemSubtext={delItem?.itemSubtext}
+        itemBadge={delItem?.itemBadge}
+        onConfirm={() => delItem?.action && delItem.action()}
+        onCancel={() => setDelItem(null)}
+        loading={!!deletingFolderId || !!deletingFileId}
+      />
 
     </div>
   );

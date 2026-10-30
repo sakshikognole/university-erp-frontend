@@ -1,7 +1,8 @@
 import { useState, useEffect, useCallback } from 'react';
-import { Plus, Eye, Edit, Trash2 } from 'lucide-react';
+import { Plus, Eye, Edit, Trash2, Search } from 'lucide-react';
 import { springApi, springGet } from '../services/api';
 import PageError from '../components/PageError';
+import ConfirmDialog from '../components/ConfirmDialog';
 
 // ── Empty form ─────────────────────────────────────────────────────────────
 const EMPTY = { subjectName: '', description: '' };
@@ -208,6 +209,8 @@ export default function SubjectsPage() {
   const [pageError, setPageError] = useState('');
   const [saving,    setSaving]    = useState(false);
   const [deleting,  setDeleting]  = useState(null);  // subjectId being deleted
+  const [delSub,    setDelSub]    = useState(null);
+  const [search,    setSearch]    = useState('');
 
   // Modal state
   const [modalOpen, setModalOpen] = useState(false);
@@ -295,12 +298,17 @@ export default function SubjectsPage() {
   };
 
   // ── Delete ────────────────────────────────────────────────────────────
-  const handleDelete = async (sub) => {
-    if (!window.confirm(`Delete subject "${sub.subjectName}"?`)) return;
-    setDeleting(sub.subjectId);
+  const handleDelete = (sub) => {
+    setDelSub(sub);
+  };
+
+  const confirmDelete = async () => {
+    if (!delSub) return;
+    setDeleting(delSub.subjectId);
     try {
-      await springApi.delete(`/subjects/${sub.subjectId}`);
-      setSuccess(`"${sub.subjectName}" deleted.`);
+      await springApi.delete(`/subjects/${delSub.subjectId}`);
+      setSuccess(`"${delSub.subjectName}" deleted.`);
+      setDelSub(null);
       load(true);
     } catch (err) {
       setError(err.message || 'Failed to delete subject.');
@@ -308,6 +316,14 @@ export default function SubjectsPage() {
       setDeleting(null);
     }
   };
+
+  const filteredSubjects = subjects.filter((s) => {
+    const q = search.toLowerCase();
+    return !q
+      || (s.subjectName && s.subjectName.toLowerCase().includes(q))
+      || (s.subjectId && s.subjectId.toLowerCase().includes(q))
+      || (s.description && s.description.toLowerCase().includes(q));
+  });
 
   // ── Render ────────────────────────────────────────────────────────────
   return (
@@ -384,10 +400,33 @@ export default function SubjectsPage() {
         <PageError message={pageError} onRetry={load} />
       ) : (
         <div className="card table-card" style={{ marginTop: '1.25rem' }}>
-          {/* Total Subjects Count Badge — top-right corner */}
-          <div className="table-controls-bar" style={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center' }}>
-            <div className="table-stats-badge" style={{ marginLeft: 'auto', alignSelf: 'flex-end', width: 'fit-content' }}>
-              Total: <strong>{subjects.length}</strong> {subjects.length === 1 ? 'Subject' : 'Subjects'}
+          {/* Search + count INSIDE the card */}
+          <div className="table-controls-bar">
+            <div className="search-box-wrapper">
+              <Search size={16} className="search-icon" />
+              <input
+                className="search-input"
+                placeholder="Search by Subject ID, Name, or Description..."
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+              />
+              {search && (
+                <button
+                  type="button"
+                  className="search-clear-btn"
+                  onClick={() => setSearch('')}
+                  aria-label="Clear search"
+                >
+                  Clear
+                </button>
+              )}
+            </div>
+            <div
+              className="table-stats-badge"
+              style={{ width: 'fit-content', alignSelf: 'flex-end', marginLeft: 'auto' }}
+            >
+              Total: <strong>{filteredSubjects.length}</strong>{' '}
+              {filteredSubjects.length === 1 ? 'Subject' : 'Subjects'}
             </div>
           </div>
 
@@ -406,6 +445,10 @@ export default function SubjectsPage() {
                 <span>Add First Subject</span>
               </button>
             </div>
+          ) : filteredSubjects.length === 0 ? (
+            <div style={{ textAlign: 'center', padding: '40px 24px', color: 'var(--text-secondary)' }}>
+              <p>No subjects matched your search.</p>
+            </div>
           ) : (
             <>
               {/* ── Desktop table ── */}
@@ -422,7 +465,7 @@ export default function SubjectsPage() {
                       </tr>
                     </thead>
                     <tbody>
-                      {subjects.map((sub, i) => (
+                      {filteredSubjects.map((sub, i) => (
                         <tr
                           key={sub.subjectId}
                           style={{ cursor: 'pointer' }}
@@ -485,7 +528,7 @@ export default function SubjectsPage() {
 
               {/* ── Mobile cards ── */}
               <div className="book-mob-list">
-                {subjects.map((sub, i) => {
+                {filteredSubjects.map((sub, i) => {
                   const isExpanded = expandedId === sub.subjectId;
                   return (
                     <div key={sub.subjectId} className="book-mob-card">
@@ -569,6 +612,18 @@ export default function SubjectsPage() {
         isOpen={viewOpen}
         subject={viewSub}
         onClose={() => setViewOpen(false)}
+      />
+
+      <ConfirmDialog
+        isOpen={!!delSub}
+        title="Delete Subject"
+        description={`Are you sure you want to delete subject "${delSub?.subjectName}"? This action will permanently remove the record.`}
+        itemName={delSub?.subjectName}
+        itemSubtext={delSub?.description || 'University Subject'}
+        itemBadge={delSub?.subjectId}
+        onConfirm={confirmDelete}
+        onCancel={() => setDelSub(null)}
+        loading={!!deleting}
       />
 
     </div>

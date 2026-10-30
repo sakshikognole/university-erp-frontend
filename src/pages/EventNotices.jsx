@@ -23,6 +23,7 @@ import {
   Clock,
   Tag,
   Users,
+  Eye,
 } from 'lucide-react';
 
 import { getEventImage } from '../utils/eventImageUtils';
@@ -402,6 +403,18 @@ const EventNotices = () => {
 
                     {/* Card Actions */}
                     <div className="event-card-footer">
+                      <button
+                        type="button"
+                        className="action-btn view-btn"
+                        title="View Event Notice"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          navigate(`/event-notices/view/${event._id}`);
+                        }}
+                      >
+                        <Eye size={14} />
+                        <span className="action-label">View</span>
+                      </button>
                       <button
                         type="button"
                         className="action-btn edit-btn"
