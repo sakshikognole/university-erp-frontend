@@ -41,6 +41,22 @@ const Sidebar = ({ isOpen, toggleSidebar, isCollapsed, role = 'SUPER_ADMIN' }) =
     return false;
   };
 
+  // Responsive check: collapsed mode is purely for desktop view (>768px).
+  // On mobile (<= 768px), sidebar is a slide-out drawer that MUST always show both logos and labels.
+  const [isMobile, setIsMobile] = useState(() =>
+    typeof window !== 'undefined' ? window.innerWidth <= 768 : false
+  );
+
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth <= 768);
+    };
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
+  const shouldCollapse = isCollapsed && !isMobile;
+
   // Lock background body scroll when mobile sidebar is open
   useEffect(() => {
     if (isOpen && window.innerWidth <= 768) {
@@ -62,7 +78,7 @@ const Sidebar = ({ isOpen, toggleSidebar, isCollapsed, role = 'SUPER_ADMIN' }) =
       {/* Mobile overlay */}
       {isOpen && <div className="sidebar-overlay" onClick={toggleSidebar}></div>}
 
-      <aside className={`sidebar ${isOpen ? 'open' : ''} ${isCollapsed ? 'collapsed' : ''}`}>
+      <aside className={`sidebar ${isOpen ? 'open' : ''} ${shouldCollapse ? 'collapsed' : ''}`}>
 
         {/* Sidebar Header Logo */}
         <div className="sidebar-header">

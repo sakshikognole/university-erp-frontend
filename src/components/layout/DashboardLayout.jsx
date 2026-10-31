@@ -18,19 +18,34 @@ const DashboardLayout = () => {
     localStorage.setItem('sidebarCollapsed', isCollapsed);
   }, [isCollapsed]);
 
+  // Responsive check: collapsed state is only for desktop viewport (>768px)
+  const [isMobile, setIsMobile] = useState(() =>
+    typeof window !== 'undefined' ? window.innerWidth <= 768 : false
+  );
+
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth <= 768);
+    };
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
+  const effectiveCollapsed = isCollapsed && !isMobile;
+
   const toggleSidebar = () => {
     if (window.innerWidth <= 768) {
-      setIsMobileOpen(!isMobileOpen);
+      setIsMobileOpen(prev => !prev);
     } else {
-      setIsCollapsed(!isCollapsed);
+      setIsCollapsed(prev => !prev);
     }
   };
 
   const userRole = user?.adminType !== 'NONE' && user?.adminType ? user.adminType : (user?.role || 'SUPER_ADMIN');
 
   return (
-    <div className={`dashboard-layout ${isCollapsed ? 'sidebar-collapsed' : ''}`}>
-      <Sidebar isOpen={isMobileOpen} toggleSidebar={toggleSidebar} isCollapsed={isCollapsed} role={userRole} />
+    <div className={`dashboard-layout ${effectiveCollapsed ? 'sidebar-collapsed' : ''}`}>
+      <Sidebar isOpen={isMobileOpen} toggleSidebar={toggleSidebar} isCollapsed={effectiveCollapsed} role={userRole} />
       <div className="dashboard-main">
         <Header toggleSidebar={toggleSidebar} />
         <main className="main-content">

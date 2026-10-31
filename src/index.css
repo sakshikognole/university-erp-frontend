@@ -7328,21 +7328,48 @@ button {
   }
 
   /* Fixed full-height mobile drawer: prevents sidebar from breaking at bottom */
-  .sidebar {
-    position: fixed;
-    top: 0;
-    left: 0;
-    bottom: 0;
-    height: 100vh;
-    height: 100dvh;
-    z-index: 1000;
+  /* On mobile view, sidebar drawer must ALWAYS be full width and show BOTH logos and feature labels */
+  .sidebar,
+  .sidebar.collapsed {
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    bottom: 0 !important;
+    width: var(--sidebar-width, 260px) !important;
+    max-width: 85vw !important;
+    height: 100vh !important;
+    height: 100dvh !important;
+    z-index: 1000 !important;
     transform: translateX(-100%);
     overscroll-behavior: contain;
     /* Prevents scroll chaining to background */
   }
 
-  .sidebar.open {
-    transform: translateX(0);
+  .sidebar.open,
+  .sidebar.collapsed.open {
+    transform: translateX(0) !important;
+  }
+
+  .sidebar.collapsed .nav-label {
+    display: inline-block !important;
+  }
+
+  .sidebar.collapsed .logo-text {
+    display: inline-block !important;
+  }
+
+  .sidebar.collapsed .nav-link {
+    justify-content: flex-start !important;
+    padding: 0.75rem 1rem !important;
+  }
+
+  .sidebar.collapsed .sidebar-header {
+    justify-content: space-between !important;
+    padding: 0 1.5rem !important;
+  }
+
+  .sidebar.collapsed .sidebar-search-container {
+    display: block !important;
   }
 
   .sidebar-header-mobile {
