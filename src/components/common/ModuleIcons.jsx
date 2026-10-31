@@ -61,41 +61,31 @@ export const StaffIcon = ({ size = 20, className = 'nav-icon', ...props }) => (
     viewBox="0 0 24 24"
     fill="none"
     stroke="currentColor"
+    strokeWidth="1.3"
+    strokeLinecap="round"
+    strokeLinejoin="round"
     className={className}
     {...props}
   >
-    {/* Shield with Cutout Checkmark */}
-    <path
-      fillRule="evenodd"
-      clipRule="evenodd"
-      fill="currentColor"
-      stroke="none"
-      d="M12 1.5C12 1.5 6.8 4.2 6.8 4.8v4.5c0 2.5 4.2 3.8 5.2 4.1 1-.3 5.2-1.6 5.2-4.1V4.8C17.2 4.2 12 1.5 12 1.5zM10.2 7.2l1.5 1.6 3.1-3.4 1.1 1-4.2 4.6-2.6-2.8 1.1-1z"
-    />
+    {/* Right Person */}
+    <circle cx="16.2" cy="5" r="2.6" />
+    <path d="M11.6 12.8c.8-2.6 2.5-4 4.6-4.1 2.5.1 4.5 1.7 5.2 4.4v6.6a1.4 1.4 0 0 1-1.4 1.4h-7.6a1.4 1.4 0 0 1-1.4-1.4v-3" />
+    <path d="M14.2 9.5l1 2.3 1.2-1.6" />
+    <path d="M18.2 9.5l-1 2.3-1.2-1.6" />
+    <path d="M15.8 11.5h1l-.2 1h-.6z" />
+    <path d="M16 12.4l-.5 4.8 1 1.6 1-1.6-.5-4.8" />
+    <line x1="13.2" y1="13.8" x2="13.2" y2="19.2" />
+    <line x1="19.4" y1="13.8" x2="19.4" y2="19.2" />
 
-    {/* Left Team Member */}
-    <circle cx="6" cy="13" r="2.4" fill="currentColor" stroke="none" />
-    <path
-      d="M1.5 22.5c0-3.6 2.4-5.6 5.8-5.6 1.5 0 2.6.5 3.3 1.2-.8 1.2-1.2 2.6-1.2 4.4z"
-      fill="currentColor"
-      stroke="none"
-    />
-
-    {/* Right Team Member */}
-    <circle cx="18" cy="13" r="2.4" fill="currentColor" stroke="none" />
-    <path
-      d="M22.5 22.5c0-3.6-2.4-5.6-5.8-5.6-1.5 0-2.6.5-3.3 1.2.8 1.2 1.2 2.6 1.2 4.4z"
-      fill="currentColor"
-      stroke="none"
-    />
-
-    {/* Center Team Member (Foreground) */}
-    <circle cx="12" cy="14.5" r="2.5" fill="currentColor" stroke="none" />
-    <path
-      d="M7.8 22.5c0-3.6 1.9-5.6 4.2-5.6s4.2 2 4.2 5.6z"
-      fill="currentColor"
-      stroke="none"
-    />
+    {/* Left Person */}
+    <circle cx="7.6" cy="6.2" r="2.5" />
+    <path d="M2.5 19.8v-5.8c.6-2.5 2.4-4 4.8-4.2 2.4.2 4.2 1.7 4.8 4.2v5.8a1.4 1.4 0 0 1-1.4 1.4H3.9a1.4 1.4 0 0 1-1.4-1.4z" />
+    <path d="M5.6 10.6l1 2.2 1.2-1.5" />
+    <path d="M9.6 10.6l-1 2.2-1.2-1.5" />
+    <path d="M7.2 12.5h1l-.2 1h-.6z" />
+    <path d="M7.4 13.4l-.5 4.5 1 1.5 1-1.5-.5-4.5" />
+    <line x1="4.3" y1="14.6" x2="4.3" y2="19.6" />
+    <line x1="10.1" y1="14.6" x2="10.1" y2="19.6" />
   </svg>
 );
 
@@ -113,38 +103,29 @@ export const DepartmentsIcon = ({ size = 20, className = 'nav-icon', ...props })
     className={className}
     {...props}
   >
-    <rect x="2" y="20.5" width="20" height="2" rx="0.5" />
-    <line x1="3.8" y1="18.5" x2="3.8" y2="20.5" />
-    <path d="M3.8 14c-1 0-1.6 1.5-1.6 3 0 1.5.8 2 1.6 2s1.6-.5 1.6-2c0-1.5-.6-3-1.6-3z" fill="currentColor" stroke="none" />
-    <line x1="20.2" y1="18.5" x2="20.2" y2="20.5" />
-    <path d="M20.2 14c-1 0-1.6 1.5-1.6 3 0 1.5.8 2 1.6 2s1.6-.5 1.6-2c0-1.5-.6-3-1.6-3z" fill="currentColor" stroke="none" />
-    <path
-      fillRule="evenodd"
-      clipRule="evenodd"
-      fill="currentColor"
-      stroke="none"
-      d="M5.5 11.5h2.2v9H5.5z M6.6 13a.45.45 0 1 0 0-.9.45.45 0 0 0 0 .9z M6.6 14.7a.45.45 0 1 0 0-.9.45.45 0 0 0 0 .9z M6.6 16.4a.45.45 0 1 0 0-.9.45.45 0 0 0 0 .9z M6.6 18.1a.45.45 0 1 0 0-.9.45.45 0 0 0 0 .9z M6.6 19.8a.45.45 0 1 0 0-.9.45.45 0 0 0 0 .9z"
-    />
-    <path
-      fillRule="evenodd"
-      clipRule="evenodd"
-      fill="currentColor"
-      stroke="none"
-      d="M16.3 11.5h2.2v9h-2.2z M17.4 13a.45.45 0 1 0 0-.9.45.45 0 0 0 0 .9z M17.4 14.7a.45.45 0 1 0 0-.9.45.45 0 0 0 0 .9z M17.4 16.4a.45.45 0 1 0 0-.9.45.45 0 0 0 0 .9z M17.4 18.1a.45.45 0 1 0 0-.9.45.45 0 0 0 0 .9z M17.4 19.8a.45.45 0 1 0 0-.9.45.45 0 0 0 0 .9z"
-    />
-    <path d="M11.3 2.2v2h1.4v-2" />
-    <rect x="9.5" y="4.2" width="5" height="1.8" rx="0.3" />
-    <rect x="8.3" y="6" width="7.4" height="14.5" />
-    <rect x="9.5" y="7.5" width="1.8" height="1.8" rx="0.3" />
-    <rect x="12.7" y="7.5" width="1.8" height="1.8" rx="0.3" />
-    <rect x="9.5" y="10.5" width="1.8" height="1.8" rx="0.3" />
-    <rect x="12.7" y="10.5" width="1.8" height="1.8" rx="0.3" />
-    <rect x="9.5" y="13.5" width="1.8" height="1.8" rx="0.3" />
-    <rect x="12.7" y="13.5" width="1.8" height="1.8" rx="0.3" />
-    <path d="M9.3 17.5h5.4" />
-    <line x1="10.1" y1="17.5" x2="10.1" y2="20.5" />
-    <line x1="13.9" y1="17.5" x2="13.9" y2="20.5" />
-    <line x1="12" y1="17.5" x2="12" y2="20.5" />
+    {/* Roof */}
+    <path d="M4.5 7.2L12 1.8l7.5 5.4" strokeWidth="1.5" />
+    {/* Building walls with open bottom base */}
+    <path d="M6.5 6.8v8.7h2.3m6.4 0h2.3V6.8" />
+    {/* Round window */}
+    <circle cx="12" cy="5.8" r="1.1" />
+    {/* Classical Entrance Portico */}
+    <rect x="9.5" y="8.2" width="5" height="1.4" rx="0.3" />
+    <line x1="10.8" y1="9.6" x2="10.8" y2="12.4" />
+    <line x1="13.2" y1="9.6" x2="13.2" y2="12.4" />
+    <rect x="9.8" y="12.4" width="4.4" height="1.2" rx="0.2" />
+    <rect x="8.8" y="13.6" width="6.4" height="1.2" rx="0.2" />
+    {/* Side notches */}
+    <path d="M6.5 10.5h1.2v1.4H6.5" />
+    <path d="M17.5 10.5h-1.2v1.4h1.2" />
+    {/* Branching hierarchy lines */}
+    <path d="M12 15v2.5" />
+    <path d="M3.8 19.5v-1.2a1 1 0 0 1 1-1h14.4a1 1 0 0 1 1 1v1.2" />
+    <path d="M12 17.5v2" />
+    {/* Three Department Node Boxes */}
+    <rect x="1.5" y="19.5" width="4.6" height="3.2" rx="0.8" />
+    <rect x="9.7" y="19.5" width="4.6" height="3.2" rx="0.8" />
+    <rect x="17.9" y="19.5" width="4.6" height="3.2" rx="0.8" />
   </svg>
 );
 
@@ -436,16 +417,52 @@ export const ClassroomsIcon = createIcon(
 );
 
 // 24. Transport
-export const TransportIcon = createIcon(
-  <>
-    <rect x="4" y="4" width="16" height="13" rx="3" />
-    <rect x="6" y="6" width="5" height="4" rx="0.5" />
-    <rect x="13" y="6" width="5" height="4" rx="0.5" />
-    <circle cx="7.5" cy="13.5" r="1.5" />
-    <circle cx="16.5" cy="13.5" r="1.5" />
-    <circle cx="7" cy="19" r="1.5" />
-    <circle cx="17" cy="19" r="1.5" />
-  </>
+export const TransportIcon = ({ size = 20, className = 'nav-icon', ...props }) => (
+  <svg
+    width={size}
+    height={size}
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="1.3"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    className={className}
+    {...props}
+  >
+    {/* Container / Cargo Box */}
+    <path d="M16.5 4.5H3.5a1 1 0 0 0-1 1v8.5" />
+    <path d="M16.5 4.5v9.5" />
+
+    {/* Big Checkmark */}
+    <path d="M7.2 11.2l2.2 2.6 4-4.8" strokeWidth="1.6" />
+
+    {/* Speed Lines on left */}
+    <line x1="1.5" y1="15.2" x2="6.5" y2="15.2" />
+    <line x1="0.8" y1="17.4" x2="4.8" y2="17.4" />
+
+    {/* Rear underbody bumper */}
+    <path d="M2.2 17.4v2.2h2.6" />
+
+    {/* Cab Roof & Windshield */}
+    <path d="M16.5 6.8h3.2a1.8 1.8 0 0 1 1.7 1.2l1.1 4.5H16.5" />
+    <path d="M17 8.8h2.6a1 1 0 0 1 .9.7l.7 2.8H17" />
+
+    {/* Cab Front, Headlight & Bumper */}
+    <path d="M22.5 12.5h.4a1.2 1.2 0 0 1 1.2 1.2v.3a1 1 0 0 0-.9 1 1 1 0 0 0 .9 1v.5a1.2 1.2 0 0 1-1.2 1.2H21.5" />
+    <line x1="16.5" y1="14.8" x2="16.5" y2="19.2" />
+
+    {/* Chassis middle bar */}
+    <line x1="9.8" y1="17.4" x2="15.5" y2="17.4" />
+
+    {/* Rear Wheel */}
+    <circle cx="7.2" cy="19.5" r="2.2" />
+    <circle cx="7.2" cy="19.5" r="0.8" fill="currentColor" stroke="none" />
+
+    {/* Front Wheel */}
+    <circle cx="19.4" cy="19.5" r="2.2" />
+    <circle cx="19.4" cy="19.5" r="0.8" fill="currentColor" stroke="none" />
+  </svg>
 );
 
 // 25. Fee Payment
