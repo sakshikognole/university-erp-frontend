@@ -665,6 +665,7 @@ export default function PaymentPage() {
                             }}
                             onClick={toggleAll}
                           >
+                            <span style={{ fontWeight: 600 }}>Select</span>
                             <input
                               type="checkbox"
                               className="pay-checkbox"
@@ -673,7 +674,6 @@ export default function PaymentPage() {
                               title="Select all on this page"
                               style={{ cursor: 'pointer' }}
                             />
-                            <span style={{ fontWeight: 600 }}>Select</span>
                           </div>
                         </th>
                       )}

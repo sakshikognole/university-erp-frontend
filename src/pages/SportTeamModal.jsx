@@ -168,7 +168,7 @@ export default function SportTeamModal({ isOpen, mode, team, sports = [], onSave
               <textarea
                 className="books-form-control"
                 name="members" value={form.members} onChange={change}
-                placeholder="e.g. Rahul Patil, Arjun Mehta, Priya Sharma"
+                placeholder="e.g. Rahul Patil, Arjun Mehta"
                 rows={2}
                 style={{ resize: 'vertical', fontFamily: 'inherit' }}
               />

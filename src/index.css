@@ -3917,14 +3917,24 @@ button {
 
 .books-form-control {
   width: 100%;
+  box-sizing: border-box;
+  min-width: 0;
   padding: 8px 11px;
   border: 1px solid var(--border-color);
   border-radius: 6px;
   font-size: 14px;
+  line-height: 1.4;
   outline: none;
   font-family: inherit;
   background: var(--bg-primary);
   color: var(--text-primary);
+}
+
+.books-form-control::placeholder {
+  color: #9ca3af;
+  opacity: 1;
+  font-size: 13.5px;
+  line-height: normal;
 }
 
 .books-form-control:focus {
@@ -3939,6 +3949,25 @@ button {
   font-size: 12px;
   color: #c92a2a;
   margin-top: 3px;
+}
+
+/* Classroom Modal dimensions row */
+.classroom-dims-row {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+}
+
+.classroom-dims-row .books-form-control {
+  min-width: 0;
+  box-sizing: border-box;
+}
+
+@media (max-width: 600px) {
+  .classroom-dims-row {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
 }
 
 /* ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ Alert toast ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ */
@@ -4789,9 +4818,10 @@ button {
   gap: 12px;
 }
 
-@media (max-width: 480px) {
+@media (max-width: 640px) {
   .club-form-row {
-    grid-template-columns: 1fr;
+    grid-template-columns: 1fr !important;
+    gap: 12px;
   }
 }
 
@@ -6110,7 +6140,9 @@ button {
   outline: none;
   background: var(--bg-primary);
   color: var(--text-primary);
-  width: 300px;
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
 }
 
 .hst-prn-input:focus {
@@ -6344,6 +6376,16 @@ button {
   .books-form-control {
     font-size: 16px;
     /* Prevents zoom on iOS */
+  }
+
+  .books-form-control::placeholder {
+    font-size: 14px;
+    line-height: normal;
+  }
+
+  .club-form-row {
+    grid-template-columns: 1fr !important;
+    gap: 12px;
   }
 }
 
@@ -9624,7 +9666,14 @@ input[type='password']::-webkit-inner-spin-button {
 .club-form-row {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 16px;
+  gap: 14px;
+}
+
+@media (max-width: 640px) {
+  .club-form-row {
+    grid-template-columns: 1fr !important;
+    gap: 12px;
+  }
 }
 
 .club-optional-tag {

@@ -208,7 +208,7 @@ function ExamScheduleModal({ isOpen, mode, schedule, onSave, onClose, saving }) 
                 {errors.examId && <p className="books-form-err">{errors.examId}</p>}
               </div>
 
-              <div className="books-form-group" style={{ maxWidth: 220 }}>
+              <div className="books-form-group">
                 <label className="books-form-label">Date <span style={{ color: '#dc2626' }}>*</span></label>
                 <input type="date" className={`books-form-control ${errors.scheduleDate ? 'err' : ''}`}
                   value={form.scheduleDate}
@@ -216,7 +216,7 @@ function ExamScheduleModal({ isOpen, mode, schedule, onSave, onClose, saving }) 
                 {errors.scheduleDate && <p className="books-form-err">{errors.scheduleDate}</p>}
               </div>
 
-              <div className="books-form-group" style={{ maxWidth: 280 }}>
+              <div className="books-form-group">
                 <label className="books-form-label">Classroom</label>
                 <select className="books-form-control" value={form.classroom}
                   onChange={e => setForm(f => ({ ...f, classroom: e.target.value }))}>
@@ -420,7 +420,7 @@ function ClassScheduleModal({ isOpen, mode = 'add', schedule = null, onSave, onC
         ) : (
           <form onSubmit={submit}>
             <div className="books-modal-body" style={{ maxHeight: '70vh', overflowY: 'auto' }}>
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+              <div className="club-form-row">
                 <div className="books-form-group">
                   <label className="books-form-label">Department *</label>
                   <select className={`books-form-control ${errors.department ? 'err' : ''}`} value={form.department}
@@ -441,7 +441,7 @@ function ClassScheduleModal({ isOpen, mode = 'add', schedule = null, onSave, onC
                 </div>
               </div>
 
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+              <div className="club-form-row">
                 <div className="books-form-group">
                   <label className="books-form-label">Subject *</label>
                   <select className={`books-form-control ${errors.subjectId ? 'err' : ''}`} value={form.subjectId}
@@ -484,7 +484,7 @@ function ClassScheduleModal({ isOpen, mode = 'add', schedule = null, onSave, onC
                     const ven = venues.find(v => v.venueId === vid);
                     setForm(f => ({ ...f, venueId: vid, venueName: ven?.name ?? '' }));
                     setErrors(er => ({ ...er, venueId: '' }));
-                  }} style={{ maxWidth: 340 }}>
+                  }}>
                   <option value="">— Select Venue —</option>
                   {venues.map(v => (
                     <option key={v.venueId} value={v.venueId}>{v.name} ({v.venueId})</option>
@@ -493,7 +493,7 @@ function ClassScheduleModal({ isOpen, mode = 'add', schedule = null, onSave, onC
                 {errors.venueId && <p className="books-form-err">{errors.venueId}</p>}
               </div>
 
-              <div className="books-form-group" style={{ maxWidth: 220 }}>
+              <div className="books-form-group">
                 <label className="books-form-label">Date *</label>
                 <input type="date" className={`books-form-control ${errors.scheduleDate ? 'err' : ''}`}
                   value={form.scheduleDate}

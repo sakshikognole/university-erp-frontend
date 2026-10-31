@@ -222,7 +222,7 @@ export default function HostelRoomModal({ isOpen, blockId, onClose, onSaved }) {
                   name="roomNo"
                   value={form.roomNo}
                   onChange={change}
-                  placeholder="Example: 101, A-12"
+                  placeholder="e.g. 101, A-12"
                   maxLength={20}
                 />
                 {errors.roomNo && <p className="books-form-err">{errors.roomNo}</p>}

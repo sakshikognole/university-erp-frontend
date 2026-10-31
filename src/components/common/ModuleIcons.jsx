@@ -23,14 +23,13 @@ const createIcon = (d) => {
 // 1. Superadmin Dashboard
 export const SuperadminDashboardIcon = createIcon(
   <>
-    <rect x="3" y="3" width="18" height="18" rx="2" />
-    <line x1="3" y1="8" x2="21" y2="8" />
-    <rect x="5.5" y="10.5" width="5.5" height="3.5" rx="0.5" />
-    <rect x="13" y="10.5" width="5.5" height="3.5" rx="0.5" />
-    <rect x="5.5" y="15.5" width="5.5" height="3.5" rx="0.5" />
-    <rect x="13" y="15.5" width="5.5" height="3.5" rx="0.5" />
+    <rect x="2.8" y="2.2" width="7.4" height="8.6" rx="2.8" strokeWidth="2.2" />
+    <rect x="13.8" y="2.2" width="7.4" height="8.6" rx="2.8" strokeWidth="2.2" />
+    <rect x="2.8" y="13.2" width="7.4" height="8.6" rx="2.8" strokeWidth="2.2" />
+    <rect x="13.8" y="13.2" width="7.4" height="8.6" rx="2.8" strokeWidth="2.2" />
   </>
 );
+export const DashboardIcon = SuperadminDashboardIcon;
 
 // 2. User Directory
 export const UserDirectoryIcon = createIcon(
@@ -55,41 +54,111 @@ export const StudentsIcon = createIcon(
 );
 
 // 4. Staff
-export const StaffIcon = createIcon(
-  <>
-    <rect x="5" y="4" width="14" height="17" rx="2" />
-    <path d="M9 2h6v2a1 1 0 0 1-1 1h-4a1 1 0 0 1-1-1V2z" />
-    <circle cx="10" cy="10" r="2" />
-    <path d="M7 15c0-1.7 1.3-3 3-3s3 1.3 3 3" />
-    <line x1="14" y1="9" x2="17" y2="9" />
-    <line x1="14" y1="12" x2="17" y2="12" />
-  </>
+export const StaffIcon = ({ size = 20, className = 'nav-icon', ...props }) => (
+  <svg
+    width={size}
+    height={size}
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    className={className}
+    {...props}
+  >
+    {/* Shield with Cutout Checkmark */}
+    <path
+      fillRule="evenodd"
+      clipRule="evenodd"
+      fill="currentColor"
+      stroke="none"
+      d="M12 1.5C12 1.5 6.8 4.2 6.8 4.8v4.5c0 2.5 4.2 3.8 5.2 4.1 1-.3 5.2-1.6 5.2-4.1V4.8C17.2 4.2 12 1.5 12 1.5zM10.2 7.2l1.5 1.6 3.1-3.4 1.1 1-4.2 4.6-2.6-2.8 1.1-1z"
+    />
+
+    {/* Left Team Member */}
+    <circle cx="6" cy="13" r="2.4" fill="currentColor" stroke="none" />
+    <path
+      d="M1.5 22.5c0-3.6 2.4-5.6 5.8-5.6 1.5 0 2.6.5 3.3 1.2-.8 1.2-1.2 2.6-1.2 4.4z"
+      fill="currentColor"
+      stroke="none"
+    />
+
+    {/* Right Team Member */}
+    <circle cx="18" cy="13" r="2.4" fill="currentColor" stroke="none" />
+    <path
+      d="M22.5 22.5c0-3.6-2.4-5.6-5.8-5.6-1.5 0-2.6.5-3.3 1.2.8 1.2 1.2 2.6 1.2 4.4z"
+      fill="currentColor"
+      stroke="none"
+    />
+
+    {/* Center Team Member (Foreground) */}
+    <circle cx="12" cy="14.5" r="2.5" fill="currentColor" stroke="none" />
+    <path
+      d="M7.8 22.5c0-3.6 1.9-5.6 4.2-5.6s4.2 2 4.2 5.6z"
+      fill="currentColor"
+      stroke="none"
+    />
+  </svg>
 );
 
 // 5. Departments
-export const DepartmentsIcon = createIcon(
-  <>
-    <line x1="3" y1="5" x2="21" y2="5" />
-    <rect x="4" y="5" width="16" height="15" rx="1" />
-    <rect x="6" y="8" width="2" height="2" />
-    <rect x="9.5" y="8" width="2" height="2" />
-    <rect x="13" y="8" width="2" height="2" />
-    <rect x="16.5" y="8" width="2" height="2" />
-    <rect x="6" y="13" width="2" height="2" />
-    <rect x="9.5" y="13" width="2" height="2" />
-    <rect x="13" y="13" width="2" height="2" />
-    <rect x="16.5" y="13" width="2" height="2" />
-  </>
+export const DepartmentsIcon = ({ size = 20, className = 'nav-icon', ...props }) => (
+  <svg
+    width={size}
+    height={size}
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="1.3"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    className={className}
+    {...props}
+  >
+    <rect x="2" y="20.5" width="20" height="2" rx="0.5" />
+    <line x1="3.8" y1="18.5" x2="3.8" y2="20.5" />
+    <path d="M3.8 14c-1 0-1.6 1.5-1.6 3 0 1.5.8 2 1.6 2s1.6-.5 1.6-2c0-1.5-.6-3-1.6-3z" fill="currentColor" stroke="none" />
+    <line x1="20.2" y1="18.5" x2="20.2" y2="20.5" />
+    <path d="M20.2 14c-1 0-1.6 1.5-1.6 3 0 1.5.8 2 1.6 2s1.6-.5 1.6-2c0-1.5-.6-3-1.6-3z" fill="currentColor" stroke="none" />
+    <path
+      fillRule="evenodd"
+      clipRule="evenodd"
+      fill="currentColor"
+      stroke="none"
+      d="M5.5 11.5h2.2v9H5.5z M6.6 13a.45.45 0 1 0 0-.9.45.45 0 0 0 0 .9z M6.6 14.7a.45.45 0 1 0 0-.9.45.45 0 0 0 0 .9z M6.6 16.4a.45.45 0 1 0 0-.9.45.45 0 0 0 0 .9z M6.6 18.1a.45.45 0 1 0 0-.9.45.45 0 0 0 0 .9z M6.6 19.8a.45.45 0 1 0 0-.9.45.45 0 0 0 0 .9z"
+    />
+    <path
+      fillRule="evenodd"
+      clipRule="evenodd"
+      fill="currentColor"
+      stroke="none"
+      d="M16.3 11.5h2.2v9h-2.2z M17.4 13a.45.45 0 1 0 0-.9.45.45 0 0 0 0 .9z M17.4 14.7a.45.45 0 1 0 0-.9.45.45 0 0 0 0 .9z M17.4 16.4a.45.45 0 1 0 0-.9.45.45 0 0 0 0 .9z M17.4 18.1a.45.45 0 1 0 0-.9.45.45 0 0 0 0 .9z M17.4 19.8a.45.45 0 1 0 0-.9.45.45 0 0 0 0 .9z"
+    />
+    <path d="M11.3 2.2v2h1.4v-2" />
+    <rect x="9.5" y="4.2" width="5" height="1.8" rx="0.3" />
+    <rect x="8.3" y="6" width="7.4" height="14.5" />
+    <rect x="9.5" y="7.5" width="1.8" height="1.8" rx="0.3" />
+    <rect x="12.7" y="7.5" width="1.8" height="1.8" rx="0.3" />
+    <rect x="9.5" y="10.5" width="1.8" height="1.8" rx="0.3" />
+    <rect x="12.7" y="10.5" width="1.8" height="1.8" rx="0.3" />
+    <rect x="9.5" y="13.5" width="1.8" height="1.8" rx="0.3" />
+    <rect x="12.7" y="13.5" width="1.8" height="1.8" rx="0.3" />
+    <path d="M9.3 17.5h5.4" />
+    <line x1="10.1" y1="17.5" x2="10.1" y2="20.5" />
+    <line x1="13.9" y1="17.5" x2="13.9" y2="20.5" />
+    <line x1="12" y1="17.5" x2="12" y2="20.5" />
+  </svg>
 );
 
 // 6. Venues
 export const VenuesIcon = createIcon(
   <>
-    <polygon points="12 3 3 10 21 10" />
-    <rect x="5" y="10" width="14" height="11" rx="0.5" />
-    <rect x="7" y="12" width="2.5" height="2.5" />
-    <rect x="14.5" y="12" width="2.5" height="2.5" />
-    <path d="M10.5 21v-5h3v5" />
+    <path d="M6.5 16C6.5 19.5 9.5 21 12 21s5.5-1.5 5.5-5" />
+    <path
+      fillRule="evenodd"
+      clipRule="evenodd"
+      fill="currentColor"
+      stroke="none"
+      d="M12 18.5C12 18.5 5.8 12.8 5.8 7.8a6.2 6.2 0 1 1 12.4 0c0 5-6.2 10.7-6.2 10.7zM12 11a3.2 3.2 0 1 0 0-6.4 3.2 3.2 0 0 0 0 6.4zm0-2a1.2 1.2 0 1 1 0-2.4 1.2 1.2 0 0 1 0 2.4z"
+    />
   </>
 );
 
@@ -129,27 +198,62 @@ export const SportsIcon = createIcon(
 );
 
 // 10. Sport Team
-export const SportTeamIcon = createIcon(
-  <>
-    <path d="M9 3a3 3 0 0 0 6 0l4.5 3-2 3.5-2-1V20a1 1 0 0 1-1 1H9a1 1 0 0 1-1-1V8.5l-2 1-2-3.5L9 3z" />
-    <line x1="12" y1="6" x2="12" y2="11" />
-    <circle cx="12" cy="12.5" r="1.5" />
-  </>
+export const SportTeamIcon = ({ size = 20, className = 'nav-icon', ...props }) => (
+  <svg
+    width={size}
+    height={size}
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="1.4"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    className={className}
+    {...props}
+  >
+    {/* Trophy Cup */}
+    <path d="M10 2.2h4v1.8c0 1.2-.9 2.2-2 2.2s-2-1-2-2.2v-1.8z" />
+    <path d="M10 2.8H9c-.8 0-1.5.6-1.5 1.3s.7 1.3 1.5 1.3h1" />
+    <path d="M14 2.8h1c.8 0 1.5.6 1.5 1.3s-.7 1.3-1.5 1.3h-1" />
+    <path d="M8.2 5.5l-.7 1.5" />
+    <path d="M15.8 5.5l.7 1.5" />
+    <line x1="12" y1="6.2" x2="12" y2="7.2" />
+    <rect x="10.8" y="7.2" width="2.4" height="1.4" rx="0.2" />
+    <line x1="9.5" y1="8.6" x2="14.5" y2="8.6" />
+
+    {/* Team Members Heads */}
+    <circle cx="4" cy="13" r="2.2" />
+    <path d="M3.2 11.6c.6.8 1.4 1.4 2.4 1.4" />
+    <circle cx="12" cy="13" r="2.2" />
+    <path d="M10.4 13c1-.6 2.2-.6 3.2 0" />
+    <circle cx="20" cy="13" r="2.2" />
+    <path d="M18.2 11.2c.6.4 1.4.4 2.2-.2" />
+
+    {/* Team Members Torsos */}
+    <rect x="1.8" y="17.5" width="4.4" height="5" rx="0.3" />
+    <rect x="9.8" y="17.5" width="4.4" height="5" rx="0.3" />
+    <rect x="17.8" y="17.5" width="4.4" height="5" rx="0.3" />
+
+    {/* High-five Raised Arms */}
+    <path d="M6.2 17.5l1.3-4.5v-2.5a.5.5 0 0 1 1 0v2.5l1.3 4.5" />
+    <path d="M14.2 17.5l1.3-4.5v-2.5a.5.5 0 0 1 1 0v2.5l1.3 4.5" />
+  </svg>
 );
 
 // 11. Venue Booking
 export const VenueBookingIcon = createIcon(
   <>
-    <line x1="8" y1="2" x2="8" y2="5" />
-    <line x1="16" y1="2" x2="16" y2="5" />
-    <rect x="4" y="4" width="16" height="17" rx="2" />
-    <line x1="4" y1="8" x2="20" y2="8" />
-    <rect x="6.5" y="11" width="2" height="2" />
-    <rect x="11" y="11" width="2" height="2" />
-    <rect x="15.5" y="11" width="2" height="2" />
-    <rect x="6.5" y="15" width="2" height="2" />
-    <rect x="11" y="15" width="2" height="2" />
-    <rect x="15.5" y="15" width="2" height="2" />
+    <rect x="6" y="1.5" width="2" height="3.5" rx="1" />
+    <rect x="11" y="1.5" width="2" height="3.5" rx="1" />
+    <rect x="16" y="1.5" width="2" height="3.5" rx="1" />
+    <rect x="3" y="4" width="18" height="17" rx="2.5" />
+    <line x1="3" y1="9" x2="21" y2="9" />
+    <rect x="5.5" y="11" width="3" height="3" rx="0.6" />
+    <rect x="10.5" y="11" width="3" height="3" rx="0.6" />
+    <rect x="15.5" y="11" width="3" height="3" rx="0.6" />
+    <rect x="5.5" y="16" width="3" height="3" rx="0.6" />
+    <path d="M10.2 17.2l1.6 2 2.6-3.4" />
+    <rect x="15.5" y="16" width="3" height="3" rx="0.6" />
   </>
 );
 
@@ -279,16 +383,46 @@ export const SubjectsIcon = createIcon(
 );
 
 // 22. Schedule
-export const ScheduleIcon = createIcon(
-  <>
-    <line x1="8" y1="2" x2="8" y2="5" />
-    <line x1="16" y1="2" x2="16" y2="5" />
-    <rect x="4" y="4" width="16" height="17" rx="2" />
-    <line x1="4" y1="8" x2="20" y2="8" />
-    <line x1="7" y1="11" x2="17" y2="11" />
-    <line x1="7" y1="14" x2="17" y2="14" />
-    <line x1="7" y1="17" x2="17" y2="17" />
-  </>
+export const ScheduleIcon = ({ size = 20, className = 'nav-icon', ...props }) => (
+  <svg
+    width={size}
+    height={size}
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="1.6"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    className={className}
+    {...props}
+  >
+    {/* Calendar border */}
+    <path d="M12.6 20H4a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h1.2" />
+    <line x1="6.8" y1="4" x2="13.2" y2="4" />
+    <path d="M14.8 4H18a2 2 0 0 1 2 2v5.3" />
+
+    {/* Binder loops */}
+    <rect x="5.2" y="1.8" width="1.6" height="4" rx="0.8" fill="currentColor" stroke="none" />
+    <rect x="13.2" y="1.8" width="1.6" height="4" rx="0.8" fill="currentColor" stroke="none" />
+
+    {/* Header line */}
+    <line x1="2" y1="8.5" x2="19.8" y2="8.5" />
+
+    {/* Date pill dashes (2 cols x 3 rows + 1 extra in row 1) */}
+    <line x1="4.5" y1="11.5" x2="6.8" y2="11.5" strokeWidth="1.8" />
+    <line x1="8.8" y1="11.5" x2="11.1" y2="11.5" strokeWidth="1.8" />
+    <line x1="13.1" y1="11.5" x2="15.4" y2="11.5" strokeWidth="1.8" />
+
+    <line x1="4.5" y1="14.8" x2="6.8" y2="14.8" strokeWidth="1.8" />
+    <line x1="8.8" y1="14.8" x2="11.1" y2="14.8" strokeWidth="1.8" />
+
+    <line x1="4.5" y1="18" x2="6.8" y2="18" strokeWidth="1.8" />
+    <line x1="8.8" y1="18" x2="11.1" y2="18" strokeWidth="1.8" />
+
+    {/* Clock */}
+    <circle cx="17" cy="16.5" r="5.2" />
+    <path d="M17 13.5v3l2 1.5" />
+  </svg>
 );
 
 // 23. Classrooms
@@ -420,19 +554,44 @@ export const AlumniJobsIcon = createIcon(
 );
 
 // 30. System Announcement
-export const SystemAnnouncementIcon = createIcon(
-  <>
-    <rect x="4" y="4" width="16" height="16" rx="2" />
-    <circle cx="12" cy="12" r="2.8" />
-    <line x1="12" y1="6.5" x2="12" y2="8" />
-    <line x1="12" y1="16" x2="12" y2="17.5" />
-    <line x1="6.5" y1="12" x2="8" y2="12" />
-    <line x1="16" y1="12" x2="17.5" y2="12" />
-    <line x1="8" y1="8" x2="9.2" y2="9.2" />
-    <line x1="14.8" y1="14.8" x2="16" y2="16" />
-    <line x1="8" y1="16" x2="9.2" y2="14.8" />
-    <line x1="14.8" y1="9.2" x2="16" y2="8" />
-  </>
+export const SystemAnnouncementIcon = ({ size = 20, className = 'nav-icon', ...props }) => (
+  <svg
+    width={size}
+    height={size}
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="1.4"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    className={className}
+    {...props}
+  >
+    {/* Megaphone back mouthpiece */}
+    <path d="M2.2 12.2l1.6-1.2 1.8 2.4-1.6 1.2z" />
+
+    {/* Megaphone cylinder body */}
+    <rect x="3.8" y="8.2" width="5.2" height="6.5" rx="1.2" transform="rotate(-38 6.4 11.45)" />
+
+    {/* Megaphone handle */}
+    <path d="M6.2 15.5l1.2 4.5a1.2 1.2 0 0 0 2.3-.6l-1.1-4.2" />
+
+    {/* Trigger button */}
+    <path d="M8.8 15.5c.7.4 1 1.2.7 1.8" />
+
+    {/* Megaphone cone */}
+    <path d="M7.6 8.2L13.6 2a1.2 1.2 0 0 1 1.4.1l.8.7" />
+    <path d="M15.8 6.2c1.8.8 2.3 2.3 1.4 3.8" />
+    <path d="M17.2 10l1.3 4.2" />
+    <path d="M9.8 13.8l4.4 2.4" />
+
+    {/* Speech Bubble */}
+    <path d="M15.5 14.5h5a1.5 1.5 0 0 1 1.5 1.5v4.5a1.5 1.5 0 0 1-1.5 1.5h-4l-2.3 1.8v-1.8h-.2a1.5 1.5 0 0 1-1.5-1.5V16a1.5 1.5 0 0 1 1.5-1.5z" />
+
+    {/* Message text lines */}
+    <line x1="16.5" y1="17.2" x2="20.5" y2="17.2" />
+    <line x1="16.5" y1="19.2" x2="20.5" y2="19.2" />
+  </svg>
 );
 
 // 31. Attendance

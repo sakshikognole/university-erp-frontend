@@ -109,7 +109,7 @@ export default function ClubModal({ isOpen, mode, club, parentClubs, onSave, onC
                                 <input
                                     className="books-form-control"
                                     name="clubCategory" value={form.clubCategory} onChange={change}
-                                    placeholder="e.g. Technical, Sports, Cultural"
+                                    placeholder="e.g. Technical, Sports"
                                 />
                             </div>
                             <div className="books-form-group">
@@ -174,7 +174,7 @@ export default function ClubModal({ isOpen, mode, club, parentClubs, onSave, onC
                                     className="books-form-control"
                                     name="activeMembers" type="number" min="0"
                                     value={form.activeMembers} onChange={change}
-                                    placeholder="0"
+                                    placeholder="e.g. 25"
                                 />
                             </div>
                         </div>
@@ -187,7 +187,7 @@ export default function ClubModal({ isOpen, mode, club, parentClubs, onSave, onC
                                 <input
                                     className="books-form-control"
                                     name="studentLeadName" value={form.studentLeadName} onChange={change}
-                                    placeholder="Student name"
+                                    placeholder="e.g. Rahul Patil"
                                 />
                             </div>
                             <div className="books-form-group">
@@ -204,7 +204,7 @@ export default function ClubModal({ isOpen, mode, club, parentClubs, onSave, onC
                             <input
                                 className="books-form-control"
                                 name="studentLeadRole" value={form.studentLeadRole} onChange={change}
-                                placeholder="e.g. President, Captain"
+                                placeholder="e.g. President"
                             />
                         </div>
 
