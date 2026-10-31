@@ -363,7 +363,7 @@ const Venues = () => {
                     <th style={{ width: '100px' }}>Capacity</th>
                     <th>Facilities</th>
                     <th style={{ width: '120px' }}>Status</th>
-                    <th style={{ width: '220px', textAlign: 'right' }}>Actions</th>
+                    <th>Actions</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -388,8 +388,8 @@ const Venues = () => {
                           {venue.status || 'N/A'}
                         </span>
                       </td>
-                      <td style={{ textAlign: 'right' }}>
-                        <div className="action-buttons-cell" style={{ justifyContent: 'flex-end' }}>
+                      <td>
+                        <div className="books-actions">
                           <button
                             type="button"
                             className="action-btn view-btn"

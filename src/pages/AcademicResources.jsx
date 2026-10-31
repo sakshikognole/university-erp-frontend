@@ -219,7 +219,7 @@ const AcademicResources = () => {
                   <th>Title</th>
                   <th>Subject</th>
                   <th style={{ width: 120 }}>Uploaded on</th>
-                  <th style={{ width: 140, textAlign: 'right' }}>Actions</th>
+                  <th style={{ width: 140 }}>Actions</th>
                 </tr>
               </thead>
               <tbody>
@@ -237,7 +237,7 @@ const AcademicResources = () => {
                       {new Date(res.createdAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}
                     </td>
                     <td>
-                      <div className="books-actions" style={{ justifyContent: 'flex-end' }}>
+                      <div className="books-actions">
         <button
                           className="books-btn books-btn-sm books-btn-ghost"
                           onClick={async () => {

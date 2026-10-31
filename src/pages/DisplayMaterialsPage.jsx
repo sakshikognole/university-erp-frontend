@@ -207,6 +207,45 @@ export default function DisplayMaterialsPage() {
   const [previewFile,      setPreviewFile]      = useState(null);
   const [downloadingId,    setDownloadingId]    = useState(null);
 
+  // Create folder form
+  const [showNewFolder,  setShowNewFolder]  = useState(false);
+  const [newFolderName,  setNewFolderName]  = useState('');
+  const [creatingFolder, setCreatingFolder] = useState(false);
+  const [folderError,    setFolderError]    = useState('');
+
+  const handleCreateFolder = async () => {
+    const trimmed = newFolderName.trim();
+    if (!trimmed) {
+      setFolderError('Folder name is required.');
+      return;
+    }
+
+    const exists = subjects.some(
+      (f) => f.folderName.trim().toLowerCase() === trimmed.toLowerCase()
+    );
+    if (exists) {
+      setFolderError(`Folder "${trimmed}" already exists.`);
+      return;
+    }
+
+    setCreatingFolder(true);
+    setFolderError('');
+    try {
+      const res = await springApi.post('/material-folders', {
+        folderName: trimmed,
+        parentFolderId: '',
+      });
+      setSubjects((prev) => [...prev, res]);
+      handleFolderChange(res.folderId);
+      setNewFolderName('');
+      setShowNewFolder(false);
+    } catch (err) {
+      setFolderError(err.message || 'Failed to create folder.');
+    } finally {
+      setCreatingFolder(false);
+    }
+  };
+
   // ── Direct Download via fetch + blob ─────────────────────────────────────
   const downloadFile = async (fileUrl, fileName, materialId, e) => {
     if (e) {
@@ -311,28 +350,84 @@ export default function DisplayMaterialsPage() {
         </div>
       )}
 
-      {/* Subject dropdown */}
-      <div className="books-form-group" style={{ maxWidth: 420, width: '100%', marginBottom: 20 }}>
-        <label className="books-form-label">Select Subject / Folder</label>
+      {/* ── Step 1: Folder Selection Box ─────────────────────────────── */}
+      <div className="vb-form-panel">
+        <p className="vb-form-title">Step 1 — Select Folder</p>
+
         {subjectsLoading ? (
-          <p className="books-loading">Loading subjects...</p>
-        ) : subjects.length === 0 ? (
-          <p style={{ fontSize: 14, color: 'var(--text-secondary)' }}>
-            No folders available yet.
-          </p>
+          <p className="books-loading">Loading folders...</p>
         ) : (
-          <select
-            className="books-form-control"
-            value={selectedSubject}
-            onChange={(e) => handleFolderChange(e.target.value)}
-          >
-            <option value="">— Select Subject —</option>
-            {subjects.map((s) => (
-              <option key={s.folderId} value={s.folderId}>
-                📁 {s.folderName}
-              </option>
-            ))}
-          </select>
+          <>
+            {subjects.length === 0 ? (
+              <p style={{ fontSize: 14, color: 'var(--text-secondary)', marginBottom: 12 }}>
+                No folders available yet. Create one below to get started.
+              </p>
+            ) : (
+              <div className="books-form-group" style={{ maxWidth: 380 }}>
+                <label className="books-form-label">Choose a folder</label>
+                <select
+                  className="books-form-control"
+                  value={selectedSubject}
+                  onChange={(e) => handleFolderChange(e.target.value)}
+                >
+                  <option value="">— Select folder —</option>
+                  {subjects.map((s) => (
+                    <option key={s.folderId} value={s.folderId}>
+                      📁 {s.folderName}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            )}
+
+            {/* Create new folder */}
+            {!showNewFolder ? (
+              <button
+                type="button"
+                className="books-btn books-btn-ghost"
+                style={{ marginTop: 6 }}
+                onClick={() => { setShowNewFolder(true); setFolderError(''); }}
+              >
+                📁 + Create New Folder
+              </button>
+            ) : (
+              <div style={{ marginTop: 12, display: 'flex', gap: 8,
+                            alignItems: 'flex-start', flexWrap: 'wrap' }}>
+                <div className="books-form-group" style={{ margin: 0 }}>
+                  <input
+                    className={`books-form-control ${folderError ? 'err' : ''}`}
+                    placeholder="e.g. Java Notes"
+                    value={newFolderName}
+                    onChange={(e) => { setNewFolderName(e.target.value); setFolderError(''); }}
+                    onKeyDown={(e) => e.key === 'Enter' && handleCreateFolder()}
+                    autoFocus
+                    style={{ width: 260 }}
+                  />
+                  {folderError && (
+                    <p className="books-form-err" style={{ marginTop: 4 }}>
+                      {folderError}
+                    </p>
+                  )}
+                </div>
+                <button
+                  type="button"
+                  className="books-btn books-btn-primary"
+                  onClick={handleCreateFolder}
+                  disabled={creatingFolder}
+                >
+                  {creatingFolder ? 'Creating...' : 'Create'}
+                </button>
+                <button
+                  type="button"
+                  className="books-btn books-btn-ghost"
+                  onClick={() => { setShowNewFolder(false); setNewFolderName(''); setFolderError(''); }}
+                  disabled={creatingFolder}
+                >
+                  Cancel
+                </button>
+              </div>
+            )}
+          </>
         )}
       </div>
 
@@ -370,7 +465,7 @@ export default function DisplayMaterialsPage() {
                       <th style={{ width: '40%', textAlign: 'left', padding: '12px 16px' }}>Material name</th>
                       <th style={{ width: '18%', textAlign: 'center', padding: '12px 16px' }}>File type</th>
                       <th style={{ width: '18%', textAlign: 'center', padding: '12px 16px' }}>Size</th>
-                      <th style={{ width: '24%', textAlign: 'center', padding: '12px 16px' }}>Actions</th>
+                      <th style={{ width: '24%', textAlign: 'left', padding: '12px 16px' }}>Actions</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -398,7 +493,7 @@ export default function DisplayMaterialsPage() {
                           <th style={{ width: '40%', textAlign: 'left', padding: '12px 16px' }}>Material name</th>
                           <th style={{ width: '18%', textAlign: 'center', padding: '12px 16px' }}>File type</th>
                           <th style={{ width: '18%', textAlign: 'center', padding: '12px 16px' }}>Size</th>
-                          <th style={{ width: '24%', textAlign: 'center', padding: '12px 16px' }}>Actions</th>
+                          <th style={{ width: '24%', textAlign: 'left', padding: '12px 16px' }}>Actions</th>
                         </tr>
                       </thead>
                       <tbody>
@@ -429,8 +524,8 @@ export default function DisplayMaterialsPage() {
                                     : (m.fileSize / (1024 * 1024)).toFixed(1) + ' MB'
                                   : '—'}
                               </td>
-                              <td style={{ textAlign: 'center', verticalAlign: 'middle', padding: '12px 16px' }}>
-                                <div className="books-actions" style={{ justifyContent: 'center', alignItems: 'center', gap: 8 }}>
+                              <td style={{ textAlign: 'left', verticalAlign: 'middle', padding: '12px 16px' }}>
+                                <div className="books-actions" style={{ alignItems: 'center', gap: 8 }}>
                                   <button
                                     type="button"
                                     className="books-btn books-btn-sm books-btn-ghost"

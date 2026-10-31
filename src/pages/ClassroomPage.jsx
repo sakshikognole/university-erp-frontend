@@ -116,7 +116,7 @@ function ClassroomModal({ isOpen, mode, classroom, onSave, onClose, saving }) {
               </div>
 
               {/* Rows, Columns, Extra */}
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 12 }}>
+              <div className="classroom-dims-row">
                 <div className="books-form-group">
                   <label className="books-form-label">Rows *</label>
                   <input
@@ -128,6 +128,7 @@ function ClassroomModal({ isOpen, mode, classroom, onSave, onClose, saving }) {
                       setForm(f => ({ ...f, rows: e.target.value }));
                       setErrors(er => ({ ...er, rows: '' }));
                     }}
+                    placeholder="e.g. 5"
                   />
                   {errors.rows && <p className="books-form-err">{errors.rows}</p>}
                 </div>
@@ -142,6 +143,7 @@ function ClassroomModal({ isOpen, mode, classroom, onSave, onClose, saving }) {
                       setForm(f => ({ ...f, columns: e.target.value }));
                       setErrors(er => ({ ...er, columns: '' }));
                     }}
+                    placeholder="e.g. 6"
                   />
                   {errors.columns && <p className="books-form-err">{errors.columns}</p>}
                 </div>
@@ -156,6 +158,7 @@ function ClassroomModal({ isOpen, mode, classroom, onSave, onClose, saving }) {
                       setForm(f => ({ ...f, extra: e.target.value }));
                       setErrors(er => ({ ...er, extra: '' }));
                     }}
+                    placeholder="e.g. 0"
                   />
                   {errors.extra && <p className="books-form-err">{errors.extra}</p>}
                 </div>
@@ -282,6 +285,7 @@ export default function ClassroomPage() {
   const [bunches, setBunches] = useState([]);
   const [loadingBunches, setLoadingBunches] = useState(false);
   const [savingBunch, setSavingBunch] = useState(false);
+  const [editingBunch, setEditingBunch] = useState(null);
 
   useEffect(() => {
     if (!success && !error) return;
@@ -402,31 +406,50 @@ export default function ClassroomPage() {
       setError('Please select at least one classroom.');
       return;
     }
+    setEditingBunch(null);
     setError('');
     setBunchName('');
     setBunchModalOpen(true);
   };
 
-  // Create bunch
-  const handleCreateBunch = async () => {
+  // Open edit bunch modal
+  const openEditBunch = (bunch) => {
+    setEditingBunch(bunch);
+    setBunchName(bunch.bunchName || '');
+    setSelectedClassrooms(bunch.classroomIds || []);
+    setError('');
+    setBunchModalOpen(true);
+  };
+
+  // Create or Update bunch
+  const handleSaveBunch = async () => {
     if (!bunchName.trim()) {
       setError('Bunch name is required.');
       return;
     }
     setSavingBunch(true);
     try {
-      await springApi.post('/classroom-bunches', {
-        bunchName: bunchName.trim(),
-        classroomIds: selectedClassrooms,
-      });
-      setSuccess('Bunch created successfully.');
+      if (editingBunch) {
+        await springApi.put(`/classroom-bunches/${editingBunch.bunchId}`, {
+          bunchName: bunchName.trim(),
+          classroomIds: selectedClassrooms,
+        });
+        setSuccess('Bunch updated successfully.');
+      } else {
+        await springApi.post('/classroom-bunches', {
+          bunchName: bunchName.trim(),
+          classroomIds: selectedClassrooms,
+        });
+        setSuccess('Bunch created successfully.');
+      }
       setBunchModalOpen(false);
+      setEditingBunch(null);
       setBunchName('');
       setSelectedClassrooms([]);
       setShowCheckboxes(false);
       loadBunches();
     } catch (err) {
-      setError(err.message || 'Failed to create bunch.');
+      setError(err.message || (editingBunch ? 'Failed to update bunch.' : 'Failed to create bunch.'));
     } finally {
       setSavingBunch(false);
     }
@@ -728,10 +751,21 @@ export default function ClassroomPage() {
                     </div>
                   </div>
 
-                  <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: 14 }}>
+                  <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 6, marginTop: 14 }}>
+                    <button
+                      className="books-btn books-btn-sm books-btn-warning"
+                      onClick={() => openEditBunch(bunch)}
+                      title="Edit Bunch"
+                    >
+                      <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}>
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+                        Edit
+                      </span>
+                    </button>
                     <button
                       className="books-btn books-btn-sm books-btn-danger"
                       onClick={() => handleDeleteBunch(bunch)}
+                      title="Delete Bunch"
                     >
                       <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}>
                         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -757,8 +791,8 @@ export default function ClassroomPage() {
         <div className="books-overlay">
           <div className="books-modal" style={{ maxWidth: 520 }}>
             <div className="books-modal-head">
-              <h3>Create Classroom Bunch</h3>
-              <button className="books-modal-close" onClick={() => setBunchModalOpen(false)} disabled={savingBunch}>×</button>
+              <h3>{editingBunch ? 'Edit Classroom Bunch' : 'Create Classroom Bunch'}</h3>
+              <button className="books-modal-close" onClick={() => { setBunchModalOpen(false); setEditingBunch(null); }} disabled={savingBunch}>×</button>
             </div>
             <div className="books-modal-body">
               <div style={{ marginBottom: 16 }}>
@@ -798,7 +832,7 @@ export default function ClassroomPage() {
               <button 
                 type="button" 
                 className="books-btn books-btn-ghost" 
-                onClick={() => setBunchModalOpen(false)} 
+                onClick={() => { setBunchModalOpen(false); setEditingBunch(null); }} 
                 disabled={savingBunch}
               >
                 Cancel
@@ -806,10 +840,10 @@ export default function ClassroomPage() {
               <button 
                 type="button" 
                 className="books-btn books-btn-primary" 
-                onClick={handleCreateBunch}
+                onClick={handleSaveBunch}
                 disabled={savingBunch}
               >
-                {savingBunch ? 'Creating...' : 'Create Bunch'}
+                {savingBunch ? 'Saving...' : editingBunch ? 'Save Changes' : 'Create Bunch'}
               </button>
             </div>
           </div>

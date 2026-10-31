@@ -491,10 +491,15 @@ export default function HostelBlockDetails({ block: blockProp, onBack }) {
           background: 'var(--bg-primary)',
           boxShadow: '0 2px 8px rgba(37,99,235,0.08)',
         }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between',
-                        alignItems: 'center', marginBottom: 12 }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-              <Users size={18} style={{ color: '#2563eb' }} />
+          <div style={{
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'flex-start',
+            gap: '0.75rem',
+            marginBottom: 12,
+          }}>
+            <div style={{ display: 'flex', alignItems: 'flex-start', gap: 10 }}>
+              <Users size={18} style={{ color: '#2563eb', marginTop: 2, flexShrink: 0 }} />
               <div>
                 <strong style={{ fontSize: 15 }}>Students Allotted to Room {selRoom.roomNo}</strong>
                 <span style={{ fontSize: 13, color: 'var(--text-secondary)', marginLeft: 10 }}>
@@ -505,6 +510,7 @@ export default function HostelBlockDetails({ block: blockProp, onBack }) {
             <button
               className="books-btn books-btn-sm books-btn-ghost"
               onClick={() => setSelRoom(null)}
+              style={{ alignSelf: 'flex-start', flexShrink: 0 }}
             >
               ✕ Close
             </button>
@@ -623,6 +629,9 @@ export default function HostelBlockDetails({ block: blockProp, onBack }) {
             }
             placeholder="Name will appear here"
             style={{
+              width: '100%',
+              maxWidth: '100%',
+              boxSizing: 'border-box',
               background: 'var(--bg-secondary)',
               color: namePreview === 'Not found' ? '#dc2626'
                    : namePreview && namePreview !== '...' ? '#16a34a'

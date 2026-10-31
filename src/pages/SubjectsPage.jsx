@@ -373,7 +373,7 @@ export default function SubjectsPage() {
                   <th style={{ width: '140px', textAlign: 'left' }}>Subject ID</th>
                   <th style={{ minWidth: '180px', width: '220px', textAlign: 'left' }}>Subject Name</th>
                   <th style={{ textAlign: 'left' }}>Description</th>
-                  <th style={{ width: '230px', textAlign: 'right' }}>Actions</th>
+                  <th>Actions</th>
                 </tr>
               </thead>
               <tbody>
@@ -461,7 +461,7 @@ export default function SubjectsPage() {
                         <th style={{ width: '140px', textAlign: 'left' }}>Subject ID</th>
                         <th style={{ minWidth: '180px', width: '220px', textAlign: 'left' }}>Subject Name</th>
                         <th style={{ textAlign: 'left' }}>Description</th>
-                        <th style={{ width: '230px', textAlign: 'right' }}>Actions</th>
+                        <th>Actions</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -490,8 +490,8 @@ export default function SubjectsPage() {
                           }}>
                             {sub.description || '—'}
                           </td>
-                          <td style={{ textAlign: 'right', verticalAlign: 'middle', width: '230px' }} onClick={(e) => e.stopPropagation()}>
-                            <div className="action-buttons-cell" style={{ justifyContent: 'flex-end', gap: '6px' }}>
+                          <td style={{ verticalAlign: 'middle' }} onClick={(e) => e.stopPropagation()}>
+                            <div className="books-actions">
                               <button
                                 type="button"
                                 className="action-btn view-btn"

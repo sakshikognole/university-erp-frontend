@@ -573,15 +573,17 @@ export default function VenueBookingPage() {
                     </div>
                   </div>
 
-                  {/* Date + Start + End */}
+                  {/* Date */}
+                  <div className="books-form-group">
+                    <label className="books-form-label">Booking Date *</label>
+                    <input className={`books-form-control ${formErrs.bookingDate ? 'err' : ''}`}
+                           type="date" name="bookingDate" value={form.bookingDate}
+                           min={todayStr()} onChange={changeForm} />
+                    {formErrs.bookingDate && <p className="books-form-err">{formErrs.bookingDate}</p>}
+                  </div>
+
+                  {/* Start + End Time */}
                   <div className="club-form-row">
-                    <div className="books-form-group">
-                      <label className="books-form-label">Booking Date *</label>
-                      <input className={`books-form-control ${formErrs.bookingDate ? 'err' : ''}`}
-                             type="date" name="bookingDate" value={form.bookingDate}
-                             min={todayStr()} onChange={changeForm} />
-                      {formErrs.bookingDate && <p className="books-form-err">{formErrs.bookingDate}</p>}
-                    </div>
                     <div className="books-form-group">
                       <label className="books-form-label">Start Time *</label>
                       <input className={`books-form-control ${formErrs.startTime ? 'err' : ''}`}
@@ -680,11 +682,14 @@ export default function VenueBookingPage() {
                 <table className="books-table">
                   <thead>
                     <tr>
-                      {/* Improvement: center-aligned headers */}
-                      {['#','Booking id','Event','Venue','Date','Start','Status','Actions']
-                        .map(h => (
-                          <th key={h} style={{ textAlign: 'center' }}>{h}</th>
-                        ))}
+                      <th style={{ width: '50px', textAlign: 'center' }}>#</th>
+                      <th style={{ width: '130px', textAlign: 'center' }}>Booking id</th>
+                      <th>Event</th>
+                      <th>Venue</th>
+                      <th style={{ width: '120px', textAlign: 'center' }}>Date</th>
+                      <th style={{ width: '100px', textAlign: 'center' }}>Start</th>
+                      <th style={{ width: '110px', textAlign: 'center' }}>Status</th>
+                      <th>Actions</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -720,8 +725,8 @@ export default function VenueBookingPage() {
                           <StatusBadge status={b.status} />
                         </td>
                         {/* D4: Actions always visible — not pushed off-screen */}
-                        <td style={{ textAlign: 'center' }}>
-                          <div className="books-actions" style={{ justifyContent: 'center' }}>
+                        <td>
+                          <div className="books-actions">
                             <button
                               type="button"
                               className="action-btn view-btn"

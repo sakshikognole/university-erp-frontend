@@ -221,7 +221,7 @@ export default function ExamsPage() {
                     <th>Subject</th>
                     <th style={{ width: '150px' }}>Academic Year</th>
                     <th style={{ width: '110px', textAlign: 'center' }}>Students</th>
-                    <th style={{ width: '220px', textAlign: 'right' }}>Actions</th>
+                    <th>Actions</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -242,8 +242,8 @@ export default function ExamsPage() {
                           {totalStudents(exam)}
                         </span>
                       </td>
-                      <td style={{ textAlign: 'right' }}>
-                        <div className="action-buttons-cell" style={{ justifyContent: 'flex-end' }}>
+                      <td>
+                        <div className="books-actions">
                           <button
                             type="button"
                             className="action-btn view-btn"
