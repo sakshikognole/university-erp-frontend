@@ -1,22 +1,21 @@
 import React from 'react';
 
 /**
- * Reusable pagination bar — used by PaymentPage and BooksPage.
- *
+ * Reusable pagination bar matching screenshot
  * Props:
  *   pageData      — { pageNumber, pageSize, totalElements, totalPages, first, last }
  *   onPageChange  — (pageIndex: number) => void
  *   onSizeChange  — (size: number) => void
+ *   unit          — string (e.g. 'books', 'students', 'classrooms', default: 'books')
  */
-export default function Pagination({ pageData, onPageChange, onSizeChange }) {
+export default function Pagination({ pageData, onPageChange, onSizeChange, unit = 'books' }) {
+  if (!pageData || pageData.totalElements === 0) return null;
+
   const { pageNumber, pageSize, totalElements, totalPages, first, last } = pageData;
 
-  if (totalElements === 0) return null;
+  const to = Math.min((pageNumber + 1) * pageSize, totalElements);
 
-  const from = pageNumber * pageSize + 1;
-  const to   = Math.min((pageNumber + 1) * pageSize, totalElements);
-
-  // Build page button list with ellipsis
+  // Desktop page numbers with ellipsis
   const buildPages = () => {
     if (totalPages <= 7) {
       return Array.from({ length: totalPages }, (_, i) => i);
@@ -31,7 +30,7 @@ export default function Pagination({ pageData, onPageChange, onSizeChange }) {
     const sorted = Array.from(pages).sort((a, b) => a - b);
     const result = [];
     for (let i = 0; i < sorted.length; i++) {
-      if (i > 0 && sorted[i] - sorted[i - 1] > 1) result.push(-1); // ellipsis
+      if (i > 0 && sorted[i] - sorted[i - 1] > 1) result.push(-1);
       result.push(sorted[i]);
     }
     return result;
@@ -39,49 +38,71 @@ export default function Pagination({ pageData, onPageChange, onSizeChange }) {
 
   return (
     <div className="books-pagination-bar">
-      {/* Showing X–Y of Z */}
+      {/* Showing X of Y unit */}
       <span className="books-pg-info">
-        Showing {from} to {to} of {totalElements}
+        <span className="books-pg-count">{to} of {totalElements}</span>
+        {unit ? <span className="books-pg-unit"> {unit}</span> : null}
       </span>
 
-      {/* Page buttons */}
+      {/* Page controls */}
       <div className="books-pg-controls">
         <button
+          type="button"
           className="books-pg-btn books-pg-arrow"
           onClick={() => onPageChange(pageNumber - 1)}
           disabled={first}
           title="Previous"
+          aria-label="Previous page"
         >
           &lt;
         </button>
 
-        {buildPages().map((p, idx) =>
-          p === -1 ? (
-            <span key={`ellipsis-${idx}`} className="books-pg-ellipsis">...</span>
-          ) : (
-            <button
-              key={p}
-              className={`books-pg-btn${p === pageNumber ? ' active' : ''}`}
-              onClick={() => onPageChange(p)}
-            >
-              {p + 1}
-            </button>
-          )
-        )}
+        {/* Desktop full page buttons */}
+        <div className="books-pg-desk-buttons">
+          {buildPages().map((p, idx) =>
+            p === -1 ? (
+              <span key={`ellipsis-${idx}`} className="books-pg-ellipsis">...</span>
+            ) : (
+              <button
+                type="button"
+                key={p}
+                className={`books-pg-btn${p === pageNumber ? ' active' : ''}`}
+                onClick={() => onPageChange(p)}
+              >
+                {p + 1}
+              </button>
+            )
+          )}
+        </div>
+
+        {/* Mobile active page button: [ < ] [ 1 ] [ > ] */}
+        <div className="books-pg-mob-button">
+          <button type="button" className="books-pg-btn active">
+            {pageNumber + 1}
+          </button>
+        </div>
 
         <button
+          type="button"
           className="books-pg-btn books-pg-arrow"
           onClick={() => onPageChange(pageNumber + 1)}
           disabled={last}
           title="Next"
+          aria-label="Next page"
         >
           &gt;
         </button>
       </div>
 
+      {/* Divider */}
+      <div className="books-pg-divider" />
+
       {/* Items per page */}
       <div className="books-pg-size">
-        <span>Items per page:</span>
+        <span className="books-pg-size-label">
+          <span className="books-pg-size-full">Items per page:</span>
+          <span className="books-pg-size-short">Per page:</span>
+        </span>
         <select value={pageSize} onChange={(e) => onSizeChange(Number(e.target.value))}>
           <option value={10}>10</option>
           <option value={20}>20</option>

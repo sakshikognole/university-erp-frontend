@@ -22,12 +22,9 @@ export default function ViewSportTeamModal({ isOpen, team, onClose }) {
 
         <div className="books-modal-body">
 
-          {/* Team ID + Status */}
-          <div style={{ display: 'flex', justifyContent: 'space-between',
+          {/* Status badge */}
+          <div style={{ display: 'flex', justifyContent: 'flex-end',
             alignItems: 'center', marginBottom: 12, flexWrap: 'wrap', gap: 8 }}>
-            <span style={{ fontFamily: 'monospace', fontSize: '0.8rem', color: '#6b7280' }}>
-              {team.teamId}
-            </span>
             <span style={{
               ...badgeStyle, padding: '3px 10px', borderRadius: 9999,
               fontSize: '0.78rem', fontWeight: 600, whiteSpace: 'nowrap',
@@ -44,6 +41,7 @@ export default function ViewSportTeamModal({ isOpen, team, onClose }) {
           <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.87rem' }}>
             <tbody>
               {[
+                ['Team ID',       team.teamId],
                 ['Sport ID',      team.sportId],
                 ['Coach',         team.coachName],
                 ['Status',        team.status],

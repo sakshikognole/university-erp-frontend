@@ -356,6 +356,7 @@ export default function BooksPage() {
           pageData={pageData}
           onPageChange={setPage}
           onSizeChange={onSizeChange}
+          unit="books"
         />
       </div>
 

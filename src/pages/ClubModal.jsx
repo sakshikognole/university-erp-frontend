@@ -48,11 +48,88 @@ export default function ClubModal({ isOpen, mode, club, parentClubs, onSave, onC
         setErrors((er) => ({ ...er, [name]: '' }));
     };
 
+    const handleBlur = (e) => {
+        const { name, value } = e.target;
+        const val = value.trim();
+        if (name === 'clubId') {
+            if (!val) {
+                setErrors((er) => ({ ...er, clubId: 'Club ID is required' }));
+            } else if (!/^[A-Za-z0-9]+$/.test(val)) {
+                setErrors((er) => ({ ...er, clubId: 'Invalid ID. Please enter a valid ID.' }));
+            }
+        } else if (name === 'clubName') {
+            if (!val) {
+                setErrors((er) => ({ ...er, clubName: 'Club Name is required' }));
+            } else if (!/^[A-Za-z0-9\s]+$/.test(val)) {
+                setErrors((er) => ({ ...er, clubName: 'Invalid Club Name. Please enter a valid club name.' }));
+            }
+        } else if (name === 'clubCategory') {
+            if (val && !/^[A-Za-z0-9\s]+$/.test(val)) {
+                setErrors((er) => ({ ...er, clubCategory: 'Invalid Category. Please enter a valid category.' }));
+            }
+        } else if (name === 'facultyCoordinator') {
+            if (val && !/^[A-Za-z0-9\s.]+$/.test(val)) {
+                setErrors((er) => ({ ...er, facultyCoordinator: 'Invalid Coordinator Name. Please enter a valid name.' }));
+            }
+        } else if (name === 'studentLeadName') {
+            if (val && !/^[A-Za-z0-9\s.]+$/.test(val)) {
+                setErrors((er) => ({ ...er, studentLeadName: 'Invalid Name. Please enter a valid name.' }));
+            }
+        } else if (name === 'studentLeadId') {
+            if (val && !/^[A-Za-z0-9]+$/.test(val)) {
+                setErrors((er) => ({ ...er, studentLeadId: 'Invalid ID. Please enter a valid ID.' }));
+            }
+        } else if (name === 'studentLeadRole') {
+            if (val && !/^[A-Za-z0-9\s]+$/.test(val)) {
+                setErrors((er) => ({ ...er, studentLeadRole: 'Invalid Role. Please enter a valid role.' }));
+            }
+        }
+    };
+
     const validate = () => {
         const e = {};
-        if (!form.clubId.trim()) e.clubId = 'Required';
-        if (!form.clubName.trim()) e.clubName = 'Required';
+
+        // Club ID validation — upper and lower letters and numbers only
+        if (!form.clubId.trim()) {
+            e.clubId = 'Club ID is required';
+        } else if (!/^[A-Za-z0-9]+$/.test(form.clubId.trim())) {
+            e.clubId = 'Invalid ID. Please enter a valid ID.';
+        }
+
+        // Club Name validation — upper and lower letters and numbers only
+        if (!form.clubName.trim()) {
+            e.clubName = 'Club Name is required';
+        } else if (!/^[A-Za-z0-9\s]+$/.test(form.clubName.trim())) {
+            e.clubName = 'Invalid Club Name. Please enter a valid club name.';
+        }
+
+        // Club Category validation — upper and lower letters and numbers only
+        if (form.clubCategory.trim() && !/^[A-Za-z0-9\s]+$/.test(form.clubCategory.trim())) {
+            e.clubCategory = 'Invalid Category. Please enter a valid category.';
+        }
+
         if (!form.status) e.status = 'Required';
+
+        // Faculty Coordinator validation
+        if (form.facultyCoordinator.trim() && !/^[A-Za-z0-9\s.]+$/.test(form.facultyCoordinator.trim())) {
+            e.facultyCoordinator = 'Invalid Coordinator Name. Please enter a valid name.';
+        }
+
+        // Student Lead Name validation
+        if (form.studentLeadName.trim() && !/^[A-Za-z0-9\s.]+$/.test(form.studentLeadName.trim())) {
+            e.studentLeadName = 'Invalid Name. Please enter a valid name.';
+        }
+
+        // Student Lead ID validation
+        if (form.studentLeadId.trim() && !/^[A-Za-z0-9]+$/.test(form.studentLeadId.trim())) {
+            e.studentLeadId = 'Invalid ID. Please enter a valid ID.';
+        }
+
+        // Student Lead Role validation
+        if (form.studentLeadRole.trim() && !/^[A-Za-z0-9\s]+$/.test(form.studentLeadRole.trim())) {
+            e.studentLeadRole = 'Invalid Role. Please enter a valid role.';
+        }
+
         return e;
     };
 
@@ -67,6 +144,13 @@ export default function ClubModal({ isOpen, mode, club, parentClubs, onSave, onC
         });
     };
 
+    const handleKeyDown = (e) => {
+        if (e.key === 'Enter' && e.target.tagName !== 'TEXTAREA') {
+            e.preventDefault();
+            submit(e);
+        }
+    };
+
     return (
         <div className="books-overlay">
             <div className="books-modal" style={{ maxWidth: 540 }}>
@@ -76,7 +160,7 @@ export default function ClubModal({ isOpen, mode, club, parentClubs, onSave, onC
                     <button className="books-modal-close" onClick={onClose}>x</button>
                 </div>
 
-                <form onSubmit={submit}>
+                <form onSubmit={submit} onKeyDown={handleKeyDown}>
                     <div className="books-modal-body" style={{ maxHeight: '70vh', overflowY: 'auto' }}>
 
                         {/* Row 1 — Club ID + Club Name */}
@@ -85,7 +169,7 @@ export default function ClubModal({ isOpen, mode, club, parentClubs, onSave, onC
                                 <label className="books-form-label">Club ID *</label>
                                 <input
                                     className={`books-form-control ${errors.clubId ? 'err' : ''}`}
-                                    name="clubId" value={form.clubId} onChange={change}
+                                    name="clubId" value={form.clubId} onChange={change} onBlur={handleBlur}
                                     placeholder="e.g. CLB001"
                                     disabled={mode === 'edit'}
                                 />
@@ -95,7 +179,7 @@ export default function ClubModal({ isOpen, mode, club, parentClubs, onSave, onC
                                 <label className="books-form-label">Club Name *</label>
                                 <input
                                     className={`books-form-control ${errors.clubName ? 'err' : ''}`}
-                                    name="clubName" value={form.clubName} onChange={change}
+                                    name="clubName" value={form.clubName} onChange={change} onBlur={handleBlur}
                                     placeholder="e.g. Coding Club"
                                 />
                                 {errors.clubName && <p className="books-form-err">{errors.clubName}</p>}
@@ -107,10 +191,11 @@ export default function ClubModal({ isOpen, mode, club, parentClubs, onSave, onC
                             <div className="books-form-group">
                                 <label className="books-form-label">Club Category</label>
                                 <input
-                                    className="books-form-control"
-                                    name="clubCategory" value={form.clubCategory} onChange={change}
+                                    className={`books-form-control ${errors.clubCategory ? 'err' : ''}`}
+                                    name="clubCategory" value={form.clubCategory} onChange={change} onBlur={handleBlur}
                                     placeholder="e.g. Technical, Sports"
                                 />
+                                {errors.clubCategory && <p className="books-form-err">{errors.clubCategory}</p>}
                             </div>
                             <div className="books-form-group">
                                 <label className="books-form-label">Status *</label>
@@ -163,10 +248,11 @@ export default function ClubModal({ isOpen, mode, club, parentClubs, onSave, onC
                             <div className="books-form-group">
                                 <label className="books-form-label">Faculty Coordinator</label>
                                 <input
-                                    className="books-form-control"
-                                    name="facultyCoordinator" value={form.facultyCoordinator} onChange={change}
+                                    className={`books-form-control ${errors.facultyCoordinator ? 'err' : ''}`}
+                                    name="facultyCoordinator" value={form.facultyCoordinator} onChange={change} onBlur={handleBlur}
                                     placeholder="e.g. Prof. A. Sharma"
                                 />
+                                {errors.facultyCoordinator && <p className="books-form-err">{errors.facultyCoordinator}</p>}
                             </div>
                             <div className="books-form-group">
                                 <label className="books-form-label">Active Members</label>
@@ -185,27 +271,30 @@ export default function ClubModal({ isOpen, mode, club, parentClubs, onSave, onC
                             <div className="books-form-group">
                                 <label className="books-form-label">Name</label>
                                 <input
-                                    className="books-form-control"
-                                    name="studentLeadName" value={form.studentLeadName} onChange={change}
+                                    className={`books-form-control ${errors.studentLeadName ? 'err' : ''}`}
+                                    name="studentLeadName" value={form.studentLeadName} onChange={change} onBlur={handleBlur}
                                     placeholder="e.g. Rahul Patil"
                                 />
+                                {errors.studentLeadName && <p className="books-form-err">{errors.studentLeadName}</p>}
                             </div>
                             <div className="books-form-group">
                                 <label className="books-form-label">Student ID</label>
                                 <input
-                                    className="books-form-control"
-                                    name="studentLeadId" value={form.studentLeadId} onChange={change}
+                                    className={`books-form-control ${errors.studentLeadId ? 'err' : ''}`}
+                                    name="studentLeadId" value={form.studentLeadId} onChange={change} onBlur={handleBlur}
                                     placeholder="e.g. STU001"
                                 />
+                                {errors.studentLeadId && <p className="books-form-err">{errors.studentLeadId}</p>}
                             </div>
                         </div>
                         <div className="books-form-group">
                             <label className="books-form-label">Role</label>
                             <input
-                                className="books-form-control"
-                                name="studentLeadRole" value={form.studentLeadRole} onChange={change}
+                                className={`books-form-control ${errors.studentLeadRole ? 'err' : ''}`}
+                                name="studentLeadRole" value={form.studentLeadRole} onChange={change} onBlur={handleBlur}
                                 placeholder="e.g. President"
                             />
+                            {errors.studentLeadRole && <p className="books-form-err">{errors.studentLeadRole}</p>}
                         </div>
 
                     </div>

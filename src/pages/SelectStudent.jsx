@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Search } from 'lucide-react';
+import { Search, X } from 'lucide-react';
 import { getAllStudents } from '../services/studentService';
 import PageLoader from '../components/PageLoader';
 import PageError  from '../components/PageError';
@@ -162,24 +162,15 @@ export default function SelectStudent() {
               <span className="stu-selected-tag-text">
                 Selected: <strong>{selected.studentName}</strong> ({selected.studentId})
               </span>
-              <div className="stu-selected-tag-actions">
-                <button
-                  type="button"
-                  className="stu-btn stu-btn-primary stu-btn-sm"
-                  onClick={handleContinue}
-                  style={{ padding: '3px 10px', fontSize: 12, height: 'auto', whiteSpace: 'nowrap' }}
-                >
-                  Continue →
-                </button>
-                <button
-                  type="button"
-                  className="stu-selected-clear-btn"
-                  onClick={() => setSelected(null)}
-                  title="Clear selection"
-                >
-                  ✕
-                </button>
-              </div>
+              <button
+                type="button"
+                className="stu-selected-clear-btn"
+                onClick={() => setSelected(null)}
+                title="Clear selection"
+                aria-label="Clear selection"
+              >
+                <X size={16} />
+              </button>
             </div>
           )}
         </div>
@@ -307,6 +298,7 @@ export default function SelectStudent() {
           pageData={pageData}
           onPageChange={onPageChange}
           onSizeChange={onSizeChange}
+          unit="students"
         />
       </div>
 

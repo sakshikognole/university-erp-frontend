@@ -20,7 +20,7 @@ export default function ConfirmDialog({
     description ||
     message ||
     `Are you sure you want to delete this ${title.toLowerCase().replace('delete ', '')}? This action will permanently remove the record.`;
-  const btnLabel = confirmText || (title.startsWith('Delete') ? title : `Delete ${title}`);
+  const btnLabel = confirmText || 'Delete';
 
   return (
     <div className="modal-overlay" onClick={() => !loading && onCancel && onCancel()}>

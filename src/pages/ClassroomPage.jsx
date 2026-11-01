@@ -261,6 +261,7 @@ function ClsMobCard({ c, num, onEdit, onDelete, deleting, expanded, onToggle, sh
 
 export default function ClassroomPage() {
   const [classrooms, setClassrooms] = useState([]);
+  const [allClassrooms, setAllClassrooms] = useState([]);
   const [pageInfo, setPageInfo] = useState(DEFAULT_PAGE);
   const [page, setPage] = useState(0);
   const [size, setSize] = useState(10);
@@ -293,6 +294,17 @@ export default function ClassroomPage() {
     return () => clearTimeout(t);
   }, [success, error]);
 
+  // Load all classrooms across all pages for bunch cards & bunch editing
+  const loadAllClassrooms = useCallback(async () => {
+    try {
+      const res = await springGet('/classrooms?page=0&size=1000');
+      const all = res?.content ?? (Array.isArray(res) ? res : []);
+      setAllClassrooms(all);
+    } catch (err) {
+      console.error('Load all classrooms error:', err);
+    }
+  }, []);
+
   const load = useCallback(async (silent = false) => {
     if (!silent) { setLoading(true); setPageError(''); }
     try {
@@ -311,15 +323,17 @@ export default function ClassroomPage() {
       
       setClassrooms(content);
       setPageInfo(pageData);
+      loadAllClassrooms();
     } catch (err) {
       console.error('Load classrooms error:', err);
       if (!silent) setPageError(err.message || 'Failed to load classrooms.');
     } finally {
       if (!silent) setLoading(false);
     }
-  }, [page, size]);
+  }, [page, size, loadAllClassrooms]);
 
   useEffect(() => { load(); }, [load]);
+  useEffect(() => { loadAllClassrooms(); }, [loadAllClassrooms]);
 
   // Load bunches
   const loadBunches = useCallback(async () => {
@@ -327,17 +341,31 @@ export default function ClassroomPage() {
     try {
       const res = await springGet('/classroom-bunches');
       setBunches(Array.isArray(res) ? res : []);
+      loadAllClassrooms();
     } catch (err) {
       console.error('Load bunches error:', err);
     } finally {
       setLoadingBunches(false);
     }
-  }, []);
+  }, [loadAllClassrooms]);
 
   useEffect(() => { loadBunches(); }, [loadBunches]);
 
-  const openAdd = () => { setSelClassroom(null); setModalMode('add'); setModalOpen(true); };
-  const openEdit = (c) => { setSelClassroom(c); setModalMode('edit'); setModalOpen(true); };
+  const openAdd = () => {
+    setShowCheckboxes(false);
+    setSelectedClassrooms([]);
+    setSelClassroom(null);
+    setModalMode('add');
+    setModalOpen(true);
+  };
+
+  const openEdit = (c) => {
+    setShowCheckboxes(false);
+    setSelectedClassrooms([]);
+    setSelClassroom(c);
+    setModalMode('edit');
+    setModalOpen(true);
+  };
 
   const handleSave = async (form) => {
     setSaving(true);
@@ -373,6 +401,8 @@ export default function ClassroomPage() {
           setDelItem(null);
           if (classrooms.length === 1 && page > 0) setPage(page - 1);
           else load(true);
+          loadAllClassrooms();
+          loadBunches();
         } catch {
           setError('Failed to delete classroom.');
         } finally {
@@ -400,6 +430,16 @@ export default function ClassroomPage() {
     }
   };
 
+  // Close bunch modal
+  const closeBunchModal = () => {
+    setBunchModalOpen(false);
+    setEditingBunch(null);
+    setBunchName('');
+    if (editingBunch) {
+      setSelectedClassrooms([]);
+    }
+  };
+
   // Open bunch modal
   const openBunchModal = () => {
     if (selectedClassrooms.length === 0) {
@@ -409,6 +449,7 @@ export default function ClassroomPage() {
     setEditingBunch(null);
     setError('');
     setBunchName('');
+    loadAllClassrooms();
     setBunchModalOpen(true);
   };
 
@@ -418,6 +459,7 @@ export default function ClassroomPage() {
     setBunchName(bunch.bunchName || '');
     setSelectedClassrooms(bunch.classroomIds || []);
     setError('');
+    loadAllClassrooms();
     setBunchModalOpen(true);
   };
 
@@ -425,6 +467,10 @@ export default function ClassroomPage() {
   const handleSaveBunch = async () => {
     if (!bunchName.trim()) {
       setError('Bunch name is required.');
+      return;
+    }
+    if (selectedClassrooms.length === 0) {
+      setError('Please select at least one classroom for the bunch.');
       return;
     }
     setSavingBunch(true);
@@ -688,11 +734,11 @@ export default function ClassroomPage() {
               />
             ))}
           </div>
-          </div>
 
           {/* Pagination */}
           <Pagination
             pageData={pageInfo}
+            unit="classrooms"
             onPageChange={(p) => {
               setPage(p);
               setSelectedClassrooms([]);
@@ -703,7 +749,7 @@ export default function ClassroomPage() {
               setSelectedClassrooms([]);
             }}
           />
-
+        </div>
         </>
       )}
 
@@ -713,9 +759,12 @@ export default function ClassroomPage() {
           <h2 style={{ fontSize: 20, fontWeight: 600, marginBottom: 16 }}>Classroom Bunches</h2>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: 16 }}>
             {bunches.map(bunch => {
-              const bunchClassrooms = classrooms.filter(c => bunch.classroomIds.includes(c.classroomId));
+              const bunchClassrooms = (bunch.classroomIds || []).map(id => {
+                const found = allClassrooms.find(c => c.classroomId === id) || classrooms.find(c => c.classroomId === id);
+                return found || { classroomId: id, classroomName: id };
+              });
               return (
-                <div key={bunch.bunchId} className="card" style={{ padding: 16 }}>
+                <div key={bunch.bunchId} className="card" style={{ padding: 16, display: 'flex', flexDirection: 'column' }}>
                   <div style={{ marginBottom: 12 }}>
                     <h3 style={{ fontSize: 16, fontWeight: 600, marginBottom: 4 }}>{bunch.bunchName}</h3>
                     <span style={{
@@ -739,19 +788,23 @@ export default function ClassroomPage() {
                   <div style={{ fontSize: 13 }}>
                     <strong style={{ display: 'block', marginBottom: 6 }}>Classrooms:</strong>
                     <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
-                      {bunchClassrooms.map(c => (
-                        <span key={c.classroomId} style={{
-                          background: '#dbeafe', color: '#1e40af',
-                          padding: '4px 8px', borderRadius: 4,
-                          fontSize: '0.75rem', fontWeight: 500,
-                        }}>
-                          {c.classroomName}
-                        </span>
-                      ))}
+                      {bunchClassrooms.length === 0 ? (
+                        <span style={{ color: '#9ca3af', fontStyle: 'italic', fontSize: '0.8rem' }}>None</span>
+                      ) : (
+                        bunchClassrooms.map(c => (
+                          <span key={c.classroomId} style={{
+                            background: '#dbeafe', color: '#1e40af',
+                            padding: '4px 8px', borderRadius: 4,
+                            fontSize: '0.75rem', fontWeight: 500,
+                          }}>
+                            {c.classroomName}
+                          </span>
+                        ))
+                      )}
                     </div>
                   </div>
 
-                  <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 6, marginTop: 14 }}>
+                  <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 6, marginTop: 'auto', paddingTop: 14 }}>
                     <button
                       className="books-btn books-btn-sm books-btn-warning"
                       onClick={() => openEditBunch(bunch)}
@@ -792,27 +845,108 @@ export default function ClassroomPage() {
           <div className="books-modal" style={{ maxWidth: 520 }}>
             <div className="books-modal-head">
               <h3>{editingBunch ? 'Edit Classroom Bunch' : 'Create Classroom Bunch'}</h3>
-              <button className="books-modal-close" onClick={() => { setBunchModalOpen(false); setEditingBunch(null); }} disabled={savingBunch}>×</button>
+              <button className="books-modal-close" onClick={closeBunchModal} disabled={savingBunch}>×</button>
             </div>
             <div className="books-modal-body">
               <div style={{ marginBottom: 16 }}>
-                <p style={{ fontSize: 14, color: '#6b7280', marginBottom: 12 }}>
-                  Selected Classrooms ({selectedClassrooms.length}):
-                </p>
-                <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
-                  {classrooms
-                    .filter(c => selectedClassrooms.includes(c.classroomId))
-                    .map(c => (
-                      <span key={c.classroomId} style={{
-                        background: '#dbeafe', color: '#1e40af',
-                        padding: '4px 10px', borderRadius: 6,
-                        fontSize: '0.85rem', fontWeight: 500,
-                      }}>
-                        {c.classroomName}
-                      </span>
-                    ))
-                  }
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
+                  <label className="books-form-label" style={{ margin: 0 }}>
+                    Selected Classrooms ({selectedClassrooms.length}) <span style={{ color: '#dc2626' }}>*</span>
+                  </label>
+                  {selectedClassrooms.length > 0 && (
+                    <span style={{ fontSize: 12, color: '#6b7280' }}>Click × to remove</span>
+                  )}
                 </div>
+
+                <div style={{
+                  display: 'flex',
+                  flexWrap: 'wrap',
+                  gap: 8,
+                  minHeight: 40,
+                  padding: selectedClassrooms.length ? '8px 10px' : '4px 0',
+                  background: selectedClassrooms.length ? '#f8fafc' : 'transparent',
+                  borderRadius: 8,
+                  border: selectedClassrooms.length ? '1px solid #e2e8f0' : 'none',
+                }}>
+                  {selectedClassrooms.length === 0 ? (
+                    <span style={{ fontSize: 13, color: '#ef4444', fontStyle: 'italic' }}>
+                      No classrooms selected. Please add at least one classroom.
+                    </span>
+                  ) : (
+                    selectedClassrooms.map(id => {
+                      const c = allClassrooms.find(item => item.classroomId === id) ||
+                                classrooms.find(item => item.classroomId === id) ||
+                                { classroomId: id, classroomName: id };
+                      return (
+                        <span
+                          key={id}
+                          style={{
+                            background: '#dbeafe',
+                            color: '#1e40af',
+                            padding: '4px 8px 4px 10px',
+                            borderRadius: 6,
+                            fontSize: '0.85rem',
+                            fontWeight: 500,
+                            display: 'inline-flex',
+                            alignItems: 'center',
+                            gap: 6,
+                          }}
+                        >
+                          <span>{c.classroomName}</span>
+                          <button
+                            type="button"
+                            onClick={() => setSelectedClassrooms(prev => prev.filter(x => x !== id))}
+                            style={{
+                              background: 'transparent',
+                              border: 'none',
+                              color: '#1e40af',
+                              cursor: 'pointer',
+                              fontSize: '1rem',
+                              lineHeight: 1,
+                              padding: '0 2px',
+                              fontWeight: 700,
+                              display: 'inline-flex',
+                              alignItems: 'center',
+                              justifyContent: 'center',
+                            }}
+                            title={`Remove ${c.classroomName}`}
+                            aria-label={`Remove ${c.classroomName}`}
+                          >
+                            ×
+                          </button>
+                        </span>
+                      );
+                    })
+                  )}
+                </div>
+
+                {/* Add Classroom to Bunch Dropdown */}
+                {allClassrooms.filter(c => !selectedClassrooms.includes(c.classroomId)).length > 0 && (
+                  <div style={{ marginTop: 10 }}>
+                    <label style={{ fontSize: 12, color: '#4b5563', display: 'block', marginBottom: 4 }}>
+                      + Add Classroom to Bunch:
+                    </label>
+                    <select
+                      className="books-form-control"
+                      value=""
+                      onChange={e => {
+                        const val = e.target.value;
+                        if (val && !selectedClassrooms.includes(val)) {
+                          setSelectedClassrooms(prev => [...prev, val]);
+                        }
+                      }}
+                    >
+                      <option value="">-- Choose classroom to add --</option>
+                      {allClassrooms
+                        .filter(c => !selectedClassrooms.includes(c.classroomId))
+                        .map(c => (
+                          <option key={c.classroomId} value={c.classroomId}>
+                            {c.classroomName || c.classroomId}
+                          </option>
+                        ))}
+                    </select>
+                  </div>
+                )}
               </div>
 
               <div className="books-form-group">
@@ -832,7 +966,7 @@ export default function ClassroomPage() {
               <button 
                 type="button" 
                 className="books-btn books-btn-ghost" 
-                onClick={() => { setBunchModalOpen(false); setEditingBunch(null); }} 
+                onClick={closeBunchModal} 
                 disabled={savingBunch}
               >
                 Cancel

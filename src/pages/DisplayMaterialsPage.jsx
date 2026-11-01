@@ -350,9 +350,9 @@ export default function DisplayMaterialsPage() {
         </div>
       )}
 
-      {/* ── Step 1: Folder Selection Box ─────────────────────────────── */}
+      {/* ── Folder Selection Box ─────────────────────────────── */}
       <div className="vb-form-panel">
-        <p className="vb-form-title">Step 1 — Select Folder</p>
+        <p className="vb-form-title">Select Folder</p>
 
         {subjectsLoading ? (
           <p className="books-loading">Loading folders...</p>
@@ -360,7 +360,7 @@ export default function DisplayMaterialsPage() {
           <>
             {subjects.length === 0 ? (
               <p style={{ fontSize: 14, color: 'var(--text-secondary)', marginBottom: 12 }}>
-                No folders available yet. Create one below to get started.
+                No folders available yet.
               </p>
             ) : (
               <div className="books-form-group" style={{ maxWidth: 380 }}>
@@ -377,54 +377,6 @@ export default function DisplayMaterialsPage() {
                     </option>
                   ))}
                 </select>
-              </div>
-            )}
-
-            {/* Create new folder */}
-            {!showNewFolder ? (
-              <button
-                type="button"
-                className="books-btn books-btn-ghost"
-                style={{ marginTop: 6 }}
-                onClick={() => { setShowNewFolder(true); setFolderError(''); }}
-              >
-                📁 + Create New Folder
-              </button>
-            ) : (
-              <div style={{ marginTop: 12, display: 'flex', gap: 8,
-                            alignItems: 'flex-start', flexWrap: 'wrap' }}>
-                <div className="books-form-group" style={{ margin: 0 }}>
-                  <input
-                    className={`books-form-control ${folderError ? 'err' : ''}`}
-                    placeholder="e.g. Java Notes"
-                    value={newFolderName}
-                    onChange={(e) => { setNewFolderName(e.target.value); setFolderError(''); }}
-                    onKeyDown={(e) => e.key === 'Enter' && handleCreateFolder()}
-                    autoFocus
-                    style={{ width: 260 }}
-                  />
-                  {folderError && (
-                    <p className="books-form-err" style={{ marginTop: 4 }}>
-                      {folderError}
-                    </p>
-                  )}
-                </div>
-                <button
-                  type="button"
-                  className="books-btn books-btn-primary"
-                  onClick={handleCreateFolder}
-                  disabled={creatingFolder}
-                >
-                  {creatingFolder ? 'Creating...' : 'Create'}
-                </button>
-                <button
-                  type="button"
-                  className="books-btn books-btn-ghost"
-                  onClick={() => { setShowNewFolder(false); setNewFolderName(''); setFolderError(''); }}
-                  disabled={creatingFolder}
-                >
-                  Cancel
-                </button>
               </div>
             )}
           </>

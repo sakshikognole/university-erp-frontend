@@ -31,6 +31,31 @@ const DashboardLayout = () => {
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
+  // Prevent background scrolling on mobile when any modal/overlay is open
+  useEffect(() => {
+    const checkModalScrollLock = () => {
+      const hasModal = !!document.querySelector(
+        '.books-overlay, .modal-overlay, .sf-overlay, .dm-preview-overlay, .delete-dialog'
+      );
+      if (hasModal) {
+        document.body.classList.add('modal-open');
+        document.body.style.overflow = 'hidden';
+      } else {
+        document.body.classList.remove('modal-open');
+        document.body.style.overflow = '';
+      }
+    };
+
+    checkModalScrollLock();
+    const observer = new MutationObserver(checkModalScrollLock);
+    observer.observe(document.body, { childList: true, subtree: true });
+    return () => {
+      observer.disconnect();
+      document.body.classList.remove('modal-open');
+      document.body.style.overflow = '';
+    };
+  }, []);
+
   const effectiveCollapsed = isCollapsed && !isMobile;
 
   const toggleSidebar = () => {

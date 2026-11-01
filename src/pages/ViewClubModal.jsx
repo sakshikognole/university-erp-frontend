@@ -27,12 +27,7 @@ export default function ViewClubModal({ isOpen, club, parentClubs, onClose }) {
             <div className="books-modal" style={{ maxWidth: 500 }}>
 
                 <div className="books-modal-head">
-                    <div>
-                        <p style={{ fontSize: 11, color: 'var(--text-secondary)', marginBottom: 2 }}>
-                            {club.clubId}
-                        </p>
-                        <h3>{club.clubName}</h3>
-                    </div>
+                    <h3>{club.clubName}</h3>
                     <button className="books-modal-close" onClick={onClose}>x</button>
                 </div>
 

@@ -1203,8 +1203,7 @@ export default function SchedulePage() {
 
       <ViewDetailModal
         isOpen={!!viewSchedule}
-        title={viewSchedule?.examId ? 'Exam Schedule Details' : 'Class Schedule Details'}
-        subtitle={viewSchedule?.scheduleId}
+        title={viewSchedule ? (viewSchedule.examId ? (viewSchedule.examName || viewSchedule.subjectName || 'Exam Schedule') : (viewSchedule.subjectName || 'Class Schedule')) : ''}
         rows={viewSchedule ? (viewSchedule.examId ? [
           { label: 'Schedule ID', value: viewSchedule.scheduleId },
           { label: 'Exam Name', value: viewSchedule.examName || viewSchedule.subjectName },

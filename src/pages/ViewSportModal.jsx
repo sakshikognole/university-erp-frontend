@@ -15,12 +15,7 @@ export default function ViewSportModal({ isOpen, sport, onClose }) {
       <div className="books-modal" style={{ maxWidth: 480 }}>
 
         <div className="books-modal-head">
-          <div>
-            <p style={{ fontSize: 11, color: 'var(--text-secondary)', marginBottom: 2 }}>
-              {sport.sportId}
-            </p>
-            <h3>{sport.sportName}</h3>
-          </div>
+          <h3>{sport.sportName}</h3>
           <button className="books-modal-close" onClick={onClose}>x</button>
         </div>
 

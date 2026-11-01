@@ -217,6 +217,7 @@ export default function HostelPage() {
 
       <Pagination
         pageData={pageData}
+        unit="blocks"
         onPageChange={(p) => setPage(p)}
         onSizeChange={(s) => { setSize(s); setPage(0); }}
       />

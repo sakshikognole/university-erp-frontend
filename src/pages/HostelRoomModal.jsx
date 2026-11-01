@@ -1,7 +1,7 @@
 import { springApi } from '../services/api';
 import { useState, useEffect, useRef } from 'react';
 
-const EMPTY = { roomNo: '', capacity: 1 };
+const EMPTY = { roomNo: '', capacity: '' };
 
 // D5: validate room number — letters, numbers, hyphens only, no special chars or spaces
 function validateRoomNo(val) {
@@ -240,6 +240,7 @@ export default function HostelRoomModal({ isOpen, blockId, onClose, onSaved }) {
                   min="1"
                   value={form.capacity}
                   onChange={change}
+                  placeholder="e.g. 1, 2, 4"
                 />
                 {errors.capacity && (
                   <p className="books-form-err">{errors.capacity}</p>

@@ -283,7 +283,7 @@ export default function ExamsPage() {
               <div key={exam.examId} className="mob-card" style={{ marginBottom: 12, padding: 14 }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                    <span className="mob-card-num" style={{ fontSize: '0.85rem', color: '#6b7280', fontWeight: 600 }}>#{i + 1}</span>
+                    <span className="mob-card-num">{i + 1}</span>
                     <span className="code-badge">{exam.examId}</span>
                   </div>
                   <span className="status-badge status-active" style={{ fontSize: '0.75rem' }}>
