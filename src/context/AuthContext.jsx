@@ -76,20 +76,13 @@ export const AuthProvider = ({ children }) => {
   }, [logout]);
 
   const checkAuthStatus = useCallback(async () => {
-    // Skip checking on login / auth pages so re-login works smoothly
-    if (typeof window !== 'undefined') {
-      const path = window.location.pathname;
-      if (
-        path.startsWith('/login') ||
-        path.startsWith('/forgot-password') ||
-        path.startsWith('/password-management')
-      ) {
-        return;
-      }
-    }
-
-    // Only monitor if the user is supposed to be logged in
-    if (!user && !token) {
+    if (typeof window === 'undefined') return;
+    const path = window.location.pathname;
+    if (
+      path.startsWith('/login') ||
+      path.startsWith('/forgot-password') ||
+      path.startsWith('/password-management')
+    ) {
       return;
     }
 
@@ -97,14 +90,14 @@ export const AuthProvider = ({ children }) => {
     const savedUser = localStorage.getItem('erp_user');
     const cacheActive = localStorage.getItem('erp_cache_active');
 
-    // 1. Storage / site data cleared check
+    // 1. If on protected route but storage / site data was cleared:
     if (!savedToken || !savedUser) {
       redirectToLogin();
       return;
     }
 
     // 2. Browser cache cleared check ("Cached images and files")
-    if (cacheActive === '1' && typeof window !== 'undefined' && 'caches' in window) {
+    if (cacheActive === '1' && 'caches' in window) {
       try {
         const hasCache = await caches.has(CACHE_NAME);
         let markerFound = false;
@@ -122,7 +115,7 @@ export const AuthProvider = ({ children }) => {
         // Fallback: don't block if CacheStorage is unsupported
       }
     }
-  }, [user, token, redirectToLogin]);
+  }, [redirectToLogin]);
 
   // Check token expiration on mount and set session timeout check.
   // authLoading is set to false once this check has run so consumers know
@@ -156,30 +149,14 @@ export const AuthProvider = ({ children }) => {
     return () => { if (timer) clearTimeout(timer); };
   }, [token, logout]);
 
-  // Monitor storage and browser cache clearing
+  // Continuously monitor storage and browser cache clearing
   useEffect(() => {
-    if (typeof window !== 'undefined') {
-      const path = window.location.pathname;
-      if (
-        path.startsWith('/login') ||
-        path.startsWith('/forgot-password') ||
-        path.startsWith('/password-management')
-      ) {
-        return;
-      }
-    }
-
-    if (!user || !token) {
-      return;
-    }
-
     checkAuthStatus();
 
-    const handleStorageChange = (e) => {
-      if (!e.key || e.key === 'erp_token' || e.key === 'erp_user' || e.key === 'erp_cache_active') {
-        checkAuthStatus();
-      }
-    };
+    // Check every 800ms
+    const interval = setInterval(() => {
+      checkAuthStatus();
+    }, 800);
 
     const handleFocus = () => {
       checkAuthStatus();
@@ -191,19 +168,23 @@ export const AuthProvider = ({ children }) => {
       }
     };
 
-    const interval = setInterval(checkAuthStatus, 1500);
+    const handleStorageChange = (e) => {
+      if (!e.key || e.key === 'erp_token' || e.key === 'erp_user' || e.key === 'erp_cache_active') {
+        checkAuthStatus();
+      }
+    };
 
-    window.addEventListener('storage', handleStorageChange);
     window.addEventListener('focus', handleFocus);
-    document.addEventListener('visibilitychange', handleVisibilityChange);
+    window.addEventListener('visibilitychange', handleVisibilityChange);
+    window.addEventListener('storage', handleStorageChange);
 
     return () => {
       clearInterval(interval);
-      window.removeEventListener('storage', handleStorageChange);
       window.removeEventListener('focus', handleFocus);
-      document.removeEventListener('visibilitychange', handleVisibilityChange);
+      window.removeEventListener('visibilitychange', handleVisibilityChange);
+      window.removeEventListener('storage', handleStorageChange);
     };
-  }, [user, token, checkAuthStatus]);
+  }, [checkAuthStatus]);
 
   useEffect(() => {
     if (user) {
