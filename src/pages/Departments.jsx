@@ -344,7 +344,7 @@ const Departments = () => {
           {/* Add Department Button */}
           <button
             type="button"
-            className="btn btn-primary add-department-btn"
+            className="books-btn books-btn-primary"
             onClick={openAddModal}
           >
             <Plus size={16} />
@@ -461,7 +461,7 @@ const Departments = () => {
               {!search && (
                 <button
                   type="button"
-                  className="btn btn-primary"
+                  className="books-btn books-btn-primary"
                   style={{ marginTop: '1rem' }}
                   onClick={openAddModal}
                 >
