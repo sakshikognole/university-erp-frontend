@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 
 const AuthContext = createContext();
 
@@ -6,6 +6,32 @@ const _IS_PROD = window.location.hostname !== 'localhost';
 const API_BASE_URL = _IS_PROD
   ? 'https://university-erp-node.onrender.com/api'
   : 'http://localhost:5000/api';
+
+const CACHE_NAME = 'erp-auth-cache-v1';
+const CACHE_MARKER = '/__erp_auth_active__';
+
+const registerCacheMarker = async () => {
+  try {
+    localStorage.setItem('erp_cache_active', '1');
+    if (typeof window !== 'undefined' && 'caches' in window) {
+      const cache = await caches.open(CACHE_NAME);
+      await cache.put(CACHE_MARKER, new Response('active', { status: 200 }));
+    }
+  } catch (e) {
+    // Ignore cache API errors
+  }
+};
+
+const clearCacheMarker = async () => {
+  try {
+    localStorage.removeItem('erp_cache_active');
+    if (typeof window !== 'undefined' && 'caches' in window) {
+      await caches.delete(CACHE_NAME);
+    }
+  } catch (e) {
+    // Ignore cache API errors
+  }
+};
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(() => {
@@ -24,12 +50,64 @@ export const AuthProvider = ({ children }) => {
   // during the first render cycle causes a blank-page flash (DEF-001, DEF-002, DEF-015).
   const [authLoading, setAuthLoading] = useState(true);
 
-  const logout = () => {
+  const logout = useCallback(() => {
     setUser(null);
     setToken(null);
-    localStorage.removeItem('erp_user');
-    localStorage.removeItem('erp_token');
-  };
+    try {
+      localStorage.removeItem('erp_user');
+      localStorage.removeItem('erp_token');
+      sessionStorage.clear();
+      clearCacheMarker();
+    } catch (e) {}
+  }, []);
+
+  const redirectToLogin = useCallback(() => {
+    logout();
+    if (typeof window !== 'undefined') {
+      const path = window.location.pathname;
+      if (
+        !path.startsWith('/login') &&
+        !path.startsWith('/forgot-password') &&
+        !path.startsWith('/password-management')
+      ) {
+        window.location.replace('/login');
+      }
+    }
+  }, [logout]);
+
+  const checkAuthStatus = useCallback(async () => {
+    const savedToken = localStorage.getItem('erp_token');
+    const savedUser = localStorage.getItem('erp_user');
+    const cacheActive = localStorage.getItem('erp_cache_active');
+
+    // 1. Storage / site data cleared check
+    if (user || token) {
+      if (!savedToken || !savedUser) {
+        redirectToLogin();
+        return;
+      }
+    }
+
+    // 2. Browser cache cleared check ("Cached images and files")
+    if (cacheActive === '1' && typeof window !== 'undefined' && 'caches' in window) {
+      try {
+        const hasCache = await caches.has(CACHE_NAME);
+        let markerFound = false;
+        if (hasCache) {
+          const cache = await caches.open(CACHE_NAME);
+          const match = await cache.match(CACHE_MARKER);
+          if (match) markerFound = true;
+        }
+
+        if (!markerFound) {
+          redirectToLogin();
+          return;
+        }
+      } catch (e) {
+        // Fallback: don't block if CacheStorage is unsupported
+      }
+    }
+  }, [user, token, redirectToLogin]);
 
   // Check token expiration on mount and set session timeout check.
   // authLoading is set to false once this check has run so consumers know
@@ -61,7 +139,45 @@ export const AuthProvider = ({ children }) => {
     // Auth check is complete — unblock any gated consumers
     setAuthLoading(false);
     return () => { if (timer) clearTimeout(timer); };
-  }, [token]);
+  }, [token, logout]);
+
+  // Monitor storage and browser cache clearing
+  useEffect(() => {
+    if (user && token) {
+      registerCacheMarker();
+    }
+
+    checkAuthStatus();
+
+    const handleStorageChange = (e) => {
+      if (!e.key || e.key === 'erp_token' || e.key === 'erp_user' || e.key === 'erp_cache_active') {
+        checkAuthStatus();
+      }
+    };
+
+    const handleFocus = () => {
+      checkAuthStatus();
+    };
+
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'visible') {
+        checkAuthStatus();
+      }
+    };
+
+    const interval = setInterval(checkAuthStatus, 1500);
+
+    window.addEventListener('storage', handleStorageChange);
+    window.addEventListener('focus', handleFocus);
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+
+    return () => {
+      clearInterval(interval);
+      window.removeEventListener('storage', handleStorageChange);
+      window.removeEventListener('focus', handleFocus);
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+    };
+  }, [user, token, checkAuthStatus]);
 
   useEffect(() => {
     if (user) {
@@ -97,6 +213,7 @@ export const AuthProvider = ({ children }) => {
 
       setUser(data.user);
       setToken(data.user.token);
+      registerCacheMarker();
       setLoading(false);
       return data;
     } catch (error) {
@@ -138,6 +255,7 @@ export const AuthProvider = ({ children }) => {
 
       setUser(data.user);
       setToken(data.user.token);
+      registerCacheMarker();
       setLoading(false);
       return data;
     } catch (error) {

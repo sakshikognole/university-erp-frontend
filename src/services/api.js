@@ -46,6 +46,24 @@ export const nodeApi   = axios.create({ baseURL: NODE_BASE });
 const responseInterceptor = [
   (res) => res.data,
   (err) => {
+    if (err.response?.status === 401) {
+      try {
+        localStorage.removeItem('erp_user');
+        localStorage.removeItem('erp_token');
+        localStorage.removeItem('erp_cache_active');
+        sessionStorage.clear();
+        if (typeof window !== 'undefined') {
+          const path = window.location.pathname;
+          if (
+            !path.startsWith('/login') &&
+            !path.startsWith('/forgot-password') &&
+            !path.startsWith('/password-management')
+          ) {
+            window.location.replace('/login');
+          }
+        }
+      } catch (e) {}
+    }
     const msg =
       err.response?.data?.message ||
       err.response?.data?.error   ||
