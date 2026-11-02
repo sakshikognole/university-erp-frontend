@@ -14,7 +14,7 @@ const EMPTY = {
     status: 'Active',
 };
 
-export default function ClubModal({ isOpen, mode, club, parentClubs, onSave, onClose, loading }) {
+export default function ClubModal({ isOpen, mode, club, parentClubs, onSave, onClose, loading, dupError, onDupOk }) {
     const [form, setForm] = useState(EMPTY);
     const [errors, setErrors] = useState({});
 
@@ -46,6 +46,7 @@ export default function ClubModal({ isOpen, mode, club, parentClubs, onSave, onC
         const { name, value } = e.target;
         setForm((f) => ({ ...f, [name]: value }));
         setErrors((er) => ({ ...er, [name]: '' }));
+        if (name === 'clubId' && onDupOk) onDupOk();
     };
 
     const handleBlur = (e) => {
@@ -168,12 +169,13 @@ export default function ClubModal({ isOpen, mode, club, parentClubs, onSave, onC
                             <div className="books-form-group">
                                 <label className="books-form-label">Club ID *</label>
                                 <input
-                                    className={`books-form-control ${errors.clubId ? 'err' : ''}`}
+                                    className={`books-form-control ${errors.clubId || dupError ? 'err' : ''}`}
                                     name="clubId" value={form.clubId} onChange={change} onBlur={handleBlur}
                                     placeholder="e.g. CLB001"
                                     disabled={mode === 'edit'}
                                 />
                                 {errors.clubId && <p className="books-form-err">{errors.clubId}</p>}
+                                {dupError && <p className="books-form-err">{dupError}</p>}
                             </div>
                             <div className="books-form-group">
                                 <label className="books-form-label">Club Name *</label>

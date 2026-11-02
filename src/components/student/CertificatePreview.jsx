@@ -5,7 +5,7 @@ import { getCertificatePdfUrl, downloadCertificatePdf } from '../../services/stu
 const isMobile = () => /Android|iPhone|iPad|iPod/i.test(navigator.userAgent)
   || window.innerWidth <= 768;
 
-export default function CertificatePreview({ student, customContent, docType }) {
+export default function CertificatePreview({ student, customContent, docType, onBack }) {
   const [pdfUrl,      setPdfUrl]      = useState('');
   const [loading,     setLoading]     = useState(true);
   const [error,       setError]       = useState('');
@@ -68,7 +68,18 @@ export default function CertificatePreview({ student, customContent, docType }) 
           </p>
         </div>
       )}
-      {error && <p className="stu-error-text">{error}</p>}
+      {error && (
+        <div>
+          <p className="stu-error-text">{error}</p>
+          {onBack && (
+            <div className="stu-button-row">
+              <button type="button" className="stu-btn stu-btn-ghost" onClick={onBack}>
+                Back
+              </button>
+            </div>
+          )}
+        </div>
+      )}
 
       {!loading && !error && pdfUrl && (
         <>
@@ -107,12 +118,22 @@ export default function CertificatePreview({ student, customContent, docType }) 
           )}
 
           <div className="stu-button-row">
+            {onBack && (
+              <button
+                type="button"
+                className="stu-btn stu-btn-ghost"
+                onClick={onBack}
+              >
+                Back
+              </button>
+            )}
             {!mobile && (
-              <button className="stu-btn stu-btn-ghost" onClick={handlePrint}>
+              <button type="button" className="stu-btn stu-btn-ghost" onClick={handlePrint}>
                 Print
               </button>
             )}
             <button
+              type="button"
               className="stu-btn stu-btn-primary"
               onClick={handleDownload}
               disabled={downloading}

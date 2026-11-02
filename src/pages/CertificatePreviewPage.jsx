@@ -50,16 +50,12 @@ export default function CertificatePreviewPage() {
       </div>
 
       <div className="card stu-form-card" style={{ maxWidth: 800, width: '100%', boxSizing: 'border-box' }}>
-        <CertificatePreview student={student} customContent={customContent} docType={docType} />
-
-        <div className="stu-button-row" style={{ marginTop: '0.5rem' }}>
-          <button
-            className="stu-btn stu-btn-ghost"
-            onClick={() => navigate('/student-details', { state: { student } })}
-          >
-            Back
-          </button>
-        </div>
+        <CertificatePreview
+          student={student}
+          customContent={customContent}
+          docType={docType}
+          onBack={() => navigate('/student-details', { state: { student } })}
+        />
       </div>
     </div>
   );

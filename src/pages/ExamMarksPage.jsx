@@ -1,7 +1,10 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
+import { Trash2 } from 'lucide-react';
 import { springApi } from '../services/api';
+import ConfirmDialog from '../components/ConfirmDialog';
 import * as XLSX from 'xlsx';
+
 
 // ── Node.js backend URL (Students module source) ──────────────────────────────
 const _IS_PROD = typeof window !== 'undefined' && !window.location.hostname.includes('localhost') && !window.location.hostname.includes('127.0.0.1');
@@ -272,6 +275,9 @@ export default function ExamMarksPage() {
   const [edited,    setEdited]      = useState({ T1: false, T2: false, SEE: false });
   const [rowErrors, setRowErrors]   = useState({ T1: [], T2: [], SEE: [] });
   const [saving,    setSaving]      = useState(false);
+  const [delRow,    setDelRow]      = useState(null);
+  const [deleting,  setDeleting]    = useState(false);
+
 
   // PRN lookup status for auto-name
   const [prnLookupStatus, setPrnLookupStatus] = useState({});
@@ -338,6 +344,47 @@ export default function ExamMarksPage() {
       [activeTab]: (prev[activeTab] || []).filter((_, i) => i !== idx),
     }));
   };
+
+  const handleDeleteRow = (row, idx) => {
+    setDelRow({ ...row, index: idx });
+  };
+
+  const confirmDeleteRow = async () => {
+    if (!delRow) return;
+    const idx = delRow.index;
+    const updated = currentRows.filter((_, i) => i !== idx);
+
+    setCurrentRows(updated);
+    setRowErrors((prev) => ({
+      ...prev,
+      [activeTab]: (prev[activeTab] || []).filter((_, i) => i !== idx),
+    }));
+
+    if (exam && examId) {
+      setDeleting(true);
+      try {
+        const section = SEC_KEY[activeTab];
+        const res = await springApi.put(`/exams/${examId}/marks/${section}`, updated);
+        const saved = res?.data ?? res;
+        setExam(saved);
+        setTabData((prev) => ({
+          ...prev,
+          [activeTab]: Array.isArray(saved[`${section}Marks`]) ? saved[`${section}Marks`] : updated,
+        }));
+        setEdited((prev) => ({ ...prev, [activeTab]: false }));
+        setSuccess('Student record deleted successfully.');
+      } catch (err) {
+        setSuccess('Student record removed. Click Save to persist changes.');
+      } finally {
+        setDeleting(false);
+        setDelRow(null);
+      }
+    } else {
+      setDelRow(null);
+      setSuccess('Student record removed.');
+    }
+  };
+
 
   // PRN lookup → auto-fill student name from Students module (consistent across T1, T2, SEE)
   const lookupPrn = useCallback(async (prn, idx) => {
@@ -828,7 +875,7 @@ export default function ExamMarksPage() {
                   <th style={{ textAlign:'center' }}>
                     {isFraction ? `/${fracScale}` : `% (/${pctScale})`}
                   </th>
-                  <th style={{ width:48, textAlign:'center' }}>Del</th>
+                  <th style={{ width: 110, textAlign: 'center' }}>Actions</th>
                 </tr>
               </thead>
               <tbody>
@@ -900,11 +947,16 @@ export default function ExamMarksPage() {
                               : `${+((comp.raw/max)*pctScale).toFixed(2)}%`)
                           : '—'}
                       </td>
-                      <td style={{ textAlign:'center' }}>
+                      <td style={{ textAlign: 'center' }}>
                         <button
-                          className="books-btn books-btn-sm books-btn-danger"
-                          onClick={() => removeRow(idx)}
-                        >×</button>
+                          type="button"
+                          className="action-btn delete-btn"
+                          title="Delete Student"
+                          onClick={() => handleDeleteRow(m, idx)}
+                        >
+                          <Trash2 size={14} />
+                          <span className="action-label">Delete</span>
+                        </button>
                       </td>
                     </tr>
                   );
@@ -914,6 +966,22 @@ export default function ExamMarksPage() {
           </div>
         )}
       </div>
+
+      <ConfirmDialog
+        isOpen={!!delRow}
+        title="Delete Student"
+        description={`Are you sure you want to delete ${delRow?.studentName ? `"${delRow.studentName}"` : 'this student record'}? This action will permanently remove the record.`}
+        itemName={delRow?.studentName || delRow?.prn || `Student (Row #${(delRow?.index ?? 0) + 1})`}
+        itemSubtext={
+          delRow?.marks !== null && delRow?.marks !== undefined && delRow?.marks !== ''
+            ? `${activeTab} Marks: ${delRow.marks}`
+            : undefined
+        }
+        itemBadge={delRow?.prn || undefined}
+        onConfirm={confirmDeleteRow}
+        onCancel={() => !deleting && setDelRow(null)}
+        loading={deleting}
+      />
 
     </div>
   );

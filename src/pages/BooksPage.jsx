@@ -162,12 +162,16 @@ export default function BooksPage() {
           setSaving(false);
           return;
         }
-        // Defect #3: Check bookId uniqueness and show error in modal below Book ID field
-        const idTaken = books.some(
-          (b) => b.bookId && b.bookId.trim().toLowerCase() === form.bookId.trim().toLowerCase()
+        // Check bookId uniqueness and show error in modal below Book ID field
+        const searchIdRes = await bookService.getAll(form.bookId.trim(), 0, 100);
+        const matchingIdBooks = searchIdRes?.data?.content ?? searchIdRes?.content ?? [];
+        const idTaken = matchingIdBooks.some(
+          (b) => b.bookId && b.bookId.trim().toUpperCase() === form.bookId.trim().toUpperCase()
+        ) || books.some(
+          (b) => b.bookId && b.bookId.trim().toUpperCase() === form.bookId.trim().toUpperCase()
         );
         if (idTaken) {
-          setDuplicateIdError('Book ID already exists');
+          setDuplicateIdError(`Book ID "${form.bookId}" already exists.`);
           setSaving(false);
           return;
         }
@@ -178,9 +182,19 @@ export default function BooksPage() {
         notify('success', 'Book updated successfully');
       }
       setModalOpen(false);
+      setDuplicateIdError('');
       load();
     } catch (e) {
-      notify('error', e.message || 'Failed to save book.');
+      const msg = e.response?.data?.error || e.response?.data?.message || e.message || '';
+      if (
+        msg.toLowerCase().includes('book id') ||
+        msg.toLowerCase().includes('already in use') ||
+        (msg.toLowerCase().includes('already exists') && !msg.toLowerCase().includes('titled'))
+      ) {
+        setDuplicateIdError(`Book ID "${form.bookId}" already exists.`);
+      } else {
+        notify('error', msg || 'Failed to save book.');
+      }
     } finally {
       setSaving(false);
     }
@@ -365,7 +379,7 @@ export default function BooksPage() {
         mode={modalMode}
         book={selBook}
         onSave={handleSave}
-        onClose={() => setModalOpen(false)}
+        onClose={() => { setModalOpen(false); setDuplicateIdError(''); }}
         loading={saving}
         duplicateIdError={duplicateIdError}
         onDuplicateIdErrorClear={() => setDuplicateIdError('')}

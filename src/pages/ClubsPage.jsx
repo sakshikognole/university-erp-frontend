@@ -22,6 +22,8 @@ export default function ClubsPage() {
     const [viewClub, setViewClub] = useState(null);
     const [error, setError] = useState('');
     const [success, setSuccess] = useState('');
+    const [dupError, setDupError] = useState('');
+
 
     const load = useCallback(async (silent = false) => {
         if (!silent) setLoading(true);
@@ -43,14 +45,22 @@ export default function ClubsPage() {
         return () => clearTimeout(t);
     }, [success, error]);
 
-    const openAdd = () => { setSelClub(null); setModalMode('add'); setModalOpen(true); };
-    const openEdit = (club) => { setSelClub(club); setModalMode('edit'); setModalOpen(true); };
+    const openAdd = () => { setSelClub(null); setModalMode('add'); setDupError(''); setModalOpen(true); };
+    const openEdit = (club) => { setSelClub(club); setModalMode('edit'); setDupError(''); setModalOpen(true); };
     const openView = (club) => { setViewClub(club); setViewOpen(true); };
 
     const handleSave = async (form) => {
         setSaving(true);
         try {
             if (modalMode === 'add') {
+                const isDuplicate = clubs.some(
+                    (c) => c.clubId && c.clubId.trim().toUpperCase() === form.clubId.trim().toUpperCase()
+                );
+                if (isDuplicate) {
+                    setDupError(`Club ID "${form.clubId}" already exists.`);
+                    setSaving(false);
+                    return;
+                }
                 await axios.post(`${SPRING_API}/clubs`, form);
                 setSuccess('Club added successfully.');
             } else {
@@ -58,9 +68,15 @@ export default function ClubsPage() {
                 setSuccess('Club updated successfully.');
             }
             setModalOpen(false);
+            setDupError('');
             load(true);
         } catch (err) {
-            setError(err.response?.data?.error || 'Failed to save club.');
+            const msg = err.response?.data?.error || err.response?.data?.message || err.message || 'Failed to save club.';
+            if (msg.toLowerCase().includes('already exists') || msg.toLowerCase().includes('duplicate')) {
+                setDupError(`Club ID "${form.clubId}" already exists.`);
+            } else {
+                setError(msg);
+            }
         } finally {
             setSaving(false);
         }
@@ -269,8 +285,10 @@ export default function ClubsPage() {
                 club={selClub}
                 parentClubs={parentClubs}
                 onSave={handleSave}
-                onClose={() => setModalOpen(false)}
+                onClose={() => { setModalOpen(false); setDupError(''); }}
                 loading={saving}
+                dupError={dupError}
+                onDupOk={() => setDupError('')}
             />
 
             <ViewClubModal
