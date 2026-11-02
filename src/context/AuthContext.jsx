@@ -12,11 +12,11 @@ const CACHE_MARKER = '/__erp_auth_active__';
 
 const registerCacheMarker = async () => {
   try {
-    localStorage.setItem('erp_cache_active', '1');
     if (typeof window !== 'undefined' && 'caches' in window) {
       const cache = await caches.open(CACHE_NAME);
       await cache.put(CACHE_MARKER, new Response('active', { status: 200 }));
     }
+    localStorage.setItem('erp_cache_active', '1');
   } catch (e) {
     // Ignore cache API errors
   }
@@ -76,16 +76,31 @@ export const AuthProvider = ({ children }) => {
   }, [logout]);
 
   const checkAuthStatus = useCallback(async () => {
+    // Skip checking on login / auth pages so re-login works smoothly
+    if (typeof window !== 'undefined') {
+      const path = window.location.pathname;
+      if (
+        path.startsWith('/login') ||
+        path.startsWith('/forgot-password') ||
+        path.startsWith('/password-management')
+      ) {
+        return;
+      }
+    }
+
+    // Only monitor if the user is supposed to be logged in
+    if (!user && !token) {
+      return;
+    }
+
     const savedToken = localStorage.getItem('erp_token');
     const savedUser = localStorage.getItem('erp_user');
     const cacheActive = localStorage.getItem('erp_cache_active');
 
     // 1. Storage / site data cleared check
-    if (user || token) {
-      if (!savedToken || !savedUser) {
-        redirectToLogin();
-        return;
-      }
+    if (!savedToken || !savedUser) {
+      redirectToLogin();
+      return;
     }
 
     // 2. Browser cache cleared check ("Cached images and files")
@@ -143,8 +158,19 @@ export const AuthProvider = ({ children }) => {
 
   // Monitor storage and browser cache clearing
   useEffect(() => {
-    if (user && token) {
-      registerCacheMarker();
+    if (typeof window !== 'undefined') {
+      const path = window.location.pathname;
+      if (
+        path.startsWith('/login') ||
+        path.startsWith('/forgot-password') ||
+        path.startsWith('/password-management')
+      ) {
+        return;
+      }
+    }
+
+    if (!user || !token) {
+      return;
     }
 
     checkAuthStatus();
@@ -211,9 +237,11 @@ export const AuthProvider = ({ children }) => {
         throw new Error(data.message || 'Login failed');
       }
 
+      await registerCacheMarker();
+      localStorage.setItem('erp_user', JSON.stringify(data.user));
+      localStorage.setItem('erp_token', data.user.token);
       setUser(data.user);
       setToken(data.user.token);
-      registerCacheMarker();
       setLoading(false);
       return data;
     } catch (error) {
@@ -253,9 +281,11 @@ export const AuthProvider = ({ children }) => {
         throw new Error(data.message || 'Student login failed');
       }
 
+      await registerCacheMarker();
+      localStorage.setItem('erp_user', JSON.stringify(data.user));
+      localStorage.setItem('erp_token', data.user.token);
       setUser(data.user);
       setToken(data.user.token);
-      registerCacheMarker();
       setLoading(false);
       return data;
     } catch (error) {
