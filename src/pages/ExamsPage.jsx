@@ -248,7 +248,7 @@ export default function ExamsPage() {
                             type="button"
                             className="action-btn view-btn"
                             title="View Marks"
-                            onClick={() => navigate(`/exam-marks?examId=${exam.examId}`)}
+                            onClick={() => navigate(`/exams/marks?examId=${exam.examId}`)}
                           >
                             <Eye size={14} /><span className="action-label">Marks</span>
                           </button>
@@ -302,7 +302,7 @@ export default function ExamsPage() {
                   <button
                     type="button"
                     className="action-btn view-btn"
-                    onClick={() => navigate(`/exam-marks?examId=${exam.examId}`)}
+                    onClick={() => navigate(`/exams/marks?examId=${exam.examId}`)}
                   >
                     <Eye size={15} /><span className="action-label">Marks</span>
                   </button>

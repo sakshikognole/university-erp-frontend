@@ -415,7 +415,7 @@ const SystemAnnouncementView = () => {
           <div style={{ marginTop: '2rem', paddingTop: '1.25rem', borderTop: '1px solid var(--border-color, #e5e7eb)', display: 'flex', gap: '0.75rem' }}>
             <button
               type="button"
-              className="books-btn books-btn-ghost"
+              className="books-btn books-btn-ghost mob-back"
               onClick={() => navigate('/system-announcements')}
             >
               <ArrowLeft size={15} />

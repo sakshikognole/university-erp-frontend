@@ -478,7 +478,7 @@ const EventDetails = () => {
           }}>
             <button
               type="button"
-              className="books-btn books-btn-ghost"
+              className="books-btn books-btn-ghost mob-back"
               onClick={() => navigate('/events')}
             >
               <ArrowLeft size={16} />

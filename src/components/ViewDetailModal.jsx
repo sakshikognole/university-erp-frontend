@@ -24,8 +24,8 @@ export default function ViewDetailModal({ isOpen, title, subtitle, rows, onClose
             const label = Array.isArray(row) ? row[0] : row.label;
             const value = Array.isArray(row) ? row[1] : row.value;
             return (
-              <div className="books-detail-row" key={idx}>
-                <span className="books-detail-label">{label}</span>
+              <div className="books-detail-row" key={idx} style={{ alignItems: 'flex-start' }}>
+                <span className="books-detail-label" style={{ paddingTop: '1px' }}>{label}</span>
                 <span style={{ fontSize: 14, color: 'var(--text-primary)', flex: 1, wordBreak: 'break-word' }}>
                   {value != null && value !== '' ? value : '—'}
                 </span>

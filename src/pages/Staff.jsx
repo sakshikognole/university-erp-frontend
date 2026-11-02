@@ -190,9 +190,8 @@ const Staff = () => {
 
   const handleDownload = (format) => { setShowDownloadMenu(false); exportStaff(filteredStaff, format); };
 
-  // ── Render ────────────────────────────────────────────────────────────
   return (
-    <div className="page-container">
+    <div className="page-container staff-page">
 
       {/* Page header */}
       <div className="page-header-row">

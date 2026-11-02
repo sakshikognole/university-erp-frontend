@@ -507,7 +507,6 @@ const EventNoticeForm = () => {
 
             {/* ── Event Attachment ─────────────────────────────────────── */}
             <div className="form-section">
-              <h3 className="form-section-title">Event Attachment</h3>
 
               <div className="form-group">
                 <label className="form-label">Upload Event Image or Document (Max 10 MB)</label>
@@ -576,7 +575,6 @@ const EventNoticeForm = () => {
 
             {/* ── Basic Information ─────────────────────────────────────── */}
             <div className="form-section" style={{ marginTop: '2rem' }}>
-              <h3 className="form-section-title">Basic Information</h3>
 
               {/* Booked event selector */}
               <div className="form-group">
@@ -664,7 +662,6 @@ const EventNoticeForm = () => {
 
             {/* ── Event Details ─────────────────────────────────────────── */}
             <div className="form-section" style={{ marginTop: '2rem' }}>
-              <h3 className="form-section-title">Event Details</h3>
 
               <div className="form-row">
                 {/* Date */}
@@ -746,7 +743,6 @@ const EventNoticeForm = () => {
 
             {/* ── Organizer Information ─────────────────────────────────── */}
             <div className="form-section" style={{ marginTop: '2rem' }}>
-              <h3 className="form-section-title">Organizer Information</h3>
 
               {/* Organizer Name */}
               <div className="form-group">

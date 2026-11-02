@@ -150,6 +150,28 @@ const FeePayment = () => {
   const [itemsPerPage, setItemsPerPage] = useState(10);
   const [feeExpanded, setFeeExpanded] = useState(null);
 
+  // Receipt navigation helper (used by both desktop and mobile views)
+  const handleReceipt = (record) => {
+    navigate('/fee-payment/success', {
+      state: {
+        receipt: {
+          receiptNumber: 'RCP-PAID-COMPLETED',
+          transactionId: 'TXN_VERIFIED_ONLINE',
+          razorpayPaymentId: 'pay_verified_razorpay',
+          feeType: record.feeType || 'Tuition & Academic Fee',
+          totalFeeAmount: record.totalFeeAmount,
+          discountAmount: record.discountAmount || 0,
+          amountPaidThisTransaction: record.paidAmount,
+          totalPaidSoFar: record.paidAmount,
+          remainingBalance: 0,
+          status: 'PAID',
+          paymentMethod: 'Razorpay',
+          paidAt: new Date().toISOString(),
+        },
+      },
+    });
+  };
+
   const authHeader = () => {
     const token = localStorage.getItem('erp_token');
     return {

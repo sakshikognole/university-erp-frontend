@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { X, Save, AlertCircle, CheckCircle2, Loader2, Plus, MapPin } from 'lucide-react';
+import { X, Save, AlertCircle, CheckCircle2, Loader2, Plus } from 'lucide-react';
 import { validateRouteName } from '../utils/transportValidation';
 const _IS_PROD = typeof window !== 'undefined' && window.location.hostname !== 'localhost';
 const API_BASE_URL = _IS_PROD ? 'https://university-erp-node.onrender.com/api' : 'http://localhost:5000/api';
@@ -99,8 +99,7 @@ const AddBusRouteModal = ({ isOpen, routeId: routeIdProp, onClose, onSuccess }) 
       <div className="sf-modal">
         <div className="sf-header">
           <div className="sf-header-left">
-            <div className="sf-header-icon"><MapPin size={18} /></div>
-            <div><h2 className="sf-title">{isEdit ? 'Edit Bus Route' : 'Add Bus Route'}</h2><p className="sf-subtitle">Configure route, driver, vehicle and stops</p></div>
+            <h2 className="sf-title">{isEdit ? 'Edit Bus Route' : 'Add Bus Route'}</h2>
           </div>
           <button type="button" className="sf-close-btn" onClick={onClose} disabled={loading} aria-label="Close"><X size={18} /></button>
         </div>
@@ -108,11 +107,11 @@ const AddBusRouteModal = ({ isOpen, routeId: routeIdProp, onClose, onSuccess }) 
           {feedback.message && <div className={`sf-feedback ${feedback.type === 'success' ? 'sf-feedback-success' : 'sf-feedback-error'}`}>{feedback.type === 'success' ? <CheckCircle2 size={16} style={{ flexShrink: 0 }} /> : <AlertCircle size={16} style={{ flexShrink: 0 }} />}<span>{feedback.message}</span></div>}
           {fetching ? <div className="sf-loading"><Loader2 size={26} className="spin-animate" /><p>Loading…</p></div> : (
             <form id="route-form" onSubmit={handleSubmit} className="sf-form" noValidate>
-              <div className="sf-section-label">Route Identification</div>
               <div className="sf-row">
                 <div className="sf-group">
-                  <label className="sf-label" htmlFor="r-routeId">Route ID (Numeric) <span className="sf-required">*</span></label>
-                  <input id="r-routeId" name="routeId" type="number" className="sf-input" placeholder="e.g. 1, 2, 101" value={form.routeId} onChange={handleChange} />
+                  <label className="sf-label" htmlFor="r-routeId">Route ID <span className="sf-optional">auto</span></label>
+                  <input id="r-routeId" name="routeId" type="number" className={`sf-input sf-input-readonly`} placeholder="Auto-generated" value={form.routeId} onChange={handleChange} readOnly disabled />
+                  <small className="sf-field-hint">{isEdit ? 'Route ID cannot be changed after creation.' : 'Auto-generated — do not edit.'}</small>
                 </div>
                 <div className="sf-group" style={{ justifyContent: 'flex-end', paddingBottom: '0.25rem' }}>
                   <label className="sf-label" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', cursor: 'pointer', marginTop: 'auto' }}>
@@ -128,7 +127,6 @@ const AddBusRouteModal = ({ isOpen, routeId: routeIdProp, onClose, onSuccess }) 
                   <FieldError msg={routeNameError} />
                 </div></div>
               )}
-              <div className="sf-section-label" style={{ marginTop: '0.25rem' }}>Assignment</div>
               <div className="sf-row">
                 <div className="sf-group">
                   <label className="sf-label" htmlFor="r-driverName">Driver <span className="sf-required">*</span></label>
@@ -151,9 +149,9 @@ const AddBusRouteModal = ({ isOpen, routeId: routeIdProp, onClose, onSuccess }) 
                   <option value="ACTIVE">Active</option><option value="INACTIVE">Inactive</option>
                 </select>
               </div></div>
-              <div className="sf-section-label" style={{ marginTop: '0.25rem' }}>Stops <span className="sf-optional">optional</span></div>
               <div className="sf-custom-input-row">
                 <div className="sf-group" style={{ flex: 1 }}>
+                  <label className="sf-label">Stops</label>
                   <input type="text" className="sf-input" placeholder="Type stop name, press Enter or comma" value={stopInput}
                     onChange={handleStopInput} onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); if (stopInput.trim()) { addStop(stopInput); setStopInput(''); } } }} />
                 </div>

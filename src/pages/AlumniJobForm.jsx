@@ -8,11 +8,13 @@ const toInputDate = (d) => {
   try { return new Date(d).toISOString().slice(0, 10); } catch { return ''; }
 };
 
-const JOB_ID_RE = /^[A-Z0-9]{3,20}$/;
+const JOB_ID_RE = /^[A-Za-z0-9]+(-[A-Za-z0-9]+)?$/;
 const validateJobId = (raw) => {
-  const v = raw.trim().toUpperCase();
+  const v = (raw || '').trim().toUpperCase();
   if (!v) return 'Job ID is required.';
-  if (!JOB_ID_RE.test(v)) return 'Job ID must be 3–20 uppercase letters or digits with no spaces (e.g. JOB2024001).';
+  if (v.length < 2) return 'Job ID must be at least 2 characters.';
+  if (v.length > 30) return 'Job ID must not exceed 30 characters.';
+  if (!JOB_ID_RE.test(v)) return 'Job ID may only contain letters, digits, and one hyphen (e.g. JOB001, JOB-2024).';
   return null;
 };
 const LETTER_RE = /[A-Za-z]/;
@@ -175,15 +177,7 @@ const AlumniJobFormModal = ({ isOpen, jobId, onClose, onSuccess }) => {
       <div className="sf-modal">
         <div className="sf-header">
           <div className="sf-header-left">
-            <div className="sf-header-icon">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/>
-              </svg>
-            </div>
-            <div>
-              <h2 className="sf-title">{isEdit ? 'Edit Job Posting' : 'Add Job Posting'}</h2>
-              <p className="sf-subtitle">{isEdit ? 'Update alumni job details' : 'Add a new job opportunity from an alumni'}</p>
-            </div>
+            <h2 className="sf-title">{isEdit ? 'Edit Job Posting' : 'Add Job Posting'}</h2>
           </div>
           <button type="button" className="sf-close-btn" onClick={onClose} disabled={loading} aria-label="Close"><X size={18} /></button>
         </div>
@@ -201,13 +195,13 @@ const AlumniJobFormModal = ({ isOpen, jobId, onClose, onSuccess }) => {
           ) : (
             <form id="alumni-job-form" onSubmit={handleSubmit} className="sf-form" noValidate>
 
-              <div className="sf-section-label">Job Information</div>
               <div className="sf-row">
                 <div className="sf-group">
                   <label className="sf-label" htmlFor="aj-jobId">Job ID {!isEdit && <span className="sf-required">*</span>}</label>
-                  <input id="aj-jobId" name="jobId" type="text" className={ic('jobId')}
-                    placeholder="e.g. JOB2024001" value={form.jobId}
-                    onChange={handleChange} disabled={isEdit} autoComplete="off" maxLength={20} />
+                  <input id="aj-jobId" name="jobId" type="text" className={`${ic('jobId')}${isEdit ? ' sf-input-readonly' : ''}`}
+                    placeholder="e.g. JOB001, JOB-2024" value={form.jobId}
+                    onChange={handleChange} readOnly={isEdit} disabled={isEdit} autoComplete="off" maxLength={30} />
+                  {isEdit && <small className="sf-field-hint">Job ID cannot be changed after creation.</small>}
                   <FieldError msg={fieldErrors.jobId} />
                 </div>
                 <div className="sf-group">
@@ -255,7 +249,6 @@ const AlumniJobFormModal = ({ isOpen, jobId, onClose, onSuccess }) => {
                 </div>
               </div>
 
-              <div className="sf-section-label" style={{ marginTop: '0.25rem' }}>Dates <span className="sf-optional">optional</span></div>
               <div className="sf-row">
                 <div className="sf-group">
                   <label className="sf-label" htmlFor="aj-datePosted">Date Posted</label>

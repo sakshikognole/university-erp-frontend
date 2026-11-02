@@ -114,7 +114,7 @@ const PaymentSuccess = () => {
       <div style={{ marginBottom: '1.5rem' }}>
         <button
           type="button"
-          className="btn btn-secondary"
+          className="btn btn-secondary mob-back"
           onClick={() => navigate('/fee-payment')}
           style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}
         >

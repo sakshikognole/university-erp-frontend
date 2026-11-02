@@ -50,7 +50,7 @@ const StudentFormModal = ({ isOpen, studentId, onClose, onSuccess }) => {
 
   const emptyForm = {
     name: '', prn: '', class: '', division: '',
-    degree: '', yearOfEnrollment: '', email: '',
+    degree: '', yearOfEnrollment: '', email: '', gender: '',
     customFields: [],
   };
 
@@ -165,6 +165,7 @@ const StudentFormModal = ({ isOpen, studentId, onClose, onSuccess }) => {
       degree:           student.degree           || '',
       yearOfEnrollment: student.yearOfEnrollment || '',
       email:            student.email            || '',
+      gender:           student.gender           || '',
       customFields: Array.isArray(student.customFields) ? student.customFields : [],
     });
     setFieldErrors({});
@@ -176,8 +177,8 @@ const StudentFormModal = ({ isOpen, studentId, onClose, onSuccess }) => {
     const { name, value } = e.target;
     let newValue = value;
     if (name === 'prn') {
-      // Allow only letters and digits — strip everything else, then uppercase
-      newValue = value.replace(/[^A-Za-z0-9]/g, '').toUpperCase();
+      // Allow letters, digits, and one hyphen — strip everything else, then uppercase
+      newValue = value.replace(/[^A-Za-z0-9-]/g, '').toUpperCase();
     }
     if (name === 'division') {
       // Single letter A-Z only — take first letter, strip everything else
@@ -248,6 +249,10 @@ const StudentFormModal = ({ isOpen, studentId, onClose, onSuccess }) => {
       yearOfEnrollment: formData.yearOfEnrollment,
       email:            formData.email,
     });
+    // Email is required
+    if (!formData.email.trim()) {
+      errors.email = 'Email Address is required.';
+    }
     setFieldErrors(errors);
 
     if (Object.keys(errors).length > 0) {
@@ -275,6 +280,7 @@ const StudentFormModal = ({ isOpen, studentId, onClose, onSuccess }) => {
           degree:           formData.degree.trim(),
           yearOfEnrollment: formData.yearOfEnrollment.trim(),
           email:            formData.email.trim().toLowerCase(),
+          gender:           formData.gender,
           customFields:     formData.customFields,
         }),
       });
@@ -343,31 +349,9 @@ const StudentFormModal = ({ isOpen, studentId, onClose, onSuccess }) => {
         {/* ── Header ── */}
         <div className="sf-header">
           <div className="sf-header-left">
-            <div className="sf-header-icon">
-              {isEditMode ? (
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
-                  <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
-                </svg>
-              ) : (
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/>
-                  <circle cx="9" cy="7" r="4"/>
-                  <line x1="19" y1="8" x2="19" y2="14"/>
-                  <line x1="22" y1="11" x2="16" y2="11"/>
-                </svg>
-              )}
-            </div>
-            <div>
-              <h2 className="sf-title">
+            <h2 className="sf-title">
                 {isEditMode ? 'Edit Student' : 'Add New Student'}
               </h2>
-              <p className="sf-subtitle">
-                {isEditMode
-                  ? 'Update the student\'s enrollment information'
-                  : 'Register a new student into the university system'}
-              </p>
-            </div>
           </div>
           <button
             type="button"
@@ -406,9 +390,6 @@ const StudentFormModal = ({ isOpen, studentId, onClose, onSuccess }) => {
               className="sf-form"
               noValidate
             >
-              {/* ── Section: Basic Info ── */}
-              <div className="sf-section-label">Basic Information</div>
-
               {/* Row 1: Name + PRN */}
               <div className="sf-row">
                 <div className="sf-group">
@@ -437,23 +418,26 @@ const StudentFormModal = ({ isOpen, studentId, onClose, onSuccess }) => {
                     id="sf-prn"
                     name="prn"
                     type="text"
-                    className={inputClass('prn')}
-                    placeholder="e.g. PRN2024001"
+                    className={`${inputClass('prn')}${isEditMode ? ' sf-input-readonly' : ''}`}
+                    placeholder="e.g. PRN001, PRN-2024"
                     value={formData.prn}
                     onChange={handleChange}
                     onBlur={handleBlur}
                     autoComplete="off"
+                    readOnly={isEditMode}
+                    disabled={isEditMode}
+                    maxLength={30}
                   />
+                  {isEditMode && <small className="sf-field-hint">PRN cannot be changed after creation.</small>}
                   <FieldError message={touched.prn ? fieldErrors.prn : ''} />
                 </div>
               </div>
 
-              {/* Row 2: Email (full width) */}
+              {/* Row 2: Email + Gender */}
               <div className="sf-row">
-                <div className="sf-group sf-group-full">
+                <div className="sf-group">
                   <label className="sf-label" htmlFor="sf-email">
-                    Email Address
-                    <span className="sf-optional">optional</span>
+                    Email Address <span className="sf-required">*</span>
                   </label>
                   <input
                     id="sf-email"
@@ -469,11 +453,24 @@ const StudentFormModal = ({ isOpen, studentId, onClose, onSuccess }) => {
                   />
                   <FieldError message={touched.email ? fieldErrors.email : ''} />
                 </div>
-              </div>
 
-              {/* ── Section: Enrollment Details ── */}
-              <div className="sf-section-label" style={{ marginTop: '0.25rem' }}>
-                Enrollment Details
+                <div className="sf-group">
+                  <label className="sf-label" htmlFor="sf-gender">
+                    Gender
+                  </label>
+                  <select
+                    id="sf-gender"
+                    name="gender"
+                    className="sf-input"
+                    value={formData.gender}
+                    onChange={handleChange}
+                  >
+                    <option value="">Select gender</option>
+                    <option value="Male">Male</option>
+                    <option value="Female">Female</option>
+                    <option value="Other">Other</option>
+                  </select>
+                </div>
               </div>
 
               {/* Row 3: Class + Division */}
@@ -557,13 +554,7 @@ const StudentFormModal = ({ isOpen, studentId, onClose, onSuccess }) => {
                 </div>
               </div>
 
-              {/* ── Section: Custom Fields ── */}
-              <div className="sf-section-label" style={{ marginTop: '0.25rem' }}>
-                Custom Fields
-                <span className="sf-optional">optional</span>
-              </div>
-
-              <div className="sf-custom-input-row">
+              {/* Row 5: Custom Fields */}<div className="sf-custom-input-row">
                 <div className="sf-group" style={{ flex: 1 }}>
                   <label className="sf-label" htmlFor="sf-customFieldKey">Field Name</label>
                   <input

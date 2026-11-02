@@ -25,17 +25,15 @@ const NODE_API_URL  = _IS_PROD ? 'https://university-erp-node.onrender.com/api' 
 
 // ─── Validation helpers ────────────────────────────────────────────────────────
 
-// D6: Event IDs are manually entered. The existing convention in the DB is
-// free-form alphanumeric strings with optional hyphens (e.g. EVT-2024-001).
-// We enforce: 3–50 chars, at least one letter or digit, no leading/trailing spaces.
-const EVENT_ID_HAS_ALNUM = /[A-Za-z0-9]/;
+// Event IDs: alphanumeric with one optional hyphen, 2–30 chars.
+const EVENT_ID_RE = /^[A-Za-z0-9]+(-[A-Za-z0-9]+)?$/;
 const validateEventId = (v) => {
-  const t = v.trim();
+  const t = (v || '').trim();
   if (!t) return 'Event ID is required.';
   if (t.length < 2) return 'Event ID must be at least 2 characters.';
-  if (t.length > 50) return 'Event ID must not exceed 50 characters.';
-  if (!EVENT_ID_HAS_ALNUM.test(t))
-    return 'Event ID must contain at least one letter or digit.';
+  if (t.length > 30) return 'Event ID must not exceed 30 characters.';
+  if (!EVENT_ID_RE.test(t))
+    return 'Event ID may only contain letters, digits, and one hyphen (e.g. EVT001, EVT-2024).';
   return null;
 };
 
@@ -514,7 +512,6 @@ const EventForm = ({ isDialog = false, dialogId, onClose, onSaved } = {}) => {
 
       {/* ── Basic Information ─────────────────────────────────────── */}
       <div className="form-section">
-        <h3 className="form-section-title">Basic Information</h3>
 
         <div className="form-row">
           {/* D6 / D12: Event ID — disabled (read-only) on edit */}
@@ -527,13 +524,13 @@ const EventForm = ({ isDialog = false, dialogId, onClose, onSaved } = {}) => {
               id="eb-eventId"
               name="eventId"
               className={`form-input${fieldErrors.eventId ? ' input-error' : ''}${isEditMode ? ' eb-readonly-id' : ''}`}
-              placeholder="e.g. EVT-2024-001"
+              placeholder="e.g. EVT001, EVT-2024"
               value={formData.eventId}
               onChange={handleInputChange}
               readOnly={isEditMode}
               disabled={isEditMode}
               style={isEditMode ? { backgroundColor: 'var(--bg-secondary)', cursor: 'not-allowed', opacity: 0.8 } : undefined}
-              maxLength={50}
+              maxLength={30}
             />
             {isEditMode && (
               <small className="form-field-hint">Event ID cannot be changed after creation.</small>
@@ -611,7 +608,6 @@ const EventForm = ({ isDialog = false, dialogId, onClose, onSaved } = {}) => {
 
       {/* ── Schedule & Location ──────────────────────────────────── */}
       <div className="form-section" style={{ marginTop: '2rem' }}>
-        <h3 className="form-section-title">Schedule &amp; Location</h3>
 
         {/* D10: asterisks on date/time labels */}
         <div className="form-row">
@@ -817,10 +813,6 @@ const EventForm = ({ isDialog = false, dialogId, onClose, onSaved } = {}) => {
           {/* D5: Back / close button at top-left of dialog header */}
           <div className="modal-header eb-dialog-header">
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.625rem' }}>
-              {/* D5: back arrow before heading */}
-              <button type="button" className="btn-back" onClick={handleCancel} title="Close" style={{ flexShrink: 0 }}>
-                <ArrowLeft size={18} />
-              </button>
               <div>
                 <h2 className="modal-title" style={{ fontSize: '1.125rem' }}>
                   {isEditMode ? 'Edit Event' : 'Add New Event'}

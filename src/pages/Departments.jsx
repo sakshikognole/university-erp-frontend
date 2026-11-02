@@ -285,7 +285,7 @@ const Departments = () => {
 
   // ── Render: full Super Admin view ──
   return (
-    <div className="page-container">
+    <div className="page-container departments-page">
       {/* Top Header with Action Buttons on Top-Right Corner */}
       <div className="page-header-row">
         <div>

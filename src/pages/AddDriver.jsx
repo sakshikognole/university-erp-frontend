@@ -85,8 +85,7 @@ const AddDriverModal = ({ isOpen, driverId: driverIdProp, onClose, onSuccess }) 
       <div className="sf-modal" style={{ maxWidth: '560px' }}>
         <div className="sf-header">
           <div className="sf-header-left">
-            <div className="sf-header-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg></div>
-            <div><h2 className="sf-title">{isEdit ? 'Edit Driver' : 'Add Driver'}</h2><p className="sf-subtitle">{isEdit ? 'Update driver credentials' : 'Register a new driver'}</p></div>
+            <h2 className="sf-title">{isEdit ? 'Edit Driver' : 'Add Driver'}</h2>
           </div>
           <button type="button" className="sf-close-btn" onClick={onClose} disabled={loading} aria-label="Close"><X size={18} /></button>
         </div>
@@ -94,11 +93,11 @@ const AddDriverModal = ({ isOpen, driverId: driverIdProp, onClose, onSuccess }) 
           {feedback.message && <div className={`sf-feedback ${feedback.type === 'success' ? 'sf-feedback-success' : 'sf-feedback-error'}`}>{feedback.type === 'success' ? <CheckCircle2 size={16} style={{ flexShrink: 0 }} /> : <AlertCircle size={16} style={{ flexShrink: 0 }} />}<span>{feedback.message}</span></div>}
           {fetching ? <div className="sf-loading"><Loader2 size={26} className="spin-animate" /><p>Loading…</p></div> : (
             <form id="driver-form" onSubmit={handleSubmit} className="sf-form" noValidate>
-              <div className="sf-section-label">Driver Information</div>
               <div className="sf-row">
                 <div className="sf-group">
-                  <label className="sf-label" htmlFor="d-driverId">Driver ID {!isEdit && '(Auto)'}</label>
-                  <input id="d-driverId" name="driverId" type="number" className="sf-input" placeholder="e.g. 101" value={form.driverId} onChange={handleChange} />
+                  <label className="sf-label" htmlFor="d-driverId">Driver ID <span className="sf-optional">auto</span></label>
+                  <input id="d-driverId" name="driverId" type="number" className="sf-input sf-input-readonly" placeholder="Auto-generated" value={form.driverId} onChange={handleChange} readOnly disabled />
+                  <small className="sf-field-hint">{isEdit ? 'Driver ID cannot be changed after creation.' : 'Auto-generated — do not edit.'}</small>
                 </div>
                 <div className="sf-group">
                   <label className="sf-label" htmlFor="d-status">Status</label>

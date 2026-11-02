@@ -313,7 +313,7 @@ const Students = () => {
             )}
           </div>
 
-          {/* Bulk Upload */}
+          {/* Upload */}
           <button
             type="button"
             className="btn btn-secondary"
@@ -321,7 +321,7 @@ const Students = () => {
             title="Bulk upload students via CSV"
           >
             <Upload size={16} />
-            <span>Bulk Upload</span>
+            <span>Upload</span>
           </button>
 
           {/* Add Student — opens modal */}
@@ -389,36 +389,40 @@ const Students = () => {
             )}
           </div>
 
-          <button
-            type="button"
-            className={`btn btn-secondary students-filter-btn${activeFilterCount > 0 ? ' filter-active' : ''}`}
-            onClick={() => setShowFilters((v) => !v)}
-            title="Toggle filters"
-          >
-            <Filter size={15} />
-            <span>Filter{activeFilterCount > 0 ? ` (${activeFilterCount})` : ''}</span>
-            <ChevronDown
-              size={13}
-              style={{
-                transform: showFilters ? 'rotate(180deg)' : 'rotate(0deg)',
-                transition: 'transform 0.2s ease',
-              }}
-            />
-          </button>
+          {/* filter-count-row: Filter btn LEFT | Total count RIGHT — same row, equal halves */}
+          <div className="filter-count-row">
+            <button
+              type="button"
+              className={`btn btn-secondary students-filter-btn${activeFilterCount > 0 ? ' filter-active' : ''}`}
+              onClick={() => setShowFilters((v) => !v)}
+              title="Toggle filters"
+            >
+              <Filter size={15} />
+              <span>Filter{activeFilterCount > 0 ? ` (${activeFilterCount})` : ''}</span>
+              <ChevronDown
+                size={13}
+                style={{
+                  transform: showFilters ? 'rotate(180deg)' : 'rotate(0deg)',
+                  transition: 'transform 0.2s ease',
+                }}
+              />
+            </button>
 
-          <div className="students-bar-right">
-            {(activeFilterCount > 0 || search) && (
-              <button type="button" className="students-clear-all-btn" onClick={clearAll}>
-                <X size={13} />
-                <span>Clear all</span>
-              </button>
-            )}
-            <div className="table-stats-badge">
-              Total: <strong>{filteredStudents.length}</strong>{' '}
-              {filteredStudents.length === 1 ? 'Student' : 'Students'}
+            <div className="students-bar-right">
+              {(activeFilterCount > 0 || search) && (
+                <button type="button" className="students-clear-all-btn" onClick={clearAll}>
+                  <X size={13} />
+                  <span>Clear all</span>
+                </button>
+              )}
+              <div className="table-stats-badge">
+                Total: <strong>{filteredStudents.length}</strong>{' '}
+                {filteredStudents.length === 1 ? 'Student' : 'Students'}
+              </div>
             </div>
           </div>
         </div>
+
 
         {/* ── Filter panel ── */}
         {showFilters && (
@@ -515,7 +519,7 @@ const Students = () => {
                     <th>Degree</th>
                     <th style={{ width: '80px' }}>Year</th>
                     <th>Email</th>
-                    <th style={{ width: '220px', textAlign: 'right' }}>Actions</th>
+                    <th style={{ width: '220px', textAlign: 'center' }}>Actions</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -538,8 +542,8 @@ const Students = () => {
                           : <span className="text-secondary">—</span>
                         }
                       </td>
-                      <td style={{ textAlign: 'right' }}>
-                        <div className="action-buttons-cell" style={{ justifyContent: 'flex-end' }}>
+                      <td style={{ textAlign: 'center' }}>
+                        <div className="action-buttons-cell" style={{ justifyContent: 'center' }}>
                           <button
                             type="button"
                             className="action-btn view-btn"

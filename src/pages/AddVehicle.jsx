@@ -78,8 +78,7 @@ const AddVehicleModal = ({ isOpen, vehicleId: vehicleIdProp, onClose, onSuccess 
       <div className="sf-modal" style={{ maxWidth: '560px' }}>
         <div className="sf-header">
           <div className="sf-header-left">
-            <div className="sf-header-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="1" y="3" width="15" height="13"/><path d="M16 8h4l3 3v5h-7V8z"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg></div>
-            <div><h2 className="sf-title">{isEdit ? 'Edit Vehicle' : 'Add Vehicle'}</h2><p className="sf-subtitle">{isEdit ? 'Update fleet vehicle info' : 'Register a new transport vehicle'}</p></div>
+            <h2 className="sf-title">{isEdit ? 'Edit Vehicle' : 'Add Vehicle'}</h2>
           </div>
           <button type="button" className="sf-close-btn" onClick={onClose} disabled={loading} aria-label="Close"><X size={18} /></button>
         </div>
@@ -87,11 +86,10 @@ const AddVehicleModal = ({ isOpen, vehicleId: vehicleIdProp, onClose, onSuccess 
           {feedback.message && <div className={`sf-feedback ${feedback.type === 'success' ? 'sf-feedback-success' : 'sf-feedback-error'}`}>{feedback.type === 'success' ? <CheckCircle2 size={16} style={{ flexShrink: 0 }} /> : <AlertCircle size={16} style={{ flexShrink: 0 }} />}<span>{feedback.message}</span></div>}
           {fetching ? <div className="sf-loading"><Loader2 size={26} className="spin-animate" /><p>Loading…</p></div> : (
             <form id="vehicle-form" onSubmit={handleSubmit} className="sf-form" noValidate>
-              <div className="sf-section-label">Vehicle Information</div>
               <div className="sf-row">
                 <div className="sf-group">
                   <label className="sf-label" htmlFor="v2-vehicleId">Vehicle ID <span className="sf-required">*</span>{isEdit && <span className="sf-optional">read-only</span>}</label>
-                  <input id="v2-vehicleId" name="vehicleId" type="text" className={`${ic('vehicleId')}${isEdit ? ' sf-input-readonly' : ''}`} placeholder="e.g. BUS-101" value={form.vehicleId} onChange={handleChange} readOnly={isEdit} disabled={isEdit} />
+                  <input id="v2-vehicleId" name="vehicleId" type="text" className={`${ic('vehicleId')}${isEdit ? ' sf-input-readonly' : ''}`} placeholder="e.g. BUS101, BUS-101" value={form.vehicleId} onChange={handleChange} readOnly={isEdit} disabled={isEdit} maxLength={30} />
                   <FieldError msg={fieldErrors.vehicleId} />
                 </div>
                 <div className="sf-group">

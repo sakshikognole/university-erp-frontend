@@ -3,7 +3,7 @@ import { X, Save, AlertCircle, CheckCircle2, Loader2, Plus, Trash2 } from 'lucid
 const _IS_PROD = typeof window !== 'undefined' && window.location.hostname !== 'localhost';
 const API_BASE_URL = _IS_PROD ? 'https://university-erp-node.onrender.com/api' : 'http://localhost:5000/api';
 
-const VENUE_ID_REGEX  = /^(?=[A-Z0-9-]*[A-Z])(?=[A-Z0-9-]*[0-9])[A-Z0-9]{1,10}(-[A-Z0-9]{1,10}){0,4}$/;
+const VENUE_ID_REGEX  = /^[A-Za-z0-9]+(-[A-Za-z0-9]+)?$/;
 const VENUE_NAME_REGEX = /^[A-Za-z][A-Za-z0-9 ,.\-'()]{1,99}$/;
 
 const FieldError = ({ message }) =>
@@ -90,7 +90,9 @@ const VenueFormModal = ({ isOpen, venueId, onClose, onSuccess }) => {
       case 'venueId': {
         const v = (value || '').trim().toUpperCase();
         if (!v) return 'Venue ID is required.';
-        if (!VENUE_ID_REGEX.test(v)) return 'Invalid Venue ID (e.g. HALL-101).';
+        if (v.length < 2) return 'Venue ID must be at least 2 characters.';
+        if (v.length > 30) return 'Venue ID must not exceed 30 characters.';
+        if (!VENUE_ID_REGEX.test(v)) return 'Venue ID may only contain letters, digits, and one hyphen (e.g. HALL101, HALL-101).';
         return '';
       }
       case 'name': {
@@ -183,15 +185,7 @@ const VenueFormModal = ({ isOpen, venueId, onClose, onSuccess }) => {
 
         <div className="sf-header">
           <div className="sf-header-left">
-            <div className="sf-header-icon">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/>
-              </svg>
-            </div>
-            <div>
-              <h2 className="sf-title">{isEditMode ? 'Edit Venue' : 'Add New Venue'}</h2>
-              <p className="sf-subtitle">{isEditMode ? 'Update venue information and facilities' : 'Create a new venue record with facility information'}</p>
-            </div>
+            <h2 className="sf-title">{isEditMode ? 'Edit Venue' : 'Add New Venue'}</h2>
           </div>
           <button type="button" className="sf-close-btn" onClick={onClose} disabled={loading} aria-label="Close"><X size={18} /></button>
         </div>
@@ -209,14 +203,14 @@ const VenueFormModal = ({ isOpen, venueId, onClose, onSuccess }) => {
           ) : (
             <form id="venue-form" onSubmit={handleSubmit} className="sf-form" noValidate>
 
-              <div className="sf-section-label">Venue Information</div>
-
               <div className="sf-row">
                 <div className="sf-group">
                   <label className="sf-label" htmlFor="v-venueId">Venue ID <span className="sf-required">*</span></label>
-                  <input id="v-venueId" name="venueId" type="text" className={ic('venueId')}
-                    placeholder="e.g. HALL-101" value={formData.venueId}
-                    onChange={handleChange} onBlur={handleBlur} autoComplete="off" />
+                  <input id="v-venueId" name="venueId" type="text" className={`${ic('venueId')}${isEditMode ? ' sf-input-readonly' : ''}`}
+                    placeholder="e.g. HALL101, HALL-101" value={formData.venueId}
+                    onChange={handleChange} onBlur={handleBlur} autoComplete="off"
+                    readOnly={isEditMode} disabled={isEditMode} maxLength={30} />
+                  {isEditMode && <small className="sf-field-hint">Venue ID cannot be changed after creation.</small>}
                   <FieldError message={touched.venueId ? fieldErrors.venueId : ''} />
                 </div>
                 <div className="sf-group">
@@ -247,10 +241,6 @@ const VenueFormModal = ({ isOpen, venueId, onClose, onSuccess }) => {
                   </select>
                   <FieldError message={touched.status ? fieldErrors.status : ''} />
                 </div>
-              </div>
-
-              <div className="sf-section-label" style={{ marginTop: '0.25rem' }}>
-                Facilities <span className="sf-optional">optional</span>
               </div>
 
               <div className="sf-custom-input-row">

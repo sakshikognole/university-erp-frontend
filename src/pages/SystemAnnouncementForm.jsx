@@ -158,8 +158,7 @@ const SystemAnnouncementFormModal = ({ isOpen, annId, onClose, onSuccess }) => {
       <div className="sf-modal">
         <div className="sf-header">
           <div className="sf-header-left">
-            <div className="sf-header-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M22 17H2a3 3 0 0 0 3-3V9a7 7 0 0 1 14 0v5a3 3 0 0 0 3 3zm-8.27 4a2 2 0 0 1-3.46 0"/></svg></div>
-            <div><h2 className="sf-title">{isEdit ? 'Edit Announcement' : 'New Announcement'}</h2><p className="sf-subtitle">{isEdit ? 'Update announcement details' : 'Publish to selected departments'}</p></div>
+            <h2 className="sf-title">{isEdit ? 'Edit Announcement' : 'New Announcement'}</h2>
           </div>
           <button type="button" className="sf-close-btn" onClick={onClose} disabled={loading} aria-label="Close"><X size={18} /></button>
         </div>
@@ -176,7 +175,6 @@ const SystemAnnouncementFormModal = ({ isOpen, annId, onClose, onSuccess }) => {
           {fetching ? <div className="sf-loading"><Loader2 size={26} className="spin-animate" /><p>Loading announcement…</p></div> : (
             <form id="ann-form" onSubmit={handleSubmit} className="sf-form" noValidate>
 
-              <div className="sf-section-label">Title</div>
               <div className="sf-row"><div className="sf-group sf-group-full">
                 <label className="sf-label" htmlFor="ann-title">Title <span className="sf-required">*</span></label>
                 <input id="ann-title" type="text" className={`sf-input${titleError ? ' sf-input-error' : ''}`}
@@ -186,7 +184,6 @@ const SystemAnnouncementFormModal = ({ isOpen, annId, onClose, onSuccess }) => {
                 {titleError && <p className="sf-field-error"><AlertCircle size={12} style={{ flexShrink: 0 }} />{titleError}</p>}
               </div></div>
 
-              <div className="sf-section-label" style={{ marginTop: '0.25rem' }}>Target Departments <span className="sf-optional">leave blank for all</span></div>
               <div className="sf-row"><div className="sf-group sf-group-full">
                 <div ref={deptDropRef} style={{ position: 'relative' }}>
                   <button type="button" className="sf-input" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', cursor: 'pointer', textAlign: 'left' }} onClick={() => setDeptDropOpen((o) => !o)}>
@@ -212,7 +209,6 @@ const SystemAnnouncementFormModal = ({ isOpen, annId, onClose, onSuccess }) => {
                 </div>
               </div></div>
 
-              <div className="sf-section-label" style={{ marginTop: '0.25rem' }}>Content</div>
               <div style={{ display: 'flex', borderRadius: '0.5rem', overflow: 'hidden', border: '1px solid #e5e7eb', width: 'fit-content', marginBottom: '1rem' }}>
                 {['description', 'file'].map((m) => (
                   <button key={m} type="button" onClick={() => setContentMode(m)}

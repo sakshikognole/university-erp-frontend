@@ -27,11 +27,45 @@ import {
 } from 'lucide-react';
 
 import { getEventImage } from '../utils/eventImageUtils';
+import EventNoticeFormModal from './EventNoticeFormModal';
 const _IS_PROD = typeof window !== 'undefined' && window.location.hostname !== 'localhost';
 const API_BASE_URL = _IS_PROD ? 'https://university-erp-node.onrender.com/api' : 'http://localhost:5000/api';
 
 const EventNotices = () => {
   const navigate = useNavigate();
+
+  // -- Form modal state --
+  const [formOpen,    setFormOpen]    = useState(false);
+  const [editEventId, setEditEventId] = useState(null);
+
+  const openAddModal   = ()    => { setEditEventId(null); setFormOpen(true); };
+  const openEditModal  = (id)  => { setEditEventId(id);   setFormOpen(true); };
+  const closeFormModal = ()    => { setFormOpen(false);   setEditEventId(null); };
+  const handleFormSave = ()    => { closeFormModal();     setTimeout(fetchEvents, 100); };
+
+  // -- View modal state --
+  const [viewOpen,    setViewOpen]    = useState(false);
+  const [viewEvent,   setViewEvent]   = useState(null);
+  const [viewLoading, setViewLoading] = useState(false);
+
+  const openViewModal = async (id) => {
+    setViewOpen(true);
+    setViewLoading(true);
+    try {
+      const res = await fetch(`${API_BASE_URL}/events/${id}`, {
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${localStorage.getItem('erp_token')}` },
+      });
+      if (!res.ok) throw new Error('Failed to load');
+      const data = await res.json();
+      setViewEvent(data);
+    } catch {
+      setViewEvent(null);
+    } finally {
+      setViewLoading(false);
+    }
+  };
+  const closeViewModal = () => { setViewOpen(false); setViewEvent(null); };
+
   const [events, setEvents] = useState([]);
   const [loading, setLoading] = useState(true);
   const [deleting, setDeleting] = useState(false);
@@ -190,7 +224,7 @@ const EventNotices = () => {
           <button
             type="button"
             className="books-btn books-btn-primary"
-            onClick={() => navigate('/event-notices/add')}
+            onClick={() => openAddModal()}
           >
             <Plus size={16} />
             <span>Publish Event Notice</span>
@@ -310,7 +344,7 @@ const EventNotices = () => {
               type="button"
               className="books-btn books-btn-primary"
               style={{ marginTop: '1rem' }}
-              onClick={() => navigate('/event-notices/add')}
+              onClick={() => openAddModal()}
             >
               <Plus size={16} />
               <span>Publish Event Notice</span>
@@ -327,7 +361,7 @@ const EventNotices = () => {
                 <div
                   key={event._id}
                   className="event-card"
-                  onClick={() => navigate(`/event-notices/view/${event._id}`)}
+                  onClick={() => openViewModal(event._id)}
                   style={{ cursor: 'pointer' }}
                 >
                   {/* Image Area */}
@@ -409,7 +443,7 @@ const EventNotices = () => {
                         title="View Event Notice"
                         onClick={(e) => {
                           e.stopPropagation();
-                          navigate(`/event-notices/view/${event._id}`);
+                          openViewModal(event._id);
                         }}
                       >
                         <Eye size={14} />
@@ -421,7 +455,7 @@ const EventNotices = () => {
                         title="Edit Event Notice"
                         onClick={(e) => {
                           e.stopPropagation();
-                          navigate(`/event-notices/edit/${event._id}`);
+                          openEditModal(event._id);
                         }}
                       >
                         <Edit size={14} />
@@ -523,7 +557,87 @@ const EventNotices = () => {
         </>
       )}
 
+      {/* ===== Event Notice View Modal ===== */}
+      {viewOpen && (
+        <div className="env-overlay" onClick={closeViewModal}>
+          <div className="env-modal" onClick={e => e.stopPropagation()}>
+            {/* Header */}
+            <div className="env-header">
+              <div>
+                <h2 className="env-title">Event Notice Details</h2>
+                <p className="env-subtitle">View only information</p>
+              </div>
+              <button type="button" className="close-modal-btn" onClick={closeViewModal}><X size={18} /></button>
+            </div>
+            {/* Body */}
+            <div className="env-body">
+              {viewLoading ? (
+                <div style={{ display:'flex', alignItems:'center', justifyContent:'center', padding:'3rem', gap:'0.75rem', color:'var(--text-secondary)' }}>
+                  <Loader2 size={24} className="spin-animate" /><span>Loading...</span>
+                </div>
+              ) : !viewEvent ? (
+                <div style={{ textAlign:'center', padding:'2rem', color:'var(--text-secondary)' }}>
+                  <AlertCircle size={28} style={{ color:'#ef4444', margin:'0 auto 0.5rem' }} />
+                  <p>Could not load event notice.</p>
+                </div>
+              ) : (
+                <>
+                  {/* Image */}
+                  <img src={getEventImage(viewEvent.category || viewEvent.eventType, viewEvent.imageUrl)} alt={viewEvent.title} className="env-image" onError={e => { e.target.src = getEventImage(viewEvent.category || viewEvent.eventType); }} />
+                  {/* Badges */}
+                  <div className="env-badges">
+                    <span className="event-id-badge">{viewEvent.eventId}</span>
+                    {viewEvent.status && <span className="env-badge env-badge-status">{viewEvent.status}</span>}
+                    {viewEvent.category && <span className="env-badge env-badge-cat">{viewEvent.category}</span>}
+                  </div>
+                  {/* Title */}
+                  <h3 className="env-event-title">{viewEvent.title}</h3>
+                  {viewEvent.shortDescription && <p className="env-short-desc">{viewEvent.shortDescription}</p>}
+                  <hr className="env-divider" />
+                  {/* Details Grid */}
+                  <div className="env-details-grid">
+                    <div className="env-detail-row"><Calendar size={14} className="env-icon" /><span className="env-detail-label">Date &amp; Time</span><span className="env-detail-val">{new Date(viewEvent.eventDate).toLocaleDateString('en-IN', { weekday:'long', year:'numeric', month:'long', day:'numeric' })} &nbsp; {viewEvent.eventTime && <><Clock size={12} style={{verticalAlign:'middle'}} /> {viewEvent.eventTime}</>}</span></div>
+                    {viewEvent.venue && <div className="env-detail-row"><MapPin size={14} className="env-icon" /><span className="env-detail-label">Venue</span><span className="env-detail-val">{viewEvent.venue?.name || viewEvent.venue}{viewEvent.venue?.capacity && <> &bull; Capacity: {viewEvent.venue.capacity}</>}</span></div>}
+                    {viewEvent.organizer && <div className="env-detail-row"><User size={14} className="env-icon" /><span className="env-detail-label">Organizer</span><span className="env-detail-val">{viewEvent.organizer?.name || viewEvent.organizer}</span></div>}
+                    {viewEvent.organizer?.email && <div className="env-detail-row"><Tag size={14} className="env-icon" /><span className="env-detail-label">Email</span><span className="env-detail-val">{viewEvent.organizer.email}</span></div>}
+                    {viewEvent.targetAudience && <div className="env-detail-row"><Users size={14} className="env-icon" /><span className="env-detail-label">Audience</span><span className="env-detail-val">{Array.isArray(viewEvent.targetAudience) ? viewEvent.targetAudience.join(', ') : viewEvent.targetAudience}</span></div>}
+                    {viewEvent.eventTime && !viewEvent.eventDate && <div className="env-detail-row"><Clock size={14} className="env-icon" /><span className="env-detail-label">Time</span><span className="env-detail-val">{viewEvent.eventTime}</span></div>}
+                    {viewEvent.duration && <div className="env-detail-row"><Clock size={14} className="env-icon" /><span className="env-detail-label">Duration</span><span className="env-detail-val">{viewEvent.duration}</span></div>}
+                    {viewEvent.maxParticipants && <div className="env-detail-row"><Users size={14} className="env-icon" /><span className="env-detail-label">Max Seats</span><span className="env-detail-val">{viewEvent.maxParticipants}</span></div>}
+                    {viewEvent.registrationRequired && viewEvent.registrationDeadline && (
+                      <div className="env-detail-row"><Tag size={14} className="env-icon" /><span className="env-detail-label">Reg. Deadline</span><span className="env-detail-val">{new Date(viewEvent.registrationDeadline).toLocaleDateString('en-IN', { year:'numeric', month:'long', day:'numeric' })}</span></div>
+                    )}
+                    {viewEvent.tags && viewEvent.tags.length > 0 && (
+                      <div className="env-detail-row"><Tag size={14} className="env-icon" /><span className="env-detail-label">Tags</span><span className="env-detail-val" style={{ display:'flex', flexWrap:'wrap', gap:'0.3rem' }}>{viewEvent.tags.map((t,i) => <span key={i} style={{ background:'#e0e7ff', color:'#3730a3', borderRadius:'12px', padding:'1px 8px', fontSize:'0.75rem', fontWeight:600 }}>{t}</span>)}</span></div>
+                    )}
+                  </div>
+                  {/* Description */}
+                  {viewEvent.description && viewEvent.description.trim() && (
+                    <div className="env-section">
+                      <p className="env-section-label">Description</p>
+                      <div className="env-desc-box">{viewEvent.description}</div>
+                    </div>
+                  )}
+                </>
+              )}
+            </div>
+            {/* Footer */}
+            <div className="env-footer">
+              <button type="button" className="books-btn books-btn-ghost" onClick={closeViewModal}>Close</button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Delete Confirmation Modal */}
+      {/* Event Notice Form Modal */}
+      <EventNoticeFormModal
+        isOpen={formOpen}
+        eventId={editEventId}
+        onClose={closeFormModal}
+        onSave={handleFormSave}
+      />
+
       {deleteConfirm && (
         <div className="modal-overlay" onClick={() => !deleting && setDeleteConfirm(null)}>
           <div className="modal-content delete-dialog" onClick={(e) => e.stopPropagation()}>

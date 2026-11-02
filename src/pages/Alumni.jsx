@@ -20,7 +20,7 @@ import { useNavigate } from 'react-router-dom';
 import {
   Users, Plus, Download, Search, ChevronDown, FileText, FileSpreadsheet,
   Printer, AlertCircle, CheckCircle2, Loader2, ChevronLeft, ChevronRight,
-  Upload, Eye, Edit, Trash2, X, AlertTriangle, RefreshCw,
+  Upload, Eye, Edit, Trash2, X, AlertTriangle, RefreshCw, Filter,
 } from 'lucide-react';
 
 import AlumniFormModal from './AlumniForm';
@@ -173,6 +173,12 @@ const Alumni = () => {
   const [currentPage,  setCurrentPage]  = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(10);
 
+  // Filter state
+  const [showFilters,   setShowFilters]   = useState(false);
+  const [filterYear,    setFilterYear]    = useState('');
+  const [filterCompany, setFilterCompany] = useState('');
+  const activeFilterCount = [filterYear, filterCompany].filter(Boolean).length;
+
   const authHeader = useCallback(() => {
     const token = localStorage.getItem('erp_token');
     return { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` };
@@ -259,7 +265,7 @@ const Alumni = () => {
 
   const filteredAlumni = alumni.filter((a) => {
     const q = search.toLowerCase().trim();
-    return !q ||
+    const matchSearch = !q ||
       (a.name||'').toLowerCase().includes(q) ||
       (a.alumniId||'').toLowerCase().includes(q) ||
       (a.jobTitle||'').toLowerCase().includes(q) ||
@@ -267,7 +273,14 @@ const Alumni = () => {
       (a.email||'').toLowerCase().includes(q) ||
       (a.phone||'').includes(q) ||
       String(a.graduationYear||'').includes(q);
+    const matchYear    = !filterYear    || String(a.graduationYear||'') === filterYear;
+    const matchCompany = !filterCompany || (a.currentCompany||'').toLowerCase().includes(filterCompany.toLowerCase());
+    return matchSearch && matchYear && matchCompany;
   });
+
+  // Unique years + companies for filter dropdowns
+  const uniqueYears     = [...new Set(alumni.map(a => String(a.graduationYear||'')).filter(Boolean))].sort().reverse();
+  const uniqueCompanies = [...new Set(alumni.map(a => (a.currentCompany||'').trim()).filter(Boolean))].sort();
 
   const totalPages   = Math.ceil(filteredAlumni.length / itemsPerPage) || 1;
   const startIndex   = (currentPage - 1) * itemsPerPage;
@@ -308,7 +321,7 @@ const Alumni = () => {
 
           <button type="button" className="btn btn-secondary"
             onClick={() => navigate('/alumni/bulk-upload')}>
-            <Upload size={16} /><span>Bulk Upload</span>
+            <Upload size={16} /><span>Upload</span>
           </button>
 
           <button type="button" className="books-btn books-btn-primary"
@@ -350,10 +363,55 @@ const Alumni = () => {
               <button type="button" className="search-clear-btn" onClick={() => setSearch('')}>Clear</button>
             )}
           </div>
-          <div className="table-stats-badge">
-            Total: <strong>{filteredAlumni.length}</strong> Alumni
+
+          {/* filter-count-row: Filter btn LEFT | Total count RIGHT — same row, equal halves */}
+          <div className="filter-count-row">
+            <button
+              type="button"
+              className={`btn btn-secondary students-filter-btn${activeFilterCount > 0 ? ' filter-active' : ''}`}
+              onClick={() => setShowFilters(v => !v)}
+              title="Toggle filters"
+            >
+              <Filter size={15} />
+              <span>Filter{activeFilterCount > 0 ? ` (${activeFilterCount})` : ''}</span>
+            </button>
+            <div className="table-stats-badge">
+              Total: <strong>{filteredAlumni.length}</strong> Alumni
+            </div>
           </div>
         </div>
+
+        {/* Filter panel */}
+        {showFilters && (
+          <div className="alumni-filter-panel">
+            <div className="alumni-filter-grid">
+              <div className="alumni-filter-group">
+                <label htmlFor="alumni-filter-year">Graduation Year</label>
+                <select id="alumni-filter-year" className="alumni-filter-select"
+                  value={filterYear} onChange={e => { setFilterYear(e.target.value); setCurrentPage(1); }}>
+                  <option value="">All Years</option>
+                  {uniqueYears.map(y => <option key={y} value={y}>{y}</option>)}
+                </select>
+              </div>
+              <div className="alumni-filter-group">
+                <label htmlFor="alumni-filter-company">Company</label>
+                <select id="alumni-filter-company" className="alumni-filter-select"
+                  value={filterCompany} onChange={e => { setFilterCompany(e.target.value); setCurrentPage(1); }}>
+                  <option value="">All Companies</option>
+                  {uniqueCompanies.map(c => <option key={c} value={c}>{c}</option>)}
+                </select>
+              </div>
+            </div>
+            {activeFilterCount > 0 && (
+              <div style={{ paddingTop: '0.5rem' }}>
+                <button type="button" className="students-clear-filters-btn"
+                  onClick={() => { setFilterYear(''); setFilterCompany(''); setCurrentPage(1); }}>
+                  <X size={13} /><span>Clear filters</span>
+                </button>
+              </div>
+            )}
+          </div>
+        )}
 
         <div className="table-container">
           {loading ? (
@@ -393,7 +451,7 @@ const Alumni = () => {
                     {/* Improvement C: Email + Phone instead of Profile Links */}
                     <th style={{ width: '170px' }}>Email</th>
                     <th style={{ width: '120px' }}>Phone</th>
-                    <th style={{ width: '220px', textAlign: 'right' }}>Actions</th>
+                    <th style={{ width: '220px', textAlign: 'center' }}>Actions</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -416,8 +474,8 @@ const Alumni = () => {
                       <td style={{ fontSize: '0.8125rem', color: a.phone ? 'var(--text-primary)' : 'var(--text-secondary)' }}>
                         {a.phone || '—'}
                       </td>
-                      <td style={{ textAlign: 'right' }}>
-                        <div className="action-buttons-cell" style={{ justifyContent: 'flex-end' }}>
+                      <td style={{ textAlign: 'center' }}>
+                        <div className="action-buttons-cell" style={{ justifyContent: 'center' }}>
                           <button type="button" className="action-btn view-btn" title="View"
                             onClick={() => setViewAlumni(a)}>
                             <Eye size={14} /><span className="action-label">View</span>

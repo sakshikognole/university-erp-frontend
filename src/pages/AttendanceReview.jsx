@@ -19,6 +19,11 @@ import {
 const _IS_PROD = typeof window !== 'undefined' && window.location.hostname !== 'localhost';
 const API_BASE_URL = _IS_PROD ? 'https://university-erp-node.onrender.com/api' : 'http://localhost:5000/api';
 
+const ATT_DRAFT_KEY = 'att_draft_v1';
+const clearAttendanceDraft = () => {
+  try { sessionStorage.removeItem(ATT_DRAFT_KEY); } catch { /* non-fatal */ }
+};
+
 const AttendanceReview = () => {
   const navigate  = useNavigate();
   const location  = useLocation();
@@ -30,6 +35,9 @@ const AttendanceReview = () => {
   const [submitted, setSubmitted]   = useState(false);
   const [feedback, setFeedback]     = useState({ type: '', message: '' });
   const [submitResult, setSubmitResult] = useState(null);
+
+  // ── Filter: 'all' | 'present' | 'absent' ─────────────────────────────────
+  const [filterStatus, setFilterStatus] = useState('all');
 
   // Guard: if someone lands here directly without state, send them back
   if (!session || !students) {
@@ -51,7 +59,14 @@ const AttendanceReview = () => {
   }
 
   const presentStudents = students.filter((s) => s.present);
-  const absentCount     = students.length - presentStudents.length;
+  const absentStudents  = students.filter((s) => !s.present);
+  const absentCount     = absentStudents.length;
+
+  // ── Filtered list based on active filter tab ──────────────────────────────
+  const displayStudents =
+    filterStatus === 'present' ? presentStudents :
+    filterStatus === 'absent'  ? absentStudents  :
+    students;
 
   // ── Submit to backend ─────────────────────────────────────────────────────
   const handleSubmit = async () => {
@@ -67,6 +82,7 @@ const AttendanceReview = () => {
       if (!res.ok) throw new Error(data.message || 'Failed to submit attendance');
       setSubmitResult(data);
       setSubmitted(true);
+      clearAttendanceDraft(); // session complete — wipe stored draft
       setFeedback({ type: 'success', message: 'Attendance submitted successfully.' });
     } catch (err) {
       setFeedback({
@@ -78,13 +94,22 @@ const AttendanceReview = () => {
     }
   };
 
-  // ── Export present students as .txt ───────────────────────────────────────
+  // ── Export filtered list as .txt ─────────────────────────────────────────
   const handleExport = () => {
-    const list = submitResult ? submitResult.presentStudents : presentStudents;
+    const baseList = submitResult ? submitResult.presentStudents : presentStudents;
+    const exportList =
+      filterStatus === 'absent'  ? absentStudents  :
+      filterStatus === 'present' ? baseList        :
+      students;
+
+    const statusLabel =
+      filterStatus === 'absent'  ? 'ABSENT STUDENTS'  :
+      filterStatus === 'present' ? 'PRESENT STUDENTS' :
+      'ALL STUDENTS';
 
     const lines = [
       '============================================================',
-      '              ATTENDANCE REPORT — PRESENT STUDENTS',
+      `              ATTENDANCE REPORT — ${statusLabel}`,
       '============================================================',
       `Venue       : ${session.venue}`,
       `Date        : ${session.date}`,
@@ -92,13 +117,13 @@ const AttendanceReview = () => {
       `Subject     : ${session.subjectName}`,
       '------------------------------------------------------------',
       `Total Students : ${students.length}`,
-      `Present        : ${list.length}`,
-      `Absent         : ${students.length - list.length}`,
+      `Present        : ${presentStudents.length}`,
+      `Absent         : ${absentCount}`,
       '------------------------------------------------------------',
       '',
       'Roll No       Name',
       '------------------------------------------------------------',
-      ...list.map((s) => `${s.rollNo.padEnd(14)}${s.name}`),
+      ...exportList.map((s) => `${String(s.rollNo).padEnd(14)}${s.name}`),
       '',
       '============================================================',
       `Generated on : ${new Date().toLocaleString()}`,
@@ -109,7 +134,7 @@ const AttendanceReview = () => {
     const url  = URL.createObjectURL(blob);
     const a    = document.createElement('a');
     a.href     = url;
-    a.download = `attendance_${session.subjectName.replace(/\s+/g, '_')}_${session.date}.txt`;
+    a.download = `attendance_${session.subjectName.replace(/\s+/g, '_')}_${session.date}_${filterStatus}.txt`;
     document.body.appendChild(a);
     a.click();
     setTimeout(() => { document.body.removeChild(a); URL.revokeObjectURL(url); }, 150);
@@ -174,8 +199,8 @@ const AttendanceReview = () => {
         </div>
       </div>
 
-      {/* ── Summary chips ────────────────────────────────────────────────── */}
-      <div style={{ display: 'flex', gap: '0.625rem', flexWrap: 'wrap', marginBottom: '1rem' }}>
+      {/* ── Summary chips + Filter tabs ──────────────────────────────────── */}
+      <div style={{ display: 'flex', gap: '0.625rem', flexWrap: 'wrap', marginBottom: '0.75rem' }}>
         <div className="attendance-chip attendance-chip--total">
           <Users size={13} /><span>Total: <strong>{students.length}</strong></span>
         </div>
@@ -187,8 +212,26 @@ const AttendanceReview = () => {
         </div>
       </div>
 
-      {/* ── Present students list ─────────────────────────────────────────── */}
-      <div className="card" style={{ marginBottom: '1rem', overflow: 'hidden' }}>
+      {/* Filter tabs */}
+      <div className="att-filter-tabs" style={{ marginBottom: '1rem' }}>
+        {[
+          { key: 'all',     label: `All (${students.length})` },
+          { key: 'present', label: `Present (${presentStudents.length})` },
+          { key: 'absent',  label: `Absent (${absentCount})` },
+        ].map(({ key, label }) => (
+          <button
+            key={key}
+            type="button"
+            className={`att-filter-tab${filterStatus === key ? ' att-filter-tab--active' : ''}`}
+            onClick={() => setFilterStatus(key)}
+          >
+            {label}
+          </button>
+        ))}
+      </div>
+
+      {/* ── Student list (filtered) ───────────────────────────────────────── */}
+      <div className="card att-list-card" style={{ marginBottom: '1rem' }}>
 
         {/* Table header */}
         <div className="attendance-table-header">
@@ -201,23 +244,20 @@ const AttendanceReview = () => {
           <span className="attendance-col-action" style={{ textAlign: 'center' }}>Status</span>
         </div>
 
-        {presentStudents.length === 0 ? (
-          <div
-            style={{
-              padding: '3rem',
-              textAlign: 'center',
-              color: 'var(--text-secondary)',
-              fontSize: '0.9rem',
-            }}
-          >
+        {displayStudents.length === 0 ? (
+          <div style={{ padding: '3rem', textAlign: 'center', color: 'var(--text-secondary)', fontSize: '0.9rem' }}>
             <UserX size={28} style={{ margin: '0 auto 0.75rem', display: 'block', opacity: 0.4 }} />
-            No students marked present. Go back and mark attendance.
+            {filterStatus === 'present'
+              ? 'No students marked present. Go back and mark attendance.'
+              : filterStatus === 'absent'
+              ? 'No absent students — everyone is present!'
+              : 'No students found.'}
           </div>
         ) : (
-          presentStudents.map((student, index) => (
+          displayStudents.map((student, index) => (
             <div
               key={student.rollNo}
-              className={`attendance-row attendance-row--present ${
+              className={`attendance-row ${student.present ? 'attendance-row--present' : ''} ${
                 index % 2 === 0 ? 'attendance-row--even' : ''
               }`}
             >
@@ -234,9 +274,9 @@ const AttendanceReview = () => {
                 </span>
               </span>
               <span className="attendance-col-action">
-                <span className="att-present-pill">
-                  <CheckCircle2 size={13} /> Present
-                </span>
+                {student.present
+                  ? <span className="att-present-pill"><CheckCircle2 size={13} /> Present</span>
+                  : <span className="att-absent-pill"><UserX size={13} /> Absent</span>}
               </span>
             </div>
           ))
@@ -259,40 +299,29 @@ const AttendanceReview = () => {
       )}
 
       {/* ── Bottom action bar ─────────────────────────────────────────────── */}
-      <div
-        style={{
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          gap: '1rem',
-          flexWrap: 'wrap',
-          paddingBottom: '2rem',
-        }}
-      >
+      <div className="att-action-bar">
         {/* Export — always available */}
         <button
           type="button"
           className="attendance-export-btn"
           onClick={handleExport}
-          title="Export present students as .txt"
+          title="Export list as .txt"
         >
           <Download size={16} />
-          Export Present (.txt)
+          Export {filterStatus === 'absent' ? 'Absent' : filterStatus === 'present' ? 'Present' : 'All'} (.txt)
         </button>
 
-        <div style={{ display: 'flex', gap: '0.75rem' }}>
+        <div className="att-action-bar-right">
           {submitted ? (
-            /* After submit — offer to start a new session */
             <button
               type="button"
               className="attendance-reset-btn"
-              onClick={() => navigate('/attendance')}
+              onClick={() => { clearAttendanceDraft(); navigate('/attendance'); }}
             >
               <RotateCcw size={16} />
               Start New Session
             </button>
           ) : (
-            /* Before submit */
             <button
               type="button"
               className="attendance-submit-btn"

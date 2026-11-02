@@ -193,29 +193,11 @@ const EventDetailsDialog = ({ eventId, onClose, onEdit, onDeleted }) => {
             )}
 
             {/* Actions */}
-            {confirmDel ? (
-              <div style={{ padding: '1rem', background: '#fef2f2', border: '1px solid #fecaca', borderRadius: '8px', marginTop: '1rem' }}>
-                <p style={{ margin: '0 0 0.75rem', color: '#991b1b', fontWeight: 500 }}>Delete "{event.eventTitle}"? This cannot be undone.</p>
-                <div style={{ display: 'flex', gap: '0.75rem', justifyContent: 'flex-end' }}>
-                  <button type="button" className="books-btn books-btn-ghost" onClick={() => setConfirmDel(false)} disabled={deleting}>Cancel</button>
-                  <button type="button" className="btn btn-danger" onClick={handleDelete} disabled={deleting}>
-                    {deleting ? <><Loader2 size={14} className="spin-animate" /><span>Deleting…</span></> : <><Trash2 size={14} /><span>Delete</span></>}
-                  </button>
-                </div>
-              </div>
-            ) : (
               <div className="modal-footer">
                 <button type="button" className="books-btn books-btn-ghost" onClick={onClose}>
-                  <ArrowLeft size={14} /><span>Back</span>
-                </button>
-                <button type="button" className="books-btn books-btn-secondary" onClick={() => onEdit(event.eventId)}>
-                  <Edit size={14} /><span>Edit</span>
-                </button>
-                <button type="button" className="btn btn-danger" onClick={() => setConfirmDel(true)}>
-                  <Trash2 size={14} /><span>Delete</span>
+                  <X size={14} /><span>Close</span>
                 </button>
               </div>
-            )}
           </>
         ) : (
           <div style={{ padding: '2rem', textAlign: 'center', color: 'var(--text-secondary)' }}>

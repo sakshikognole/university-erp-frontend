@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import { ArrowLeft } from 'lucide-react';
 
 const _IS_PROD_SUB = window.location.hostname !== 'localhost';
 const NODE_URL = _IS_PROD_SUB ? 'https://university-erp-node.onrender.com/api' : 'http://localhost:5000/api';
@@ -80,7 +81,9 @@ const Submission = () => {
           <h1 className="page-title">Assignment Submission</h1>
           <p className="page-subtitle">Submit your assignment for the selected announcement</p>
         </div>
-        <button className="books-btn books-btn-ghost" onClick={() => navigate(-1)}>← Back</button>
+        <button className="btn-back" onClick={() => navigate(-1)} title="Back">
+          <ArrowLeft size={18} />
+        </button>
       </div>
 
       {/* Assignment Details Card */}

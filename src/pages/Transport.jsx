@@ -20,6 +20,7 @@ import AddBusPassModal from './AddBusPass';
 import {
   Bus, Plus, Search, AlertCircle, AlertTriangle, CheckCircle2, Loader2,
   ChevronLeft, ChevronRight, Edit, Trash2, UserCheck, Truck, Ticket, X, Eye,
+  ChevronDown,
 } from 'lucide-react';
 import ViewDetailModal from '../components/ViewDetailModal';
 const _IS_PROD = typeof window !== 'undefined' && window.location.hostname !== 'localhost';
@@ -106,6 +107,10 @@ const Transport = () => {
   const closeModal = ()               => { setModalType(null);   setModalItemId(null); };
   const handleModalSuccess = () => { closeModal(); fetchAllData(); };
 
+  // Add dropdown
+  const [showAddMenu, setShowAddMenu] = useState(false);
+  const addMenuRef = useRef(null);
+
   const [search,   setSearch]   = useState('');
   const [feedback, setFeedback] = useState({ type: '', message: '' });
 
@@ -132,6 +137,17 @@ const Transport = () => {
   useEffect(() => {
     fetchAllData();
     return () => { if (feedbackTimerRef.current) clearTimeout(feedbackTimerRef.current); };
+  }, []);
+
+  // Close Add dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (addMenuRef.current && !addMenuRef.current.contains(e.target)) {
+        setShowAddMenu(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
   const fetchAllData = async () => {
@@ -266,7 +282,8 @@ const Transport = () => {
           <h1 className="page-title">Transport</h1>
           <p className="page-subtitle">Manage campus bus routes, drivers, vehicles, and student passes</p>
         </div>
-        <div className="header-actions-group transport-header-actions">
+        {/* Desktop: 4 individual buttons — hidden on mobile */}
+        <div className="header-actions-group transport-header-actions trn-header-desktop">
           <button type="button" className="btn btn-secondary" onClick={() => openModal('driver')}>
             <UserCheck size={15} /><span>Add Driver</span>
           </button>
@@ -279,6 +296,42 @@ const Transport = () => {
           <button type="button" className="books-btn books-btn-primary" onClick={() => openModal('route')}>
             <Plus size={15} /><span>Add Bus Route</span>
           </button>
+        </div>
+
+        {/* Mobile: single dropdown button — hidden on desktop */}
+        <div className="download-dropdown-wrapper trn-header-mobile" ref={addMenuRef}>
+          <button
+            type="button"
+            className="books-btn books-btn-primary"
+            onClick={() => setShowAddMenu(!showAddMenu)}
+            title="Add new transport record"
+          >
+            <Plus size={16} />
+            <span>Add New</span>
+            <ChevronDown size={14} />
+          </button>
+
+          {showAddMenu && (
+            <div className="download-dropdown-menu">
+              <div className="dropdown-menu-header">Select Record Type</div>
+              <button type="button" className="dropdown-menu-item"
+                onClick={() => { setShowAddMenu(false); openModal('route'); }}>
+                <Bus size={15} /><span>Add Bus Route</span>
+              </button>
+              <button type="button" className="dropdown-menu-item"
+                onClick={() => { setShowAddMenu(false); openModal('driver'); }}>
+                <UserCheck size={15} /><span>Add Driver</span>
+              </button>
+              <button type="button" className="dropdown-menu-item"
+                onClick={() => { setShowAddMenu(false); openModal('vehicle'); }}>
+                <Truck size={15} /><span>Add Vehicle</span>
+              </button>
+              <button type="button" className="dropdown-menu-item"
+                onClick={() => { setShowAddMenu(false); openModal('pass'); }}>
+                <Ticket size={15} /><span>Add Bus Pass</span>
+              </button>
+            </div>
+          )}
         </div>
       </div>
 
@@ -368,7 +421,7 @@ const Transport = () => {
                       <th style={{ width: '155px' }}>Driver Name</th>
                       <th style={{ width: '155px' }}>Vehicle Name</th>
                       <th>Stops</th>
-                      <th style={{ width: '130px', textAlign: 'right' }}>Actions</th>
+                      <th style={{ width: '130px', textAlign: 'center' }}>Actions</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -400,8 +453,8 @@ const Transport = () => {
                             <span style={{ color: 'var(--text-secondary)', fontStyle: 'italic' }}>No stops defined</span>
                           )}
                         </td>
-                        <td style={{ textAlign: 'right' }}>
-                          <div className="action-buttons-cell" style={{ justifyContent: 'flex-end' }}>
+                        <td style={{ textAlign: 'center' }}>
+                          <div className="action-buttons-cell" style={{ justifyContent: 'center' }}>
                             <button type="button" className="action-btn view-btn" title="View" onClick={() => setViewItem({ type: 'route', data: route })}>
                               <Eye size={14} /><span className="action-label">View</span>
                             </button>
@@ -429,7 +482,7 @@ const Transport = () => {
                       <th>Phone</th>
                       <th>License Number</th>
                       <th style={{ width: '110px' }}>Status</th>
-                      <th style={{ width: '220px', textAlign: 'right' }}>Actions</th>
+                      <th style={{ width: '220px', textAlign: 'center' }}>Actions</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -445,8 +498,8 @@ const Transport = () => {
                             {driver.status}
                           </span>
                         </td>
-                        <td style={{ textAlign: 'right' }}>
-                          <div className="action-buttons-cell" style={{ justifyContent: 'flex-end' }}>
+                        <td style={{ textAlign: 'center' }}>
+                          <div className="action-buttons-cell" style={{ justifyContent: 'center' }}>
                             <button type="button" className="action-btn view-btn" title="View" onClick={() => setViewItem({ type: 'driver', data: driver })}>
                               <Eye size={14} /><span className="action-label">View</span>
                             </button>
@@ -475,7 +528,7 @@ const Transport = () => {
                       <th>Registration / Plate</th>
                       <th style={{ width: '90px' }}>Capacity</th>
                       <th style={{ width: '110px' }}>Status</th>
-                      <th style={{ width: '220px', textAlign: 'right' }}>Actions</th>
+                      <th style={{ width: '220px', textAlign: 'center' }}>Actions</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -491,8 +544,8 @@ const Transport = () => {
                             {vehicle.status}
                           </span>
                         </td>
-                        <td style={{ textAlign: 'right' }}>
-                          <div className="action-buttons-cell" style={{ justifyContent: 'flex-end' }}>
+                        <td style={{ textAlign: 'center' }}>
+                          <div className="action-buttons-cell" style={{ justifyContent: 'center' }}>
                             <button type="button" className="action-btn view-btn" title="View" onClick={() => setViewItem({ type: 'vehicle', data: vehicle })}>
                               <Eye size={14} /><span className="action-label">View</span>
                             </button>
@@ -522,7 +575,7 @@ const Transport = () => {
                       <th>Stops (From → To)</th>
                       <th style={{ width: '110px' }}>Payment</th>
                       <th style={{ width: '110px' }}>Valid Till</th>
-                      <th style={{ width: '220px', textAlign: 'right' }}>Actions</th>
+                      <th style={{ width: '220px', textAlign: 'center' }}>Actions</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -544,8 +597,8 @@ const Transport = () => {
                           </span>
                         </td>
                         <td>{pass.validTill ? new Date(pass.validTill).toLocaleDateString() : '—'}</td>
-                        <td style={{ textAlign: 'right' }}>
-                          <div className="action-buttons-cell" style={{ justifyContent: 'flex-end' }}>
+                        <td style={{ textAlign: 'center' }}>
+                          <div className="action-buttons-cell" style={{ justifyContent: 'center' }}>
                             <button type="button" className="action-btn view-btn" title="View" onClick={() => setViewItem({ type: 'pass', data: pass })}>
                               <Eye size={14} /><span className="action-label">View</span>
                             </button>

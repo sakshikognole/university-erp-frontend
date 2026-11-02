@@ -811,7 +811,7 @@ const EmailCommunication = () => {
               title="Import emails from CSV or Excel"
             >
               <Upload size={16} />
-              <span>Bulk Upload</span>
+              <span>Upload</span>
             </button>
             {recipientList.length > 0 && (
               <button

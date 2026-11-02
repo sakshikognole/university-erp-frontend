@@ -255,7 +255,7 @@ const Announcements = () => {
             {/* Action Buttons */}
             <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
               <button className="books-btn books-btn-sm books-btn-ghost" onClick={() => { setEditingDeadlineId(ann._id); setEditingDeadline(formatDateTimeLocal(ann.deadline)); }}>Edit Deadline</button>
-              <button className="books-btn books-btn-sm books-btn-ghost" onClick={() => navigate(`/submission/${ann._id}`)}>View Assignment</button>
+              <button className="books-btn books-btn-sm books-btn-ghost" onClick={() => navigate(`/announcements/submission/${ann._id}`)}>View Assignment</button>
               <button className="books-btn books-btn-sm books-btn-ghost" onClick={() => handleViewSubmissions(ann._id)}>
                 {viewingSubmissionsId === ann._id ? 'Hide Submissions' : 'View Submissions'}
               </button>

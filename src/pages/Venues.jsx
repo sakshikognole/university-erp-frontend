@@ -268,7 +268,7 @@ const Venues = () => {
             title="Bulk upload venues via CSV"
           >
             <Upload size={16} />
-            <span>Bulk Upload</span>
+            <span>Upload</span>
           </button>
 
           <button
@@ -363,7 +363,7 @@ const Venues = () => {
                     <th style={{ width: '100px' }}>Capacity</th>
                     <th>Facilities</th>
                     <th style={{ width: '120px' }}>Status</th>
-                    <th>Actions</th>
+                    <th style={{ width: '220px', textAlign: 'center' }}>Actions</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -388,8 +388,8 @@ const Venues = () => {
                           {venue.status || 'N/A'}
                         </span>
                       </td>
-                      <td>
-                        <div className="books-actions">
+                      <td style={{ textAlign: 'center' }}>
+                        <div className="action-buttons-cell" style={{ justifyContent: 'center' }}>
                           <button
                             type="button"
                             className="action-btn view-btn"
@@ -612,7 +612,27 @@ const Venues = () => {
           { label: 'Venue Name', value: viewVenue.name },
           { label: 'Capacity', value: viewVenue.capacity },
           { label: 'Status', value: viewVenue.status },
-          { label: 'Facilities', value: Array.isArray(viewVenue.facilities) ? viewVenue.facilities.map(f => f.name || f).join(', ') : viewVenue.facilities },
+          {
+            label: 'Facilities',
+            value: Array.isArray(viewVenue.facilities) && viewVenue.facilities.length > 0
+              ? (
+                <ul style={{ margin: 0, padding: 0, listStyle: 'none', display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                  {viewVenue.facilities.map((f, i) => {
+                    const fname   = typeof f === 'string' ? f : (f.name    || '');
+                    const fdetail = typeof f === 'string' ? '' : (f.details || '');
+                    return (
+                      <li key={i} style={{ display: 'flex', flexDirection: 'column', gap: '0.125rem' }}>
+                        <span style={{ fontWeight: 600, color: 'var(--text-primary)' }}>{fname}</span>
+                        {fdetail && (
+                          <span style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>{fdetail}</span>
+                        )}
+                      </li>
+                    );
+                  })}
+                </ul>
+              )
+              : '—',
+          },
         ] : []}
         onClose={() => setViewVenue(null)}
       />

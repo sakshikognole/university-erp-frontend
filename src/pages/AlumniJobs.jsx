@@ -388,7 +388,7 @@ const AlumniJobs = () => {
                     <th style={{ width: '120px' }}>Posted</th>
                     <th style={{ width: '120px' }}>Expiry</th>
                     <th style={{ width: '160px' }}>Application Link</th>
-                    <th style={{ width: '220px', textAlign: 'right' }}>Actions</th>
+                    <th style={{ width: '220px', textAlign: 'center' }}>Actions</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -436,8 +436,8 @@ const AlumniJobs = () => {
                           <span style={{ color: 'var(--text-secondary)', fontSize: '0.8125rem' }}>—</span>
                         )}
                       </td>
-                      <td style={{ textAlign: 'right' }}>
-                        <div className="action-buttons-cell" style={{ justifyContent: 'flex-end' }}>
+                      <td style={{ textAlign: 'center' }}>
+                        <div className="action-buttons-cell" style={{ justifyContent: 'center' }}>
                           <button
                             type="button"
                             className="action-btn view-btn"

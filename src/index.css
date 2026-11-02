@@ -1,4 +1,4 @@
-/* ==========================================
+﻿/* ==========================================
    CSS VARIABLES - WHITE THEME (Black & White)
    ========================================== */
 :root {
@@ -14227,3 +14227,1813 @@ input[type='password']::-webkit-inner-spin-button {
   }
 }
 
+/* ============================================================
+   UNIFIED MOBILE BUTTON ALIGNMENT FIX
+   Pages: Students, Staff, Departments, Venues, Transport,
+   Events, Event Notices, Alumni, Alumni Jobs, System
+   Announcements, Email Communication
+   ============================================================ */
+
+/* ── 1. PAGE HEADER: title + actions layout on mobile ───── */
+@media (max-width: 640px) {
+  .page-header-row {
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 0.625rem !important;
+  }
+
+  /* Direct dropdown wrapper in page-header-row (e.g. Super Admin Dashboard):
+     align button to the right and keep dropdown anchored correctly */
+  .page-header-row > .download-dropdown-wrapper {
+    display: flex !important;
+    justify-content: flex-end !important;
+    width: 100% !important;
+  }
+
+  .page-header-row > .download-dropdown-wrapper .download-dropdown-menu {
+    left: auto !important;
+    right: 0 !important;
+    z-index: 9999 !important;
+  }
+
+  /* All action groups: single nowrap row, right-aligned */
+  .header-actions-group,
+  .alumni-header-actions,
+  .alumni-jobs-header-actions {
+    display: flex !important;
+    flex-direction: row !important;
+    flex-wrap: nowrap !important;
+    justify-content: flex-end !important;
+    align-items: center !important;
+    gap: 0.375rem !important;
+    width: 100% !important;
+  }
+
+  /* Transport desktop 4-button group — hidden on mobile (overrides any display:flex above) */
+  .trn-header-desktop { display: none !important; }
+  /* Transport mobile dropdown — shown on mobile */
+  .trn-header-mobile  { display: flex !important; }
+
+  /* Every direct child: auto-size, no full-width stretch */
+  .header-actions-group > .btn,
+  .header-actions-group > .books-btn,
+  .header-actions-group > .download-dropdown-wrapper,
+  .alumni-header-actions > .btn,
+  .alumni-header-actions > .books-btn,
+  .alumni-header-actions > .download-dropdown-wrapper,
+  .alumni-jobs-header-actions > .btn,
+  .alumni-jobs-header-actions > .books-btn,
+  .alumni-jobs-header-actions > .download-dropdown-wrapper {
+    flex: 0 0 auto !important;
+    width: auto !important;
+    min-width: 0 !important;
+    white-space: nowrap !important;
+    justify-content: center !important;
+  }
+
+  /* Compact padding for all header buttons on mobile */
+  .header-actions-group > .btn,
+  .alumni-header-actions > .btn,
+  .alumni-jobs-header-actions > .btn {
+    padding-left: 0.5rem !important;
+    padding-right: 0.5rem !important;
+    font-size: 0.8125rem !important;
+    gap: 0.25rem !important;
+  }
+  .header-actions-group > .books-btn,
+  .alumni-header-actions > .books-btn,
+  .alumni-jobs-header-actions > .books-btn {
+    padding-left: 0.625rem !important;
+    padding-right: 0.625rem !important;
+    font-size: 0.8125rem !important;
+    gap: 0.25rem !important;
+  }
+
+  /* ── Unified height for all header buttons ── */
+  .students-page .header-actions-group > .btn,
+  .students-page .header-actions-group > .books-btn,
+  .students-page .header-actions-group > .download-dropdown-wrapper,
+  .students-page .header-actions-group .download-trigger-btn,
+  .venues-page .header-actions-group > .btn,
+  .venues-page .header-actions-group > .books-btn,
+  .venues-page .header-actions-group > .download-dropdown-wrapper,
+  .venues-page .header-actions-group .download-trigger-btn,
+  .alumni-page .header-actions-group > .btn,
+  .alumni-page .header-actions-group > .books-btn,
+  .alumni-page .header-actions-group > .download-dropdown-wrapper,
+  .alumni-page .header-actions-group .download-trigger-btn,
+  .alumni-jobs-page .header-actions-group > .btn,
+  .alumni-jobs-page .header-actions-group > .books-btn,
+  .alumni-jobs-page .header-actions-group > .download-dropdown-wrapper,
+  .alumni-jobs-page .header-actions-group .download-trigger-btn,
+  .staff-page .header-actions-group > .btn,
+  .staff-page .header-actions-group > .books-btn,
+  .staff-page .header-actions-group > .download-dropdown-wrapper,
+  .staff-page .header-actions-group .download-trigger-btn,
+  .departments-page .header-actions-group > .btn,
+  .departments-page .header-actions-group > .books-btn,
+  .departments-page .header-actions-group > .download-dropdown-wrapper,
+  .departments-page .header-actions-group .download-trigger-btn,
+  .events-page .header-actions-group > .btn,
+  .events-page .header-actions-group > .books-btn,
+  .events-page .header-actions-group > .download-dropdown-wrapper,
+  .events-page .header-actions-group .download-trigger-btn {
+    height: 2rem !important;
+    padding-top: 0 !important;
+    padding-bottom: 0 !important;
+    font-size: 0.8125rem !important;
+    gap: 0.25rem !important;
+    box-sizing: border-box !important;
+  }
+
+  /* Download wrapper — keep as flex container for the trigger button */
+  .students-page .header-actions-group > .download-dropdown-wrapper,
+  .venues-page   .header-actions-group > .download-dropdown-wrapper,
+  .alumni-page   .header-actions-group > .download-dropdown-wrapper,
+  .alumni-jobs-page .header-actions-group > .download-dropdown-wrapper {
+    display: flex !important;
+    align-items: center !important;
+    flex-direction: row !important;
+  }
+
+  /* Ensure page-header-row never overflows its container */
+  .students-page .page-header-row,
+  .venues-page   .page-header-row,
+  .alumni-page   .page-header-row,
+  .alumni-jobs-page .page-header-row {
+    width: 100% !important;
+    box-sizing: border-box !important;
+  }
+}
+
+/* ── 2. SEARCH BAR CONTROLS: full-width search + meta row ── */
+@media (max-width: 640px) {
+  /* Default: column layout — search full-width row 1,
+     stats badge right-aligned on row 2 (pages with no filter btn) */
+  .table-controls-bar {
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 0.5rem !important;
+  }
+
+  .table-controls-bar .search-box-wrapper {
+    width: 100% !important;
+    max-width: 100% !important;
+    flex: 1 1 100% !important;
+  }
+
+  /* Total count (no filter): right-aligned below search bar */
+  .table-controls-bar > .table-stats-badge {
+    align-self: flex-end !important;
+    flex: 0 0 auto !important;
+    margin-left: auto !important;
+  }
+
+  /* ══════════════════════════════════════════════════════
+     STUDENTS page — row layout:
+       Row 1: [search box full-width]
+       Row 2: [Filter btn ←]  [Total: N Students →]
+     Structure: .search-box-wrapper + .students-filter-btn
+                + .students-bar-right (holds clear-all + badge)
+     ══════════════════════════════════════════════════════ */
+  .students-page .table-controls-bar {
+    display: flex !important;
+    flex-direction: row !important;
+    flex-wrap: wrap !important;
+    align-items: center !important;
+    gap: 0.5rem !important;
+    padding: 0.75rem 0.875rem !important;
+  }
+
+  /* Row 1: search spans full width */
+  .students-page .table-controls-bar .search-box-wrapper {
+    flex: 1 1 100% !important;
+    width: 100% !important;
+    order: 1 !important;
+  }
+
+  /* Row 2 LEFT: Filter button */
+  .students-page .table-controls-bar > .students-filter-btn {
+    order: 2 !important;
+    flex: 0 0 auto !important;
+    width: auto !important;
+    margin-left: 0 !important;
+    align-self: center !important;
+  }
+
+  /* Row 2 RIGHT: students-bar-right (total count + clear-all) */
+  .students-page .students-bar-right {
+    order: 2 !important;
+    flex: 1 1 auto !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: flex-end !important;
+    gap: 0.375rem !important;
+    margin-left: auto !important;
+  }
+
+  /* ══════════════════════════════════════════════════════
+     ALUMNI page — row layout:
+       Row 1: [search box full-width]
+       Row 2: [Filter btn ←]  [Total: N Alumni →]
+     Structure: .search-box-wrapper + .students-filter-btn
+                + .table-stats-badge (direct child)
+     ══════════════════════════════════════════════════════ */
+  .alumni-page .table-controls-bar {
+    display: flex !important;
+    flex-direction: row !important;
+    flex-wrap: wrap !important;
+    align-items: center !important;
+    gap: 0.5rem !important;
+    padding: 0.75rem 0.875rem !important;
+  }
+
+  /* Row 1: search spans full width */
+  .alumni-page .table-controls-bar .search-box-wrapper {
+    flex: 1 1 100% !important;
+    width: 100% !important;
+    order: 1 !important;
+  }
+
+  /* Row 2 LEFT: Filter button */
+  .alumni-page .table-controls-bar > .students-filter-btn {
+    order: 2 !important;
+    flex: 0 0 auto !important;
+    width: auto !important;
+    margin-left: 0 !important;
+    align-self: center !important;
+  }
+
+  /* Row 2 RIGHT: total count badge */
+  .alumni-page .table-controls-bar > .table-stats-badge {
+    order: 2 !important;
+    flex: 1 1 auto !important;
+    display: flex !important;
+    justify-content: flex-end !important;
+    align-items: center !important;
+    margin-left: auto !important;
+    align-self: center !important;
+  }
+}
+
+/* ── 3–5. ALL PAGES: equal-width buttons, fill full row on mobile ─────────── */
+@media (max-width: 640px) {
+  /* Make the group fill the full available width */
+  .students-page   .header-actions-group,
+  .venues-page     .header-actions-group,
+  .alumni-page     .header-actions-group,
+  .alumni-jobs-page .header-actions-group,
+  .staff-page      .header-actions-group,
+  .departments-page .header-actions-group,
+  .events-page     .header-actions-group {
+    width: 100% !important;
+    flex-wrap: nowrap !important;
+    gap: 0.375rem !important;
+  }
+
+  /* ── 3-button pages (Download + Upload + Add): stretch equally across full row ── */
+  .students-page   .header-actions-group > .download-dropdown-wrapper,
+  .students-page   .header-actions-group > .btn:not(.download-trigger-btn),
+  .students-page   .header-actions-group > .books-btn,
+  .venues-page     .header-actions-group > .download-dropdown-wrapper,
+  .venues-page     .header-actions-group > .btn:not(.download-trigger-btn),
+  .venues-page     .header-actions-group > .books-btn,
+  .alumni-page     .header-actions-group > .download-dropdown-wrapper,
+  .alumni-page     .header-actions-group > .btn:not(.download-trigger-btn),
+  .alumni-page     .header-actions-group > .books-btn {
+    flex: 1 1 0 !important;
+    min-width: 0 !important;
+    box-sizing: border-box !important;
+    justify-content: center !important;
+  }
+
+  /* ── 2-button pages (Download + Add): right-aligned, natural width, not full-stretch ── */
+  .alumni-jobs-page .header-actions-group,
+  .staff-page       .header-actions-group,
+  .departments-page .header-actions-group,
+  .events-page      .header-actions-group {
+    justify-content: flex-end !important;
+  }
+
+  .alumni-jobs-page .header-actions-group > .download-dropdown-wrapper,
+  .alumni-jobs-page .header-actions-group > .btn:not(.download-trigger-btn),
+  .alumni-jobs-page .header-actions-group > .books-btn,
+  .staff-page       .header-actions-group > .download-dropdown-wrapper,
+  .staff-page       .header-actions-group > .btn:not(.download-trigger-btn),
+  .staff-page       .header-actions-group > .books-btn,
+  .departments-page .header-actions-group > .download-dropdown-wrapper,
+  .departments-page .header-actions-group > .btn:not(.download-trigger-btn),
+  .departments-page .header-actions-group > .books-btn,
+  .events-page      .header-actions-group > .download-dropdown-wrapper,
+  .events-page      .header-actions-group > .btn:not(.download-trigger-btn),
+  .events-page      .header-actions-group > .books-btn {
+    flex: 0 0 auto !important;
+    min-width: 0 !important;
+    box-sizing: border-box !important;
+    justify-content: center !important;
+    white-space: nowrap !important;
+  }
+
+  /* The trigger button inside the download wrapper fills its slot */
+  .students-page   .header-actions-group .download-trigger-btn,
+  .venues-page     .header-actions-group .download-trigger-btn,
+  .alumni-page     .header-actions-group .download-trigger-btn {
+    width: 100% !important;
+    justify-content: center !important;
+    min-width: 0 !important;
+  }
+
+  /* Download wrapper: flex so the trigger fills it, overflow VISIBLE for dropdown */
+  .students-page   .header-actions-group > .download-dropdown-wrapper,
+  .venues-page     .header-actions-group > .download-dropdown-wrapper,
+  .alumni-page     .header-actions-group > .download-dropdown-wrapper,
+  .alumni-jobs-page .header-actions-group > .download-dropdown-wrapper,
+  .staff-page       .header-actions-group > .download-dropdown-wrapper,
+  .departments-page .header-actions-group > .download-dropdown-wrapper,
+  .events-page      .header-actions-group > .download-dropdown-wrapper {
+    display: flex !important;
+    align-items: center !important;
+    overflow: visible !important;
+  }
+
+  /* Button order */
+  .students-page   .header-actions-group > .download-dropdown-wrapper,
+  .venues-page     .header-actions-group > .download-dropdown-wrapper,
+  .alumni-page     .header-actions-group > .download-dropdown-wrapper,
+  .alumni-jobs-page .header-actions-group > .download-dropdown-wrapper,
+  .staff-page       .header-actions-group > .download-dropdown-wrapper,
+  .departments-page .header-actions-group > .download-dropdown-wrapper,
+  .events-page      .header-actions-group > .download-dropdown-wrapper { order: 1 !important; }
+
+  .students-page   .header-actions-group > .btn:not(.download-trigger-btn),
+  .venues-page     .header-actions-group > .btn:not(.download-trigger-btn),
+  .alumni-page     .header-actions-group > .btn:not(.download-trigger-btn) { order: 2 !important; }
+
+  .students-page   .header-actions-group > .books-btn,
+  .venues-page     .header-actions-group > .books-btn,
+  .alumni-page     .header-actions-group > .books-btn { order: 3 !important; }
+
+  /* 2-button pages: Download order 1, Add order 2 (no gap) */
+  .alumni-jobs-page .header-actions-group > .books-btn,
+  .staff-page       .header-actions-group > .books-btn,
+  .departments-page .header-actions-group > .books-btn,
+  .events-page      .header-actions-group > .books-btn { order: 2 !important; }
+
+  /* page-header-row width lock */
+  .students-page   .page-header-row,
+  .venues-page     .page-header-row,
+  .alumni-page     .page-header-row,
+  .alumni-jobs-page .page-header-row,
+  .staff-page       .page-header-row,
+  .departments-page .page-header-row,
+  .events-page      .page-header-row {
+    width: 100% !important;
+    box-sizing: border-box !important;
+  }
+}
+
+/* ── 6. TRANSPORT header actions ───────────────────────────── */
+@media (max-width: 640px) {
+  .transport-header-actions {
+    flex-wrap: nowrap !important;
+    justify-content: flex-end !important;
+    gap: 0.375rem !important;
+  }
+  .transport-header-actions .btn,
+  .transport-header-actions .books-btn {
+    flex: 0 0 auto !important;
+    padding: 0 0.5rem !important;
+    font-size: 0.8125rem !important;
+    white-space: nowrap !important;
+  }
+}
+
+/* END UNIFIED MOBILE BUTTON ALIGNMENT FIX */
+
+/* ============================================================
+   ALUMNI FILTER PANEL STYLES
+   Mirror the Students filter panel design exactly.
+   The .alumni-filter-panel was missing styles entirely.
+   ============================================================ */
+
+.alumni-filter-panel {
+  padding: 1rem 1.25rem;
+  border-bottom: 1px solid var(--border-color);
+  background-color: var(--bg-secondary);
+  display: flex;
+  flex-direction: column;
+  gap: 0.875rem;
+}
+
+/* 2-column grid (Graduation Year | Company) */
+.alumni-filter-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.875rem;
+}
+
+@media (max-width: 560px) {
+  .alumni-filter-grid {
+    grid-template-columns: 1fr 1fr; /* keep side-by-side even on small screens */
+    gap: 0.625rem;
+  }
+}
+
+@media (max-width: 380px) {
+  .alumni-filter-grid {
+    grid-template-columns: 1fr; /* stack only on very tiny screens */
+  }
+}
+
+.alumni-filter-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+
+.alumni-filter-group label {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.alumni-filter-select {
+  padding: 0.4rem 0.625rem;
+  font-size: 0.875rem;
+  background-color: var(--bg-primary);
+  border: 1px solid var(--border-color);
+  border-radius: 0.375rem;
+  color: var(--text-primary);
+  outline: none;
+  cursor: pointer;
+  transition: border-color 0.2s ease;
+  max-width: 100%;
+  width: 100%;
+}
+
+.alumni-filter-select:focus {
+  border-color: var(--color-black);
+}
+
+/* ── Fix: override earlier conflicting Students filter-btn rules ──
+   Earlier rules at lines ~9659 and ~13553 set margin-left:auto on
+   .students-filter-btn, pushing it RIGHT. The unified fix needs it LEFT.
+   These scoped overrides win via higher specificity + later cascade.   */
+@media (max-width: 768px) {
+  .students-page .table-controls-bar > .students-filter-btn,
+  .alumni-page   .table-controls-bar > .students-filter-btn {
+    margin-left: 0 !important;
+    order: 2 !important;
+    flex: 0 0 auto !important;
+    width: auto !important;
+  }
+  /* Total count (students): right-aligned */
+  .students-page .students-bar-right {
+    justify-content: flex-end !important;
+    margin-left: auto !important;
+    order: 2 !important;
+  }
+  /* Total count (alumni): right-aligned */
+  .alumni-page .table-controls-bar > .table-stats-badge {
+    margin-left: auto !important;
+    order: 2 !important;
+    justify-content: flex-end !important;
+  }
+}
+
+/* ============================================================
+   FILTER ROW: SAME ROW + SAME HEIGHT — FINAL OVERRIDE
+   Students: filter and count were on different rows.
+   Alumni: filter and count were different heights.
+   Placed at file-end to win all earlier cascade conflicts.
+   ============================================================ */
+@media (max-width: 768px) {
+
+  /* ── STUDENTS ─────────────────────────────────────────────── */
+  .students-page .table-controls-bar {
+    display: flex !important;
+    flex-direction: row !important;
+    flex-wrap: wrap !important;
+    align-items: center !important;
+    gap: 0.5rem !important;
+    padding: 0.75rem 0.875rem !important;
+  }
+  /* Row 1: search full width */
+  .students-page .table-controls-bar > .search-box-wrapper {
+    flex: 1 1 100% !important;
+    width: 100% !important;
+    order: 1 !important;
+    max-width: 100% !important;
+  }
+  /* Row 2 LEFT: Filter button */
+  .students-page .table-controls-bar > .students-filter-btn {
+    order: 2 !important;
+    flex: 0 0 auto !important;
+    width: auto !important;
+    margin-left: 0 !important;
+    align-self: center !important;
+  }
+  /* Row 2 RIGHT: students-bar-right — MUST be flex: 0 0 auto
+     so it stays on the same row as the filter button          */
+  .students-page .students-bar-right {
+    order: 2 !important;
+    flex: 0 0 auto !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: flex-end !important;
+    gap: 0.375rem !important;
+    margin-left: auto !important;
+  }
+
+  /* ── ALUMNI ───────────────────────────────────────────────── */
+  .alumni-page .table-controls-bar {
+    display: flex !important;
+    flex-direction: row !important;
+    flex-wrap: wrap !important;
+    align-items: center !important;
+    gap: 0.5rem !important;
+    padding: 0.75rem 0.875rem !important;
+  }
+  .alumni-page .table-controls-bar > .search-box-wrapper {
+    flex: 1 1 100% !important;
+    width: 100% !important;
+    order: 1 !important;
+    max-width: 100% !important;
+  }
+  .alumni-page .table-controls-bar > .students-filter-btn {
+    order: 2 !important;
+    flex: 0 0 auto !important;
+    width: auto !important;
+    margin-left: 0 !important;
+    align-self: center !important;
+  }
+  .alumni-page .table-controls-bar > .table-stats-badge {
+    order: 2 !important;
+    flex: 0 0 auto !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: flex-end !important;
+    margin-left: auto !important;
+  }
+
+  /* ── SAME HEIGHT: filter button = stats badge ─────────────── */
+  .students-page .table-controls-bar > .students-filter-btn,
+  .alumni-page   .table-controls-bar > .students-filter-btn {
+    height: 2.125rem !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    padding-top: 0 !important;
+    padding-bottom: 0 !important;
+  }
+
+  .students-page .students-bar-right > .table-stats-badge,
+  .alumni-page   .table-controls-bar > .table-stats-badge {
+    height: 2.125rem !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    padding: 0 0.625rem !important;
+    border: 1px solid var(--border-color, #e5e7eb) !important;
+    border-radius: 0.375rem !important;
+    background: var(--bg-secondary, #f9fafb) !important;
+    font-size: 0.8125rem !important;
+    white-space: nowrap !important;
+    box-sizing: border-box !important;
+  }
+}
+
+
+
+/* ============================================================
+   FILTER-COUNT-ROW
+   Puts Filter button and Total count on ONE row, 50/50 width.
+   Used in Students and Alumni pages.
+   ============================================================ */
+
+/* Wrapper: one flex row, gap between the two halves */
+.filter-count-row {
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: stretch !important;
+  width: 100% !important;
+  gap: 0.5rem !important;        /* breathing space between Filter and Total */
+}
+
+/* LEFT HALF — Filter button
+   order:1 ensures it is ALWAYS left even if old CSS sets a different order */
+.filter-count-row > .students-filter-btn {
+  order: 1 !important;
+  flex: 1 1 0 !important;        /* equal share */
+  min-width: 0 !important;
+  justify-content: center !important;
+  border-radius: 0.375rem !important;   /* full independent radius */
+  height: 2.25rem !important;
+  white-space: nowrap !important;
+  /* reset any margin-left:auto from old rules */
+  margin-left: 0 !important;
+  margin-right: 0 !important;
+  align-self: center !important;
+}
+
+/* RIGHT HALF — stats badge direct child (Alumni page) */
+.filter-count-row > .table-stats-badge {
+  order: 2 !important;
+  flex: 1 1 0 !important;        /* equal share */
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  height: 2.25rem !important;
+  padding: 0 0.75rem !important;
+  border: 1px solid var(--border-color, #e5e7eb) !important;
+  border-radius: 0.375rem !important;   /* full independent radius */
+  background: var(--bg-secondary, #f9fafb) !important;
+  font-size: 0.8125rem !important;
+  font-weight: 500 !important;
+  color: var(--text-secondary, #6b7280) !important;
+  white-space: nowrap !important;
+  box-sizing: border-box !important;
+  /* reset any old margin/order pushing */
+  margin-left: 0 !important;
+  align-self: center !important;
+}
+
+/* RIGHT HALF — students-bar-right wrapper (Students page)
+   Hide any inner .table-stats-badge label that old CSS was double-rendering */
+.filter-count-row > .students-bar-right {
+  order: 2 !important;
+  flex: 1 1 0 !important;        /* equal share */
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 0.375rem !important;
+  height: 2.25rem !important;
+  padding: 0 0.75rem !important;
+  border: 1px solid var(--border-color, #e5e7eb) !important;
+  border-radius: 0.375rem !important;   /* full independent radius */
+  background: var(--bg-secondary, #f9fafb) !important;
+  font-size: 0.8125rem !important;
+  white-space: nowrap !important;
+  box-sizing: border-box !important;
+  margin-left: 0 !important;
+  align-self: center !important;
+}
+
+/* Suppress the old duplicate .table-stats-badge that was a direct sibling
+   of .students-filter-btn before the filter-count-row wrapper was added.
+   If any stray badge exists outside filter-count-row in students-page, hide it. */
+.students-page .table-controls-bar > .table-stats-badge {
+  display: none !important;
+}
+
+/* ── filter-count-row layout ──────────────────────────────────────────────
+   Desktop (> 640px): sits INLINE with the search box on the same row.
+     Search box takes flex:1 (grows), filter+count cluster is flex:0 auto.
+   Mobile (≤ 640px): wraps to its own full-width row below the search box.
+   ──────────────────────────────────────────────────────────────────────── */
+
+/* Desktop default: inline, auto-sized, stays on same row as search */
+.table-controls-bar > .filter-count-row {
+  flex: 0 0 auto !important;
+  width: auto !important;
+  order: 2 !important;
+  /* Let children (filter btn + count) auto-size instead of 50/50 split */
+}
+
+/* Override the 50/50 equal-width on desktop — children should be compact */
+@media (min-width: 641px) {
+  .filter-count-row > .students-filter-btn,
+  .filter-count-row > .table-stats-badge,
+  .filter-count-row > .students-bar-right {
+    flex: 0 0 auto !important;
+    width: auto !important;
+    min-width: 90px !important;   /* ensure they don't collapse too small */
+  }
+}
+
+/* Mobile only: force filter-count-row below the search on its own full-width row */
+@media (max-width: 640px) {
+  .table-controls-bar > .filter-count-row {
+    flex: 1 1 100% !important;
+    width: 100% !important;
+  }
+  /* Restore 50/50 equal split on mobile */
+  .filter-count-row > .students-filter-btn,
+  .filter-count-row > .table-stats-badge,
+  .filter-count-row > .students-bar-right {
+    flex: 1 1 0 !important;
+    width: auto !important;
+  }
+}
+
+/* ── Students: remove the inner "box inside a box" on the total count ──
+   .students-bar-right is already the styled outer container with border +
+   background. The .table-stats-badge nested inside it must NOT add its own
+   border, background, padding or height — it should just be plain text.   */
+.filter-count-row > .students-bar-right > .table-stats-badge {
+  /* No border/bg — outer students-bar-right is already the styled box */
+  border: none !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  border-radius: 0 !important;
+  /* Fill the full flex-parent so justify-content/align-items center the text */
+  display: flex !important;
+  width: 100% !important;
+  height: 100% !important;
+  align-items: center !important;
+  justify-content: center !important;
+  text-align: center !important;
+  /* Reset padding/margin so we don't create extra space */
+  padding: 0 !important;
+  margin: 0 !important;
+  /* Inherit typography from parent */
+  font-size: inherit !important;
+  font-weight: inherit !important;
+  color: inherit !important;
+  white-space: nowrap !important;
+  box-sizing: border-box !important;
+}
+
+
+
+
+
+/* ============================================================
+   EXAM MARKS PAGE — Mobile responsive styles
+   Scoped to .exam-marks-toolbar so other pages are NOT affected.
+   ============================================================ */
+
+@media (max-width: 640px) {
+  /* Toolbar row: keep Upload + Download + Add Row in ONE horizontal row */
+  .exam-marks-toolbar {
+    flex-direction: row !important;
+    align-items: center !important;
+    justify-content: flex-end !important;
+    flex-wrap: nowrap !important;
+    gap: 0.4rem !important;
+  }
+
+  /* Hide the empty left placeholder div inside the toolbar */
+  .exam-marks-toolbar > div:first-child {
+    display: none !important;
+  }
+
+  /* Actions group: single row, full width, equal space */
+  .exam-marks-toolbar .header-actions-group {
+    display: flex !important;
+    flex-direction: row !important;
+    flex-wrap: nowrap !important;
+    gap: 0.4rem !important;
+    width: 100% !important;
+    align-items: center !important;
+  }
+
+  /* Each dropdown wrapper + Add Row button: equal 1/3 width */
+  .exam-marks-toolbar .header-actions-group > .download-dropdown-wrapper,
+  .exam-marks-toolbar .header-actions-group > .books-btn {
+    flex: 1 1 0 !important;
+    min-width: 0 !important;
+  }
+
+  /* Trigger/action buttons fill their wrapper */
+  .exam-marks-toolbar .header-actions-group .download-trigger-btn,
+  .exam-marks-toolbar .header-actions-group > .books-btn {
+    width: 100% !important;
+    justify-content: center !important;
+    padding-left: 0.4rem !important;
+    padding-right: 0.4rem !important;
+    font-size: 0.78rem !important;
+    white-space: nowrap !important;
+  }
+
+  /* Hide ChevronDown chevrons inside toolbar buttons to save space */
+  .exam-marks-toolbar .header-actions-group .download-trigger-btn svg:last-child {
+    display: none !important;
+  }
+
+  /* Marks table: horizontal scroll so inputs don't shrink unusably */
+  .page-container .books-table-wrap {
+    overflow-x: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+  }
+
+  /* Compact inputs inside the table */
+  .page-container .books-table td input.books-form-control {
+    min-width: 60px !important;
+    font-size: 0.78rem !important;
+    padding: 3px 5px !important;
+  }
+
+  /* Smaller table font / padding on mobile */
+  .page-container .books-table {
+    font-size: 0.78rem !important;
+    white-space: nowrap !important;
+  }
+
+  .page-container .books-table th,
+  .page-container .books-table td {
+    padding: 6px 7px !important;
+  }
+}
+
+/* ============================================================
+   EVENT NOTICES BOARD — Inline View-Only Detail Modal (enb-*)
+   ============================================================ */
+
+/* Full-screen overlay */
+.enb-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.55);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  z-index: 1200;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  animation: fadeInDown 0.15s ease-out;
+}
+
+/* Modal card */
+.enb-modal-card {
+  background: var(--surface-primary, #fff);
+  border-radius: 14px;
+  width: 100%;
+  max-width: 680px;
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
+  box-shadow:
+    0 4px 6px -1px rgba(0,0,0,0.08),
+    0 24px 48px -8px rgba(0,0,0,0.22);
+  overflow: hidden;
+}
+
+/* Header */
+.enb-modal-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1.125rem 1.5rem;
+  border-bottom: 1px solid var(--border-color, #e5e7eb);
+  flex-shrink: 0;
+}
+.enb-modal-title {
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: var(--text-primary, #111827);
+  margin: 0 0 0.2rem;
+}
+.enb-modal-subtitle {
+  font-size: 0.8125rem;
+  color: var(--text-secondary, #6b7280);
+  margin: 0;
+}
+.enb-modal-close {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+  border: none;
+  border-radius: 50%;
+  background: var(--bg-secondary, #f3f4f6);
+  color: var(--text-secondary, #6b7280);
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: background 0.15s, color 0.15s;
+}
+.enb-modal-close:hover {
+  background: #fee2e2;
+  color: #dc2626;
+}
+
+/* Scrollable body */
+.enb-modal-body {
+  flex: 1;
+  overflow-y: auto;
+  padding: 1.25rem 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+/* Event image */
+.enb-modal-image {
+  width: 100%;
+  max-height: 280px;
+  object-fit: cover;
+  border-radius: 8px;
+  border: 1px solid var(--border-color, #e5e7eb);
+  display: block;
+}
+
+/* Badges row */
+.enb-modal-badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+/* Event title inside modal */
+.enb-modal-event-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--text-primary, #111827);
+  margin: 0;
+  line-height: 1.3;
+}
+
+/* Description */
+.enb-modal-desc {
+  font-size: 0.9375rem;
+  color: var(--text-secondary, #6b7280);
+  line-height: 1.65;
+  margin: 0;
+}
+
+/* 2-column detail cards grid */
+.enb-detail-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 1rem;
+}
+
+/* Registration / Tags extra section */
+.enb-extra-section {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 1rem;
+  padding: 1rem 1.25rem;
+  background: var(--bg-secondary, #f9fafb);
+  border: 1px solid var(--border-color, #e5e7eb);
+  border-radius: 8px;
+}
+
+/* Published note */
+.enb-published-note {
+  font-size: 0.8125rem;
+  color: var(--text-secondary, #6b7280);
+  padding: 0.75rem 1rem;
+  background: var(--bg-secondary, #f9fafb);
+  border-radius: 6px;
+  border: 1px solid var(--border-color, #e5e7eb);
+}
+
+/* Footer — close button only */
+.enb-modal-footer {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.75rem;
+  padding: 0.875rem 1.5rem;
+  border-top: 1px solid var(--border-color, #e5e7eb);
+  flex-shrink: 0;
+}
+
+/* ── Mobile overrides ── */
+@media (max-width: 640px) {
+  .enb-modal-overlay {
+    padding: 0.75rem;
+    align-items: center;   /* centered on mobile */
+  }
+  .enb-modal-card {
+    max-width: 100%;
+    max-height: 92vh;
+    border-radius: 14px;  /* centered card */
+  }
+  .enb-modal-header {
+    padding: 1rem 1.125rem;
+  }
+  .enb-modal-body {
+    padding: 1rem 1.125rem;
+    gap: 1rem;
+  }
+  .enb-modal-image {
+    max-height: 180px;
+  }
+  .enb-modal-event-title {
+    font-size: 1.2rem;
+  }
+  .enb-detail-grid {
+    grid-template-columns: 1fr;  /* single column on mobile */
+    gap: 0.75rem;
+  }
+  .enb-extra-section {
+    grid-template-columns: 1fr;
+    gap: 0.75rem;
+  }
+  .enb-modal-footer {
+    padding: 0.75rem 1.125rem;
+  }
+}
+
+/* ============================================================
+   EVENT NOTICE FORM MODAL  (enf-*)
+   Multi-step card centered on desktop, bottom-sheet on mobile
+   ============================================================ */
+
+/* Overlay */
+.enf-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.52);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  z-index: 1200;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  animation: fadeInDown 0.15s ease-out;
+}
+
+/* Card */
+.enf-card {
+  background: var(--surface-primary, #fff);
+  border-radius: 16px;
+  width: 100%;
+  max-width: 660px;
+  max-height: 92vh;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 4px 6px -1px rgba(0,0,0,0.07), 0 28px 56px -8px rgba(0,0,0,0.22);
+  overflow: hidden;
+}
+
+/* Header */
+.enf-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1.125rem 1.5rem;
+  border-bottom: 1px solid var(--border-color, #e5e7eb);
+  flex-shrink: 0;
+}
+.enf-title {
+  font-size: 1.0625rem;
+  font-weight: 700;
+  color: var(--text-primary, #111827);
+  margin: 0 0 0.2rem;
+}
+.enf-subtitle {
+  font-size: 0.8125rem;
+  color: var(--text-secondary, #6b7280);
+  margin: 0;
+}
+.enf-close-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+  border: none;
+  border-radius: 50%;
+  background: var(--bg-secondary, #f3f4f6);
+  color: var(--text-secondary, #6b7280);
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: background 0.15s, color 0.15s;
+}
+.enf-close-btn:hover { background: #fee2e2; color: #dc2626; }
+
+/* Step indicator strip */
+.enf-steps-wrap {
+  padding: 1rem 1.5rem 0.75rem;
+  border-bottom: 1px solid var(--border-color, #e5e7eb);
+  flex-shrink: 0;
+}
+.enf-steps {
+  display: flex;
+  align-items: center;
+  gap: 0;
+}
+.enf-step-dot {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.3rem;
+  flex-shrink: 0;
+  cursor: default;
+}
+.enf-step-dot > span,
+.enf-step-dot > svg {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.8125rem;
+  font-weight: 700;
+  transition: background 0.2s, color 0.2s, border-color 0.2s;
+  border: 2px solid var(--border-color, #d1d5db);
+  background: var(--bg-secondary, #f9fafb);
+  color: var(--text-secondary, #9ca3af);
+}
+.enf-step-active > span,
+.enf-step-active > svg {
+  border-color: var(--primary, #6366f1);
+  background: var(--primary, #6366f1);
+  color: #fff;
+  box-shadow: 0 0 0 3px rgba(99,102,241,0.15);
+}
+.enf-step-done > span,
+.enf-step-done > svg {
+  border-color: #16a34a;
+  background: #16a34a;
+  color: #fff;
+}
+.enf-step-label {
+  font-size: 0.7rem;
+  font-weight: 600;
+  white-space: nowrap;
+  color: var(--text-secondary, #9ca3af);
+}
+.enf-step-active .enf-step-label { color: var(--primary, #6366f1); }
+.enf-step-done  .enf-step-label  { color: #16a34a; }
+
+.enf-step-line {
+  flex: 1;
+  height: 2px;
+  background: var(--border-color, #e5e7eb);
+  margin-bottom: 1.2rem; /* align with dot center */
+  transition: background 0.2s;
+}
+.enf-step-line-done { background: #16a34a; }
+
+/* Feedback banner */
+.enf-feedback {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.6rem 1.5rem;
+  font-size: 0.8625rem;
+  flex-shrink: 0;
+}
+.enf-feedback-success { background: #f0fdf4; color: #15803d; border-bottom: 1px solid #bbf7d0; }
+.enf-feedback-error   { background: #fef2f2; color: #dc2626; border-bottom: 1px solid #fecaca; }
+.enf-feedback > span { flex: 1; }
+.enf-feedback-close {
+  display: flex; align-items: center; justify-content: center;
+  width: 1.5rem; height: 1.5rem;
+  border: none; border-radius: 50%;
+  background: transparent; cursor: pointer; color: inherit; padding: 0;
+  flex-shrink: 0;
+}
+
+/* Scrollable body */
+.enf-body {
+  flex: 1;
+  overflow-y: auto;
+  padding: 1.25rem 1.5rem;
+}
+
+/* Loading state */
+.enf-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  padding: 3rem 0;
+  color: var(--text-secondary, #6b7280);
+}
+
+/* Step body */
+.enf-step-body {
+  display: flex;
+  flex-direction: column;
+  gap: 1.125rem;
+}
+
+/* Form primitives */
+.enf-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+.enf-label {
+  font-size: 0.84375rem;
+  font-weight: 600;
+  color: var(--text-primary, #374151);
+}
+.enf-required { color: #ef4444; margin-left: 2px; }
+.enf-optional { font-weight: 400; color: var(--text-secondary, #9ca3af); font-size: 0.8rem; }
+.enf-hint {
+  font-size: 0.78rem;
+  color: var(--text-secondary, #9ca3af);
+  margin-top: 2px;
+}
+.enf-input {
+  width: 100%;
+  padding: 0.5625rem 0.75rem;
+  border: 1px solid var(--border-color, #d1d5db);
+  border-radius: 8px;
+  font-size: 0.9rem;
+  color: var(--text-primary, #111827);
+  background: var(--bg-primary, #fff);
+  transition: border-color 0.15s, box-shadow 0.15s;
+  box-sizing: border-box;
+}
+.enf-input:focus {
+  outline: none;
+  border-color: var(--primary, #6366f1);
+  box-shadow: 0 0 0 3px rgba(99,102,241,0.12);
+}
+.enf-input-error { border-color: #ef4444 !important; }
+.enf-input-error:focus { box-shadow: 0 0 0 3px rgba(239,68,68,0.12) !important; }
+.enf-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+.enf-field-error {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.78rem;
+  color: #dc2626;
+  margin: 2px 0 0;
+}
+
+/* Image upload */
+.enf-upload-area {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+.enf-category-cover {
+  position: relative;
+  border-radius: 8px;
+  overflow: hidden;
+  height: 140px;
+  border: 1px solid var(--border-color, #e5e7eb);
+}
+.enf-category-img {
+  width: 100%; height: 100%; object-fit: cover;
+}
+.enf-category-label {
+  position: absolute; bottom: 0.4rem; left: 0.5rem;
+  background: rgba(0,0,0,0.72); color: #fff;
+  padding: 0.2rem 0.5rem; border-radius: 4px;
+  font-size: 0.75rem; font-weight: 500;
+}
+.enf-drop-zone {
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  gap: 0.35rem;
+  padding: 1.25rem;
+  border: 2px dashed var(--border-color, #d1d5db);
+  border-radius: 8px;
+  cursor: pointer;
+  background: var(--bg-secondary, #f9fafb);
+  color: var(--text-secondary, #6b7280);
+  font-size: 0.875rem;
+  transition: border-color 0.15s, background 0.15s;
+  text-align: center;
+}
+.enf-drop-zone:hover {
+  border-color: var(--primary, #6366f1);
+  background: var(--bg-tertiary, #f5f3ff);
+}
+.enf-drop-zone small { font-size: 0.75rem; }
+.enf-file-preview {
+  display: flex; align-items: center; gap: 0.75rem;
+  padding: 0.75rem 1rem;
+  border: 1px solid var(--border-color, #e5e7eb);
+  border-radius: 8px;
+  background: var(--bg-secondary, #f9fafb);
+}
+.enf-file-icon { color: var(--primary, #6366f1); flex-shrink: 0; }
+.enf-file-info { flex: 1; min-width: 0; }
+.enf-file-name { font-size: 0.875rem; color: var(--text-primary); word-break: break-all; display: block; }
+.enf-file-size { font-size: 0.75rem; color: var(--text-secondary); }
+.enf-remove-btn {
+  display: flex; align-items: center; justify-content: center;
+  width: 30px; height: 30px;
+  border: none; border-radius: 50%;
+  background: rgba(239,68,68,0.1); color: #ef4444;
+  cursor: pointer; flex-shrink: 0;
+}
+.enf-img-preview-wrap { position: relative; display: inline-block; }
+.enf-img-preview {
+  max-width: 100%; max-height: 200px;
+  border-radius: 8px; border: 1px solid var(--border-color);
+  object-fit: cover; display: block;
+}
+.enf-remove-img-btn {
+  position: absolute; top: 8px; right: 8px;
+  width: 30px; height: 30px;
+  display: flex; align-items: center; justify-content: center;
+  background: rgba(0,0,0,0.6); color: #fff;
+  border: none; border-radius: 50%; cursor: pointer;
+}
+
+/* Footer */
+.enf-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 0.875rem 1.5rem;
+  border-top: 1px solid var(--border-color, #e5e7eb);
+  flex-shrink: 0;
+}
+.enf-footer-right {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+.enf-dot-progress {
+  display: none; /* visible only on mobile */
+  gap: 5px;
+}
+.enf-dot {
+  display: inline-block;
+  width: 7px; height: 7px;
+  border-radius: 50%;
+  background: var(--border-color, #d1d5db);
+  transition: background 0.2s, transform 0.2s;
+}
+.enf-dot-active  { background: var(--primary, #6366f1); transform: scale(1.3); }
+.enf-dot-done    { background: #16a34a; }
+
+/* Buttons */
+.enf-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  padding: 0.5rem 1.125rem;
+  border-radius: 8px;
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  border: none;
+  transition: background 0.15s, color 0.15s, opacity 0.15s;
+  white-space: nowrap;
+}
+.enf-btn:disabled { opacity: 0.55; cursor: not-allowed; }
+.enf-btn-primary {
+  background: var(--primary, #6366f1);
+  color: #fff;
+}
+.enf-btn-primary:hover:not(:disabled) { background: var(--primary-dark, #4f46e5); }
+.enf-btn-ghost {
+  background: var(--bg-secondary, #f3f4f6);
+  color: var(--text-primary, #374151);
+  border: 1px solid var(--border-color, #d1d5db);
+}
+.enf-btn-ghost:hover:not(:disabled) { background: var(--bg-tertiary, #e5e7eb); }
+
+/* ── Mobile overrides (≤ 600px) ── */
+@media (max-width: 600px) {
+  .enf-overlay {
+    padding: 0.75rem;
+    align-items: center;
+  }
+  .enf-card {
+    max-width: 100%;
+    max-height: 96vh;
+    border-radius: 16px;
+  }
+  .enf-header { padding: 0.875rem 1rem; }
+  .enf-steps-wrap { padding: 0.75rem 1rem 0.5rem; }
+  .enf-step-label { display: none; } /* hide labels on mobile — dots show progress */
+  .enf-step-dot > span,
+  .enf-step-dot > svg { width: 24px; height: 24px; font-size: 0.75rem; }
+  .enf-body { padding: 1rem; }
+  .enf-row { grid-template-columns: 1fr; gap: 0.75rem; }
+  .enf-footer { padding: 0.75rem 1rem; }
+  .enf-dot-progress { display: flex; }
+  .enf-steps-wrap { display: none; } /* replaced by dot progress in footer */
+  .enf-category-cover { height: 110px; }
+}
+
+/* ── Search box: fill available space on desktop when sharing row ── */
+@media (min-width: 641px) {
+  .table-controls-bar .search-box-wrapper {
+    max-width: none !important;   /* grow to fill all space left by filter+count */
+    flex: 1 1 0 !important;
+    min-width: 160px !important;
+  }
+}
+
+/* ===== Read-only ID field styling ===== */
+.sf-input-readonly {
+  background-color: var(--bg-secondary, #f3f4f6) !important;
+  cursor: not-allowed !important;
+  opacity: 0.75 !important;
+  color: var(--text-secondary, #6b7280) !important;
+}
+.sf-field-hint {
+  display: block;
+  font-size: 0.75rem;
+  color: var(--text-secondary, #9ca3af);
+  margin-top: 0.25rem;
+  font-style: italic;
+}
+
+/* ===== Event Notice View Modal (env-*) ===== */
+.env-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.55);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  z-index: 1100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  animation: modalOverlayFade 0.2s ease-out;
+}
+.env-modal {
+  position: relative;
+  background: var(--bg-primary, #fff);
+  border-radius: 14px;
+  width: 100%;
+  max-width: 580px;
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 4px 6px -1px rgba(0,0,0,0.07), 0 20px 48px -8px rgba(0,0,0,0.22);
+  animation: modalPop 0.2s cubic-bezier(0.16,1,0.3,1);
+  overflow: hidden;
+}
+.env-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 1.125rem 1.5rem;
+  border-bottom: 1px solid var(--border-color, #e5e7eb);
+  flex-shrink: 0;
+}
+.env-title {
+  font-size: 1.0625rem;
+  font-weight: 700;
+  color: var(--text-primary, #111827);
+  margin: 0 0 0.15rem;
+}
+.env-subtitle {
+  font-size: 0.8125rem;
+  color: var(--text-secondary, #6b7280);
+  margin: 0;
+}
+.env-body {
+  flex: 1;
+  overflow-y: auto;
+  padding: 1.25rem 1.5rem;
+}
+.env-footer {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.75rem;
+  padding: 0.875rem 1.5rem;
+  border-top: 1px solid var(--border-color, #e5e7eb);
+  flex-shrink: 0;
+}
+.env-image {
+  width: 100%;
+  max-height: 220px;
+  object-fit: cover;
+  border-radius: 10px;
+  border: 1px solid var(--border-color, #e5e7eb);
+  margin-bottom: 1rem;
+  display: block;
+}
+.env-badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 0.75rem;
+}
+.env-badge {
+  display: inline-block;
+  padding: 3px 10px;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+.env-badge-status { background: #d1fae5; color: #065f46; }
+.env-badge-cat    { background: #e0e7ff; color: #3730a3; }
+.env-event-title {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--text-primary, #111827);
+  margin: 0 0 0.4rem;
+  line-height: 1.3;
+}
+.env-short-desc {
+  font-size: 0.9375rem;
+  color: var(--text-secondary, #6b7280);
+  margin: 0 0 1rem;
+  line-height: 1.5;
+}
+.env-divider {
+  border: none;
+  border-top: 1px solid var(--border-color, #e5e7eb);
+  margin: 0.75rem 0 1rem;
+}
+.env-details-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  margin-bottom: 1rem;
+}
+.env-detail-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+  font-size: 0.875rem;
+}
+.env-icon { color: var(--text-secondary, #6b7280); flex-shrink: 0; margin-top: 2px; }
+.env-detail-label {
+  font-weight: 600;
+  color: var(--text-secondary, #6b7280);
+  min-width: 80px;
+  flex-shrink: 0;
+}
+.env-detail-val { color: var(--text-primary, #111827); }
+.env-section { margin-bottom: 1rem; }
+.env-section-label {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--text-secondary, #6b7280);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 0.4rem;
+}
+.env-desc-box {
+  padding: 0.875rem 1rem;
+  border-radius: 8px;
+  background: var(--bg-secondary, #f9fafb);
+  border: 1px solid var(--border-color, #e5e7eb);
+  font-size: 0.9rem;
+  color: var(--text-primary, #111827);
+  line-height: 1.7;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+/* Mobile — keep centered, just tighten padding */
+@media (max-width: 640px) {
+  .env-overlay { padding: 0.75rem; }
+  .env-modal   { max-height: 94vh; border-radius: 14px; }
+  .env-header  { padding: 0.875rem 1rem; }
+  .env-body    { padding: 1rem; }
+  .env-footer  { padding: 0.75rem 1rem; }
+}
+
+/* EventNoticeView page route — overlay breaks out of the dashboard layout
+   so the card is always centred over the full viewport (including sidebar) */
+.env-page-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1200;
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+}
+.env-page-modal {
+  width: 100%;
+  max-width: 600px;
+  max-height: 92vh;
+}
+@media (max-width: 640px) {
+  .env-page-overlay { padding: 0.5rem; align-items: center; }
+  .env-page-modal   { max-height: 96vh; border-radius: 14px; width: 100%; }
+}
+
+/* ================================================================
+   ATTENDANCE HISTORY PAGE  (att-hist-*)
+   ================================================================ */
+
+.att-history-summary {
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  margin-bottom: 1.25rem;
+}
+
+.att-hist-chip {
+  display: flex;
+  align-items: center;
+  gap: 0.625rem;
+  padding: 0.75rem 1.125rem;
+  border-radius: 0.5rem;
+  border: 1px solid var(--border-color);
+  background: var(--bg-primary);
+  flex: 1 1 130px;
+  min-width: 0;
+}
+.att-hist-chip--total    { border-left: 3px solid #6366f1; }
+.att-hist-chip--students { border-left: 3px solid #0ea5e9; }
+.att-hist-chip--present  { border-left: 3px solid #22c55e; }
+.att-hist-chip--absent   { border-left: 3px solid #ef4444; }
+
+.att-hist-chip-val {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  line-height: 1.2;
+}
+.att-hist-chip-lbl {
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+  font-weight: 500;
+}
+
+/* Filters bar */
+.att-hist-filters {
+  display: flex;
+  align-items: center;
+  gap: 0.625rem;
+  flex-wrap: wrap;
+  padding: 0.875rem 1rem;
+  margin-bottom: 1.25rem;
+}
+
+.att-hist-select {
+  padding: 0.4rem 0.75rem;
+  border: 1px solid var(--border-color);
+  border-radius: 0.375rem;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  font-size: 0.8125rem;
+  font-family: inherit;
+  cursor: pointer;
+  min-width: 130px;
+  flex: 1 1 130px;
+}
+.att-hist-select:focus { outline: none; border-color: var(--color-black); }
+
+.att-hist-clear-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.4rem 0.75rem;
+  border: 1px solid var(--border-color);
+  border-radius: 0.375rem;
+  background: var(--bg-secondary);
+  color: var(--text-secondary);
+  font-size: 0.8125rem;
+  font-weight: 500;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.15s;
+}
+.att-hist-clear-btn:hover { border-color: #ef4444; color: #ef4444; background: #fef2f2; }
+
+/* Records list */
+.att-hist-list { display: flex; flex-direction: column; gap: 0.625rem; }
+
+.att-hist-card {
+  background: var(--bg-primary);
+  border: 1px solid var(--border-color);
+  border-radius: 0.5rem;
+  overflow: hidden;
+  transition: box-shadow 0.15s ease;
+}
+.att-hist-card--open { box-shadow: 0 4px 12px rgba(0,0,0,0.08); border-color: #d1d5db; }
+
+/* Card header */
+.att-hist-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: 0.875rem 1rem;
+  background: none;
+  border: none;
+  cursor: pointer;
+  text-align: left;
+  gap: 1rem;
+}
+.att-hist-card-header:hover { background: var(--bg-secondary); }
+
+.att-hist-meta { display: flex; flex-direction: column; gap: 0.3rem; min-width: 0; flex: 1; }
+.att-hist-meta-row { display: flex; align-items: center; gap: 0.35rem; flex-wrap: wrap; }
+.att-hist-subject {
+  font-size: 0.9375rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.att-hist-meta-secondary { font-size: 0.8rem; color: var(--text-secondary); }
+.att-hist-dot { color: var(--border-color); }
+.att-hist-icon { color: var(--text-secondary); flex-shrink: 0; }
+
+.att-hist-counts { display: flex; align-items: center; gap: 0.75rem; flex-shrink: 0; }
+.att-hist-count-group { display: flex; flex-direction: column; align-items: flex-end; }
+.att-hist-pct { font-size: 1.125rem; font-weight: 800; color: var(--text-primary); line-height: 1.1; }
+.att-hist-pct-lbl { font-size: 0.6875rem; color: var(--text-secondary); font-weight: 500; }
+.att-hist-badges { display: flex; gap: 0.3rem; }
+
+.att-hist-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.2rem 0.5rem;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  white-space: nowrap;
+}
+.att-hist-badge--present { background: #f0fdf4; color: #15803d; border: 1px solid #bbf7d0; }
+.att-hist-badge--absent  { background: #fef2f2; color: #b91c1c; border: 1px solid #fecaca; }
+.att-hist-badge--total   { background: #eff6ff; color: #1d4ed8; border: 1px solid #bfdbfe; }
+.att-hist-chevron { color: var(--text-secondary); flex-shrink: 0; }
+
+/* Progress bar */
+.att-hist-progress-bar  { height: 3px; background: #f3f4f6; width: 100%; }
+.att-hist-progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #22c55e, #16a34a);
+  border-radius: 0 2px 2px 0;
+  transition: width 0.4s ease;
+}
+
+/* Detail section */
+.att-hist-detail {
+  border-top: 1px solid var(--border-color);
+  padding: 1rem;
+  background: var(--bg-secondary);
+}
+.att-hist-detail-tiles {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 0.625rem;
+  margin-bottom: 1rem;
+}
+.att-hist-detail-tile {
+  background: var(--bg-primary);
+  border: 1px solid var(--border-color);
+  border-radius: 0.375rem;
+  padding: 0.625rem 0.75rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+.att-hist-detail-label {
+  font-size: 0.6875rem;
+  font-weight: 700;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+.att-hist-detail-val { font-size: 0.875rem; font-weight: 600; color: var(--text-primary); word-break: break-word; }
+
+.att-hist-student-table {
+  background: var(--bg-primary);
+  border: 1px solid var(--border-color);
+  border-radius: 0.375rem;
+  overflow: hidden;
+}
+.att-hist-student-header {
+  display: flex;
+  align-items: center;
+  padding: 0.5rem 0.875rem;
+  background: var(--bg-secondary);
+  border-bottom: 1px solid var(--border-color);
+}
+.att-hist-student-row {
+  display: flex;
+  align-items: center;
+  padding: 0.5rem 0.875rem;
+  border-bottom: 1px solid var(--border-color);
+}
+.att-hist-student-row:last-child { border-bottom: none; }
+.att-hist-student-row--even { background: var(--bg-secondary); }
+
+/* Mobile */
+@media (max-width: 640px) {
+  .att-hist-chip { flex: 1 1 calc(50% - 0.25rem); padding: 0.625rem 0.875rem; }
+  .att-hist-chip-val { font-size: 1.125rem; }
+  .att-hist-select { flex: 1 1 calc(50% - 0.25rem); min-width: 0; font-size: 0.75rem; }
+  .att-hist-card-header { gap: 0.5rem; padding: 0.75rem; }
+  .att-hist-subject { font-size: 0.875rem; }
+  .att-hist-meta-secondary { font-size: 0.75rem; }
+  .att-hist-counts { gap: 0.375rem; }
+  .att-hist-count-group { display: none; }
+  .att-hist-badge { padding: 0.15rem 0.375rem; font-size: 0.7rem; }
+  .att-hist-detail { padding: 0.75rem; }
+  .att-hist-detail-tiles { grid-template-columns: 1fr 1fr; gap: 0.5rem; }
+  .att-hist-student-row,
+  .att-hist-student-header { padding: 0.5rem 0.625rem; }
+}

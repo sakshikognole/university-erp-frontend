@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
-  ArrowLeft,
   AlertCircle,
   Loader2,
   MapPin,
@@ -17,6 +16,25 @@ import {
 } from 'lucide-react';
 const _IS_PROD = typeof window !== 'undefined' && window.location.hostname !== 'localhost';
 const API_BASE_URL = _IS_PROD ? 'https://university-erp-node.onrender.com/api' : 'http://localhost:5000/api';
+
+// ── sessionStorage key for draft attendance ───────────────────────────────
+const ATT_DRAFT_KEY = 'att_draft_v1';
+
+const saveDraft = (session, students) => {
+  try {
+    sessionStorage.setItem(ATT_DRAFT_KEY, JSON.stringify({ session, students }));
+  } catch { /* non-fatal */ }
+};
+
+const loadDraft = () => {
+  try {
+    return JSON.parse(sessionStorage.getItem(ATT_DRAFT_KEY) || 'null');
+  } catch { return null; }
+};
+
+export const clearAttendanceDraft = () => {
+  try { sessionStorage.removeItem(ATT_DRAFT_KEY); } catch { /* non-fatal */ }
+};
 
 const Attendance = () => {
   const navigate = useNavigate();
@@ -39,6 +57,13 @@ const Attendance = () => {
 
   useEffect(() => { fetchSession(); }, []);
 
+  // ── Auto-save draft whenever students or session fields change ────────────
+  useEffect(() => {
+    if (!loading && students.length > 0) {
+      saveDraft(session, students);
+    }
+  }, [students, session, loading]);
+
   const fetchSession = async () => {
     setLoading(true);
     setFeedback({ type: '', message: '' });
@@ -46,8 +71,31 @@ const Attendance = () => {
       const res = await fetch(`${API_BASE_URL}/attendance/session`);
       if (!res.ok) throw new Error('Failed to load session data');
       const data = await res.json();
-      setSession(data.session);
-      setStudents(data.students);
+
+      // ── Restore draft if it matches the same session ─────────────────────
+      const draft = loadDraft();
+      if (
+        draft &&
+        draft.session &&
+        draft.session.date        === data.session.date &&
+        draft.session.subjectName === data.session.subjectName &&
+        Array.isArray(draft.students) &&
+        draft.students.length === data.students.length
+      ) {
+        // Merge saved present/absent marks back onto the fresh student list
+        const marksMap = {};
+        draft.students.forEach((s) => { marksMap[s.rollNo] = s.present; });
+        setSession(draft.session); // restore any edited session fields too
+        setStudents(data.students.map((s) => ({
+          ...s,
+          present: s.rollNo in marksMap ? marksMap[s.rollNo] : (s.present || false),
+        })));
+      } else {
+        // Fresh session — clear any stale draft
+        clearAttendanceDraft();
+        setSession(data.session);
+        setStudents(data.students.map((s) => ({ ...s, present: s.present || false })));
+      }
       setCurrentPage(1);
     } catch {
       setFeedback({ type: 'error', message: 'Could not load session data. Please refresh.' });
@@ -93,7 +141,8 @@ const Attendance = () => {
       });
       return;
     }
-    // Pass everything through navigation state — no extra API call needed
+    // Save latest state to draft before navigating so review page can also use it
+    saveDraft(session, students);
     navigate('/attendance/review', { state: { session, students } });
   };
 
@@ -123,20 +172,21 @@ const Attendance = () => {
     <div className="page-container">
 
       {/* ── Page Header ──────────────────────────────────────────────────── */}
-      <div className="page-header" style={{ marginBottom: '1.5rem' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+      <div className="page-header-row" style={{ marginBottom: '1.5rem' }}>
+        <div>
+          <h1 className="page-title">Attendance</h1>
+          <p className="page-subtitle">Mark student attendance, then review before submitting</p>
+        </div>
+        <div className="header-actions-group">
           <button
             type="button"
-            className="btn-back"
-            onClick={() => navigate('/dashboard')}
-            title="Back to Dashboard"
+            className="books-btn books-btn-primary"
+            onClick={() => navigate('/attendance/history')}
+            title="View submitted attendance records"
           >
-            <ArrowLeft size={18} />
+            <Eye size={15} />
+            <span>View Attendance</span>
           </button>
-          <div>
-            <h1 className="page-title" style={{ fontSize: '1.5rem' }}>Attendance</h1>
-            <p className="page-subtitle">Mark student attendance, then review before submitting</p>
-          </div>
         </div>
       </div>
 
@@ -204,9 +254,9 @@ const Attendance = () => {
         </div>
       </div>
 
-      {/* ── Toolbar: chips + bulk buttons ────────────────────────────────── */}
-      <div className="att-toolbar">
-        <div style={{ display: 'flex', gap: '0.625rem', flexWrap: 'wrap', alignItems: 'center' }}>
+      {/* ── Toolbar: bulk preset buttons (sticky on mobile so always visible) ── */}
+      <div className="att-toolbar att-toolbar--sticky">
+        <div className="att-chips-row">
           <div className="attendance-chip attendance-chip--total">
             <Users size={13} /><span>Total: <strong>{students.length}</strong></span>
           </div>
@@ -218,7 +268,7 @@ const Attendance = () => {
           </div>
         </div>
 
-        <div style={{ display: 'flex', gap: '0.5rem' }}>
+        <div className="att-bulk-row">
           <button type="button" className="attendance-bulk-btn" onClick={() => markAll(true)}>
             Mark All Present
           </button>
@@ -233,8 +283,8 @@ const Attendance = () => {
       </div>
 
       {/* ── Student List ─────────────────────────────────────────────────── */}
-      <div className="card" style={{ marginBottom: '1rem', overflow: 'hidden' }}>
-        {/* Table header */}
+      <div className="card att-list-card" style={{ marginBottom: '1rem' }}>
+        {/* Table header — uses CSS classes so mobile overrides work */}
         <div className="attendance-table-header">
           <span className="attendance-col-roll">Roll No</span>
           <span className="attendance-col-name">

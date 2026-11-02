@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+﻿﻿﻿import React, { useState, useEffect, useCallback } from 'react';
 import { X, Save, AlertCircle, CheckCircle2, Loader2 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 const _IS_PROD = typeof window !== 'undefined' && window.location.hostname !== 'localhost';
@@ -8,8 +8,9 @@ export function validateDepartmentId(raw) {
   const val = (raw || '').trim();
   if (!val) return 'Department ID is required.';
   if (val.length < 2) return 'Department ID must be at least 2 characters.';
-  if (/^-?\d+$/.test(val)) return 'Department ID must be alphanumeric (e.g. CS-101). Purely numeric values are not allowed.';
-  if (!/^[A-Za-z0-9][A-Za-z0-9-]*$/.test(val)) return 'Department ID may only contain letters, digits, and hyphens (e.g. CS-101).';
+  if (val.length > 30) return 'Department ID must not exceed 30 characters.';
+  if (!/^[A-Za-z0-9]+(-[A-Za-z0-9]+)?$/.test(val))
+    return 'Department ID may only contain letters, digits, and one hyphen (e.g. CS101, CS-101).';
   return null;
 }
 
@@ -139,15 +140,7 @@ const DepartmentFormModal = ({ isOpen, deptId, onClose, onSuccess }) => {
 
         <div className="sf-header">
           <div className="sf-header-left">
-            <div className="sf-header-icon">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/>
-              </svg>
-            </div>
-            <div>
-              <h2 className="sf-title">{isEditMode ? 'Edit Department' : 'Add New Department'}</h2>
-              <p className="sf-subtitle">{isEditMode ? 'Update department ID and name' : 'Register a new academic department'}</p>
-            </div>
+            <h2 className="sf-title">{isEditMode ? 'Edit Department' : 'Add New Department'}</h2>
           </div>
           <button type="button" className="sf-close-btn" onClick={onClose} disabled={loading} aria-label="Close"><X size={18} /></button>
         </div>
@@ -163,16 +156,20 @@ const DepartmentFormModal = ({ isOpen, deptId, onClose, onSuccess }) => {
             <div className="sf-loading"><Loader2 size={26} className="spin-animate" /><p>Loading department details…</p></div>
           ) : (
             <form id="dept-form" onSubmit={handleSubmit} className="sf-form" noValidate>
-              <div className="sf-section-label">Department Information</div>
-              <div className="sf-row">
+              <div className="sf-row" style={{ gridTemplateColumns: '1fr' }}>
                 <div className="sf-group">
                   <label className="sf-label" htmlFor="dept-departmentId">Department ID <span className="sf-required">*</span></label>
                   <input id="dept-departmentId" name="departmentId" type="text"
-                    className={`sf-input${fieldErrors.departmentId ? ' sf-input-error' : ''}`}
-                    placeholder="e.g. CS-101, IT-102"
-                    value={formData.departmentId} onChange={handleChange} onBlur={handleBlur} autoComplete="off" />
+                    className={`sf-input${fieldErrors.departmentId ? ' sf-input-error' : ''}${isEditMode ? ' sf-input-readonly' : ''}`}
+                    placeholder="e.g. CS101, CS-101"
+                    value={formData.departmentId}
+                    onChange={handleChange}
+                    onBlur={handleBlur}
+                    readOnly={isEditMode} disabled={isEditMode}
+                    maxLength={30} autoComplete="off" />
+                  {isEditMode && <small className="sf-field-hint">Department ID cannot be changed after creation.</small>}
                   {fieldErrors.departmentId && <p className="sf-field-error"><AlertCircle size={12} />{fieldErrors.departmentId}</p>}
-                  {!fieldErrors.departmentId && <p style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', marginTop: '0.2rem' }}>Letters, digits, hyphens. Must be unique.</p>}
+                  {!fieldErrors.departmentId && !isEditMode && <p style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', marginTop: '0.2rem' }}>Letters, digits, one hyphen allowed. Must be unique.</p>}
                 </div>
                 <div className="sf-group">
                   <label className="sf-label" htmlFor="dept-name">Department Name <span className="sf-required">*</span></label>

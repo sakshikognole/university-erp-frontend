@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+﻿import React, { useState, useEffect, useCallback } from 'react';
 import { X, Save, AlertCircle, CheckCircle2, Loader2 } from 'lucide-react';
 import {
   validateName,
@@ -131,9 +131,9 @@ const StaffFormModal = ({ isOpen, staffId, onClose, onSuccess }) => {
     const newValue = (name === 'staffId' || name === 'ifscCode')
       ? value.toUpperCase()
       : value;
-    // Strip spaces and symbols from staffId — letters and digits only
+    // Strip spaces and symbols from staffId — letters, digits, one hyphen allowed
     const sanitised = name === 'staffId'
-      ? value.replace(/[^A-Za-z0-9]/g, '').toUpperCase()
+      ? value.replace(/[^A-Za-z0-9-]/g, '').toUpperCase()
       : newValue;
     setFormData((prev) => ({ ...prev, [name]: sanitised }));
     if (touched[name]) {
@@ -256,29 +256,7 @@ const StaffFormModal = ({ isOpen, staffId, onClose, onSuccess }) => {
         {/* ── Header ── */}
         <div className="sf-header">
           <div className="sf-header-left">
-            <div className="sf-header-icon">
-              {isEditMode ? (
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
-                  <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
-                </svg>
-              ) : (
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
-                  <circle cx="9" cy="7" r="4"/>
-                  <line x1="23" y1="11" x2="17" y2="11"/>
-                  <line x1="20" y1="8" x2="20" y2="14"/>
-                </svg>
-              )}
-            </div>
-            <div>
-              <h2 className="sf-title">{isEditMode ? 'Edit Staff Member' : 'Add New Staff'}</h2>
-              <p className="sf-subtitle">
-                {isEditMode
-                  ? "Update staff member's profile, role and bank details"
-                  : 'Register a new staff member into the university system'}
-              </p>
-            </div>
+            <h2 className="sf-title">{isEditMode ? 'Edit Staff Member' : 'Add New Staff'}</h2>
           </div>
           <button type="button" className="sf-close-btn" onClick={onClose} disabled={loading} aria-label="Close">
             <X size={18} />
@@ -305,9 +283,6 @@ const StaffFormModal = ({ isOpen, staffId, onClose, onSuccess }) => {
           ) : (
             <form id="staff-form" onSubmit={handleSubmit} className="sf-form" noValidate>
 
-              {/* ── Personal Information ── */}
-              <div className="sf-section-label">Personal Information</div>
-
               {/* Name + Staff ID */}
               <div className="sf-row">
                 <div className="sf-group">
@@ -331,12 +306,17 @@ const StaffFormModal = ({ isOpen, staffId, onClose, onSuccess }) => {
                   </label>
                   <input
                     id="stf-staffId" name="staffId" type="text"
-                    className={inputClass('staffId')}
-                    placeholder="e.g. STF2024001"
+                    className={`sf-input${fieldErrors.staffId && touched.staffId ? ' sf-input-error' : ''}${isEditMode ? ' sf-input-readonly' : ''}`}
+                    placeholder="e.g. STF001, STF-2024"
                     value={formData.staffId}
                     onChange={handleChange} onBlur={handleBlur}
                     autoComplete="off"
+                    readOnly={isEditMode} disabled={isEditMode}
+                    maxLength={30}
+                    readOnly={isEditMode}
+                    disabled={isEditMode}
                   />
+                  {isEditMode && <small className="sf-field-hint">Staff ID cannot be changed after creation.</small>}
                   <FieldError message={touched.staffId ? fieldErrors.staffId : ''} />
                 </div>
               </div>
@@ -408,12 +388,6 @@ const StaffFormModal = ({ isOpen, staffId, onClose, onSuccess }) => {
                   </select>
                   <FieldError message={touched.role ? fieldErrors.role : ''} />
                 </div>
-              </div>
-
-              {/* ── Bank Details ── */}
-              <div className="sf-section-label" style={{ marginTop: '0.25rem' }}>
-                Bank Details
-                <span className="sf-optional">optional</span>
               </div>
 
               {/* Bank Name + Account Holder Name */}

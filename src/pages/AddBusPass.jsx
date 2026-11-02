@@ -118,8 +118,7 @@ const AddBusPassModal = ({ isOpen, passId: passIdProp, onClose, onSuccess }) => 
       <div className="sf-modal">
         <div className="sf-header">
           <div className="sf-header-left">
-            <div className="sf-header-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg></div>
-            <div><h2 className="sf-title">{isEdit ? 'Edit Bus Pass' : 'Issue Bus Pass'}</h2><p className="sf-subtitle">{isEdit ? 'Update pass details' : 'Issue a bus pass for an enrolled student'}</p></div>
+            <h2 className="sf-title">{isEdit ? 'Edit Bus Pass' : 'Issue Bus Pass'}</h2>
           </div>
           <button type="button" className="sf-close-btn" onClick={onClose} disabled={loading} aria-label="Close"><X size={18} /></button>
         </div>
@@ -127,11 +126,11 @@ const AddBusPassModal = ({ isOpen, passId: passIdProp, onClose, onSuccess }) => 
           {feedback.message && <div className={`sf-feedback ${feedback.type === 'success' ? 'sf-feedback-success' : 'sf-feedback-error'}`}>{feedback.type === 'success' ? <CheckCircle2 size={16} style={{ flexShrink: 0 }} /> : <AlertCircle size={16} style={{ flexShrink: 0 }} />}<span>{feedback.message}</span></div>}
           {fetching ? <div className="sf-loading"><Loader2 size={26} className="spin-animate" /><p>Loading…</p></div> : (
             <form id="pass-form" onSubmit={handleSubmit} className="sf-form" noValidate>
-              <div className="sf-section-label">Pass &amp; Student</div>
               <div className="sf-row">
                 <div className="sf-group">
                   <label className="sf-label" htmlFor="bp-passId">Pass ID <span className="sf-required">*</span></label>
-                  <input id="bp-passId" name="passId" type="text" className={ic('passId')} placeholder="e.g. BP-1001" value={form.passId} onChange={handleChange} autoComplete="off" />
+                  <input id="bp-passId" name="passId" type="text" className={`${ic('passId')} sf-input-readonly`} placeholder="Auto-generated" value={form.passId} onChange={handleChange} autoComplete="off" readOnly disabled maxLength={30} />
+                  <small className="sf-field-hint">{isEdit ? 'Pass ID cannot be changed after creation.' : 'Auto-generated — do not edit.'}</small>
                   <FieldError msg={fieldErrors.passId} />
                 </div>
                 <div className="sf-group">
@@ -148,7 +147,6 @@ const AddBusPassModal = ({ isOpen, passId: passIdProp, onClose, onSuccess }) => 
                   {studentError && <p style={{ fontSize: '0.75rem', color: '#b91c1c', marginTop: '0.2rem' }}>{studentError}</p>}
                 </div>
               </div>
-              <div className="sf-section-label" style={{ marginTop: '0.25rem' }}>Route &amp; Stops</div>
               <div className="sf-row"><div className="sf-group sf-group-full">
                 <label className="sf-label" htmlFor="bp-routeId">Route <span className="sf-required">*</span></label>
                 <select id="bp-routeId" name="routeId" className="sf-input" value={form.routeId} onChange={handleChange}>
@@ -169,7 +167,6 @@ const AddBusPassModal = ({ isOpen, passId: passIdProp, onClose, onSuccess }) => 
                   <input id="bp-toStop" name="toStop" type="text" className="sf-input" placeholder="Main University Campus" value={form.toStop} onChange={handleChange} />
                 </div>
               </div>
-              <div className="sf-section-label" style={{ marginTop: '0.25rem' }}>Validity &amp; Payment</div>
               <div className="sf-row">
                 <div className="sf-group">
                   <label className="sf-label" htmlFor="bp-paymentStatus">Payment Status <span className="sf-required">*</span></label>

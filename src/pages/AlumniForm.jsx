@@ -4,7 +4,6 @@ import {
   validateName,
   validateEmail,
   validatePhone,
-  validateContactRequired,
   validateGraduationYear,
 } from '../utils/alumniValidation';
 const _IS_PROD = typeof window !== 'undefined' && window.location.hostname !== 'localhost';
@@ -113,18 +112,26 @@ const AlumniFormModal = ({ isOpen, alumniId, onClose, onSuccess }) => {
 
   const validate = () => {
     const errs = {};
+    // alumniId: optional in add mode, but if filled must be alphanumeric (one hyphen allowed)
+    if (!isEdit && form.alumniId.trim()) {
+      const id = form.alumniId.trim();
+      if (id.length > 30) errs.alumniId = 'Alumni ID must not exceed 30 characters.';
+      else if (!/^[A-Za-z0-9]+(-[A-Za-z0-9]+)?$/.test(id))
+        errs.alumniId = 'Alumni ID may only contain letters, digits, and one hyphen (e.g. ALM001, ALM-2024).';
+    }
     const nameErr = validateName(form.name);
     if (nameErr) errs.name = nameErr;
     const yearErr = validateGraduationYear(form.graduationYear);
     if (yearErr) errs.graduationYear = yearErr;
-    const emailErr = validateEmail(form.email);
-    if (emailErr) errs.email = emailErr;
+    // Email is required
+    if (!form.email.trim()) {
+      errs.email = 'Email is required.';
+    } else {
+      const emailErr = validateEmail(form.email);
+      if (emailErr) errs.email = emailErr;
+    }
     const phoneErr = validatePhone(form.phone);
     if (phoneErr) errs.phone = phoneErr;
-    if (!errs.email && !errs.phone) {
-      const contactErr = validateContactRequired(form.email, form.phone);
-      if (contactErr) errs._contact = contactErr;
-    }
     return errs;
   };
 
@@ -182,16 +189,7 @@ const AlumniFormModal = ({ isOpen, alumniId, onClose, onSuccess }) => {
         {/* Header */}
         <div className="sf-header">
           <div className="sf-header-left">
-            <div className="sf-header-icon">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/>
-                <path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>
-              </svg>
-            </div>
-            <div>
-              <h2 className="sf-title">{isEdit ? 'Edit Alumni' : 'Add Alumni'}</h2>
-              <p className="sf-subtitle">{isEdit ? 'Update alumni profile details' : 'Add a new alumni profile to the directory'}</p>
-            </div>
+            <h2 className="sf-title">{isEdit ? 'Edit Alumni' : 'Add Alumni'}</h2>
           </div>
           <button type="button" className="sf-close-btn" onClick={onClose} disabled={loading} aria-label="Close"><X size={18} /></button>
         </div>
@@ -210,14 +208,15 @@ const AlumniFormModal = ({ isOpen, alumniId, onClose, onSuccess }) => {
           ) : (
             <form id="alumni-form" onSubmit={handleSubmit} className="sf-form" noValidate>
 
-              <div className="sf-section-label">Basic Information</div>
-
               <div className="sf-row">
                 <div className="sf-group">
-                  <label className="sf-label" htmlFor="al-alumniId">Alumni ID <span className="sf-optional">auto if blank</span></label>
-                  <input id="al-alumniId" name="alumniId" type="text" className="sf-input"
-                    placeholder="e.g. ALM0001" value={form.alumniId}
-                    onChange={handleChange} disabled={isEdit} autoComplete="off" />
+                  <label className="sf-label" htmlFor="al-alumniId">Alumni ID</label>
+                  <input id="al-alumniId" name="alumniId" type="text" className={`sf-input${fieldErrors.alumniId ? ' sf-input-error' : ''}${isEdit ? ' sf-input-readonly' : ''}`}
+                    placeholder="e.g. ALM001, ALM-2024" value={form.alumniId}
+                    onChange={handleChange} readOnly={isEdit} disabled={isEdit} autoComplete="off" maxLength={30} />
+                  {isEdit && <small className="sf-field-hint">Alumni ID cannot be changed after creation.</small>}
+                  {!isEdit && <small className="sf-field-hint">Optional — leave blank to auto-generate.</small>}
+                  <FieldError message={fieldErrors.alumniId} />
                 </div>
                 <div className="sf-group">
                   <label className="sf-label" htmlFor="al-name">Name <span className="sf-required">*</span></label>
@@ -254,17 +253,9 @@ const AlumniFormModal = ({ isOpen, alumniId, onClose, onSuccess }) => {
               </div>
 
               {/* Contact */}
-              <div className="sf-section-label" style={{ marginTop: '0.25rem' }}>Contact</div>
-
-              {fieldErrors._contact && (
-                <div className="sf-feedback sf-feedback-error" style={{ marginBottom: '0.75rem' }}>
-                  <AlertCircle size={15} style={{ flexShrink: 0 }} /><span>{fieldErrors._contact}</span>
-                </div>
-              )}
-
               <div className="sf-row">
                 <div className="sf-group">
-                  <label className="sf-label" htmlFor="al-email">Email</label>
+                  <label className="sf-label" htmlFor="al-email">Email <span className="sf-required">*</span></label>
                   <input id="al-email" name="email" type="email"
                     className={`sf-input${fieldErrors.email ? ' sf-input-error' : ''}`}
                     placeholder="alumni@example.com" value={form.email}
@@ -282,10 +273,6 @@ const AlumniFormModal = ({ isOpen, alumniId, onClose, onSuccess }) => {
               </div>
 
               {/* Social Links */}
-              <div className="sf-section-label" style={{ marginTop: '0.25rem' }}>
-                Social &amp; Profile Links <span className="sf-optional">optional</span>
-              </div>
-
               <div className="sf-row">
                 <div className="sf-group">
                   <label className="sf-label" htmlFor="al-linkedin">LinkedIn</label>

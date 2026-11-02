@@ -14,6 +14,11 @@ import {
   Eye,
   Edit,
   X,
+  Calendar,
+  User,
+  Building2,
+  Download,
+  ExternalLink,
 } from 'lucide-react';
 
 import SystemAnnouncementFormModal from './SystemAnnouncementForm';
@@ -21,7 +26,7 @@ const _IS_PROD = typeof window !== 'undefined' && window.location.hostname !== '
 const API_BASE_URL = _IS_PROD ? 'https://university-erp-node.onrender.com/api' : 'http://localhost:5000/api';
 
 // Mobile accordion card
-function AnnMobCard({ ann, num, formatDate, navigate, canWrite, canDelete, onEdit, onDelete, expanded, onToggle }) {
+function AnnMobCard({ ann, num, formatDate, onView, canWrite, canDelete, onEdit, onDelete, expanded, onToggle }) {
   return (
     <div className="mob-card">
       <button type="button" className="mob-card-header" onClick={onToggle} aria-expanded={expanded}>
@@ -40,7 +45,7 @@ function AnnMobCard({ ann, num, formatDate, navigate, canWrite, canDelete, onEdi
           <div className="mob-card-row"><span className="mob-card-label">Title</span><span className="mob-card-value">{ann.title}</span></div>
           <div className="mob-card-row"><span className="mob-card-label">Date</span><span className="mob-card-value">{formatDate(ann.createdAt)}</span></div>
           <div className="mob-card-actions">
-            <button type="button" className="action-btn view-btn" onClick={() => navigate(`/system-announcements/view/${ann._id}`)}><Eye size={14} /><span className="action-label">View</span></button>
+            <button type="button" className="action-btn view-btn" onClick={() => onView(ann._id)}><Eye size={14} /><span className="action-label">View</span></button>
             {canWrite && <button type="button" className="action-btn edit-btn" onClick={onEdit}><Edit size={14} /><span className="action-label">Edit</span></button>}
             {canDelete && <button type="button" className="action-btn delete-btn" onClick={onDelete}><Trash2 size={14} /><span className="action-label">Delete</span></button>}
           </div>
@@ -95,6 +100,53 @@ const SystemAnnouncements = () => {
   const openEditModal = (id)  => { setEditAnnId(id);    setModalOpen(true); };
   const closeModal    = ()    => { setModalOpen(false); setEditAnnId(null); };
   const handleModalSuccess = () => { closeModal(); fetchAnnouncements(); };
+
+  // View modal state
+  const [viewAnn, setViewAnn] = useState(null);
+  const [viewOpen, setViewOpen] = useState(false);
+  const [viewLoading, setViewLoading] = useState(false);
+  const [viewDownloading, setViewDownloading] = useState(false);
+
+  const openView = async (id) => {
+    setViewOpen(true);
+    setViewLoading(true);
+    try {
+      const res = await fetch(`${API_BASE_URL}/system-announcements/${id}`, { headers: authHeader() });
+      if (!res.ok) throw new Error('Failed to load');
+      const data = await res.json();
+      setViewAnn(data);
+    } catch {
+      setViewAnn(null);
+    } finally {
+      setViewLoading(false);
+    }
+  };
+
+  const downloadFile = async (url) => {
+    if (!url) return;
+    setViewDownloading(true);
+    try {
+      const proxyUrl = `${API_BASE_URL}/system-announcements/download-proxy?url=${encodeURIComponent(url)}`;
+      const res = await fetch(proxyUrl, { headers: authHeader() });
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const blob = await res.blob();
+      const objectUrl = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = objectUrl;
+      a.download = decodeURIComponent(url.split('/').pop().split('?')[0]) || 'attachment';
+      document.body.appendChild(a); a.click();
+      setTimeout(() => { document.body.removeChild(a); URL.revokeObjectURL(objectUrl); }, 150);
+    } catch {
+      window.open(url, '_blank', 'noopener,noreferrer');
+    } finally {
+      setViewDownloading(false);
+    }
+  };
+
+  const isImageUrl = (url) => {
+    if (!url) return false;
+    return /\.(jpg|jpeg|png|webp|gif)(\?.*)?$/i.test(url) || url.includes('/image/upload/');
+  };
 
   // Pagination state
   const [currentPage, setCurrentPage] = useState(1);
@@ -294,7 +346,7 @@ const SystemAnnouncements = () => {
                     <th style={{ width: '130px' }}>ID</th>
                     <th>Title</th>
                     <th style={{ width: '130px' }}>Date</th>
-                    <th style={{ width: '175px', textAlign: 'right' }}>Actions</th>
+                    <th style={{ width: '175px', textAlign: 'center' }}>Actions</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -302,7 +354,7 @@ const SystemAnnouncements = () => {
                     <tr
                       key={ann._id}
                       style={{ cursor: 'pointer' }}
-                      onClick={() => navigate(`/system-announcements/view/${ann._id}`)}
+                      onClick={() => openView(ann._id)}
                     >
                       <td className="text-secondary">{startIndex + i + 1}</td>
                       <td>
@@ -314,17 +366,17 @@ const SystemAnnouncements = () => {
                       <td style={{ color: 'var(--text-secondary)', fontSize: '0.8125rem' }}>
                         {formatDate(ann.createdAt)}
                       </td>
-                      <td style={{ textAlign: 'right' }}>
+                      <td style={{ textAlign: 'center' }}>
                         <div
                           className="action-buttons-cell"
-                          style={{ justifyContent: 'flex-end' }}
+                          style={{ justifyContent: 'center' }}
                           onClick={(e) => e.stopPropagation()}
                         >
                           <button
                             type="button"
                             className="action-btn view-btn"
                             title="View"
-                            onClick={() => navigate(`/system-announcements/view/${ann._id}`)}
+                            onClick={() => openView(ann._id)}
                           >
                             <Eye size={14} />
                             <span className="action-label">View</span>
@@ -366,7 +418,7 @@ const SystemAnnouncements = () => {
                     ann={ann}
                     num={startIndex + i + 1}
                     formatDate={formatDate}
-                    navigate={navigate}
+                    onView={openView}
                     canWrite={canWrite()}
                     canDelete={canDelete()}
                     onEdit={() => openEditModal(ann._id)}
@@ -518,6 +570,127 @@ const SystemAnnouncements = () => {
         onClose={closeModal}
         onSuccess={handleModalSuccess}
       />
+
+      {/* ── Inline View Modal ─────────────────────────────────────────────── */}
+      {viewOpen && (
+        <div className="ann-view-overlay" onClick={() => setViewOpen(false)}>
+          <div className="ann-view-modal" onClick={e => e.stopPropagation()}>
+            {/* Header */}
+            <div className="ann-view-modal-header">
+              <h2 style={{ fontSize: '1.0625rem', fontWeight: 700, color: 'var(--text-primary)', margin: 0 }}>
+                Announcement Details
+              </h2>
+              <button type="button" className="close-modal-btn" onClick={() => setViewOpen(false)}>
+                <X size={18} />
+              </button>
+            </div>
+
+            {/* Body */}
+            <div className="ann-view-modal-body">
+              {viewLoading ? (
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '3rem', gap: '0.75rem', color: 'var(--text-secondary)' }}>
+                  <Loader2 size={24} className="spin-animate" />
+                  <span>Loading...</span>
+                </div>
+              ) : !viewAnn ? (
+                <div style={{ textAlign: 'center', padding: '2rem', color: 'var(--text-secondary)' }}>
+                  <AlertCircle size={28} style={{ color: '#ef4444', margin: '0 auto 0.5rem' }} />
+                  <p>Could not load announcement.</p>
+                </div>
+              ) : (
+                <>
+                  {/* Title + date */}
+                  <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: '1rem', marginBottom: '1rem' }}>
+                    <h3 style={{ fontSize: '1.125rem', fontWeight: 700, color: 'var(--text-primary)', lineHeight: 1.35, flex: 1, margin: 0 }}>
+                      <BellRing size={17} style={{ display: 'inline', marginRight: 8, verticalAlign: 'middle', color: '#6366f1' }} />
+                      {viewAnn.title}
+                    </h3>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 5, color: 'var(--text-secondary)', fontSize: '0.8rem', flexShrink: 0 }}>
+                      <Calendar size={13} />
+                      <span>{formatDate(viewAnn.createdAt)}</span>
+                    </div>
+                  </div>
+
+                  <hr style={{ border: 'none', borderTop: '1px solid var(--border-color)', margin: '0 0 1rem' }} />
+
+                  {/* Meta */}
+                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: '1rem', marginBottom: '1rem' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                      <User size={14} style={{ color: 'var(--text-secondary)' }} />
+                      <span style={{ fontSize: '0.8125rem', color: 'var(--text-secondary)' }}>Created by</span>
+                      <span style={{ fontSize: '0.875rem', fontWeight: 600, color: 'var(--text-primary)' }}>
+                        {viewAnn.createdBy?.name || viewAnn.createdBy?.email || 'Unknown'}
+                      </span>
+                    </div>
+                    <span style={{ fontSize: '0.75rem', fontWeight: 500, padding: '2px 10px', borderRadius: 20, background: '#eef2ff', color: '#6366f1' }}>
+                      {viewAnn.announcementId}
+                    </span>
+                  </div>
+
+                  {/* Departments */}
+                  <div style={{ marginBottom: '1rem' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: '0.5rem' }}>
+                      <Building2 size={14} style={{ color: 'var(--text-secondary)' }} />
+                      <span style={{ fontSize: '0.75rem', fontWeight: 700, color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Departments</span>
+                    </div>
+                    {(!viewAnn.departments || viewAnn.departments.length === 0) ? (
+                      <span style={{ display: 'inline-block', padding: '3px 12px', borderRadius: 20, background: 'var(--bg-secondary)', color: 'var(--text-secondary)', fontSize: '0.875rem' }}>All Departments</span>
+                    ) : (
+                      <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
+                        {viewAnn.departments.map(dept => (
+                          <span key={dept._id || dept} style={{ display: 'inline-flex', alignItems: 'center', gap: 4, padding: '3px 10px', borderRadius: 20, background: '#eef2ff', color: '#6366f1', fontSize: '0.8125rem', fontWeight: 500 }}>
+                            <Building2 size={12} />{dept.name || dept}
+                          </span>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Description */}
+                  {viewAnn.description && viewAnn.description.trim() && (
+                    <div style={{ marginBottom: '1rem' }}>
+                      <p style={{ fontSize: '0.75rem', fontWeight: 700, color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '0.5rem' }}>Description</p>
+                      <div style={{ padding: '0.875rem 1rem', borderRadius: 8, background: 'var(--bg-secondary)', border: '1px solid var(--border-color)', fontSize: '0.9rem', color: 'var(--text-primary)', lineHeight: 1.7, whiteSpace: 'pre-wrap', wordBreak: 'break-word' }}>
+                        {viewAnn.description}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Attachment */}
+                  {viewAnn.fileUrl && (
+                    <div>
+                      <p style={{ fontSize: '0.75rem', fontWeight: 700, color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '0.5rem' }}>Attachment</p>
+                      {isImageUrl(viewAnn.fileUrl) ? (
+                        <div style={{ borderRadius: 8, overflow: 'hidden', border: '1px solid var(--border-color)', maxWidth: 480 }}>
+                          <img src={viewAnn.fileUrl} alt="Attachment" style={{ width: '100%', display: 'block', objectFit: 'contain', maxHeight: 300 }} onError={e => { e.target.style.display = 'none'; }} />
+                          <div style={{ padding: '6px 12px', borderTop: '1px solid var(--border-color)', display: 'flex', justifyContent: 'flex-end' }}>
+                            <a href={viewAnn.fileUrl} target="_blank" rel="noopener noreferrer" style={{ display: 'inline-flex', alignItems: 'center', gap: 4, fontSize: '0.8125rem', color: '#6366f1', textDecoration: 'none', fontWeight: 500 }}>
+                              <ExternalLink size={12} />Open full image
+                            </a>
+                          </div>
+                        </div>
+                      ) : (
+                        <button type="button" onClick={() => downloadFile(viewAnn.fileUrl)} disabled={viewDownloading}
+                          style={{ display: 'inline-flex', alignItems: 'center', gap: 8, padding: '10px 16px', borderRadius: 8, background: 'var(--bg-secondary)', border: '1px solid var(--border-color)', color: viewDownloading ? 'var(--text-secondary)' : '#6366f1', fontSize: '0.875rem', fontWeight: 500, cursor: viewDownloading ? 'not-allowed' : 'pointer' }}>
+                          {viewDownloading ? <Loader2 size={16} className="spin-animate" /> : <Download size={16} />}
+                          <span>{viewDownloading ? 'Downloading…' : 'Download Attachment'}</span>
+                        </button>
+                      )}
+                    </div>
+                  )}
+                </>
+              )}
+            </div>
+
+            {/* Footer */}
+            <div className="ann-view-modal-footer">
+              <button type="button" className="books-btn books-btn-ghost" onClick={() => setViewOpen(false)}>
+                Close
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

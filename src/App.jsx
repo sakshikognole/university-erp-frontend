@@ -110,6 +110,10 @@ import SystemAnnouncements from './pages/SystemAnnouncements';
 import SystemAnnouncementForm from './pages/SystemAnnouncementForm';
 import SystemAnnouncementView from './pages/SystemAnnouncementView';
 
+// --- View-only Boards ---
+import EventNoticesBoard from './pages/EventNoticesBoard';
+import SystemAnnouncementsBoard from './pages/SystemAnnouncementsBoard';
+
 // --- Announcements, Submissions, Academic Resources ---
 import Announcements from './pages/Announcements';
 import Submission from './pages/Submission';
@@ -118,6 +122,7 @@ import AcademicResources from './pages/AcademicResources';
 // --- Attendance ---
 import Attendance from './pages/Attendance';
 import AttendanceReview from './pages/AttendanceReview';
+import AttendanceHistory from './pages/AttendanceHistory';
 
 // --- Password Management ---
 import PasswordManagementPage from './pages/PasswordManagement/PasswordManagementPage';
@@ -334,7 +339,9 @@ function AppRoutes() {
 
         {/* ==================== EXAMS ==================== */}
         <Route path="exams" element={<ExamsPage />} />
-        <Route path="exam-marks" element={<ExamMarksPage />} />
+        <Route path="exams/marks" element={<ExamMarksPage />} />
+        {/* Keep legacy route as redirect so old bookmarks/links still work */}
+        <Route path="exam-marks" element={<Navigate to="/exams/marks" replace />} />
 
         {/* ==================== SUBJECTS ==================== */}
         <Route path="subjects" element={<SubjectsPage />} />
@@ -627,9 +634,14 @@ function AppRoutes() {
           element={<SystemAnnouncementForm />}
         />
 
+        {/* ==================== VIEW-ONLY BOARDS ==================== */}
+        <Route path="event-notices-board" element={<EventNoticesBoard />} />
+        <Route path="system-announcements-board" element={<SystemAnnouncementsBoard />} />
+
         {/* ==================== ATTENDANCE ==================== */}
         <Route path="attendance" element={<Attendance />} />
         <Route path="attendance/review" element={<AttendanceReview />} />
+        <Route path="attendance/history" element={<AttendanceHistory />} />
 
         {/* ==================== EMAIL COMMUNICATION ==================== */}
         <Route
@@ -643,7 +655,9 @@ function AppRoutes() {
 
         {/* ==================== ANNOUNCEMENTS ==================== */}
         <Route path="announcements" element={<Announcements />} />
-        <Route path="submission/:announcementId" element={<Submission />} />
+        <Route path="announcements/submission/:announcementId" element={<Submission />} />
+        {/* legacy submission path — redirect to prefixed route */}
+        <Route path="submission/:announcementId" element={<Navigate to="/announcements" replace />} />
 
         {/* ==================== ACADEMIC RESOURCES ==================== */}
         <Route path="academic-resources" element={<AcademicResources />} />
