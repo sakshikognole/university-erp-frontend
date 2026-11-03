@@ -9,7 +9,7 @@ const NODE_URL = _IS_PROD_AR ? 'https://university-erp-node.onrender.com/api' : 
 function ResMobCard({ res, num, nodeUrl, onDelete, expanded, onToggle }) {
   const fmtDate = d => new Date(d).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' });
   const openFile = async () => {
-    const url = res.fileUrl.startsWith('/api') ? `${nodeUrl.replace('/api','')}${res.fileUrl}` : res.fileUrl;
+    const url = res.fileUrl.startsWith('/api') ? `${nodeUrl.replace('/api', '')}${res.fileUrl}` : res.fileUrl;
     try {
       const resp = await fetch(url);
       if (!resp.ok) { alert('File not available. Please delete this entry and re-upload the file.'); }
@@ -34,8 +34,8 @@ function ResMobCard({ res, num, nodeUrl, onDelete, expanded, onToggle }) {
           <div className="mob-card-row"><span className="mob-card-label">Subject</span><span className="mob-card-value mono">{res.subject}</span></div>
           <div className="mob-card-row"><span className="mob-card-label">Uploaded on</span><span className="mob-card-value">{fmtDate(res.createdAt)}</span></div>
           <div className="mob-card-actions">
-            <button className="books-btn books-btn-sm books-btn-ghost" onClick={openFile}><span style={{display:"inline-flex",alignItems:"center",gap:4}}><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>Open</span></button>
-            <button className="books-btn books-btn-sm books-btn-danger" onClick={() => onDelete(res)}><span style={{display:"inline-flex",alignItems:"center",gap:4}}><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg><span className="action-label">Delete</span></span></button>
+            <button className="books-btn books-btn-sm books-btn-ghost" onClick={openFile}><span style={{ display: "inline-flex", alignItems: "center", gap: 4 }}><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" /><circle cx="12" cy="12" r="3" /></svg>Download</span></button>
+            <button className="books-btn books-btn-sm books-btn-danger" onClick={() => onDelete(res)}><span style={{ display: "inline-flex", alignItems: "center", gap: 4 }}><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="3 6 5 6 21 6" /><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6" /><path d="M10 11v6" /><path d="M14 11v6" /><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2" /></svg><span className="action-label">Delete</span></span></button>
           </div>
         </div>
       )}
@@ -53,6 +53,8 @@ const AcademicResources = () => {
   const [success, setSuccess] = useState('');
   const [resExpanded, setResExpanded] = useState(null);
   const [error, setError] = useState('');
+  const [formError, setFormError] = useState('');
+  const [submitted, setSubmitted] = useState(false);
   const [delRes, setDelRes] = useState(null);
   const [deleting, setDeleting] = useState(false);
 
@@ -77,7 +79,9 @@ const AcademicResources = () => {
 
   const handleUpload = async () => {
     setSuccess(''); setError('');
-    if (!subject || !title || !file) { setError('Please fill in all fields and choose a file.'); return; }
+    setSubmitted(true);
+    setFormError('');
+    if (!subject || !title.trim() || !file) { setFormError('Please fill in all fields and choose a file.'); return; }
     setLoading(true);
     try {
       const formData = new FormData();
@@ -89,11 +93,12 @@ const AcademicResources = () => {
       if (!res.ok) throw new Error(data.message || 'Failed to upload resource');
       setResources((prev) => [data.resource, ...prev]);
       setSubject(''); setTitle(''); setFile(null);
+      setSubmitted(false); setFormError('');
       const fi = document.getElementById('ar-file');
       if (fi) fi.value = '';
       setSuccess('Academic resource uploaded successfully!');
       setShowForm(false);
-    } catch (err) { setError(err.message); }
+    } catch (err) { setFormError(err.message); }
     finally { setLoading(false); }
   };
 
@@ -149,13 +154,24 @@ const AcademicResources = () => {
           <div className="books-modal" style={{ maxWidth: 520 }}>
             <div className="books-modal-head">
               <h3>Upload Academic Resource</h3>
-              <button className="books-modal-close" onClick={() => { setShowForm(false); setSubject(''); setTitle(''); setFile(null); }}>x</button>
+              <button className="books-modal-close" onClick={() => { setShowForm(false); setSubject(''); setTitle(''); setFile(null); setFormError(''); setSubmitted(false); }}>x</button>
             </div>
             <div className="books-modal-body">
+              {formError && (
+                <div className="books-alert books-alert-error" role="alert" style={{ marginBottom: 16 }}>
+                  <span>{formError}</span>
+                  <button type="button" onClick={() => setFormError('')}>×</button>
+                </div>
+              )}
               <div className="club-form-row">
                 <div className="books-form-group">
                   <label className="books-form-label">Subject *</label>
-                  <select className="books-form-control" value={subject} onChange={(e) => setSubject(e.target.value)}>
+                  <select
+                    className="books-form-control"
+                    value={subject}
+                    onChange={(e) => { setSubject(e.target.value); setFormError(''); }}
+                    style={{ border: submitted && !subject ? '1px solid #ef4444' : undefined }}
+                  >
                     <option value="">Select Subject</option>
                     <option value="Database Management System">Database Management System</option>
                     <option value="Operating System">Operating System</option>
@@ -166,17 +182,25 @@ const AcademicResources = () => {
                 </div>
                 <div className="books-form-group">
                   <label className="books-form-label">Resource Title *</label>
-                  <input className="books-form-control" type="text" placeholder="Enter resource title" value={title} onChange={(e) => setTitle(e.target.value)} />
+                  <input
+                    className="books-form-control"
+                    type="text"
+                    placeholder="Enter resource title"
+                    value={title}
+                    onChange={(e) => { setTitle(e.target.value); setFormError(''); }}
+                    style={{ border: submitted && !title.trim() ? '1px solid #ef4444' : undefined }}
+                  />
                 </div>
               </div>
               <div className="books-form-group">
                 <label className="books-form-label">Upload File * (.pdf, .doc, .docx, .ppt, .pptx)</label>
                 <input id="ar-file" className="books-form-control" type="file" accept=".pdf,.doc,.docx,.ppt,.pptx"
-                  onChange={(e) => { const f = e.target.files[0]; if (f) { setFile(f); setError(''); } }} />
+                  onChange={(e) => { const f = e.target.files[0]; if (f) { setFile(f); setFormError(''); } }}
+                  style={{ border: submitted && !file ? '1px solid #ef4444' : undefined }} />
                 {file && (
                   <p style={{ fontSize: '0.82rem', color: '#6b7280', marginTop: 4 }}>
                     {file.name} ({(file.size / (1024 * 1024)).toFixed(2)} MB)
-                    <button type="button" onClick={() => { setFile(null); const fi = document.getElementById('ar-file'); if (fi) fi.value = ''; }}
+                    <button type="button" onClick={() => { setFile(null); setFormError(''); const fi = document.getElementById('ar-file'); if (fi) fi.value = ''; }}
                       style={{ marginLeft: 8, color: '#ef4444', background: 'none', border: 'none', cursor: 'pointer', fontSize: '0.82rem' }}>
                       Remove
                     </button>
@@ -185,7 +209,7 @@ const AcademicResources = () => {
               </div>
             </div>
             <div className="books-modal-foot">
-              <button className="books-btn books-btn-ghost" onClick={() => { setShowForm(false); setSubject(''); setTitle(''); setFile(null); }}>Cancel</button>
+              <button className="books-btn books-btn-ghost" onClick={() => { setShowForm(false); setSubject(''); setTitle(''); setFile(null); setFormError(''); setSubmitted(false); }}>Cancel</button>
               <button className="books-btn books-btn-primary" onClick={handleUpload} disabled={loading}>
                 {loading ? 'Uploading...' : 'Upload Resource'}
               </button>
@@ -211,59 +235,61 @@ const AcademicResources = () => {
       ) : (
         <div className="card" style={{ padding: 0, overflow: 'hidden' }}>
           <div className="res-desk-table">
-          <div className="books-table-wrap">
-            <table className="books-table">
-              <thead>
-                <tr>
-                  <th style={{ width: 40 }}>#</th>
-                  <th>Title</th>
-                  <th>Subject</th>
-                  <th style={{ width: 120 }}>Uploaded on</th>
-                  <th style={{ width: 140 }}>Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                {resources.map((res, i) => (
-                  <tr key={res._id}>
-                    <td style={{ color: '#9ca3af' }}>{i + 1}</td>
-                    <td>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                        <FileText size={15} style={{ color: '#6b7280', flexShrink: 0 }} />
-                        <span style={{ fontWeight: 600, color: '#111827' }}>{res.title}</span>
-                      </div>
-                    </td>
-                    <td><span className="code-badge">{res.subject}</span></td>
-                    <td style={{ fontSize: '0.78rem', color: '#6b7280' }}>
-                      {new Date(res.createdAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}
-                    </td>
-                    <td>
-                      <div className="books-actions">
-        <button
-                          className="books-btn books-btn-sm books-btn-ghost"
-                          onClick={async () => {
-                            const url = res.fileUrl.startsWith('/api')
-                              ? `${NODE_URL.replace('/api','')}${res.fileUrl}`
-                              : res.fileUrl;
-                            try {
-                              const resp = await fetch(url);
-                              if (!resp.ok) {
-                                alert('File not available. Please delete this entry and re-upload the file.');
-                              } else {
-                                window.open(url, '_blank');
-                              }
-                            } catch {
-                              alert('Could not open file. Please try again.');
-                            }
-                          }}
-                        >Open</button>
-                        <button className="books-btn books-btn-sm books-btn-danger" onClick={() => handleDelete(res)}><span style={{display:"inline-flex",alignItems:"center",gap:4}}><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>Delete</span></button>
-                      </div>
-                    </td>
+            <div className="books-table-wrap">
+              <table className="books-table">
+                <thead>
+                  <tr>
+                    <th style={{ width: 40 }}>#</th>
+                    <th>Title</th>
+                    <th>Subject</th>
+                    <th style={{ width: 120 }}>Uploaded on</th>
+                    <th style={{ width: 140 }}>Actions</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+                </thead>
+                <tbody>
+                  {resources.map((res, i) => (
+                    <tr key={res._id}>
+                      <td style={{ color: '#9ca3af' }}>{i + 1}</td>
+                      <td>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                          <FileText size={15} style={{ color: '#6b7280', flexShrink: 0 }} />
+                          <span style={{ fontWeight: 600, color: '#111827' }}>{res.title}</span>
+                        </div>
+                      </td>
+                      <td>
+                        <span className="academic-subject-name">{res.subject}</span>
+                      </td>
+                      <td style={{ fontSize: '0.78rem', color: '#6b7280' }}>
+                        {new Date(res.createdAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}
+                      </td>
+                      <td>
+                        <div className="books-actions">
+                          <button
+                            className="books-btn books-btn-sm books-btn-ghost"
+                            onClick={async () => {
+                              const url = res.fileUrl.startsWith('/api')
+                                ? `${NODE_URL.replace('/api', '')}${res.fileUrl}`
+                                : res.fileUrl;
+                              try {
+                                const resp = await fetch(url);
+                                if (!resp.ok) {
+                                  alert('File not available. Please delete this entry and re-upload the file.');
+                                } else {
+                                  window.open(url, '_blank');
+                                }
+                              } catch {
+                                alert('Could not open file. Please try again.');
+                              }
+                            }}
+                          >Download</button>
+                          <button className="books-btn books-btn-sm books-btn-danger" onClick={() => handleDelete(res)}><span style={{ display: "inline-flex", alignItems: "center", gap: 4 }}><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="3 6 5 6 21 6" /><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6" /><path d="M10 11v6" /><path d="M14 11v6" /><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2" /></svg>Delete</span></button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           </div>
           <div className="res-mob-list">
             {resources.map((res, i) => (
