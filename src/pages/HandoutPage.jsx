@@ -6,24 +6,10 @@ import PageError  from '../components/PageError';
 import { getAllStudents } from '../services/studentService';
 
 const onLocalhost = window.location.hostname === 'localhost';
-const SPRING_BASES = onLocalhost
-  ? ['http://localhost:9090', 'http://localhost:8080', 'https://university-erp-spring.onrender.com']
-  : ['https://university-erp-spring.onrender.com', 'http://localhost:9090'];
-
-async function postToSpring(path, data, config) {
-  let lastErr = null;
-  for (const base of SPRING_BASES) {
-    try {
-      return await axios.post(`${base}${path}`, data, config);
-    } catch (e) {
-      lastErr = e;
-      if (e.response && e.response.status >= 400 && e.response.status < 500) {
-        throw e;
-      }
-    }
-  }
-  throw lastErr;
-}
+const SPRING_BASE = onLocalhost
+  ? 'http://localhost:9090'
+  : 'https://university-erp-spring.onrender.com';
+const FALLBACK_SPRING_BASE = 'https://university-erp-spring.onrender.com';
 
 function resolveContent(template, student) {
   const prefix = student.gender?.toLowerCase() === 'female' ? 'Miss'
@@ -53,6 +39,50 @@ function resolveContent(template, student) {
     .replace(/\{\{division\}\}/gi,         div)
     .replace(/\{\{degree\}\}/gi,           degree)
     .replace(/\{\{yearOfEnrollment\}\}/gi, enroll);
+}
+
+async function fetchCertificatePdf(student, docName, template) {
+  const content = resolveContent(template, student);
+  const payload = {
+    studentId:         student.studentId,
+    docType:           docName,
+    studentName:       student.studentName || student.name || '',
+    degreeProgramName: student.degreeProgramName || student.degree || '',
+    studyingYear:      student.studyingYear || student.class || '',
+    academicYear:      student.academicYear || student.yearOfEnrollment || '',
+    gender:            student.gender || '',
+    customContent:     content,
+  };
+
+  const safeName = (student.studentName || student.name || student.studentId).replace(/\s+/g, '_');
+  const safeDoc  = docName.replace(/\s+/g, '_');
+  const fileName = `${safeName}_${safeDoc}.pdf`;
+
+  // 1. Try primary SPRING_BASE with 3.5s timeout
+  try {
+    const res = await axios.post(`${SPRING_BASE}/api/documents/bonafide`, payload, {
+      responseType: 'arraybuffer',
+      timeout: 3500,
+    });
+    if (res.data && res.data.byteLength > 100) {
+      return { name: fileName, data: new Uint8Array(res.data) };
+    }
+  } catch (primaryErr) {
+    console.warn(`Primary PDF fetch failed for ${student.studentId}, trying Render fallback...`, primaryErr.message);
+  }
+
+  // 2. Fallback to Render if primary was localhost and failed
+  if (SPRING_BASE !== FALLBACK_SPRING_BASE) {
+    const res = await axios.post(`${FALLBACK_SPRING_BASE}/api/documents/bonafide`, payload, {
+      responseType: 'arraybuffer',
+      timeout: 10000,
+    });
+    if (res.data && res.data.byteLength > 100) {
+      return { name: fileName, data: new Uint8Array(res.data) };
+    }
+  }
+
+  throw new Error(`Failed to generate PDF for ${student.studentName || student.studentId}`);
 }
 
 // ── Fast, dependency-free ZIP builder for browser ───────────────────────────
@@ -204,65 +234,17 @@ export default function HandoutPage() {
     const selectedStudentsList = students.filter(s => selStudents.includes(s.studentId));
 
     try {
-      let zipBlob = null;
-
-      // 1. Try backend /api/handout/generate with student details
-      try {
-        const res = await postToSpring(
-          '/api/handout/generate',
-          {
-            studentIds: selStudents,
-            documentTypes: selDocs,
-            students: selectedStudentsList.map(s => ({
-              studentId:         s.studentId,
-              studentName:       s.studentName || s.name || '',
-              degreeProgramName: s.degreeProgramName || s.degree || '',
-              studyingYear:      s.studyingYear || s.class || '',
-              academicYear:      s.academicYear || s.yearOfEnrollment || '',
-              gender:            s.gender || '',
-              prn:               s.prn || '',
-            })),
-          },
-          { responseType: 'blob' }
-        );
-        if (res.data && res.data.size > 100) {
-          zipBlob = new Blob([res.data], { type: 'application/zip' });
+      // Generate all certificates simultaneously in parallel
+      const tasks = [];
+      for (const s of selectedStudentsList) {
+        for (const doc of selDocs) {
+          const dtObj = docTypes.find(d => (d.documentName || d.typeName) === doc);
+          tasks.push(fetchCertificatePdf(s, doc, dtObj?.defaultContent));
         }
-      } catch (backendErr) {
-        console.warn('Backend handout/generate failed, falling back to direct document generation:', backendErr);
       }
 
-      // 2. Direct document fallback: generate each certificate via /api/documents/bonafide with resolved content
-      if (!zipBlob) {
-        const generatedFiles = [];
-        for (const s of selectedStudentsList) {
-          const safeName = (s.studentName || s.name || s.studentId).replace(/\s+/g, '_');
-          for (const doc of selDocs) {
-            const dtObj = docTypes.find(d => (d.documentName || d.typeName) === doc);
-            const content = resolveContent(dtObj?.defaultContent, s);
-            const safeDoc = doc.replace(/\s+/g, '_');
-            const certRes = await postToSpring(
-              '/api/documents/bonafide',
-              {
-                studentId:         s.studentId,
-                docType:           doc,
-                studentName:       s.studentName || s.name || '',
-                degreeProgramName: s.degreeProgramName || s.degree || '',
-                studyingYear:      s.studyingYear || s.class || '',
-                academicYear:      s.academicYear || s.yearOfEnrollment || '',
-                gender:            s.gender || '',
-                customContent:     content,
-              },
-              { responseType: 'arraybuffer' }
-            );
-            generatedFiles.push({
-              name: `${safeName}_${safeDoc}.pdf`,
-              data: new Uint8Array(certRes.data)
-            });
-          }
-        }
-        zipBlob = createZipBlob(generatedFiles);
-      }
+      const generatedFiles = await Promise.all(tasks);
+      const zipBlob = createZipBlob(generatedFiles);
 
       const url  = window.URL.createObjectURL(zipBlob);
       const link = document.createElement('a');
@@ -272,7 +254,7 @@ export default function HandoutPage() {
       link.click();
       link.remove();
       window.URL.revokeObjectURL(url);
-      setSuccess(`${selStudents.length * selDocs.length} PDF(s) downloaded as ZIP.`);
+      setSuccess(`${generatedFiles.length} PDF(s) downloaded as ZIP.`);
     } catch (err) {
       console.error('Handout generation failed:', err);
       setError('Failed to generate. Please try again.');
