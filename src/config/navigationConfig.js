@@ -32,6 +32,7 @@ import {
   AttendanceIcon,
   EmailCommunicationIcon,
   AnnouncementIcon,
+  SubmissionIcon,
   AcademicResourceIcon,
 } from '../components/common/ModuleIcons';
 import { Eye } from 'lucide-react';
@@ -74,6 +75,7 @@ export const navigationConfig = {
     { label: 'Email Communication',   path: '/email-communication',     icon: EmailCommunicationIcon },
     { label: 'Announcements',         path: '/announcements',           icon: AnnouncementIcon },
     { label: 'Academic Resources',    path: '/academic-resources',      icon: AcademicResourceIcon },
+    { label: 'Submissions',           path: '/submissions',             icon: SubmissionIcon },
   ],
 
   SUB_ADMIN: [
@@ -112,6 +114,7 @@ export const navigationConfig = {
     { label: 'Email Communication',   path: '/email-communication',     icon: EmailCommunicationIcon },
     { label: 'Announcements',         path: '/announcements',           icon: AnnouncementIcon },
     { label: 'Academic Resources',    path: '/academic-resources',      icon: AcademicResourceIcon },
+    { label: 'Submissions',           path: '/submissions',             icon: SubmissionIcon },
   ],
 
   FINANCE: [
@@ -151,6 +154,7 @@ export const navigationConfig = {
     { label: 'Attendance',            path: '/attendance',              icon: AttendanceIcon },
     { label: 'Announcements',         path: '/announcements',           icon: AnnouncementIcon },
     { label: 'Academic Resources',    path: '/academic-resources',      icon: AcademicResourceIcon },
+    { label: 'Submissions',           path: '/submissions',             icon: SubmissionIcon },
   ],
 
   TEACHER: [
@@ -174,6 +178,7 @@ export const navigationConfig = {
     { label: 'Attendance',            path: '/attendance',              icon: AttendanceIcon },
     { label: 'Announcements',         path: '/announcements',           icon: AnnouncementIcon },
     { label: 'Academic Resources',    path: '/academic-resources',      icon: AcademicResourceIcon },
+    { label: 'Submissions',           path: '/submissions',             icon: SubmissionIcon },
   ],
 
   STUDENT: [
@@ -195,5 +200,6 @@ export const navigationConfig = {
     { label: 'View System Announcements', path: '/system-announcements-board', icon: Eye },
     { label: 'Announcements',         path: '/announcements',           icon: AnnouncementIcon },
     { label: 'Academic Resources',    path: '/academic-resources',      icon: AcademicResourceIcon },
+    { label: 'Submissions',           path: '/submissions',             icon: SubmissionIcon },
   ],
 };

@@ -649,3 +649,12 @@ export const AcademicResourceIcon = createIcon(
     <line x1="9.5" y1="18" x2="14.5" y2="18" />
   </>
 );
+
+// 35. Submission
+export const SubmissionIcon = createIcon(
+  <>
+    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+    <polyline points="14 2 14 8 20 8" />
+    <path d="m9 15 2 2 4-4" />
+  </>
+);

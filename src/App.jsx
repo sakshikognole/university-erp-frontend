@@ -656,8 +656,12 @@ function AppRoutes() {
         {/* ==================== ANNOUNCEMENTS ==================== */}
         <Route path="announcements" element={<Announcements />} />
         <Route path="announcements/submission/:announcementId" element={<Submission />} />
-        {/* legacy submission path — redirect to prefixed route */}
-        <Route path="submission/:announcementId" element={<Navigate to="/announcements" replace />} />
+
+        {/* ==================== SUBMISSIONS ==================== */}
+        <Route path="submissions" element={<Submission />} />
+        <Route path="submissions/:announcementId" element={<Submission />} />
+        <Route path="submission" element={<Submission />} />
+        <Route path="submission/:announcementId" element={<Submission />} />
 
         {/* ==================== ACADEMIC RESOURCES ==================== */}
         <Route path="academic-resources" element={<AcademicResources />} />
