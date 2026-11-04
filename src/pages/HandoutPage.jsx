@@ -10,6 +10,98 @@ const SPRING_BASE = onLocalhost
   ? 'http://localhost:9090'
   : 'https://university-erp-spring.onrender.com';
 
+// ── Fast, dependency-free ZIP builder for browser ───────────────────────────
+const CRC_TABLE = new Uint32Array(256);
+for (let i = 0; i < 256; i++) {
+  let c = i;
+  for (let k = 0; k < 8; k++) {
+    c = (c & 1) ? (0xEDB88320 ^ (c >>> 1)) : (c >>> 1);
+  }
+  CRC_TABLE[i] = c;
+}
+
+function createZipBlob(files) {
+  const encoder = new TextEncoder();
+  const parts = [];
+  const centralDirectory = [];
+  let offset = 0;
+
+  for (const file of files) {
+    const nameBytes = encoder.encode(file.name);
+    const dataBytes = file.data instanceof Uint8Array ? file.data : new Uint8Array(file.data);
+    const size = dataBytes.length;
+
+    let crc = 0 ^ (-1);
+    for (let i = 0; i < size; i++) {
+      crc = (crc >>> 8) ^ CRC_TABLE[(crc ^ dataBytes[i]) & 0xFF];
+    }
+    crc = (crc ^ (-1)) >>> 0;
+
+    const local = new Uint8Array(30 + nameBytes.length);
+    const dvL = new DataView(local.buffer);
+    dvL.setUint32(0, 0x04034b50, true);
+    dvL.setUint16(4, 20, true);
+    dvL.setUint16(6, 0, true);
+    dvL.setUint16(8, 0, true);
+    dvL.setUint16(10, 0, true);
+    dvL.setUint16(12, 0, true);
+    dvL.setUint32(14, crc, true);
+    dvL.setUint32(18, size, true);
+    dvL.setUint32(22, size, true);
+    dvL.setUint16(26, nameBytes.length, true);
+    dvL.setUint16(28, 0, true);
+    local.set(nameBytes, 30);
+
+    parts.push(local);
+    parts.push(dataBytes);
+
+    const cd = new Uint8Array(46 + nameBytes.length);
+    const dvC = new DataView(cd.buffer);
+    dvC.setUint32(0, 0x02014b50, true);
+    dvC.setUint16(4, 20, true);
+    dvC.setUint16(6, 20, true);
+    dvC.setUint16(8, 0, true);
+    dvC.setUint16(10, 0, true);
+    dvC.setUint16(12, 0, true);
+    dvC.setUint16(14, 0, true);
+    dvC.setUint32(16, crc, true);
+    dvC.setUint32(20, size, true);
+    dvC.setUint32(24, size, true);
+    dvC.setUint16(28, nameBytes.length, true);
+    dvC.setUint16(30, 0, true);
+    dvC.setUint16(32, 0, true);
+    dvC.setUint16(34, 0, true);
+    dvC.setUint16(36, 0, true);
+    dvC.setUint32(38, 0, true);
+    dvC.setUint32(42, offset, true);
+    cd.set(nameBytes, 46);
+
+    centralDirectory.push(cd);
+    offset += local.length + dataBytes.length;
+  }
+
+  const cdOffset = offset;
+  let cdSize = 0;
+  for (const cd of centralDirectory) {
+    parts.push(cd);
+    cdSize += cd.length;
+  }
+
+  const eocd = new Uint8Array(22);
+  const dvE = new DataView(eocd.buffer);
+  dvE.setUint32(0, 0x06054b50, true);
+  dvE.setUint16(4, 0, true);
+  dvE.setUint16(6, 0, true);
+  dvE.setUint16(8, files.length, true);
+  dvE.setUint16(10, files.length, true);
+  dvE.setUint32(12, cdSize, true);
+  dvE.setUint32(16, cdOffset, true);
+  dvE.setUint16(20, 0, true);
+  parts.push(eocd);
+
+  return new Blob(parts, { type: 'application/zip' });
+}
+
 export default function HandoutPage() {
   const [students,    setStudents]    = useState([]);
   const [docTypes,    setDocTypes]    = useState([]);
@@ -22,7 +114,7 @@ export default function HandoutPage() {
   const [pageError,   setPageError]   = useState('');
   const successTimer = useRef(null);
 
-  // Improvement 3: auto-dismiss success after 4 seconds
+  // Auto-dismiss success after 4 seconds
   useEffect(() => {
     if (!success) return;
     clearTimeout(successTimer.current);
@@ -33,7 +125,6 @@ export default function HandoutPage() {
   async function loadData() {
     setLoading(true); setPageError('');
     try {
-      // D1 fix: getAllStudents now fetches all pages (size=200 per page)
       const [s, d] = await Promise.all([
         getAllStudents(),
         springGet('/document-types'),
@@ -58,20 +149,75 @@ export default function HandoutPage() {
   const toggleAllD = () =>
     setSelDocs(selDocs.length === docTypes.length ? [] : docTypes.map(d => d.documentName));
 
-  // Improvement 1: Clear all selected students at once
   const clearStudents = () => setSelStudents([]);
 
   async function handleGenerate() {
     if (!selStudents.length) { setError('Select at least one student.'); return; }
     if (!selDocs.length)     { setError('Select at least one certificate type.'); return; }
     setGenerating(true); setError(''); setSuccess('');
+
+    const selectedStudentsList = students.filter(s => selStudents.includes(s.studentId));
+
     try {
-      const res = await axios.post(
-        `${SPRING_BASE}/api/handout/generate`,
-        { studentIds: selStudents, documentTypes: selDocs },
-        { responseType: 'blob' }
-      );
-      const url  = window.URL.createObjectURL(new Blob([res.data], { type: 'application/zip' }));
+      let zipBlob = null;
+
+      // 1. Try backend /api/handout/generate with student details
+      try {
+        const res = await axios.post(
+          `${SPRING_BASE}/api/handout/generate`,
+          {
+            studentIds: selStudents,
+            documentTypes: selDocs,
+            students: selectedStudentsList.map(s => ({
+              studentId:         s.studentId,
+              studentName:       s.studentName || s.name || '',
+              degreeProgramName: s.degreeProgramName || s.degree || '',
+              studyingYear:      s.studyingYear || s.class || '',
+              academicYear:      s.academicYear || s.yearOfEnrollment || '',
+              gender:            s.gender || '',
+              prn:               s.prn || '',
+            })),
+          },
+          { responseType: 'blob' }
+        );
+        if (res.data && res.data.size > 100) {
+          zipBlob = new Blob([res.data], { type: 'application/zip' });
+        }
+      } catch (backendErr) {
+        console.warn('Backend handout/generate failed, falling back to direct document generation:', backendErr);
+      }
+
+      // 2. Direct document fallback: generate each certificate via /api/documents/bonafide and bundle into ZIP
+      if (!zipBlob) {
+        const generatedFiles = [];
+        for (const s of selectedStudentsList) {
+          const safeName = (s.studentName || s.name || s.studentId).replace(/\s+/g, '_');
+          for (const doc of selDocs) {
+            const safeDoc = doc.replace(/\s+/g, '_');
+            const certRes = await axios.post(
+              `${SPRING_BASE}/api/documents/bonafide`,
+              {
+                studentId:         s.studentId,
+                docType:           doc,
+                studentName:       s.studentName || s.name || '',
+                degreeProgramName: s.degreeProgramName || s.degree || '',
+                studyingYear:      s.studyingYear || s.class || '',
+                academicYear:      s.academicYear || s.yearOfEnrollment || '',
+                gender:            s.gender || '',
+                customContent:     '',
+              },
+              { responseType: 'arraybuffer' }
+            );
+            generatedFiles.push({
+              name: `${safeName}_${safeDoc}.pdf`,
+              data: new Uint8Array(certRes.data)
+            });
+          }
+        }
+        zipBlob = createZipBlob(generatedFiles);
+      }
+
+      const url  = window.URL.createObjectURL(zipBlob);
       const link = document.createElement('a');
       link.href  = url;
       link.setAttribute('download', 'certificates.zip');
@@ -79,9 +225,9 @@ export default function HandoutPage() {
       link.click();
       link.remove();
       window.URL.revokeObjectURL(url);
-      // Improvement 3: success message auto-dismisses after 4s
       setSuccess(`${selStudents.length * selDocs.length} PDF(s) downloaded as ZIP.`);
-    } catch {
+    } catch (err) {
+      console.error('Handout generation failed:', err);
       setError('Failed to generate. Please try again.');
     } finally {
       setGenerating(false);
@@ -111,7 +257,6 @@ export default function HandoutPage() {
           <button onClick={() => setError('')}>x</button>
         </div>
       )}
-      {/* Improvement 3: success auto-dismisses, but user can also close */}
       {success && (
         <div className="books-alert books-alert-success" style={{ marginBottom: 12 }}>
           <span>✓ {success}</span>
@@ -135,7 +280,6 @@ export default function HandoutPage() {
               <button className="stu-btn stu-btn-sm stu-btn-ghost" onClick={toggleAllS}>
                 {selStudents.length === students.length ? 'Deselect All' : 'Select All'}
               </button>
-              {/* Improvement 1: Clear button */}
               {selStudents.length > 0 && (
                 <button className="stu-btn stu-btn-sm stu-btn-ghost"
                         onClick={clearStudents}
@@ -208,7 +352,6 @@ export default function HandoutPage() {
             {selDocs.length} / {docTypes.length} selected
           </div>
 
-          {/* Improvement 2: Generate button below certificate types on the right */}
           <div style={{
             paddingTop: 12, borderTop: '1px solid var(--border-primary,#f3f4f6)',
             marginTop: 8,
@@ -223,7 +366,6 @@ export default function HandoutPage() {
                 {' '}× {selDocs.length} type{selDocs.length > 1 ? 's' : ''})
               </p>
             )}
-            {/* Improvement 2: button is compact and right-aligned */}
             <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
               <button
                 className="books-btn books-btn-primary"
