@@ -16474,3 +16474,57 @@ html.modal-open .sidebar {
     justify-content: flex-end !important;
   }
 }
+
+/* Academic Resources header alignment */
+.academic-page-header {
+  align-items: flex-start;
+}
+
+.academic-page-heading {
+  display: flex;
+  flex-direction: column;
+}
+
+.academic-upload-btn {
+  margin-top: 18px;
+  flex-shrink: 0;
+}
+
+/* Responsive alignment */
+@media (max-width: 640px) {
+  .academic-upload-btn {
+    margin-top: 0;
+    align-self: flex-end;
+  }
+}
+/* Academic Resources header alignment */
+.academic-page-header {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
+.academic-page-heading {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.academic-upload-btn {
+  margin-top: 18px;
+  flex-shrink: 0;
+}
+
+@media (max-width: 640px) {
+  .academic-page-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+
+  .academic-upload-btn {
+    margin-top: 0;
+    align-self: flex-end;
+  }
+}
