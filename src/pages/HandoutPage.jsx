@@ -6,9 +6,54 @@ import PageError  from '../components/PageError';
 import { getAllStudents } from '../services/studentService';
 
 const onLocalhost = window.location.hostname === 'localhost';
-const SPRING_BASE = onLocalhost
-  ? 'http://localhost:9090'
-  : 'https://university-erp-spring.onrender.com';
+const SPRING_BASES = onLocalhost
+  ? ['http://localhost:9090', 'http://localhost:8080', 'https://university-erp-spring.onrender.com']
+  : ['https://university-erp-spring.onrender.com', 'http://localhost:9090'];
+
+async function postToSpring(path, data, config) {
+  let lastErr = null;
+  for (const base of SPRING_BASES) {
+    try {
+      return await axios.post(`${base}${path}`, data, config);
+    } catch (e) {
+      lastErr = e;
+      if (e.response && e.response.status >= 400 && e.response.status < 500) {
+        throw e;
+      }
+    }
+  }
+  throw lastErr;
+}
+
+function resolveContent(template, student) {
+  const prefix = student.gender?.toLowerCase() === 'female' ? 'Miss'
+               : student.gender?.toLowerCase() === 'male'   ? 'Mr.' : '';
+  const sName = student.studentName || student.name || student.studentId || '';
+  const fullName = prefix ? `${prefix} ${sName}` : sName;
+  const degree = student.degreeProgramName || student.degree || '';
+  const yr = student.studyingYear || student.class || '';
+  const acad = student.academicYear || student.yearOfEnrollment || '';
+  const prn = student.prn || '';
+  const div = student.division || '';
+  const enroll = student.yearOfEnrollment || student.academicYear || '';
+
+  if (!template) {
+    return (
+      `        This is to certify that ${fullName} is a bonafide student of ` +
+      `${degree}, currently studying in ${yr} ` +
+      `during the Academic Year ${acad}.\n\n` +
+      `        This certificate is issued upon the student's request for official purposes.`
+    );
+  }
+
+  return template
+    .replace(/\{\{name\}\}/gi,             fullName)
+    .replace(/\{\{prn\}\}/gi,              prn)
+    .replace(/\{\{class\}\}/gi,            yr)
+    .replace(/\{\{division\}\}/gi,         div)
+    .replace(/\{\{degree\}\}/gi,           degree)
+    .replace(/\{\{yearOfEnrollment\}\}/gi, enroll);
+}
 
 // ── Fast, dependency-free ZIP builder for browser ───────────────────────────
 const CRC_TABLE = new Uint32Array(256);
@@ -163,8 +208,8 @@ export default function HandoutPage() {
 
       // 1. Try backend /api/handout/generate with student details
       try {
-        const res = await axios.post(
-          `${SPRING_BASE}/api/handout/generate`,
+        const res = await postToSpring(
+          '/api/handout/generate',
           {
             studentIds: selStudents,
             documentTypes: selDocs,
@@ -187,15 +232,17 @@ export default function HandoutPage() {
         console.warn('Backend handout/generate failed, falling back to direct document generation:', backendErr);
       }
 
-      // 2. Direct document fallback: generate each certificate via /api/documents/bonafide and bundle into ZIP
+      // 2. Direct document fallback: generate each certificate via /api/documents/bonafide with resolved content
       if (!zipBlob) {
         const generatedFiles = [];
         for (const s of selectedStudentsList) {
           const safeName = (s.studentName || s.name || s.studentId).replace(/\s+/g, '_');
           for (const doc of selDocs) {
+            const dtObj = docTypes.find(d => (d.documentName || d.typeName) === doc);
+            const content = resolveContent(dtObj?.defaultContent, s);
             const safeDoc = doc.replace(/\s+/g, '_');
-            const certRes = await axios.post(
-              `${SPRING_BASE}/api/documents/bonafide`,
+            const certRes = await postToSpring(
+              '/api/documents/bonafide',
               {
                 studentId:         s.studentId,
                 docType:           doc,
@@ -204,7 +251,7 @@ export default function HandoutPage() {
                 studyingYear:      s.studyingYear || s.class || '',
                 academicYear:      s.academicYear || s.yearOfEnrollment || '',
                 gender:            s.gender || '',
-                customContent:     '',
+                customContent:     content,
               },
               { responseType: 'arraybuffer' }
             );
