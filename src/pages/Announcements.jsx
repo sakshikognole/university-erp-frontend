@@ -158,7 +158,7 @@ const Announcements = () => {
           <button onClick={() => setSuccess('')}>×</button>
         </div>
       )}
-      {error && (
+      {error && !showForm && (
         <div className="books-alert books-alert-error">
           <span>{error}</span>
           <button onClick={() => setError('')}>×</button>
@@ -171,9 +171,25 @@ const Announcements = () => {
           <div className="books-modal" style={{ maxWidth: 520 }}>
             <div className="books-modal-head">
               <h3>Create New Announcement</h3>
-              <button className="books-modal-close" onClick={() => setShowForm(false)}>x</button>
+              <button
+                className="books-modal-close"
+                onClick={() => {
+                  setShowForm(false);
+                  setError('');
+                }}
+              >
+                x
+              </button>
             </div>
             <div className="books-modal-body">
+
+              {error && (
+                <div className="books-alert books-alert-error">
+                  <span>{error}</span>
+                  <button onClick={() => setError('')}>×</button>
+                </div>
+              )}
+
               <div className="books-form-group">
                 <label className="books-form-label">Subject *</label>
                 <select className="books-form-control" value={subject} onChange={(e) => setSubject(e.target.value)}>
@@ -199,7 +215,15 @@ const Announcements = () => {
               </div>
             </div>
             <div className="books-modal-foot">
-              <button className="books-btn books-btn-ghost" onClick={() => setShowForm(false)}>Cancel</button>
+              <button
+                className="books-btn books-btn-ghost"
+                onClick={() => {
+                  setShowForm(false);
+                  setError('');
+                }}
+              >
+                Cancel
+              </button>
               <button className="books-btn books-btn-primary" onClick={handlePublish} disabled={loading}>
                 {loading ? 'Publishing...' : 'Publish Announcement'}
               </button>
@@ -259,7 +283,7 @@ const Announcements = () => {
               <button className="books-btn books-btn-sm books-btn-ghost" onClick={() => handleViewSubmissions(ann._id)}>
                 {viewingSubmissionsId === ann._id ? 'Hide Submissions' : 'View Submissions'}
               </button>
-              <button className="books-btn books-btn-sm books-btn-danger" onClick={() => handleDelete(ann)}><span style={{display:"inline-flex",alignItems:"center",gap:4}}><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg> Delete</span></button>
+              <button className="books-btn books-btn-sm books-btn-danger" onClick={() => handleDelete(ann)}><span style={{ display: "inline-flex", alignItems: "center", gap: 4 }}><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="3 6 5 6 21 6" /><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6" /><path d="M10 11v6" /><path d="M14 11v6" /><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2" /></svg> Delete</span></button>
             </div>
 
             {/* Submissions Section */}
