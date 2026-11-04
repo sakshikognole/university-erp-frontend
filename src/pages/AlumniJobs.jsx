@@ -87,7 +87,7 @@ const exportPDF = (rows, setFeedback) => {
     td{padding:5px 8px;border-bottom:1px solid #e5e5e5}
   </style></head><body>
     <h2>Alumni Job Postings</h2><p>Generated: ${new Date().toLocaleString()} &bull; Total: ${rows.length}</p>
-    <table><thead><tr><th>#</th><th>Job ID</th><th>Alumni ID</th><th>Company</th><th>Role</th><th>Status</th><th>Expiry</th></tr></thead>
+                    <th style={{ minWidth: '90px' }}>Role</th>
     <tbody>${rowsHtml}</tbody></table>
   </body></html>`;
   const w = window.open('', '_blank');
@@ -131,9 +131,9 @@ function AjbMobCard({ j, num, fmtDate, isExpired, getJobStatus, STATUS_CLASSES, 
           <div className="mob-card-row"><span className="mob-card-label">Expiry</span><span className="mob-card-value" style={{color: isExpired(j.dateOfExpiry) ? '#ef4444' : 'inherit'}}>{fmtDate(j.dateOfExpiry)}</span></div>
           {j.applicationLink && <div className="mob-card-row"><span className="mob-card-label">Apply</span><span className="mob-card-value"><a href={j.applicationLink} target="_blank" rel="noopener noreferrer">Link</a></span></div>}
           <div className="mob-card-actions">
-            <button type="button" className="action-btn view-btn" onClick={onView}><Eye size={14} /><span className="action-label">View</span></button>
-            <button type="button" className="action-btn edit-btn" onClick={onEdit}><Edit size={14} /><span className="action-label">Edit</span></button>
-            <button type="button" className="action-btn delete-btn" onClick={onDelete}><Trash2 size={14} /><span className="action-label">Delete</span></button>
+            <button type="button" className="action-btn view-btn" title="View" onClick={onView}><Eye size={14} /><span className="action-label">View</span></button>
+            <button type="button" className="action-btn edit-btn" title="Edit" onClick={onEdit}><Edit size={14} /><span className="action-label">Edit</span></button>
+            <button type="button" className="action-btn delete-btn" title="Delete" onClick={onDelete}><Trash2 size={14} /><span className="action-label">Delete</span></button>
           </div>
         </div>
       )}
@@ -314,12 +314,13 @@ const AlumniJobs = () => {
 
       <div className="card table-card" style={{ marginTop: '1.25rem' }}>
         <div className="table-controls-bar">
-          <div className="search-box-wrapper">
+          <div className="search-box-wrapper" data-tooltip="Search alumni jobs">
             <Search size={16} className="search-icon" />
             <input
               type="text"
               className="search-input"
               placeholder="Search by Job ID, Alumni ID, Company, or Role..."
+              title="Search alumni jobs"
               value={search}
               onChange={(e) => { setSearch(e.target.value); setCurrentPage(1); }}
             />
@@ -379,22 +380,22 @@ const AlumniJobs = () => {
               <table className="data-table">
                 <thead>
                   <tr>
-                    <th style={{ width: '50px' }}>#</th>
-                    <th style={{ width: '110px' }}>Job ID</th>
-                    <th style={{ width: '110px' }}>Alumni ID</th>
-                    <th>Company</th>
-                    <th>Role</th>
-                    <th style={{ width: '100px' }}>Status</th>
-                    <th style={{ width: '120px' }}>Posted</th>
-                    <th style={{ width: '120px' }}>Expiry</th>
-                    <th style={{ width: '160px' }}>Application Link</th>
-                    <th style={{ width: '220px', textAlign: 'center' }}>Actions</th>
+                    <th style={{ width: '40px' }}>#</th>
+                    <th style={{ width: '85px' }}>Job ID</th>
+                    <th style={{ width: '85px' }}>Alumni ID</th>
+                    <th style={{ width: '100px' }}>Company</th>
+                    <th style={{ minWidth: '90px' }}>Role</th>
+                    <th style={{ width: '75px' }}>Status</th>
+                    <th style={{ width: '70px' }}>Posted</th>
+                    <th style={{ width: '70px' }}>Expiry</th>
+                    <th style={{ width: '65px', textAlign: 'center' }}>Apply</th>
+                    <th style={{ width: '185px', textAlign: 'center' }}>Actions</th>
                   </tr>
                 </thead>
                 <tbody>
                   {current.map((j, i) => (
                     <tr key={j._id || j.jobId}>
-                      <td className="text-secondary">{startIndex + i + 1}</td>
+                      <td className="stu-num-cell">{startIndex + i + 1}</td>
                       <td><span className="code-badge">{j.jobId}</span></td>
                       <td><span className="code-badge">{j.alumniId}</span></td>
                       <td><span className="dept-name-cell">{j.company}</span></td>
@@ -554,7 +555,7 @@ const AlumniJobs = () => {
             <div className="delete-dialog-header">
               <div className="delete-dialog-icon"><AlertTriangle size={22} /></div>
               <div className="delete-dialog-title-box">
-                <h3 className="delete-dialog-title">Delete Job Posting</h3>
+                <h3 className="delete-dialog-title">Delete</h3>
                 <p className="delete-dialog-desc">This will permanently remove the job posting.</p>
               </div>
               <button

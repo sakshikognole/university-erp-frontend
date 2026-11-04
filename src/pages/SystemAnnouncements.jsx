@@ -244,7 +244,7 @@ const SystemAnnouncements = () => {
   const startIndex = (currentPage - 1) * itemsPerPage;
 
   return (
-    <div className="page-container">
+    <div className="page-container system-announcements-page">
       {/* ── Page Header ─────────────────────────────────────────────────────── */}
       <div className="page-header-row">
         <div>
@@ -288,7 +288,7 @@ const SystemAnnouncements = () => {
       <div className="card table-card" style={{ marginTop: '1.25rem' }}>
         {/* Controls bar */}
         <div className="table-controls-bar">
-          <div className="search-box-wrapper">
+          <div className="search-box-wrapper" data-tooltip="Search announcements">
             <Search size={16} className="search-icon" />
             <input
               type="text"
@@ -296,6 +296,7 @@ const SystemAnnouncements = () => {
               placeholder="Search by title..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
+              title="Search announcements"
             />
             {search && (
               <button type="button" className="search-clear-btn" onClick={() => setSearch('')}>
@@ -511,7 +512,7 @@ const SystemAnnouncements = () => {
                 <AlertTriangle size={22} />
               </div>
               <div className="delete-dialog-title-box">
-                <h3 className="delete-dialog-title">Delete Announcement</h3>
+                <h3 className="delete-dialog-title">Delete</h3>
                 <p className="delete-dialog-desc">
                   This will permanently remove the announcement and any uploaded file.
                 </p>

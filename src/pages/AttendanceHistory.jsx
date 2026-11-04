@@ -91,31 +91,30 @@ const AttendanceHistory = () => {
 
       {/* ── Header ────────────────────────────────────────────────────────── */}
       <div className="page-header-row" style={{ marginBottom: '1.5rem' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-          <button
-            type="button"
-            className="btn-back"
-            onClick={() => navigate('/attendance')}
-            title="Back to Attendance"
-          >
-            <ArrowLeft size={18} />
-          </button>
-          <div>
-            <h1 className="page-title">Attendance Records</h1>
-            <p className="page-subtitle">All submitted attendance sessions</p>
-          </div>
+        <button
+          type="button"
+          className="btn-back"
+          onClick={() => navigate('/attendance')}
+          title="Back to Attendance"
+          style={{ marginBottom: '0.5rem' }}
+        >
+          <ArrowLeft size={18} />
+        </button>
+        <div>
+          <h1 className="page-title att-history-page-title">Attendance Records</h1>
+          <p className="page-subtitle">All submitted attendance sessions</p>
         </div>
       </div>
-
       {/* ── Filters ───────────────────────────────────────────────────────── */}
       <div className="card att-hist-filters">
         {/* Search */}
-        <div className="search-box-wrapper" style={{ flex: '1 1 200px', minWidth: 0 }}>
+        <div className="search-box-wrapper" data-tooltip="Search attendance records" style={{ flex: '1 1 200px', minWidth: 0 }}>
           <Search size={15} className="search-icon" />
           <input
             type="text"
             className="search-input"
             placeholder="Search subject, venue, date, time…"
+            title="Search attendance records"
             value={search}
             onChange={e => setSearch(e.target.value)}
           />
@@ -304,9 +303,9 @@ const AttendanceHistory = () => {
                       {/* Header */}
                       <div className="att-hist-student-header">
                         <span style={{ width: 32, flexShrink: 0, color: 'var(--text-secondary)', fontSize: '0.75rem' }}>#</span>
-                        <span style={{ flex: '0 0 110px', color: 'var(--text-secondary)', fontSize: '0.75rem', fontWeight: 600 }}>Roll No</span>
+                        <span style={{ flex: '0 0 90px', color: 'var(--text-secondary)', fontSize: '0.75rem', fontWeight: 600 }}>Roll No</span>
                         <span style={{ flex: 1, color: 'var(--text-secondary)', fontSize: '0.75rem', fontWeight: 600 }}>Name</span>
-                        <span style={{ width: 90, textAlign: 'center', color: 'var(--text-secondary)', fontSize: '0.75rem', fontWeight: 600 }}>Status</span>
+                        <span style={{ flex: '0 0 80px', textAlign: 'center', color: 'var(--text-secondary)', fontSize: '0.75rem', fontWeight: 600 }}>Status</span>
                       </div>
                       {record.students.map((s, idx) => (
                         <div
@@ -314,9 +313,9 @@ const AttendanceHistory = () => {
                           className={`att-hist-student-row${s.present ? ' att-hist-student-row--present' : ''}${idx % 2 === 0 ? ' att-hist-student-row--even' : ''}`}
                         >
                           <span style={{ width: 32, flexShrink: 0, fontSize: '0.75rem', color: 'var(--text-secondary)' }}>{idx + 1}</span>
-                          <span style={{ flex: '0 0 110px', fontFamily: 'monospace', fontSize: '0.8rem', fontWeight: 600 }}>{s.rollNo}</span>
-                          <span style={{ flex: 1, fontSize: '0.875rem' }}>{s.name}</span>
-                          <span style={{ width: 90, textAlign: 'center' }}>
+                          <span style={{ flex: '0 0 90px', fontFamily: 'monospace', fontSize: '0.8rem', fontWeight: 600 }}>{s.rollNo}</span>
+                          <span style={{ flex: 1, fontSize: '0.875rem', minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{s.name}</span>
+                          <span style={{ flex: '0 0 80px', textAlign: 'center' }}>
                             {s.present
                               ? <span className="att-present-pill"><UserCheck size={11} /> Present</span>
                               : <span className="att-absent-pill"><UserX size={11} /> Absent</span>}

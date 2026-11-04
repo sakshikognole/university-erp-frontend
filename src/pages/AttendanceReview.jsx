@@ -36,8 +36,8 @@ const AttendanceReview = () => {
   const [feedback, setFeedback]     = useState({ type: '', message: '' });
   const [submitResult, setSubmitResult] = useState(null);
 
-  // ── Filter: 'all' | 'present' | 'absent' ─────────────────────────────────
-  const [filterStatus, setFilterStatus] = useState('all');
+  // ── Filter: 'all' | 'present' | 'absent' — default shows present students ──
+  const [filterStatus, setFilterStatus] = useState('present');
 
   // Guard: if someone lands here directly without state, send them back
   if (!session || !students) {
@@ -145,25 +145,23 @@ const AttendanceReview = () => {
 
       {/* ── Page Header ──────────────────────────────────────────────────── */}
       <div className="page-header" style={{ marginBottom: '1.5rem' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-          <button
-            type="button"
-            className="btn-back"
-            onClick={() => navigate('/attendance')}
-            title="Back to Attendance"
-            disabled={submitted}
-          >
-            <ArrowLeft size={18} />
-          </button>
-          <div>
-            <h1 className="page-title" style={{ fontSize: '1.5rem' }}>Review Attendance</h1>
-            <p className="page-subtitle">
-              Verify the present students below, then submit to save the record
-            </p>
-          </div>
+        <button
+          type="button"
+          className="btn-back"
+          onClick={() => navigate('/attendance')}
+          title="Back to Attendance"
+          disabled={submitted}
+          style={{ marginBottom: '0.5rem' }}
+        >
+          <ArrowLeft size={18} />
+        </button>
+        <div>
+          <h1 className="page-title" style={{ fontSize: '1.5rem' }}>Review Attendance</h1>
+          <p className="page-subtitle">
+            Verify the present students below, then submit to save the record
+          </p>
         </div>
       </div>
-
       {/* ── Session summary card ─────────────────────────────────────────── */}
       <div className="card att-session-card" style={{ marginBottom: '1.5rem' }}>
         <div className="att-session-titlebar">
@@ -199,35 +197,32 @@ const AttendanceReview = () => {
         </div>
       </div>
 
-      {/* ── Summary chips + Filter tabs ──────────────────────────────────── */}
-      <div style={{ display: 'flex', gap: '0.625rem', flexWrap: 'wrap', marginBottom: '0.75rem' }}>
-        <div className="attendance-chip attendance-chip--total">
+      {/* ── Summary chips — clickable as filter tabs ─────────────────── */}
+      <div className="att-chips-row" style={{ marginBottom: '1rem' }}>
+        <button
+          type="button"
+          className={`attendance-chip attendance-chip--total${filterStatus === 'all' ? ' att-chip-active' : ''}`}
+          onClick={() => setFilterStatus('all')}
+          style={{ cursor: 'pointer', border: filterStatus === 'all' ? '2px solid #374151' : undefined }}
+        >
           <Users size={13} /><span>Total: <strong>{students.length}</strong></span>
-        </div>
-        <div className="attendance-chip attendance-chip--present">
+        </button>
+        <button
+          type="button"
+          className={`attendance-chip attendance-chip--present${filterStatus === 'present' ? ' att-chip-active' : ''}`}
+          onClick={() => setFilterStatus('present')}
+          style={{ cursor: 'pointer', border: filterStatus === 'present' ? '2px solid #15803d' : undefined }}
+        >
           <UserCheck size={13} /><span>Present: <strong>{presentStudents.length}</strong></span>
-        </div>
-        <div className="attendance-chip attendance-chip--absent">
+        </button>
+        <button
+          type="button"
+          className={`attendance-chip attendance-chip--absent${filterStatus === 'absent' ? ' att-chip-active' : ''}`}
+          onClick={() => setFilterStatus('absent')}
+          style={{ cursor: 'pointer', border: filterStatus === 'absent' ? '2px solid #b91c1c' : undefined }}
+        >
           <UserX size={13} /><span>Absent: <strong>{absentCount}</strong></span>
-        </div>
-      </div>
-
-      {/* Filter tabs */}
-      <div className="att-filter-tabs" style={{ marginBottom: '1rem' }}>
-        {[
-          { key: 'all',     label: `All (${students.length})` },
-          { key: 'present', label: `Present (${presentStudents.length})` },
-          { key: 'absent',  label: `Absent (${absentCount})` },
-        ].map(({ key, label }) => (
-          <button
-            key={key}
-            type="button"
-            className={`att-filter-tab${filterStatus === key ? ' att-filter-tab--active' : ''}`}
-            onClick={() => setFilterStatus(key)}
-          >
-            {label}
-          </button>
-        ))}
+        </button>
       </div>
 
       {/* ── Student list (filtered) ───────────────────────────────────────── */}

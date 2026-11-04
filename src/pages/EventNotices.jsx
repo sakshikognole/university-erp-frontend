@@ -211,7 +211,7 @@ const EventNotices = () => {
   };
 
   return (
-    <div className="page-container">
+    <div className="page-container event-notices-page">
       {/* Top Header */}
       <div className="page-header-row">
         <div>
@@ -248,7 +248,7 @@ const EventNotices = () => {
       {/* Filter and Search Bar */}
       <div className="card" style={{ marginTop: '1.25rem', padding: '1rem 1.25rem' }}>
         <div className="en-filter-bar">
-          <div className="search-box-wrapper en-search">
+          <div className="search-box-wrapper en-search" data-tooltip="Search event notices">
             <Search size={16} className="search-icon" />
             <input
               type="text"
@@ -256,6 +256,7 @@ const EventNotices = () => {
               placeholder="Search by title, event ID, description..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
+              title="Search event notices"
             />
             {search && (
               <button type="button" className="search-clear-btn" onClick={() => setSearch('')}>
@@ -442,7 +443,7 @@ const EventNotices = () => {
                       <button
                         type="button"
                         className="action-btn delete-btn"
-                        title="Delete Event Notice"
+                        title="Delete"
                         onClick={(e) => {
                           e.stopPropagation();
                           setDeleteConfirm({
@@ -624,7 +625,7 @@ const EventNotices = () => {
                 <AlertTriangle size={22} />
               </div>
               <div className="delete-dialog-title-box">
-                <h3 className="delete-dialog-title">Delete Event Notice</h3>
+                <h3 className="delete-dialog-title">Delete</h3>
                 <p className="delete-dialog-desc">
                   Are you sure you want to delete this event notice? This action cannot be undone.
                 </p>
@@ -678,7 +679,7 @@ const EventNotices = () => {
                 ) : (
                   <>
                     <Trash2 size={16} />
-                    <span>Delete Event Notice</span>
+                    <span>Delete</span>
                   </>
                 )}
               </button>

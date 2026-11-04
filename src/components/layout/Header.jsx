@@ -53,6 +53,15 @@ const Header = ({ toggleSidebar }) => {
                 <Bell size={28} style={{ color: 'var(--text-secondary)', opacity: 0.5 }} />
                 <p>No new notifications</p>
               </div>
+              <div className="notif-dropdown-footer">
+                <button
+                  type="button"
+                  className="notif-view-all-btn"
+                  onClick={() => setIsNotifOpen(false)}
+                >
+                  View All
+                </button>
+              </div>
             </div>
           )}
         </div>

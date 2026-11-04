@@ -344,8 +344,8 @@ const Announcements = () => {
       )}
       <ConfirmDialog
         isOpen={!!delAnn}
-        title="Delete Announcement"
-        description="Are you sure you want to delete this announcement? This action will permanently remove the record."
+        title="Delete"
+        description="Are you sure you want to delete this record? This action is permanent and cannot be undone."
         itemName={delAnn?.title}
         itemSubtext={delAnn?.subject ? `Subject: ${delAnn.subject}` : 'Announcement Record'}
         itemBadge={delAnn?.subject}

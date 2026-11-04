@@ -835,24 +835,33 @@ export default function EventNoticeFormModal({ isOpen, eventId, onClose, onSave 
 
         {/* Footer navigation */}
         <div className="enf-footer">
-          <button
-            type="button"
-            className="enf-btn enf-btn-ghost"
-            onClick={step === 0 ? onClose : goPrev}
-            disabled={loading}
-          >
-            {step === 0 ? 'Cancel' : (
-              <><ChevronLeft size={16} /><span>Back</span></>
-            )}
-          </button>
-
-          <div className="enf-footer-right">
+          <div className="enf-footer-right" style={{ width: '100%', justifyContent: 'flex-end' }}>
             {/* Dot progress on mobile */}
             <div className="enf-dot-progress">
               {STEPS.map((_, i) => (
                 <span key={i} className={`enf-dot ${i === step ? 'enf-dot-active' : i < step ? 'enf-dot-done' : ''}`} />
               ))}
             </div>
+
+            {step > 0 && (
+              <button
+                type="button"
+                className="enf-btn enf-btn-ghost"
+                onClick={goPrev}
+                disabled={loading}
+              >
+                <ChevronLeft size={16} /><span>Back</span>
+              </button>
+            )}
+
+            <button
+              type="button"
+              className="enf-btn enf-btn-ghost"
+              onClick={onClose}
+              disabled={loading}
+            >
+              Cancel
+            </button>
 
             {step < STEPS.length - 1 ? (
               <button

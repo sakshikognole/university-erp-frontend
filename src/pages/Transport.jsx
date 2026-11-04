@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Transport.jsx
  *
  * Defects fixed:
@@ -76,9 +76,9 @@ function TrnMobCard({ item, tab, num, openModal, setDeleteConfirm, onView, expan
             <div className="mob-card-row"><span className="mob-card-label">Valid till</span><span className="mob-card-value">{fmtDate(item.validTill)}</span></div>
           </>}
           <div className="mob-card-actions">
-            <button type="button" className="action-btn view-btn" onClick={onView}><Eye size={14} /><span className="action-label">View</span></button>
-            <button type="button" className="action-btn edit-btn" onClick={() => openModal(tab === 'passes' ? 'pass' : tab === 'routes' ? 'route' : tab === 'drivers' ? 'driver' : 'vehicle', item._id || (tab === 'routes' ? item.routeId : tab === 'drivers' ? item.driverId : tab === 'vehicles' ? item.vehicleId : item.passId))}><Edit size={14} /><span className="action-label">Edit</span></button>
-            <button type="button" className="action-btn delete-btn" onClick={() => setDeleteConfirm({ type: tab === 'passes' ? 'pass' : tab === 'routes' ? 'route' : tab === 'drivers' ? 'driver' : 'vehicle', item })}><Trash2 size={14} /><span className="action-label">Delete</span></button>
+            <button type="button" className="action-btn view-btn" title="View" onClick={onView}><Eye size={14} /><span className="action-label">View</span></button>
+            <button type="button" className="action-btn edit-btn" title="Edit" onClick={() => openModal(tab === 'passes' ? 'pass' : tab === 'routes' ? 'route' : tab === 'drivers' ? 'driver' : 'vehicle', item._id || (tab === 'routes' ? item.routeId : tab === 'drivers' ? item.driverId : tab === 'vehicles' ? item.vehicleId : item.passId))}><Edit size={14} /><span className="action-label">Edit</span></button>
+            <button type="button" className="action-btn delete-btn" title="Delete" onClick={() => setDeleteConfirm({ type: tab === 'passes' ? 'pass' : tab === 'routes' ? 'route' : tab === 'drivers' ? 'driver' : 'vehicle', item })}><Trash2 size={14} /><span className="action-label">Delete</span></button>
           </div>
         </div>
       )}
@@ -275,7 +275,7 @@ const Transport = () => {
   });
 
   return (
-    <div className="page-container">
+    <div className="page-container transport-page">
       {/* D6: transport-header-actions keeps buttons compact + one row on mobile */}
       <div className="page-header-row">
         <div>
@@ -365,9 +365,9 @@ const Transport = () => {
 
       <div className="card table-card" style={{ marginTop: '1rem' }}>
         <div className="table-controls-bar">
-          <div className="search-box-wrapper">
+          <div className="search-box-wrapper" data-tooltip="Search transport records">
             <Search size={16} className="search-icon" />
-            <input type="text" className="search-input"
+            <input type="text" className="search-input" title="Search transport records"
               placeholder={
                 activeTab === 'routes'  ? 'Search by Route ID, Name, Driver, Vehicle, or Stop...' :
                 activeTab === 'drivers' ? 'Search by Driver ID, Name, Phone...' :
@@ -415,19 +415,19 @@ const Transport = () => {
                 <table className="data-table transport-table">
                   <thead>
                     <tr>
-                      <th style={{ width: '50px' }}>#</th>
-                      <th style={{ width: '110px' }}>Route ID</th>
-                      <th style={{ width: '170px' }}>Route Name</th>
-                      <th style={{ width: '155px' }}>Driver Name</th>
-                      <th style={{ width: '155px' }}>Vehicle Name</th>
+                       <th style={{ width: '40px' }}>#</th>
+                       <th style={{ width: '95px' }}>Route ID</th>
+                       <th style={{ width: '140px' }}>Route Name</th>
+                       <th style={{ width: '130px' }}>Driver Name</th>
+                       <th style={{ width: '130px' }}>Vehicle Name</th>
                       <th>Stops</th>
-                      <th style={{ width: '130px', textAlign: 'center' }}>Actions</th>
+                       <th style={{ width: '165px', textAlign: 'center' }}>Actions</th>
                     </tr>
                   </thead>
                   <tbody>
                     {paginatedData.map((route, i) => (
                       <tr key={route._id || route.routeId}>
-                        <td className="text-secondary">{startIndex + i + 1}</td>
+                         <td className="stu-num-cell">{startIndex + i + 1}</td>
                         <td><span className="code-badge">Route #{route.routeId}</span></td>
                         <td><span className="dept-name-cell">{route.routeName || '—'}</span></td>
                         <td>
@@ -476,7 +476,7 @@ const Transport = () => {
                 <table className="data-table transport-table">
                   <thead>
                     <tr>
-                      <th style={{ width: '50px' }}>#</th>
+                       <th style={{ width: '40px' }}>#</th>
                       <th style={{ width: '110px' }}>Driver ID</th>
                       <th>Driver Name</th>
                       <th>Phone</th>
@@ -488,7 +488,7 @@ const Transport = () => {
                   <tbody>
                     {paginatedData.map((driver, i) => (
                       <tr key={driver._id || driver.driverId}>
-                        <td className="text-secondary">{startIndex + i + 1}</td>
+                         <td className="stu-num-cell">{startIndex + i + 1}</td>
                         <td><span className="code-badge">{driver.driverId}</span></td>
                         <td><span className="dept-name-cell">{driver.name}</span></td>
                         <td>{driver.phone || '—'}</td>
@@ -522,7 +522,7 @@ const Transport = () => {
                 <table className="data-table transport-table">
                   <thead>
                     <tr>
-                      <th style={{ width: '50px' }}>#</th>
+                       <th style={{ width: '40px' }}>#</th>
                       <th style={{ width: '120px' }}>Vehicle ID</th>
                       <th>Vehicle Name</th>
                       <th>Registration / Plate</th>
@@ -534,7 +534,7 @@ const Transport = () => {
                   <tbody>
                     {paginatedData.map((vehicle, i) => (
                       <tr key={vehicle._id || vehicle.vehicleId}>
-                        <td className="text-secondary">{startIndex + i + 1}</td>
+                         <td className="stu-num-cell">{startIndex + i + 1}</td>
                         <td><span className="code-badge">{vehicle.vehicleId}</span></td>
                         <td><span className="dept-name-cell">{vehicle.name}</span></td>
                         <td>{vehicle.vehicleNumber || '—'}</td>
@@ -567,21 +567,21 @@ const Transport = () => {
                 <table className="data-table transport-table">
                   <thead>
                     <tr>
-                      <th style={{ width: '50px' }}>#</th>
-                      <th style={{ width: '110px' }}>Pass ID</th>
-                      <th style={{ width: '120px' }}>Student ID</th>
-                      <th>Student Name</th>
-                      <th style={{ width: '100px' }}>Route ID</th>
+                       <th style={{ width: '40px' }}>#</th>
+                       <th style={{ width: '80px' }}>Pass ID</th>
+                       <th style={{ width: '100px' }}>Student ID</th>
+                       <th style={{ width: '115px' }}>Student Name</th>
+                       <th style={{ width: '75px' }}>Route ID</th>
                       <th>Stops (From → To)</th>
-                      <th style={{ width: '110px' }}>Payment</th>
-                      <th style={{ width: '110px' }}>Valid Till</th>
-                      <th style={{ width: '220px', textAlign: 'center' }}>Actions</th>
+                       <th style={{ width: '75px' }}>Payment</th>
+                       <th style={{ width: '80px' }}>Valid Till</th>
+                       <th style={{ width: '165px', textAlign: 'center' }}>Actions</th>
                     </tr>
                   </thead>
                   <tbody>
                     {paginatedData.map((pass, i) => (
                       <tr key={pass._id || pass.passId}>
-                        <td className="text-secondary">{startIndex + i + 1}</td>
+                         <td className="stu-num-cell">{startIndex + i + 1}</td>
                         <td><span className="code-badge">{pass.passId}</span></td>
                         <td>{pass.studentId}</td>
                         <td>{pass.studentName || '—'}</td>
@@ -679,9 +679,7 @@ const Transport = () => {
             <div className="delete-dialog-header">
               <div className="delete-dialog-icon"><AlertTriangle size={22} /></div>
               <div className="delete-dialog-title-box">
-                <h3 className="delete-dialog-title">
-                  Delete {deleteConfirm.type === 'route' ? 'Bus Route' : deleteConfirm.type === 'driver' ? 'Driver' : deleteConfirm.type === 'vehicle' ? 'Vehicle' : 'Bus Pass'}
-                </h3>
+                <h3 className="delete-dialog-title">Delete</h3>
                 <p className="delete-dialog-desc">This will permanently remove the record.</p>
               </div>
               <button type="button" className="close-modal-btn" onClick={() => !deleting && setDeleteConfirm(null)} disabled={deleting}><X size={18} /></button>

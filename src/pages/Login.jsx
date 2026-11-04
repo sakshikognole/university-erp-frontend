@@ -30,11 +30,6 @@ const Login = () => {
       return;
     }
 
-    if (/[A-Z]/.test(email)) {
-      setError('Email ID field accepts only lowercase letters. Uppercase letters are not allowed.');
-      return;
-    }
-
     try {
       const res = await loginAdmin(email, password, adminType);
 
@@ -119,13 +114,8 @@ const Login = () => {
                 placeholder="Enter your Email ID"
                 value={email}
                 onChange={(e) => {
-                  const val = e.target.value;
-                  if (/[A-Z]/.test(val)) {
-                    setError('Email ID field accepts only lowercase letters. Uppercase letters are not allowed.');
-                  } else if (error && error.includes('lowercase')) {
-                    setError('');
-                  }
-                  setEmail(val);
+                  setEmail(e.target.value.toLowerCase());
+                  if (error && error.includes('lowercase')) setError('');
                 }}
                 required
               />

@@ -3958,6 +3958,14 @@ html.modal-open {
 
 .books-modal-body {
   padding: 20px;
+  overflow-y: auto;
+}
+
+/* Ensure validation alerts stay visible at top of modal */
+.books-modal-body > .books-alert {
+  position: sticky;
+  top: 0;
+  z-index: 5;
 }
 
 .books-modal-foot {
@@ -16483,6 +16491,338 @@ html.modal-open .sidebar {
 .academic-page-heading {
   display: flex;
   flex-direction: column;
+  align-items: flex-start;
+}
+
+/* ================================================================
+   DEFECT FIXES — All modules
+   ================================================================ */
+
+/* ── D6: Event Notices filter bar — inline on laptop (≥769px) ─── */
+@media (min-width: 769px) {
+  .en-filter-bar {
+    flex-direction: row !important;
+    align-items: center !important;
+    flex-wrap: nowrap !important;
+    gap: 0.75rem !important;
+  }
+  .en-search {
+    flex: 1 1 0 !important;
+    min-width: 0 !important;
+  }
+  .en-filter-row {
+    flex-shrink: 0 !important;
+    gap: 0.5rem !important;
+    flex-wrap: nowrap !important;
+  }
+  .en-filter-select {
+    min-width: 140px !important;
+    flex: 0 0 auto !important;
+  }
+  .en-filter-count {
+    flex-shrink: 0 !important;
+  }
+}
+
+/* ── D8: Pagination — active page visible (text contrast) ───────── */
+.pagination-btn.active {
+  background-color: var(--color-black) !important;
+  color: #ffffff !important;
+  border-color: var(--color-black) !important;
+  font-weight: 700 !important;
+}
+
+/* D8: Pagination controls + items-per-page on ONE line on mobile */
+@media (max-width: 640px) {
+  .pagination-controls {
+    flex-wrap: nowrap !important;
+    gap: 0.375rem !important;
+    padding: 0.75rem 0.875rem !important;
+    overflow-x: auto !important;
+  }
+  .pagination-info {
+    display: none !important; /* hide "Showing X-Y of Z" on very small screens */
+  }
+  .pagination-buttons {
+    flex-shrink: 0 !important;
+  }
+  .items-per-page {
+    flex-shrink: 0 !important;
+    white-space: nowrap !important;
+    font-size: 0.75rem !important;
+  }
+  .items-per-page-select {
+    font-size: 0.75rem !important;
+  }
+}
+
+/* ── D19: Transport tabs — thin scroll indicator line ───────────── */
+.transport-tabs-wrapper {
+  position: relative;
+}
+.transport-tabs-wrapper::after {
+  content: '';
+  display: block;
+  height: 2px;
+  background: linear-gradient(90deg, transparent 0%, var(--border-color) 20%, var(--border-color) 80%, transparent 100%);
+  border-radius: 1px;
+  opacity: 0.6;
+  margin-top: -2px;
+}
+/* Fallback: add scroll indicator directly on transport-tabs */
+.transport-tabs {
+  padding-bottom: 4px !important;
+  border-bottom: 2px solid var(--border-color) !important;
+  margin-bottom: 0 !important;
+}
+
+/* ── D31: Attendance chips — always single horizontal line ──────── */
+.att-chips-row {
+  display: flex !important;
+  flex-direction: row !important;
+  flex-wrap: nowrap !important;
+  align-items: center !important;
+  gap: 0.5rem !important;
+  overflow-x: auto !important;
+  scrollbar-width: none !important;
+}
+.att-chips-row::-webkit-scrollbar { display: none; }
+
+.attendance-chip {
+  flex-shrink: 0 !important;
+  white-space: nowrap !important;
+}
+
+/* ── D33: Attendance absent — red color (green for present) ──────── */
+.attendance-chip--absent {
+  color: #b91c1c !important;
+  border-color: #fecaca !important;
+  background-color: #fef2f2 !important;
+}
+
+.attendance-toggle-btn--absent {
+  color: #b91c1c !important;
+  border-color: #fecaca !important;
+  background-color: #fef2f2 !important;
+}
+
+.att-absent-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #b91c1c;
+  background-color: #fef2f2;
+  border: 1px solid #fecaca;
+  border-radius: 9999px;
+  padding: 0.25rem 0.625rem;
+  white-space: nowrap;
+}
+
+/* ── D34: Attendance Records page title — single line on mobile ─── */
+@media (max-width: 640px) {
+  .att-history-page-title {
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    font-size: 1.375rem !important;
+  }
+}
+
+/* ── D7: Back button — consistent square above title ────────────── */
+.btn-back {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  width: 36px !important;
+  height: 36px !important;
+  border-radius: 0.5rem !important;
+  border: 1px solid var(--border-color) !important;
+  background-color: var(--bg-primary) !important;
+  color: var(--text-primary) !important;
+  cursor: pointer !important;
+  flex-shrink: 0 !important;
+  transition: all 0.15s ease !important;
+}
+.btn-back:hover:not(:disabled) {
+  background-color: var(--bg-active) !important;
+  border-color: var(--text-secondary) !important;
+}
+.btn-back:disabled {
+  opacity: 0.4 !important;
+  cursor: not-allowed !important;
+}
+
+/* ── D25: Attendance action bar — Export + Submit bottom-right ───── */
+.att-action-bar {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: flex-end !important;
+  gap: 0.75rem !important;
+  flex-wrap: wrap !important;
+  padding: 1rem 0 2rem !important;
+}
+
+.att-action-bar-right {
+  display: flex !important;
+  align-items: center !important;
+  gap: 0.625rem !important;
+}
+
+/* ── D21: Prevent background scroll when any modal is open ───────── */
+body.modal-open,
+html.modal-open,
+body:has(.sf-overlay),
+body:has(.modal-overlay),
+body:has(.enf-overlay),
+body:has(.books-overlay),
+body:has(.env-overlay),
+body:has(.ann-view-overlay) {
+  overflow: hidden !important;
+  overscroll-behavior: none !important;
+}
+
+/* ── D2: Table headings left-aligned ─────────────────────────────── */
+.data-table th {
+  text-align: left !important;
+}
+
+/* ── D26: Total count labels — keep existing table-stats-badge text
+   handled per-module in JSX; CSS ensures it wraps cleanly ───────── */
+.table-stats-badge {
+  white-space: nowrap !important;
+}
+
+/* ── D5: Search bar max-width consistent across all modules ──────── */
+@media (min-width: 769px) {
+  .table-controls-bar .search-box-wrapper,
+  .search-box-wrapper {
+    max-width: 380px;
+  }
+  /* Exception: full-width search in filter bars */
+  .en-filter-bar .search-box-wrapper,
+  .att-hist-filters .search-box-wrapper {
+    max-width: none !important;
+    flex: 1 1 0 !important;
+  }
+}
+
+/* ── D11: Tooltip styles — visible on all screen sizes ───────────── */
+[title]:not(input):not(select):not(textarea) {
+  position: relative;
+}
+/* Custom tooltip for buttons — use data-tooltip attribute */
+[data-tooltip] {
+  position: relative;
+}
+[data-tooltip]::after {
+  content: attr(data-tooltip);
+  position: absolute;
+  bottom: calc(100% + 6px);
+  left: 50%;
+  transform: translateX(-50%);
+  background: #111827;
+  color: #fff;
+  font-size: 0.75rem;
+  font-weight: 500;
+  padding: 4px 8px;
+  border-radius: 4px;
+  white-space: nowrap;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.15s;
+  z-index: 99999;
+  max-width: 220px;
+  text-align: center;
+}
+[data-tooltip]:hover::after,
+[data-tooltip]:focus::after {
+  opacity: 1;
+}
+/* Prevent tooltip from going off-screen on left edge */
+[data-tooltip].tt-right::after {
+  left: 0;
+  transform: translateX(0);
+}
+/* Prevent tooltip from going off-screen on right edge */
+[data-tooltip].tt-left::after {
+  left: auto;
+  right: 0;
+  transform: translateX(0);
+}
+
+/* ── D23: SystemAnnouncement validation message z-index ──────────── */
+.sf-feedback {
+  position: relative;
+  z-index: 10;
+}
+
+/* ── D15: Remove helper texts (sf-field-hint, enf-hint) on mobile ── */
+@media (max-width: 640px) {
+  .sf-field-hint,
+  .enf-hint,
+  small.sf-field-hint,
+  small.enf-hint {
+    display: none !important;
+  }
+}
+
+/* ── D3/D27: Button consistency — same height across all header actions */
+.books-btn,
+.btn {
+  height: 2.25rem;
+  box-sizing: border-box;
+}
+
+/* ── D20: Event Booking mobile — total count next to status dropdown */
+@media (max-width: 640px) {
+  .events-filter-row {
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    flex-wrap: nowrap !important;
+    gap: 0.5rem !important;
+    width: 100% !important;
+  }
+  .events-filter-row .filter-select {
+    flex: 1 1 0 !important;
+    min-width: 0 !important;
+  }
+  .events-filter-row .table-stats-badge {
+    flex-shrink: 0 !important;
+    font-size: 0.75rem !important;
+    padding: 0.25rem 0.5rem !important;
+  }
+}
+
+/* ── D30: Event Booking download dropdown mobile fix ─────────────── */
+@media (max-width: 640px) {
+  .events-header-actions .download-dropdown-menu {
+    left: 0 !important;
+    right: auto !important;
+    width: 200px !important;
+    z-index: 9999 !important;
+  }
+}
+
+/* ── D35: Email Communication Add button spacing on mobile ───────── */
+@media (max-width: 640px) {
+  .ec-section-header .header-actions-group {
+    padding: 0 !important;
+    gap: 0.375rem !important;
+  }
+  .ec-section-header .header-actions-group .books-btn {
+    flex-shrink: 0 !important;
+  }
+}
+
+/* ── D1: Notification dropdown — View All + scroll ──────────────── */
+.notif-dropdown {
+  max-height: 400px;
+  display: flex;
+  flex-direction: column;
 }
 
 .academic-upload-btn {
@@ -16511,11 +16851,6 @@ html.modal-open .sidebar {
   align-items: flex-start;
 }
 
-.academic-upload-btn {
-  margin-top: 18px;
-  flex-shrink: 0;
-}
-
 @media (max-width: 640px) {
   .academic-page-header {
     flex-direction: column;
@@ -16527,4 +16862,2998 @@ html.modal-open .sidebar {
     margin-top: 0;
     align-self: flex-end;
   }
+}
+
+.notif-dropdown-empty {
+  flex: 1;
+  overflow-y: auto;
+}
+
+.notif-dropdown-footer {
+  border-top: 1px solid var(--border-primary, #e5e7eb);
+  padding: 8px 16px;
+  display: flex;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.notif-view-all-btn {
+  background: none;
+  border: none;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: var(--color-black, #111827);
+  cursor: pointer;
+  padding: 4px 8px;
+  border-radius: 4px;
+  transition: background 0.15s;
+  width: 100%;
+  text-align: center;
+}
+
+.notif-view-all-btn:hover {
+  background: var(--bg-secondary, #f9fafb);
+}
+
+/* ── D36: BulkUploadVenues download button — ensure icon visible ── */
+.venue-bulk-action-btn {
+  display: flex;
+  align-items: center;
+}
+.venue-bulk-action-btn .btn {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 0.5rem !important;
+}
+
+/* ================================================================
+   REMAINING DEFECT FIXES — Batch 2
+   ================================================================ */
+
+/* ── D3/D27: Button consistency — all header action buttons same height ── */
+.header-actions-group .btn,
+.header-actions-group .books-btn,
+.header-actions-group .download-trigger-btn {
+  height: 2.25rem !important;
+  box-sizing: border-box !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 0.375rem !important;
+  white-space: nowrap !important;
+}
+
+/* ── D4: table headings sticky while scrolling ── */
+.table-container {
+  overflow-x: auto;
+}
+
+.data-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+}
+
+.data-table thead th {
+  position: sticky;
+  top: 0;
+  background-color: var(--bg-secondary, #f9fafb);
+  z-index: 2;
+  text-align: left !important;
+  white-space: nowrap;
+}
+
+/* ── D5: Search bar max-width consistent on laptop/desktop ── */
+@media (min-width: 769px) {
+  .search-box-wrapper {
+    max-width: 380px;
+    flex-shrink: 0;
+  }
+  /* Exception: full-width search in dedicated filter bars */
+  .en-filter-bar .search-box-wrapper,
+  .att-hist-filters .search-box-wrapper,
+  .en-search {
+    max-width: none !important;
+    flex: 1 1 0 !important;
+    flex-shrink: 1 !important;
+  }
+}
+
+/* ── D7: Back button — square, consistent above title ── */
+
+/* ── D7: Back button — square, consistent above title ── */
+.back-nav-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 0.25rem;
+}
+
+/* ── D8: Pagination active page number visible + single line ── */
+.pagination-btn.active {
+  background-color: #111827 !important;
+  color: #ffffff !important;
+  border-color: #111827 !important;
+  font-weight: 700 !important;
+  min-width: 2rem !important;
+}
+
+.pagination-btn {
+  min-width: 2rem;
+  min-height: 2rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.8125rem;
+}
+
+@media (max-width: 640px) {
+  .pagination-controls {
+    display: flex !important;
+    flex-direction: row !important;
+    flex-wrap: nowrap !important;
+    align-items: center !important;
+    gap: 0.25rem !important;
+    overflow-x: auto !important;
+    padding: 0.625rem 0.75rem !important;
+    scrollbar-width: none !important;
+  }
+  .pagination-controls::-webkit-scrollbar { display: none; }
+  .pagination-info { display: none !important; }
+  .items-per-page {
+    flex-shrink: 0 !important;
+    font-size: 0.75rem !important;
+    white-space: nowrap !important;
+    gap: 0.25rem !important;
+  }
+  .items-per-page span { display: none !important; }
+  .items-per-page-select { font-size: 0.75rem !important; }
+}
+
+/* ── D9/10: Desktop-site from mobile — buttons right-aligned ── */
+/* When viewport is medium (sidebar visible, narrow content area) */
+@media (max-width: 900px) and (min-width: 641px) {
+  .page-header-row {
+    flex-wrap: nowrap !important;
+    align-items: flex-start !important;
+  }
+  .header-actions-group {
+    flex-shrink: 0 !important;
+    flex-wrap: nowrap !important;
+  }
+}
+
+/* ── D11: Tooltips ── */
+.search-box-wrapper input[type="text"] {
+  /* title attribute provides native tooltip */
+}
+
+/* Search bar tooltip */
+[data-tooltip]::after {
+  white-space: normal !important;
+  max-width: 200px !important;
+  text-align: center !important;
+  word-break: break-word !important;
+}
+
+/* ── D15: Hide helper texts on ALL screen sizes ── */
+small.sf-field-hint,
+.sf-field-hint,
+small.enf-hint,
+.enf-hint,
+small.form-field-hint,
+.form-field-hint,
+.en-date-hint,
+.en-time-hint {
+  display: none !important;
+}
+
+/* ── D21: Prevent background scroll when modal is open ── */
+body:has(.sf-overlay),
+body:has(.modal-overlay:not(.delete-dialog)),
+body:has(.enf-overlay),
+body:has(.books-overlay),
+body:has(.env-overlay),
+body:has(.ann-view-overlay),
+body:has(.eb-form-overlay),
+body.modal-open {
+  overflow: hidden !important;
+}
+
+/* ── D26: Consistent Total Count label font ── */
+.table-stats-badge strong {
+  font-weight: 700;
+}
+
+/* ── D28: Attendance mobile — chips horizontal line ── */
+.att-chips-row {
+  display: flex !important;
+  flex-direction: row !important;
+  flex-wrap: nowrap !important;
+  gap: 0.5rem !important;
+  align-items: center !important;
+  overflow-x: auto !important;
+  -webkit-overflow-scrolling: touch !important;
+  scrollbar-width: none !important;
+}
+.att-chips-row::-webkit-scrollbar { display: none !important; }
+.attendance-chip {
+  flex-shrink: 0 !important;
+  white-space: nowrap !important;
+}
+
+/* Present = green, Absent = red — icon + label in one line */
+.attendance-chip--present {
+  color: #15803d !important;
+  background-color: #f0fdf4 !important;
+  border-color: #bbf7d0 !important;
+}
+.attendance-chip--absent {
+  color: #b91c1c !important;
+  background-color: #fef2f2 !important;
+  border-color: #fecaca !important;
+}
+
+/* ── D29: Remove edit/delete from view cards — handled per component ── */
+/* View-only modal should not show action buttons */
+.books-modal .action-btn.edit-btn,
+.books-modal .action-btn.delete-btn,
+.env-modal .action-btn.edit-btn,
+.env-modal .action-btn.delete-btn {
+  display: none !important;
+}
+
+/* ── D30: Event Booking download dropdown on mobile ── */
+@media (max-width: 640px) {
+  .events-header-actions .download-dropdown-menu {
+    left: 0 !important;
+    right: auto !important;
+    min-width: 200px !important;
+    z-index: 9999 !important;
+  }
+}
+
+/* ── D34: Attendance Records title — one line on mobile ── */
+@media (max-width: 640px) {
+  .att-history-page-title {
+    font-size: 1.25rem !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    max-width: 100% !important;
+  }
+}
+
+/* ── D35: Email Communication Add button spacing on mobile ── */
+@media (max-width: 640px) {
+  .ec-section-header {
+    flex-wrap: wrap !important;
+    gap: 0.5rem !important;
+    padding: 0.75rem 1rem !important;
+  }
+  .ec-section-header .header-actions-group {
+    width: 100% !important;
+    justify-content: flex-end !important;
+    padding: 0 !important;
+    gap: 0.375rem !important;
+  }
+  .ec-section-header .header-actions-group .books-btn {
+    margin-right: 0 !important;
+  }
+}
+
+/* ── Transport tabs scroll indicator (D19) ── */
+.transport-tabs {
+  padding-bottom: 3px !important;
+  border-bottom: 2px solid var(--border-color, #e5e7eb) !important;
+  scroll-behavior: smooth;
+}
+
+/* ── D6: Event Notices filter inline on laptop ── */
+@media (min-width: 769px) {
+  .en-filter-bar {
+    flex-direction: row !important;
+    align-items: center !important;
+    flex-wrap: nowrap !important;
+    gap: 0.75rem !important;
+    padding: 0.75rem 1rem !important;
+  }
+  .en-search { flex: 1 1 0 !important; min-width: 0 !important; }
+  .en-filter-row { flex-shrink: 0 !important; }
+  .en-filter-count { flex-shrink: 0 !important; }
+}
+
+/* ── D23: SystemAnnouncement validation z-index ── */
+.sf-body .sf-feedback {
+  position: relative;
+  z-index: 10;
+}
+
+/* ================================================================
+   FINAL LAYOUT FIXES — Search bars, Buttons, Filters
+   ================================================================ */
+
+/* ── Search bar: Events.jsx uses inline styles — let it fill its container */
+@media (min-width: 769px) {
+  .events-page .search-box-wrapper {
+    max-width: none !important;
+    flex: 1 1 0 !important;
+    min-width: 0 !important;
+  }
+}
+
+/* ── Button heights: single authoritative rule — 2.25rem everywhere ── */
+.header-actions-group .btn,
+.header-actions-group .books-btn,
+.header-actions-group .download-trigger-btn,
+.feature-page-header-actions .btn,
+.feature-page-header-actions .books-btn {
+  height: 2.25rem !important;
+  box-sizing: border-box !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 0.375rem !important;
+  white-space: nowrap !important;
+  flex-shrink: 0 !important;
+}
+
+/* ── Event Notices: en-filter-bar on desktop — search fills, count right ── */
+@media (min-width: 769px) {
+  .en-filter-bar {
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: center !important;
+    flex-wrap: nowrap !important;
+    gap: 0.75rem !important;
+    padding: 0.75rem 1rem !important;
+  }
+  .en-filter-bar .en-search,
+  .en-filter-bar .search-box-wrapper {
+    flex: 1 1 0 !important;
+    max-width: none !important;
+    min-width: 0 !important;
+  }
+  .en-filter-bar .en-filter-row {
+    flex-shrink: 0 !important;
+    flex-wrap: nowrap !important;
+    gap: 0.5rem !important;
+  }
+  .en-filter-bar .en-filter-select {
+    min-width: 130px !important;
+    flex: 0 0 auto !important;
+  }
+  .en-filter-bar .en-filter-count {
+    flex-shrink: 0 !important;
+  }
+}
+
+/* ── Table search bars on desktop: fill available space naturally ── */
+@media (min-width: 769px) {
+  .table-controls-bar .search-box-wrapper {
+    max-width: 380px !important;
+    flex: 1 1 auto !important;
+    min-width: 160px !important;
+  }
+}
+
+/* ── Buttons in page-header-row: 3 buttons → full width row, 2 → natural right, 1 → right ── */
+/* Mobile: page-header-row becomes column, actions group width depends on count */
+@media (max-width: 640px) {
+  /* 3-button pages already handled by students/venues/alumni equal-flex rules */
+  /* 2-button pages: natural width, right-aligned */
+  .departments-page .header-actions-group,
+  .staff-page       .header-actions-group,
+  .events-page      .header-actions-group,
+  .alumni-jobs-page .header-actions-group {
+    width: auto !important;
+    align-self: flex-end !important;
+    justify-content: flex-end !important;
+  }
+  /* Single button pages: right-aligned */
+  .attendance-page .header-actions-group {
+    width: auto !important;
+    align-self: flex-end !important;
+    justify-content: flex-end !important;
+  }
+}
+
+/* Desktop-site from mobile (medium viewport 641-900px) — keep buttons on same line */
+@media (min-width: 641px) {
+  .page-header-row {
+    flex-wrap: nowrap !important;
+    align-items: center !important;
+  }
+  .header-actions-group {
+    flex-shrink: 0 !important;
+    flex-wrap: nowrap !important;
+    align-self: center !important;
+  }
+}
+
+/* ================================================================
+   TARGETED FIXES — Search bars, Transport, Buttons, Filters
+   ================================================================ */
+
+/* ── Search bar: cap at 380px on desktop to match Books module ─── */
+@media (min-width: 769px) {
+  /* All search bars capped consistently */
+  .search-box-wrapper {
+    max-width: 380px !important;
+  }
+  /* In-table search can fill more space if sidebar takes width */
+  .table-controls-bar .search-box-wrapper {
+    max-width: 380px !important;
+    min-width: 200px !important;
+  }
+  /* Books toolbar search — same cap */
+  .books-toolbar .search-box-wrapper {
+    max-width: 380px !important;
+  }
+  /* Filter-bar search bars fill their container */
+  .en-filter-bar .search-box-wrapper,
+  .en-filter-bar .en-search,
+  .att-hist-filters .search-box-wrapper {
+    max-width: none !important;
+    flex: 1 1 0 !important;
+  }
+}
+
+/* ── Button alignment: flush with table card edge ──────────────── */
+.page-header-row {
+  margin-bottom: 0 !important;
+}
+.page-header-row + .card,
+.page-header-row + .feedback-banner + .card,
+.page-header-row + * + .card {
+  margin-top: 1.25rem;
+}
+
+/* ── Fix: restore transport-tabs visible scrollbar (override the hide-scrollbar rule) ── */
+.transport-tabs {
+  scrollbar-width: thin !important;
+  scrollbar-color: var(--border-color, #d1d5db) transparent !important;
+}
+.transport-tabs::-webkit-scrollbar {
+  display: block !important;
+  height: 3px !important;
+}
+.transport-tabs::-webkit-scrollbar-track {
+  background: transparent !important;
+}
+.transport-tabs::-webkit-scrollbar-thumb {
+  background-color: var(--border-color, #d1d5db) !important;
+  border-radius: 2px !important;
+}
+
+/* ── Transport: desktop-site from mobile layout fix ────────────── */
+/* Title and subtitle on same line, buttons below on medium screens */
+@media (max-width: 900px) and (min-width: 641px) {
+  .page-container .page-header-row {
+    flex-wrap: wrap !important;
+    align-items: flex-start !important;
+  }
+  /* Title+subtitle stay on one row together */
+  .page-header-row > div:first-child {
+    flex: 1 1 100% !important;
+    min-width: 0 !important;
+  }
+  /* Buttons group goes on its own second row, right-aligned */
+  .trn-header-desktop,
+  .page-header-row > .header-actions-group {
+    align-self: flex-end !important;
+    margin-left: auto !important;
+  }
+}
+
+/* ── Download trigger button: always show icon ─────────────────── */
+.download-trigger-btn {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 0.5rem !important;
+}
+.download-trigger-btn svg {
+  flex-shrink: 0 !important;
+}
+
+/* ── EventNoticesBoard (View Event Notices) filter inline on desktop ── */
+@media (min-width: 769px) {
+  .events-board-filter-wrapper {
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: center !important;
+    flex-wrap: nowrap !important;
+    gap: 0.75rem !important;
+  }
+  .events-board-filter-wrapper .search-box-wrapper {
+    flex: 1 1 0 !important;
+    max-width: none !important;
+    min-width: 0 !important;
+  }
+  .events-board-filter-wrapper .filter-selects {
+    display: flex !important;
+    flex-direction: row !important;
+    gap: 0.5rem !important;
+    flex-shrink: 0 !important;
+    flex-wrap: nowrap !important;
+  }
+  .events-board-filter-wrapper .table-stats-badge {
+    flex-shrink: 0 !important;
+  }
+}
+
+/* ── Buttons: ensure same height across all header buttons ──────── */
+.btn,
+.books-btn {
+  box-sizing: border-box;
+}
+.header-actions-group .btn,
+.header-actions-group .books-btn,
+.header-actions-group .download-trigger-btn {
+  height: 2.25rem !important;
+  padding-top: 0 !important;
+  padding-bottom: 0 !important;
+  display: inline-flex !important;
+  align-items: center !important;
+}
+
+/* ================================================================
+   ISSUE FIXES — Round 3
+   ================================================================ */
+
+/* ── Issue 1: Transport tabs — VISIBLE scrollbar (thin line) ───── */
+.transport-tabs {
+  scrollbar-width: thin !important;
+  scrollbar-color: var(--border-color, #d1d5db) transparent !important;
+  overflow-x: auto !important;
+}
+.transport-tabs::-webkit-scrollbar {
+  display: block !important;
+  height: 3px !important;
+}
+.transport-tabs::-webkit-scrollbar-track {
+  background: var(--bg-secondary, #f3f4f6) !important;
+}
+.transport-tabs::-webkit-scrollbar-thumb {
+  background-color: var(--color-black, #111827) !important;
+  border-radius: 2px !important;
+}
+
+/* ── Issue 2: Desktop-from-mobile button positions ──────────────── */
+/* 3 buttons or 1 button → right corner below subtitle. 2 buttons → left side below subtitle. */
+@media (min-width: 641px) and (max-width: 1024px) {
+  .page-header-row {
+    flex-wrap: wrap !important;
+  }
+  /* Title row: always full width */
+  .page-header-row > div:first-child {
+    flex: 1 1 100% !important;
+  }
+  /* 3-button pages: full width row, right-aligned */
+  .students-page .header-actions-group,
+  .venues-page .header-actions-group,
+  .alumni-page .header-actions-group {
+    width: 100% !important;
+    flex: 1 1 100% !important;
+    justify-content: flex-end !important;
+  }
+  /* 2-button pages: natural width, LEFT-aligned below subtitle */
+  .staff-page .header-actions-group,
+  .departments-page .header-actions-group,
+  .events-page .header-actions-group,
+  .alumni-jobs-page .header-actions-group {
+    width: auto !important;
+    flex: 0 0 auto !important;
+    margin-left: 0 !important;
+    margin-right: auto !important;
+    align-self: flex-start !important;
+    justify-content: flex-start !important;
+  }
+  /* 1-button pages: right corner */
+  .event-notices-page .header-actions-group,
+  .system-announcements-page .header-actions-group,
+  .attendance-page .header-actions-group {
+    width: auto !important;
+    flex: 0 0 auto !important;
+    margin-left: auto !important;
+    margin-right: 0 !important;
+  }
+  /* Transport: 4+ buttons — right aligned, wrap naturally */
+  .transport-page .header-actions-group {
+    width: auto !important;
+    flex: 0 0 auto !important;
+    margin-left: auto !important;
+    flex-wrap: wrap !important;
+    justify-content: flex-end !important;
+  }
+}
+
+/* ── Issue 3: Download button — prevent icon/text overflow ──────── */
+.download-trigger-btn {
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+}
+@media (max-width: 640px) {
+  .download-trigger-btn {
+    font-size: 0.75rem !important;
+    padding-left: 0.5rem !important;
+    padding-right: 0.5rem !important;
+    gap: 0.25rem !important;
+  }
+  .download-trigger-btn svg {
+    width: 14px !important;
+    height: 14px !important;
+    flex-shrink: 0 !important;
+  }
+}
+
+/* ── Issue 4: Helper texts — hide ALL form field hints ──────────── */
+small.sf-field-hint,
+.sf-field-hint,
+small.enf-hint,
+.enf-hint,
+small.form-field-hint,
+.form-field-hint,
+.en-date-hint,
+.en-time-hint,
+p.sf-field-hint {
+  display: none !important;
+}
+
+/* ── Issue 5: AttendanceReview — chips single line, clickable ───── */
+/* Chips row — always one horizontal line, nowrap */
+.att-chips-row {
+  display: flex !important;
+  flex-direction: row !important;
+  flex-wrap: nowrap !important;
+  gap: 0.5rem !important;
+  align-items: center !important;
+  overflow-x: auto !important;
+  scrollbar-width: none !important;
+  -webkit-overflow-scrolling: touch !important;
+}
+.att-chips-row::-webkit-scrollbar { display: none !important; }
+
+/* Clickable chip buttons (in review page) */
+.att-chips-row button.attendance-chip {
+  background: none !important;
+  border: none !important;
+  cursor: pointer !important;
+  padding: 0.3rem 0.625rem !important;
+  border-radius: 999px !important;
+  font-size: 0.8125rem !important;
+  font-weight: 600 !important;
+  transition: all 0.15s !important;
+}
+.att-chips-row button.attendance-chip.att-chip-active {
+  box-shadow: 0 0 0 2px currentColor !important;
+}
+
+/* Bottom action bar — single horizontal line, right-aligned */
+.att-action-bar {
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: center !important;
+  justify-content: flex-end !important;
+  gap: 0.625rem !important;
+  flex-wrap: nowrap !important;
+  padding: 0.75rem 0 2rem !important;
+  overflow-x: auto !important;
+}
+
+.att-action-bar-right {
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: center !important;
+  gap: 0.5rem !important;
+  flex-shrink: 0 !important;
+}
+
+/* Attendance main page — bulk buttons right-aligned */
+.att-toolbar {
+  justify-content: space-between !important;
+}
+.att-bulk-row {
+  display: flex !important;
+  flex-direction: row !important;
+  gap: 0.5rem !important;
+  flex-wrap: nowrap !important;
+  align-items: center !important;
+  margin-left: auto !important;
+}
+
+@media (max-width: 480px) {
+  .att-action-bar {
+    gap: 0.375rem !important;
+  }
+  .attendance-export-btn,
+  .attendance-submit-btn,
+  .attendance-reset-btn {
+    font-size: 0.75rem !important;
+    padding: 0.4rem 0.625rem !important;
+    gap: 0.25rem !important;
+  }
+}
+
+/* ================================================================
+   FINAL TARGETED FIXES
+   ================================================================ */
+
+/* ── 1. Scrollbar darker ─────────────────────────────────────────── */
+.transport-tabs::-webkit-scrollbar-thumb {
+  background-color: #374151 !important;
+}
+.transport-tabs {
+  scrollbar-color: #374151 transparent !important;
+}
+
+/* ── 2. page-header-row: buttons below subtitle unless very wide ─── */
+/* Default: ALWAYS wrap so title+subtitle stay together, buttons on own row */
+.page-header-row {
+  flex-wrap: wrap !important;
+  align-items: flex-start !important;
+  gap: 0.75rem !important;
+}
+
+/* Title+subtitle: fill first row */
+.page-header-row > div:first-child {
+  flex: 1 1 auto !important;
+  min-width: 0 !important;
+  flex-shrink: 1 !important;
+}
+
+/* Actions group: always sits on its own row on the RIGHT
+   unless viewport is wide enough (≥1280px) for both to coexist */
+.page-header-row > .header-actions-group,
+.page-header-row > .download-dropdown-wrapper {
+  flex-shrink: 0 !important;
+  flex-wrap: nowrap !important;
+  margin-left: auto !important;    /* push to right */
+  align-self: flex-start !important;
+}
+
+/* On very wide screens (≥1280px): allow side-by-side */
+@media (min-width: 1280px) {
+  .page-header-row {
+    flex-wrap: nowrap !important;
+    align-items: center !important;
+  }
+  .page-header-row > div:first-child {
+    flex: 1 1 auto !important;
+  }
+  .page-header-row > .header-actions-group {
+    margin-left: 0 !important;
+  }
+}
+
+/* On mobile (≤640px): column layout — buttons take full row, equal stretch for 3-btn pages */
+@media (max-width: 640px) {
+  .page-header-row {
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 0.625rem !important;
+  }
+  .page-header-row > .header-actions-group {
+    margin-left: 0 !important;
+  }
+}
+
+/* ── 3. Mobile 3-button row: text AND icon scale together ────────── */
+@media (max-width: 640px) {
+  /* 3-button equal-width group: scale both icon and text proportionally */
+  .students-page .header-actions-group .btn,
+  .students-page .header-actions-group .books-btn,
+  .students-page .header-actions-group .download-trigger-btn,
+  .venues-page   .header-actions-group .btn,
+  .venues-page   .header-actions-group .books-btn,
+  .venues-page   .header-actions-group .download-trigger-btn,
+  .alumni-page   .header-actions-group .btn,
+  .alumni-page   .header-actions-group .books-btn,
+  .alumni-page   .header-actions-group .download-trigger-btn {
+    font-size: 0.75rem !important;
+    gap: 0.25rem !important;
+    padding-left: 0.375rem !important;
+    padding-right: 0.375rem !important;
+  }
+  /* Icons inside 3-button mobile buttons */
+  .students-page .header-actions-group .btn svg,
+  .students-page .header-actions-group .books-btn svg,
+  .students-page .header-actions-group .download-trigger-btn svg,
+  .venues-page   .header-actions-group .btn svg,
+  .venues-page   .header-actions-group .books-btn svg,
+  .venues-page   .header-actions-group .download-trigger-btn svg,
+  .alumni-page   .header-actions-group .btn svg,
+  .alumni-page   .header-actions-group .books-btn svg,
+  .alumni-page   .header-actions-group .download-trigger-btn svg {
+    width: 13px !important;
+    height: 13px !important;
+    flex-shrink: 0 !important;
+  }
+}
+
+/* Extra small (≤360px): shrink even more */
+@media (max-width: 360px) {
+  .students-page .header-actions-group .btn,
+  .students-page .header-actions-group .books-btn,
+  .students-page .header-actions-group .download-trigger-btn,
+  .venues-page   .header-actions-group .btn,
+  .venues-page   .header-actions-group .books-btn,
+  .venues-page   .header-actions-group .download-trigger-btn,
+  .alumni-page   .header-actions-group .btn,
+  .alumni-page   .header-actions-group .books-btn,
+  .alumni-page   .header-actions-group .download-trigger-btn {
+    font-size: 0.6875rem !important;
+    gap: 0.2rem !important;
+    padding-left: 0.25rem !important;
+    padding-right: 0.25rem !important;
+  }
+  .students-page .header-actions-group .btn svg,
+  .students-page .header-actions-group .books-btn svg,
+  .students-page .header-actions-group .download-trigger-btn svg,
+  .venues-page   .header-actions-group .btn svg,
+  .venues-page   .header-actions-group .books-btn svg,
+  .venues-page   .header-actions-group .download-trigger-btn svg,
+  .alumni-page   .header-actions-group .btn svg,
+  .alumni-page   .header-actions-group .books-btn svg,
+  .alumni-page   .header-actions-group .download-trigger-btn svg {
+    width: 11px !important;
+    height: 11px !important;
+  }
+}
+
+/* ================================================================
+   FINAL TARGETED FIXES — Round 4
+   ================================================================ */
+
+/* ── Events search+filter bar ───────────────────────────────────── */
+.events-search-filter-bar {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-wrap: nowrap;
+}
+.events-search-filter-bar .search-box-wrapper {
+  flex: 1 1 0 !important;
+  min-width: 0 !important;
+  max-width: 380px !important;
+}
+.events-search-filter-bar .events-filter-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-shrink: 0;
+  flex-wrap: nowrap;
+}
+@media (max-width: 640px) {
+  .events-search-filter-bar {
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 0.5rem !important;
+  }
+  .events-search-filter-bar .search-box-wrapper {
+    max-width: 100% !important;
+    width: 100% !important;
+    flex: 1 1 100% !important;
+  }
+  .events-search-filter-bar .events-filter-row {
+    justify-content: flex-end !important;
+    width: 100% !important;
+  }
+  .events-search-filter-bar .events-filter-row .filter-select {
+    flex: 1 1 auto !important;
+    max-width: 140px !important;
+  }
+  .events-search-filter-bar .events-filter-row .table-stats-badge {
+    flex-shrink: 0 !important;
+    margin-left: auto !important;
+  }
+}
+
+/* ── 2-button pages RIGHT on mobile — authoritative rule at file end ── */
+@media (max-width: 640px) {
+  .alumni-jobs-page .header-actions-group,
+  .staff-page       .header-actions-group,
+  .departments-page .header-actions-group,
+  .events-page      .header-actions-group {
+    width: auto !important;
+    flex: 0 0 auto !important;
+    margin-left: auto !important;
+    align-self: flex-end !important;
+    justify-content: flex-end !important;
+  }
+}
+
+/* ── Alumni filter panel mobile responsive ───────────────────────── */
+@media (max-width: 480px) {
+  .alumni-filter-grid {
+    grid-template-columns: 1fr !important;
+    gap: 0.5rem !important;
+  }
+  .alumni-filter-select {
+    width: 100% !important;
+    font-size: 0.8125rem !important;
+  }
+}
+
+/* ── AttendanceHistory Status column — straight single column ────── */
+.att-hist-student-header,
+.att-hist-student-row {
+  display: flex !important;
+  align-items: center !important;
+  width: 100% !important;
+  box-sizing: border-box !important;
+}
+/* Ensure all cells in rows match header exactly */
+.att-hist-student-row > span,
+.att-hist-student-header > span {
+  flex-shrink: 0 !important;
+  box-sizing: border-box !important;
+}
+
+/* ── All overlays: never touch header on any screen size ─────────── */
+/* This is the single authoritative rule — placed last to win cascade */
+.sf-overlay,
+.modal-overlay,
+.books-overlay,
+.enf-overlay,
+.env-overlay,
+.env-page-overlay,
+.ann-view-overlay,
+.eb-form-overlay {
+  top: var(--header-height, 60px) !important;
+}
+
+@media (min-width: 769px) {
+  .sf-overlay,
+  .modal-overlay,
+  .books-overlay,
+  .enf-overlay,
+  .env-overlay,
+  .ann-view-overlay,
+  .eb-form-overlay {
+    left: var(--sidebar-width, 250px) !important;
+  }
+}
+
+@media (max-width: 768px) {
+  .sf-overlay,
+  .modal-overlay,
+  .books-overlay,
+  .enf-overlay,
+  .env-overlay,
+  .ann-view-overlay,
+  .eb-form-overlay {
+    left: 0 !important;
+    padding: 0.75rem !important;
+    padding-top: 0.75rem !important;
+    align-items: center !important;
+  }
+  /* Modal cards: never touch header — max-height uses header-aware calc */
+  .sf-modal,
+  .modal-content,
+  .books-modal,
+  .enf-card,
+  .env-modal,
+  .ann-view-modal {
+    max-height: calc(100dvh - var(--header-height, 60px) - 1.5rem) !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    border-radius: 14px !important;
+    margin: 0 auto !important;
+  }
+}
+
+/* ── Transport scrollbar: dark, thin, always visible ────────────── */
+.transport-tabs {
+  scrollbar-width: thin !important;
+  scrollbar-color: #111827 #e5e7eb !important;
+  overflow-x: auto !important;
+}
+.transport-tabs::-webkit-scrollbar {
+  display: block !important;
+  height: 4px !important;
+}
+.transport-tabs::-webkit-scrollbar-track {
+  background: #e5e7eb !important;
+  border-radius: 2px !important;
+}
+.transport-tabs::-webkit-scrollbar-thumb {
+  background-color: #111827 !important;
+  border-radius: 2px !important;
+}
+
+/* ── Button size consistency across all modules ──────────────────── */
+/* Single source of truth for button height in header */
+.header-actions-group .btn,
+.header-actions-group .books-btn,
+.header-actions-group .download-trigger-btn {
+  height: 2.25rem !important;
+  padding-top: 0 !important;
+  padding-bottom: 0 !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  box-sizing: border-box !important;
+  white-space: nowrap !important;
+}
+
+/* ================================================================
+   FINAL FIXES — Round 5
+   ================================================================ */
+
+/* ── 1. Filter select: width = content only, no stretch ─────────── */
+.filter-select {
+  width: auto !important;
+  flex: 0 0 auto !important;
+  min-width: 0 !important;
+  max-width: none !important;
+  padding: 0.35rem 0.5rem !important;
+  font-size: 0.8125rem !important;
+  cursor: pointer;
+}
+
+/* ── 2. Event Booking Add/Edit form — fix sidebar offset + center ── */
+/* eb-form-overlay inherits modal-overlay which has position:fixed;
+   the global rule sets top:header-height + left:sidebar-width.
+   Make the dialog centered with proper padding. */
+.eb-form-overlay {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  padding: 1rem !important;
+  box-sizing: border-box !important;
+}
+.eb-form-dialog {
+  max-height: calc(100dvh - var(--header-height, 60px) - 2rem) !important;
+  overflow-y: auto !important;
+  border-radius: 12px !important;
+  width: 100% !important;
+  box-sizing: border-box !important;
+  margin: 0 auto !important;
+}
+@media (min-width: 769px) {
+  .eb-form-dialog {
+    max-width: 820px !important;
+  }
+}
+@media (max-width: 768px) {
+  .eb-form-overlay {
+    padding: 0.75rem !important;
+    align-items: flex-start !important;
+    padding-top: 0.75rem !important;
+  }
+  .eb-form-dialog {
+    max-width: 100% !important;
+    max-height: calc(100dvh - var(--header-height, 60px) - 1.5rem) !important;
+    border-radius: 14px !important;
+  }
+}
+
+/* ── 3. View Event Notice / books-overlay — never touch header ───── */
+/* books-overlay on mobile needs sidebar offset on desktop */
+.books-overlay {
+  top: var(--header-height, 60px) !important;
+}
+@media (min-width: 769px) {
+  .books-overlay {
+    left: var(--sidebar-width, 250px) !important;
+  }
+}
+@media (max-width: 768px) {
+  .books-overlay {
+    left: 0 !important;
+    padding: 0.75rem !important;
+    align-items: center !important;
+  }
+  .books-modal {
+    max-height: calc(100dvh - var(--header-height, 60px) - 1.5rem) !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    border-radius: 14px !important;
+    overflow-y: auto !important;
+  }
+  .books-modal-body {
+    padding: 1rem !important;
+  }
+}
+
+/* ── 4. Students filter panel — same clean layout as Alumni ──────── */
+/* filter-count-row: proper gap between filter btn and total count */
+.filter-count-row {
+  gap: 0.625rem !important;
+  align-items: center !important;
+}
+
+/* Filter btn: compact, natural width */
+.filter-count-row > .students-filter-btn {
+  flex: 0 0 auto !important;
+  width: auto !important;
+  min-width: 0 !important;
+  white-space: nowrap !important;
+  padding-left: 0.625rem !important;
+  padding-right: 0.625rem !important;
+}
+
+/* Total count badge: natural width, no stretch */
+.filter-count-row > .table-stats-badge,
+.filter-count-row > .students-bar-right {
+  flex: 0 0 auto !important;
+  width: auto !important;
+  min-width: 0 !important;
+  margin-left: auto !important;
+}
+
+/* Students filter panel: 2-column grid like Alumni on mobile */
+.students-filter-panel {
+  padding: 0.875rem 1rem !important;
+  gap: 0.75rem !important;
+}
+
+@media (max-width: 640px) {
+  .students-filter-grid {
+    grid-template-columns: 1fr 1fr !important;
+    gap: 0.625rem !important;
+  }
+  .students-filter-select {
+    width: 100% !important;
+    font-size: 0.8125rem !important;
+    padding: 0.35rem 0.5rem !important;
+  }
+  .students-filter-group label {
+    font-size: 0.75rem !important;
+  }
+}
+
+@media (max-width: 380px) {
+  .students-filter-grid {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+/* ── 5. env-overlay / env-modal (Event Notice view on mobile) ────── */
+.env-overlay {
+  top: var(--header-height, 60px) !important;
+}
+@media (min-width: 769px) {
+  .env-overlay {
+    left: var(--sidebar-width, 250px) !important;
+  }
+}
+@media (max-width: 768px) {
+  .env-overlay {
+    left: 0 !important;
+    padding: 0.75rem !important;
+    align-items: center !important;
+  }
+  .env-modal {
+    max-height: calc(100dvh - var(--header-height, 60px) - 1.5rem) !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    border-radius: 14px !important;
+  }
+}
+
+/* ── 6. Event Notices board filter selects: compact width ────────── */
+.events-board-filter-wrapper .filter-selects .filter-select {
+  width: auto !important;
+  flex: 0 0 auto !important;
+}
+
+/* ── 7. Ensure all filter selects compact — not stretched ────────── */
+.en-filter-select {
+  width: auto !important;
+  flex: 0 0 auto !important;
+  min-width: 120px !important;
+}
+
+/* ── 8. Table controls bar: proper gap between items ─────────────── */
+.table-controls-bar {
+  gap: 0.75rem !important;
+}
+
+/* ================================================================
+   ABSOLUTE FINAL OVERRIDE — All modals stay below header
+   These rules use !important and are the LAST in the file.
+   ================================================================ */
+
+/* STEP 1: All overlays start at header height */
+.sf-overlay { top: var(--header-height, 60px) !important; }
+.modal-overlay { top: var(--header-height, 60px) !important; }
+.books-overlay { top: var(--header-height, 60px) !important; }
+.enf-overlay { top: var(--header-height, 60px) !important; }
+.env-overlay { top: var(--header-height, 60px) !important; }
+.ann-view-overlay { top: var(--header-height, 60px) !important; }
+.eb-form-overlay { top: var(--header-height, 60px) !important; }
+
+/* STEP 2: Desktop (>768px) — offset left by sidebar width */
+@media (min-width: 769px) {
+  .sf-overlay,
+  .modal-overlay,
+  .books-overlay,
+  .enf-overlay,
+  .env-overlay,
+  .ann-view-overlay,
+  .eb-form-overlay { left: var(--sidebar-width, 250px) !important; }
+}
+
+/* STEP 3: Mobile (<=768px) — full width from left:0 */
+@media (max-width: 768px) {
+  .sf-overlay,
+  .modal-overlay,
+  .books-overlay,
+  .enf-overlay,
+  .env-overlay,
+  .ann-view-overlay,
+  .eb-form-overlay {
+    left: 0 !important;
+    padding: 0.75rem !important;
+    align-items: center !important;
+  }
+  /* All modal cards: constrained height, never touch bottom */
+  .sf-modal,
+  .modal-content.delete-dialog,
+  .books-modal,
+  .enf-card,
+  .env-modal,
+  .ann-view-modal,
+  .eb-form-dialog {
+    max-height: calc(100dvh - var(--header-height, 60px) - 1.5rem) !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    border-radius: 14px !important;
+    overflow-y: auto !important;
+    box-sizing: border-box !important;
+  }
+}
+
+/* eb-form-dialog specific centering */
+.eb-form-overlay {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+.eb-form-dialog {
+  max-height: calc(100dvh - var(--header-height, 60px) - 2rem) !important;
+  overflow-y: auto !important;
+  box-sizing: border-box !important;
+  margin: 0 auto !important;
+  border-radius: 12px !important;
+}
+@media (max-width: 768px) {
+  .eb-form-overlay {
+    align-items: flex-start !important;
+  }
+  .eb-form-dialog {
+    width: 100% !important;
+    max-width: 100% !important;
+    max-height: calc(100dvh - var(--header-height, 60px) - 1.5rem) !important;
+    border-radius: 14px !important;
+  }
+}
+
+/* ── Students filter: remove duplicate × from total count box ────── */
+/* The students-bar-right contains both Clear All btn and stats badge.
+   On mobile, separate them visually so × doesn't overlap count */
+.students-bar-right {
+  display: flex !important;
+  align-items: center !important;
+  gap: 0.375rem !important;
+  flex-wrap: nowrap !important;
+  background: transparent !important;
+  border: none !important;
+  padding: 0 !important;
+}
+/* Clear All button: compact, icon-only on very small screens */
+@media (max-width: 400px) {
+  .students-clear-all-btn > span {
+    display: none !important;
+  }
+  .students-clear-all-btn {
+    padding: 0.3rem 0.4rem !important;
+  }
+}
+
+/* ── View Event Notices board: filter row spacing fix ────────────── */
+/* Category + Status selects: proper gap, not touching */
+.events-board-filter-wrapper .filter-selects {
+  display: flex !important;
+  gap: 0.5rem !important;
+  align-items: center !important;
+}
+.events-board-filter-wrapper .filter-selects .filter-select {
+  flex: 0 0 auto !important;
+  width: auto !important;
+  min-width: 100px !important;
+  max-width: 140px !important;
+}
+.events-board-filter-wrapper {
+  gap: 0.75rem !important;
+  flex-wrap: wrap !important;
+}
+
+/* ── Filter count row: proper spacing ───────────────────────────── */
+.filter-count-row {
+  gap: 0.5rem !important;
+  align-items: center !important;
+  flex-wrap: nowrap !important;
+}
+
+/* ================================================================
+   TABLE FIXES — Staff, Alumni, AlumniJobs fit without scroll
+   ================================================================ */
+
+/* Staff: keep action labels visible — icon + text both shown */
+/* (no hiding of .action-label in desktop tables) */
+
+/* All desktop tables: prevent overflow on laptop */
+.stf-desk-table .data-table,
+.alm-desk-table .data-table {
+  table-layout: fixed;
+  width: 100%;
+}
+
+/* Action buttons cell: compact icon-only buttons */
+.stf-desk-table .action-buttons-cell,
+.alm-desk-table .action-buttons-cell {
+  gap: 0.25rem !important;
+}
+.stf-desk-table .action-btn,
+.alm-desk-table .action-btn {
+  padding: 0.3rem !important;
+  min-width: 28px !important;
+  justify-content: center !important;
+}
+
+/* Alumni Profiles: truncate long cells */
+.alm-desk-table td {
+  max-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+/* Exceptions: ID badge and actions don't truncate */
+.alm-desk-table .code-badge,
+.alm-desk-table .action-buttons-cell {
+  overflow: visible !important;
+  white-space: normal !important;
+}
+
+/* ── Event Booking filter: right-aligned ─────────────────────────── */
+.events-search-filter-bar {
+  display: flex !important;
+  align-items: center !important;
+  gap: 0.75rem !important;
+  flex-wrap: nowrap !important;
+}
+.events-search-filter-bar .search-box-wrapper {
+  flex: 1 1 0 !important;
+  min-width: 0 !important;
+  max-width: 380px !important;
+}
+.events-search-filter-bar .events-filter-row {
+  display: flex !important;
+  align-items: center !important;
+  gap: 0.5rem !important;
+  flex-shrink: 0 !important;
+  margin-left: auto !important;  /* push to RIGHT */
+  flex-wrap: nowrap !important;
+}
+.events-search-filter-bar .events-filter-row .filter-select {
+  flex: 0 0 auto !important;
+  width: auto !important;
+}
+.events-search-filter-bar .events-filter-row .table-stats-badge {
+  flex-shrink: 0 !important;
+  white-space: nowrap !important;
+}
+
+/* ── Attendance Records filter bar: same search bar width as others ── */
+.att-hist-filters {
+  display: flex !important;
+  align-items: center !important;
+  gap: 0.625rem !important;
+  flex-wrap: wrap !important;
+  padding: 0.875rem 1rem !important;
+  margin-bottom: 1.25rem !important;
+}
+.att-hist-filters .search-box-wrapper {
+  flex: 1 1 auto !important;
+  max-width: 380px !important;
+  min-width: 150px !important;
+}
+.att-hist-select {
+  flex: 1 1 120px !important;
+  max-width: 180px !important;
+}
+
+/* ── Event Notices / View Event Notices: consistent search bar ────── */
+/* en-filter-bar search: cap at 380px to match other modules */
+.en-filter-bar .en-search,
+.en-filter-bar .search-box-wrapper {
+  max-width: 380px !important;
+}
+/* EventNoticesBoard: same cap */
+.events-board-filter-wrapper .search-box-wrapper {
+  max-width: 380px !important;
+}
+
+/* ================================================================
+   TABLE OVERFLOW FIX — Full table visible without horizontal scroll
+   No UI changes — just table-layout:auto so columns share space
+   ================================================================ */
+
+/* Override any fixed column widths so the browser distributes space */
+.stf-desk-table .data-table,
+.alm-desk-table .data-table,
+.alj-desk-table .data-table {
+  table-layout: auto !important;
+  width: 100% !important;
+}
+
+/* All th/td: allow wrapping so content fits in available space */
+.stf-desk-table .data-table th,
+.stf-desk-table .data-table td,
+.alm-desk-table .data-table th,
+.alm-desk-table .data-table td {
+  white-space: normal !important;
+  word-break: break-word !important;
+  overflow-wrap: break-word !important;
+}
+
+/* Exception: code badges, status pills and action buttons stay nowrap */
+.stf-desk-table .code-badge,
+.alm-desk-table .code-badge,
+.stf-desk-table .action-buttons-cell,
+.alm-desk-table .action-buttons-cell,
+.stf-desk-table .action-btn,
+.alm-desk-table .action-btn {
+  white-space: nowrap !important;
+  word-break: normal !important;
+}
+
+/* Remove all fixed widths on th for these tables so auto layout works */
+.stf-desk-table .data-table th[style*="width"],
+.alm-desk-table .data-table th[style*="width"] {
+  width: auto !important;
+  min-width: 0 !important;
+}
+
+/* Action column: compact enough to always fit */
+.stf-desk-table .data-table th:last-child,
+.stf-desk-table .data-table td:last-child,
+.alm-desk-table .data-table th:last-child,
+.alm-desk-table .data-table td:last-child {
+  width: 1% !important;      /* shrink to content */
+  white-space: nowrap !important;
+}
+
+/* AlumniJobs table */
+.alj-desk-table .data-table {
+  table-layout: auto !important;
+  width: 100% !important;
+}
+.alj-desk-table .data-table th,
+.alj-desk-table .data-table td {
+  white-space: normal !important;
+  word-break: break-word !important;
+}
+.alj-desk-table .data-table th:last-child,
+.alj-desk-table .data-table td:last-child,
+.alj-desk-table .code-badge,
+.alj-desk-table .action-btn,
+.alj-desk-table .action-buttons-cell {
+  white-space: nowrap !important;
+  word-break: normal !important;
+  width: 1% !important;
+}
+
+/* ================================================================
+   EVENT NOTICES — Filter right-aligned, search capped at 380px
+   ================================================================ */
+
+/* en-filter-bar: search left (capped), filters+count pushed to RIGHT */
+@media (min-width: 769px) {
+  .en-filter-bar {
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: center !important;
+    gap: 0.75rem !important;
+    flex-wrap: nowrap !important;
+  }
+  .en-filter-bar .en-search,
+  .en-filter-bar .search-box-wrapper {
+    flex: 0 0 auto !important;
+    width: 380px !important;
+    max-width: 380px !important;
+  }
+  .en-filter-bar .en-filter-row {
+    flex: 0 0 auto !important;
+    display: flex !important;
+    gap: 0.5rem !important;
+    align-items: center !important;
+    margin-left: auto !important;   /* push filters+count to RIGHT */
+  }
+  .en-filter-bar .en-filter-count {
+    flex-shrink: 0 !important;
+  }
+}
+
+/* View Event Notices (EventNoticesBoard): same layout */
+@media (min-width: 769px) {
+  .events-board-filter-wrapper {
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: center !important;
+    gap: 0.75rem !important;
+    flex-wrap: nowrap !important;
+  }
+  .events-board-filter-wrapper .search-box-wrapper {
+    flex: 0 0 380px !important;
+    width: 380px !important;
+    max-width: 380px !important;
+  }
+  .events-board-filter-wrapper .filter-selects {
+    display: flex !important;
+    gap: 0.5rem !important;
+    align-items: center !important;
+    margin-left: auto !important;   /* push filters+count to RIGHT */
+    flex-shrink: 0 !important;
+  }
+  .events-board-filter-wrapper .table-stats-badge {
+    flex-shrink: 0 !important;
+  }
+}
+
+/* Mobile: stack search on row 1, filters+count on row 2 right-aligned */
+@media (max-width: 768px) {
+  .en-filter-bar {
+    flex-direction: column !important;
+    gap: 0.5rem !important;
+  }
+  .en-filter-bar .en-search,
+  .en-filter-bar .search-box-wrapper {
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+  .en-filter-bar .en-filter-row {
+    width: 100% !important;
+    display: flex !important;
+    justify-content: flex-end !important;
+    gap: 0.5rem !important;
+    align-items: center !important;
+  }
+  .events-board-filter-wrapper {
+    flex-direction: column !important;
+    gap: 0.5rem !important;
+  }
+  .events-board-filter-wrapper .search-box-wrapper {
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+  .events-board-filter-wrapper .filter-selects {
+    width: 100% !important;
+    justify-content: flex-end !important;
+    display: flex !important;
+    gap: 0.5rem !important;
+    align-items: center !important;
+  }
+}
+
+/* ── Table action buttons: keep text, reduce padding to fit ──────── */
+.stf-desk-table .action-btn,
+.alm-desk-table .action-btn,
+.alj-desk-table .action-btn {
+  padding: 0.25rem 0.5rem !important;
+  font-size: 0.75rem !important;
+  gap: 0.25rem !important;
+}
+.stf-desk-table .action-btn svg,
+.alm-desk-table .action-btn svg,
+.alj-desk-table .action-btn svg {
+  width: 13px !important;
+  height: 13px !important;
+}
+.stf-desk-table .action-buttons-cell,
+.alm-desk-table .action-buttons-cell,
+.alj-desk-table .action-buttons-cell {
+  gap: 0.25rem !important;
+  flex-wrap: nowrap !important;
+}
+
+/* ================================================================
+   TABLE LAYOUT FIX — Fixed layout + ellipsis for all affected tables
+   Forces columns to honour their widths regardless of content length
+   ================================================================ */
+
+/* Apply fixed table layout to all main data tables */
+.stu-desk-table .data-table,
+.stf-desk-table .data-table,
+.ven-desk-table .data-table,
+.alm-desk-table .data-table,
+.alj-desk-table .data-table,
+.transport-table {
+  table-layout: fixed !important;
+  width: 100% !important;
+}
+
+/* All td: truncate with ellipsis so long text never expands columns */
+.stu-desk-table .data-table td,
+.stf-desk-table .data-table td,
+.ven-desk-table .data-table td,
+.alm-desk-table .data-table td,
+.alj-desk-table .data-table td,
+.transport-table td {
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  white-space: nowrap !important;
+  max-width: 0 !important;
+}
+
+/* Exceptions: badges, status pills, action cells — don't truncate */
+.stu-desk-table .code-badge,
+.stu-desk-table .action-btn,
+.stu-desk-table .action-buttons-cell,
+.stf-desk-table .code-badge,
+.stf-desk-table .action-btn,
+.stf-desk-table .action-buttons-cell,
+.ven-desk-table .code-badge,
+.ven-desk-table .action-btn,
+.ven-desk-table .action-buttons-cell,
+.alm-desk-table .code-badge,
+.alm-desk-table .action-btn,
+.alm-desk-table .action-buttons-cell,
+.alj-desk-table .code-badge,
+.alj-desk-table .action-btn,
+.alj-desk-table .action-buttons-cell,
+.transport-table .code-badge,
+.transport-table .action-btn,
+.transport-table .action-buttons-cell,
+.status-pill,
+.dept-name-cell {
+  overflow: visible !important;
+  text-overflow: clip !important;
+  white-space: nowrap !important;
+  max-width: none !important;
+}
+
+/* Action buttons cell: always fit, no truncation */
+.stu-desk-table td:last-child,
+.stf-desk-table td:last-child,
+.ven-desk-table td:last-child,
+.alm-desk-table td:last-child,
+.alj-desk-table td:last-child,
+.transport-table td:last-child {
+  overflow: visible !important;
+  text-overflow: clip !important;
+}
+
+/* Compact action button padding to save space */
+.stu-desk-table .action-btn,
+.stf-desk-table .action-btn,
+.ven-desk-table .action-btn,
+.alm-desk-table .action-btn,
+.alj-desk-table .action-btn,
+.transport-table .action-btn {
+  padding: 0.25rem 0.5rem !important;
+  font-size: 0.75rem !important;
+  gap: 0.25rem !important;
+}
+.stu-desk-table .action-btn svg,
+.stf-desk-table .action-btn svg,
+.ven-desk-table .action-btn svg,
+.alm-desk-table .action-btn svg,
+.alj-desk-table .action-btn svg,
+.transport-table .action-btn svg {
+  width: 13px !important;
+  height: 13px !important;
+  flex-shrink: 0 !important;
+}
+.stu-desk-table .action-buttons-cell,
+.stf-desk-table .action-buttons-cell,
+.ven-desk-table .action-buttons-cell,
+.alm-desk-table .action-buttons-cell,
+.alj-desk-table .action-buttons-cell {
+  gap: 0.25rem !important;
+  flex-wrap: nowrap !important;
+  justify-content: center !important;
+}
+
+/* ================================================================
+   RESPONSIVE UI FIXES — Issues 1-9
+   ================================================================ */
+
+/* FIX 2: Filter-count-row always visible */
+.filter-count-row {
+  min-width: 0;
+  overflow: visible;
+}
+
+/* FIX 3: Always show "Students" / "Alumni" label in total count badge */
+.badge-label-full {
+  display: inline !important;
+}
+
+/* FIX 5: Back button above title utility class */
+.page-back-above {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.375rem;
+}
+.page-back-above .btn-back {
+  margin-bottom: 0.25rem;
+}
+
+/* FIX 6: Mobile list action buttons right-aligned */
+.mob-card-actions {
+  justify-content: flex-end !important;
+}
+.mob-card-actions .action-btn,
+.mob-card-actions .books-btn,
+.mob-card-actions .btn {
+  flex: 0 0 auto !important;
+  width: auto !important;
+}
+
+/* FIX 7: 2-button pages — buttons LEFT-aligned below subtitle on medium screens */
+@media (min-width: 641px) and (max-width: 1279px) {
+  .staff-page .page-header-row,
+  .departments-page .page-header-row,
+  .alumni-jobs-page .page-header-row {
+    flex-wrap: wrap !important;
+  }
+  .staff-page .page-header-row > div:first-child,
+  .departments-page .page-header-row > div:first-child,
+  .alumni-jobs-page .page-header-row > div:first-child {
+    flex: 1 1 100% !important;
+    order: 1 !important;
+  }
+  .staff-page .header-actions-group,
+  .departments-page .header-actions-group,
+  .alumni-jobs-page .header-actions-group {
+    margin-left: 0 !important;
+    margin-right: auto !important;
+    align-self: flex-start !important;
+    justify-content: flex-start !important;
+    order: 2 !important;
+    flex-wrap: nowrap !important;
+  }
+  .students-page .header-actions-group,
+  .venues-page .header-actions-group,
+  .alumni-page .header-actions-group {
+    margin-left: auto !important;
+    margin-right: 0 !important;
+    align-self: flex-start !important;
+    justify-content: flex-end !important;
+  }
+}
+
+/* FIX 8: Event Notices / View Event Notices — filter bar responsive at ALL sizes */
+.en-filter-bar {
+  display: flex !important;
+  flex-wrap: wrap !important;
+  align-items: center !important;
+  gap: 0.625rem !important;
+}
+.en-filter-bar .en-search,
+.en-filter-bar .search-box-wrapper.en-search {
+  flex: 1 1 200px !important;
+  min-width: 150px !important;
+}
+.en-filter-bar .en-filter-row {
+  display: flex !important;
+  flex-wrap: nowrap !important;
+  gap: 0.5rem !important;
+  align-items: center !important;
+  flex-shrink: 0 !important;
+}
+.en-filter-bar .en-filter-select {
+  flex: 0 0 auto !important;
+  min-width: 110px !important;
+  max-width: 160px !important;
+}
+.en-filter-bar .en-filter-count {
+  flex-shrink: 0 !important;
+}
+.events-board-filter-wrapper {
+  display: flex !important;
+  flex-wrap: wrap !important;
+  align-items: center !important;
+  gap: 0.625rem !important;
+}
+.events-board-filter-wrapper .search-box-wrapper {
+  flex: 1 1 200px !important;
+  min-width: 150px !important;
+  max-width: 400px !important;
+}
+.events-board-filter-wrapper .filter-selects {
+  display: flex !important;
+  flex-wrap: nowrap !important;
+  gap: 0.5rem !important;
+  align-items: center !important;
+  flex-shrink: 0 !important;
+}
+.events-board-filter-wrapper .filter-selects .filter-select {
+  flex: 0 0 auto !important;
+  min-width: 110px !important;
+  max-width: 160px !important;
+}
+.events-board-filter-wrapper .table-stats-badge {
+  flex-shrink: 0 !important;
+}
+@media (max-width: 600px) {
+  .en-filter-bar {
+    flex-direction: column !important;
+    align-items: stretch !important;
+  }
+  .en-filter-bar .en-search,
+  .en-filter-bar .search-box-wrapper.en-search {
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+  .en-filter-bar .en-filter-row {
+    justify-content: space-between !important;
+  }
+  .en-filter-bar .en-filter-select {
+    flex: 1 1 0 !important;
+    min-width: 0 !important;
+  }
+  .en-filter-bar .en-filter-count {
+    text-align: right !important;
+  }
+  .events-board-filter-wrapper {
+    flex-direction: column !important;
+    align-items: stretch !important;
+  }
+  .events-board-filter-wrapper .search-box-wrapper {
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+  .events-board-filter-wrapper .filter-selects {
+    justify-content: flex-end !important;
+  }
+  .events-board-filter-wrapper .filter-selects .filter-select {
+    flex: 1 1 0 !important;
+    min-width: 0 !important;
+  }
+}
+
+/* FIX 9: Filter + count on same row as search bar on desktop/medium screens */
+@media (min-width: 641px) {
+  .students-page .table-controls-bar,
+  .alumni-page .table-controls-bar,
+  .alumni-jobs-page .table-controls-bar,
+  .venues-page .table-controls-bar,
+  .departments-page .table-controls-bar,
+  .staff-page .table-controls-bar {
+    flex-direction: row !important;
+    flex-wrap: nowrap !important;
+    align-items: center !important;
+  }
+  .students-page .table-controls-bar .search-box-wrapper,
+  .alumni-page .table-controls-bar .search-box-wrapper,
+  .alumni-jobs-page .table-controls-bar .search-box-wrapper,
+  .venues-page .table-controls-bar .search-box-wrapper,
+  .departments-page .table-controls-bar .search-box-wrapper,
+  .staff-page .table-controls-bar .search-box-wrapper {
+    flex: 1 1 auto !important;
+    max-width: 380px !important;
+    min-width: 120px !important;
+  }
+  .students-page .table-controls-bar .filter-count-row,
+  .alumni-page .table-controls-bar .filter-count-row {
+    flex: 0 0 auto !important;
+    width: auto !important;
+  }
+  .alumni-jobs-page .table-controls-bar > div:last-child,
+  .venues-page .table-controls-bar .table-stats-badge,
+  .departments-page .table-controls-bar .table-stats-badge,
+  .staff-page .table-controls-bar .table-stats-badge {
+    flex: 0 0 auto !important;
+    white-space: nowrap !important;
+  }
+}
+
+
+/* ================================================================
+   ISSUE FIXES — Back arrow above title, mobile alignment,
+   filter bars, total count label, button alignment
+   ================================================================ */
+
+/* Issue 3: Always show "X Students / X Staff Members" label — never hide */
+.badge-label-full {
+  display: inline !important;
+}
+
+/* Issue 4: Bulk Upload page title single line on mobile */
+@media (max-width: 480px) {
+  .page-title {
+    white-space: normal;
+  }
+}
+
+/* Issue 5: Back button above title — page-header pattern */
+/* The btn-back sits directly inside .page-header as first child,
+   followed by the title/subtitle div. Use flex-column layout. */
+.page-header {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0;
+}
+.page-header > .btn-back {
+  margin-bottom: 0.5rem;
+  align-self: flex-start;
+}
+
+/* Issue 6: Mobile list (mob-card-actions) buttons right-aligned, natural width */
+.mob-card-actions {
+  justify-content: flex-end !important;
+}
+.mob-card-actions > .action-btn,
+.mob-card-actions > .books-btn,
+.mob-card-actions > .btn {
+  flex: 0 0 auto !important;
+  width: auto !important;
+}
+
+/* Issue 7: Modules with exactly 2 buttons — LEFT-aligned below subtitle
+   on medium (641-1279px) viewports (desktop-site-from-mobile).
+   Modules with 1 or 3+ buttons stay RIGHT-aligned. */
+@media (min-width: 641px) and (max-width: 1279px) {
+  /* Wrap so title fills row 1, buttons go to row 2 */
+  .staff-page .page-header-row,
+  .departments-page .page-header-row,
+  .alumni-jobs-page .page-header-row {
+    flex-wrap: wrap !important;
+    gap: 0.75rem !important;
+  }
+  /* Title div: full width on row 1 */
+  .staff-page .page-header-row > div:first-child,
+  .departments-page .page-header-row > div:first-child,
+  .alumni-jobs-page .page-header-row > div:first-child {
+    flex: 1 1 100% !important;
+  }
+  /* Buttons: LEFT side, natural width, row 2 */
+  .staff-page .header-actions-group,
+  .departments-page .header-actions-group,
+  .alumni-jobs-page .header-actions-group {
+    margin-left: 0 !important;
+    margin-right: auto !important;
+    align-self: flex-start !important;
+    justify-content: flex-start !important;
+    flex-wrap: nowrap !important;
+  }
+
+  /* 3-button pages: also wrap, but buttons stay RIGHT */
+  .students-page .page-header-row,
+  .venues-page .page-header-row,
+  .alumni-page .page-header-row {
+    flex-wrap: wrap !important;
+    gap: 0.75rem !important;
+  }
+  .students-page .page-header-row > div:first-child,
+  .venues-page .page-header-row > div:first-child,
+  .alumni-page .page-header-row > div:first-child {
+    flex: 1 1 100% !important;
+  }
+  .students-page .header-actions-group,
+  .venues-page .header-actions-group,
+  .alumni-page .header-actions-group {
+    margin-left: auto !important;
+    margin-right: 0 !important;
+    align-self: flex-start !important;
+    justify-content: flex-end !important;
+    flex-wrap: nowrap !important;
+  }
+
+  /* 1-button pages: RIGHT aligned */
+  .event-notices-page .header-actions-group,
+  .system-announcements-page .header-actions-group {
+    margin-left: auto !important;
+    margin-right: 0 !important;
+    justify-content: flex-end !important;
+    flex-wrap: nowrap !important;
+  }
+}
+
+/* Issue 8: Event Notices (admin) + View Event Notices — filter bar responsive */
+/* On ALL screen sizes: search fills available, filters + count on same row */
+.en-filter-bar {
+  display: flex !important;
+  flex-wrap: wrap !important;
+  align-items: center !important;
+  gap: 0.625rem !important;
+}
+.en-filter-bar .en-search,
+.en-filter-bar .search-box-wrapper.en-search {
+  flex: 1 1 160px !important;
+  min-width: 140px !important;
+  max-width: 380px !important;
+}
+.en-filter-bar .en-filter-row {
+  display: flex !important;
+  flex-wrap: nowrap !important;
+  gap: 0.5rem !important;
+  align-items: center !important;
+  flex-shrink: 0 !important;
+}
+.en-filter-bar .en-filter-select {
+  flex: 0 0 auto !important;
+  min-width: 110px !important;
+  max-width: 155px !important;
+}
+.en-filter-bar .en-filter-count {
+  flex-shrink: 0 !important;
+}
+
+/* EventNoticesBoard view page */
+.events-board-filter-wrapper {
+  display: flex !important;
+  flex-wrap: wrap !important;
+  align-items: center !important;
+  gap: 0.625rem !important;
+}
+.events-board-filter-wrapper .search-box-wrapper {
+  flex: 1 1 160px !important;
+  min-width: 140px !important;
+  max-width: 380px !important;
+}
+.events-board-filter-wrapper .filter-selects {
+  display: flex !important;
+  flex-wrap: nowrap !important;
+  gap: 0.5rem !important;
+  align-items: center !important;
+  flex-shrink: 0 !important;
+}
+.events-board-filter-wrapper .filter-selects .filter-select {
+  flex: 0 0 auto !important;
+  min-width: 110px !important;
+  max-width: 155px !important;
+}
+.events-board-filter-wrapper > .table-stats-badge {
+  flex-shrink: 0 !important;
+}
+
+/* Mobile (<=600px): stack search on row 1, filters row 2 right-aligned */
+@media (max-width: 600px) {
+  .en-filter-bar {
+    flex-direction: column !important;
+    align-items: stretch !important;
+  }
+  .en-filter-bar .en-search,
+  .en-filter-bar .search-box-wrapper.en-search {
+    max-width: 100% !important;
+    width: 100% !important;
+    flex: 1 1 100% !important;
+  }
+  .en-filter-bar .en-filter-row {
+    justify-content: space-between !important;
+  }
+  .en-filter-bar .en-filter-select {
+    flex: 1 1 0 !important;
+    min-width: 0 !important;
+  }
+  .events-board-filter-wrapper {
+    flex-direction: column !important;
+    align-items: stretch !important;
+  }
+  .events-board-filter-wrapper .search-box-wrapper {
+    max-width: 100% !important;
+    width: 100% !important;
+    flex: 1 1 100% !important;
+  }
+  .events-board-filter-wrapper .filter-selects {
+    justify-content: space-between !important;
+    width: 100% !important;
+  }
+  .events-board-filter-wrapper .filter-selects .filter-select {
+    flex: 1 1 0 !important;
+    min-width: 0 !important;
+  }
+  .events-board-filter-wrapper > .table-stats-badge {
+    align-self: flex-end !important;
+  }
+}
+
+/* Issue 9: Filter + total count NEVER go below search bar on desktop view from mobile.
+   On viewports >= 641px, table-controls-bar stays in one row. */
+@media (min-width: 641px) {
+  .students-page .table-controls-bar,
+  .alumni-page .table-controls-bar,
+  .venues-page .table-controls-bar,
+  .departments-page .table-controls-bar,
+  .staff-page .table-controls-bar,
+  .alumni-jobs-page .table-controls-bar {
+    flex-direction: row !important;
+    flex-wrap: nowrap !important;
+    align-items: center !important;
+    gap: 0.75rem !important;
+  }
+  .students-page .table-controls-bar .search-box-wrapper,
+  .alumni-page .table-controls-bar .search-box-wrapper,
+  .venues-page .table-controls-bar .search-box-wrapper,
+  .departments-page .table-controls-bar .search-box-wrapper,
+  .staff-page .table-controls-bar .search-box-wrapper,
+  .alumni-jobs-page .table-controls-bar .search-box-wrapper {
+    flex: 1 1 auto !important;
+    max-width: 380px !important;
+    min-width: 120px !important;
+  }
+  /* filter-count-row: auto width, same line as search */
+  .students-page .table-controls-bar .filter-count-row,
+  .alumni-page .table-controls-bar .filter-count-row {
+    flex: 0 0 auto !important;
+    width: auto !important;
+  }
+  /* plain stats badge (no filter): natural width */
+  .staff-page .table-controls-bar .table-stats-badge,
+  .venues-page .table-controls-bar .table-stats-badge,
+  .departments-page .table-controls-bar .table-stats-badge,
+  .alumni-jobs-page .table-controls-bar .table-stats-badge {
+    flex: 0 0 auto !important;
+    white-space: nowrap !important;
+    min-width: 0 !important;
+  }
+}
+
+/* Issue 1: Students filter panel — no duplicate clear button.
+   Only the students-bar-right shows clear-all; remove extra spacing. */
+
+/* Issue 3 (mobile total count): ensure students-bar-right always shows label */
+.students-bar-right .table-stats-badge .badge-label-full,
+.filter-count-row .students-bar-right .badge-label-full {
+  display: inline !important;
+}
+
+/* BulkUploadStudents: title single line on all sizes */
+.student-bulk-card ~ * h1.page-title,
+.page-container > .page-header h1.page-title {
+  white-space: nowrap;
+}
+
+/* ================================================================
+   # COLUMN FIX — All data tables (Students, Staff, Venues,
+   Alumni, AlumniJobs, Transport)
+   Matches the Books module padding: 11px 14px.
+   The number must NEVER be clipped or show "...".
+   ================================================================ */
+
+/* Number cell in all tables — full visibility, same padding as books */
+td.stu-num-cell {
+  overflow: visible !important;
+  white-space: nowrap !important;
+  text-overflow: clip !important;
+  padding: 11px 8px 11px 14px !important;
+  color: var(--text-secondary);
+  font-size: 0.875rem;
+  vertical-align: middle;
+  max-width: none !important;
+}
+
+/* Ensure the th for # also has the same left-padding */
+.data-table th:first-child,
+.stu-desk-table .data-table th:first-child,
+.stf-desk-table .data-table th:first-child,
+.ven-desk-table .data-table th:first-child,
+.alm-desk-table .data-table th:first-child,
+.ajb-desk-table .data-table th:first-child,
+.transport-table th:first-child {
+  padding-left: 14px !important;
+  overflow: visible !important;
+  white-space: nowrap !important;
+  text-overflow: clip !important;
+}
+
+/* ALL td in these tables: match books padding exactly */
+.stu-desk-table .data-table td,
+.stf-desk-table .data-table td,
+.ven-desk-table .data-table td,
+.alm-desk-table .data-table td,
+.ajb-desk-table .data-table td,
+.transport-table td {
+  padding: 11px 14px !important;
+  vertical-align: middle;
+}
+
+/* ALL th in these tables: match books padding exactly */
+.stu-desk-table .data-table th,
+.stf-desk-table .data-table th,
+.ven-desk-table .data-table th,
+.alm-desk-table .data-table th,
+.ajb-desk-table .data-table th,
+.transport-table th {
+  padding: 11px 14px !important;
+}
+
+/* action-buttons-cell: always nowrap so View/Edit/Delete stay on one line */
+.action-buttons-cell {
+  flex-wrap: nowrap !important;
+  white-space: nowrap !important;
+  gap: 0.25rem !important;
+}
+
+/* action-btn: compact padding so 3 buttons fit without scroll */
+.stu-desk-table .action-btn,
+.stf-desk-table .action-btn,
+.ven-desk-table .action-btn,
+.alm-desk-table .action-btn,
+.ajb-desk-table .action-btn,
+.transport-table .action-btn {
+  padding: 0.3rem 0.6rem !important;
+  font-size: 0.8rem !important;
+  gap: 0.25rem !important;
+  white-space: nowrap !important;
+}
+
+/* Mobile mob-card-actions: always one row, never wrap, right-aligned */
+.mob-card-actions {
+  display: flex !important;
+  flex-direction: row !important;
+  flex-wrap: nowrap !important;
+  justify-content: flex-end !important;
+  align-items: center !important;
+  gap: 0.375rem !important;
+}
+
+.mob-card-actions .action-btn {
+  flex: 0 0 auto !important;
+  white-space: nowrap !important;
+  min-width: 0 !important;
+  padding: 0.3rem 0.6rem !important;
+  font-size: 0.8rem !important;
+}
+
+/* ================================================================
+   EVENT BOOKINGS — 2-button page: LEFT-aligned below subtitle
+   on all medium viewport sizes (641px - 1279px)
+   ================================================================ */
+@media (min-width: 641px) and (max-width: 1279px) {
+  .events-page .page-header-row {
+    flex-wrap: wrap !important;
+  }
+  .events-page .page-header-row > div:first-child {
+    flex: 1 1 100% !important;
+  }
+  .events-page .header-actions-group,
+  .events-page .events-header-actions {
+    margin-left: 0 !important;
+    margin-right: auto !important;
+    align-self: flex-start !important;
+    justify-content: flex-start !important;
+    flex-wrap: nowrap !important;
+    order: 2 !important;
+  }
+}
+
+/* Also ensure on pure mobile (<= 640px) event buttons are left-aligned */
+@media (max-width: 640px) {
+  .events-page .header-actions-group,
+  .events-page .events-header-actions {
+    margin-left: 0 !important;
+    align-self: flex-start !important;
+    justify-content: flex-start !important;
+    width: auto !important;
+  }
+}
+
+/* ================================================================
+   DEPARTMENTS — 2-button page: also LEFT-aligned (same fix)
+   ================================================================ */
+@media (min-width: 641px) and (max-width: 1279px) {
+  .departments-page .page-header-row {
+    flex-wrap: wrap !important;
+  }
+  .departments-page .page-header-row > div:first-child {
+    flex: 1 1 100% !important;
+  }
+  .departments-page .header-actions-group {
+    margin-left: 0 !important;
+    margin-right: auto !important;
+    align-self: flex-start !important;
+    justify-content: flex-start !important;
+    flex-wrap: nowrap !important;
+  }
+}
+
+/* ================================================================
+   TABLE LAYOUT AUTO OVERRIDE
+   The data-table CSS sets table-layout: fixed which causes columns
+   to truncate. Switch all module tables to auto layout so columns
+   size naturally and nothing gets clipped.
+   ================================================================ */
+
+.stu-desk-table .data-table,
+.stf-desk-table .data-table,
+.ven-desk-table .data-table,
+.alm-desk-table .data-table,
+.ajb-desk-table .data-table,
+.transport-table {
+  table-layout: auto !important;
+  width: 100% !important;
+}
+
+/* td overflow: allow natural wrapping, no clip */
+.stu-desk-table .data-table td,
+.stf-desk-table .data-table td,
+.ven-desk-table .data-table td,
+.alm-desk-table .data-table td,
+.ajb-desk-table .data-table td,
+.transport-table td {
+  overflow: visible !important;
+  text-overflow: clip !important;
+  white-space: normal !important;
+  max-width: none !important;
+}
+
+/* th: allow text to wrap too */
+.stu-desk-table .data-table th,
+.stf-desk-table .data-table th,
+.ven-desk-table .data-table th,
+.alm-desk-table .data-table th,
+.ajb-desk-table .data-table th,
+.transport-table th {
+  overflow: visible !important;
+  text-overflow: clip !important;
+  white-space: nowrap !important;
+}
+
+/* Code badges (PRN, IDs) stay on one line */
+.stu-desk-table .code-badge,
+.stf-desk-table .code-badge,
+.ven-desk-table .code-badge,
+.alm-desk-table .code-badge,
+.ajb-desk-table .code-badge,
+.transport-table .code-badge {
+  white-space: nowrap !important;
+  display: inline-block !important;
+}
+
+/* action-buttons-cell: always one row, never wrap */
+.stu-desk-table .action-buttons-cell,
+.stf-desk-table .action-buttons-cell,
+.ven-desk-table .action-buttons-cell,
+.alm-desk-table .action-buttons-cell,
+.ajb-desk-table .action-buttons-cell,
+.transport-table .action-buttons-cell {
+  display: flex !important;
+  flex-wrap: nowrap !important;
+  gap: 0.25rem !important;
+  align-items: center !important;
+}
+
+/* action-btn: compact so 3 buttons always fit on one line */
+.stu-desk-table .action-btn,
+.stf-desk-table .action-btn,
+.ven-desk-table .action-btn,
+.alm-desk-table .action-btn,
+.ajb-desk-table .action-btn,
+.transport-table .action-btn {
+  white-space: nowrap !important;
+  flex-shrink: 0 !important;
+  padding: 0.3rem 0.6rem !important;
+  font-size: 0.8rem !important;
+  gap: 0.25rem !important;
+}
+
+/* dept-name-cell (Name column) — allow wrapping for long names */
+.stu-desk-table .dept-name-cell,
+.stf-desk-table .dept-name-cell {
+  white-space: normal !important;
+  word-break: break-word !important;
+}
+
+
+/* ================================================================
+   TABLE LAYOUT AUTO OVERRIDE
+   ================================================================ */
+
+.stu-desk-table .data-table,
+.stf-desk-table .data-table,
+.ven-desk-table .data-table,
+.alm-desk-table .data-table,
+.ajb-desk-table .data-table,
+.transport-table {
+  table-layout: auto !important;
+  width: 100% !important;
+}
+
+.stu-desk-table .data-table td,
+.stf-desk-table .data-table td,
+.ven-desk-table .data-table td,
+.alm-desk-table .data-table td,
+.ajb-desk-table .data-table td,
+.transport-table td {
+  overflow: visible !important;
+  text-overflow: clip !important;
+  white-space: normal !important;
+  max-width: none !important;
+}
+
+.stu-desk-table .data-table th,
+.stf-desk-table .data-table th,
+.ven-desk-table .data-table th,
+.alm-desk-table .data-table th,
+.ajb-desk-table .data-table th,
+.transport-table th {
+  overflow: visible !important;
+  text-overflow: clip !important;
+  white-space: nowrap !important;
+}
+
+.stu-desk-table .code-badge,
+.stf-desk-table .code-badge,
+.ven-desk-table .code-badge,
+.alm-desk-table .code-badge,
+.ajb-desk-table .code-badge,
+.transport-table .code-badge {
+  white-space: nowrap !important;
+  display: inline-block !important;
+}
+
+.stu-desk-table .action-buttons-cell,
+.stf-desk-table .action-buttons-cell,
+.ven-desk-table .action-buttons-cell,
+.alm-desk-table .action-buttons-cell,
+.ajb-desk-table .action-buttons-cell,
+.transport-table .action-buttons-cell {
+  display: flex !important;
+  flex-wrap: nowrap !important;
+  gap: 0.25rem !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+.stu-desk-table .action-btn,
+.stf-desk-table .action-btn,
+.ven-desk-table .action-btn,
+.alm-desk-table .action-btn,
+.ajb-desk-table .action-btn,
+.transport-table .action-btn {
+  white-space: nowrap !important;
+  flex-shrink: 0 !important;
+  padding: 0.3rem 0.55rem !important;
+  font-size: 0.8rem !important;
+  gap: 0.2rem !important;
+}
+
+.stu-desk-table .dept-name-cell,
+.stf-desk-table .dept-name-cell {
+  white-space: normal !important;
+  word-break: break-word !important;
+}
+
+
+/* ================================================================
+   TOTAL COUNT BADGE — ensure space between number and label
+   ================================================================ */
+.table-stats-badge {
+  white-space: nowrap;
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 0.25rem !important;
+}
+
+.table-stats-badge strong {
+  display: inline !important;
+}
+
+.badge-label-full {
+  display: inline !important;
+  margin-left: 0.2rem !important;
+}
+
+
+/* ================================================================
+   MOBILE HEADER BUTTONS — RIGHT ALIGNED across all modules
+   ================================================================ */
+
+/* On mobile, all header-actions-group containers are right-aligned */
+@media (max-width: 768px) {
+  .page-header-row {
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    gap: 0.75rem !important;
+  }
+
+  /* Title/subtitle div: full width */
+  .page-header-row > div:first-child {
+    width: 100% !important;
+  }
+
+  /* ALL action groups: RIGHT-aligned, auto width, same line */
+  .header-actions-group,
+  .events-header-actions,
+  .alumni-header-actions,
+  .alumni-jobs-header-actions,
+  .transport-header-actions {
+    display: flex !important;
+    flex-direction: row !important;
+    flex-wrap: nowrap !important;
+    justify-content: flex-end !important;
+    align-items: center !important;
+    width: 100% !important;
+    gap: 0.375rem !important;
+    margin-left: auto !important;
+  }
+
+  /* Every button inside: auto-size, no stretch */
+  .header-actions-group > .btn,
+  .header-actions-group > .books-btn,
+  .header-actions-group > .download-dropdown-wrapper,
+  .events-header-actions > .btn,
+  .events-header-actions > .books-btn,
+  .events-header-actions > .download-dropdown-wrapper {
+    flex: 0 0 auto !important;
+    width: auto !important;
+    white-space: nowrap !important;
+  }
+}
+
+/* ================================================================
+   events-filter-row — Status label + select + badge on same row
+   ================================================================ */
+.events-filter-row {
+  display: flex !important;
+  align-items: center !important;
+  gap: 0.5rem !important;
+  flex-wrap: nowrap !important;
+  flex-shrink: 0 !important;
+}
+
+.events-filter-row label {
+  flex-shrink: 0 !important;
+  user-select: none;
+}
+
+.events-filter-row .filter-select {
+  flex: 0 0 auto !important;
+  min-width: 90px !important;
+}
+
+.events-filter-row .table-stats-badge {
+  flex-shrink: 0 !important;
+  white-space: nowrap !important;
+}
+
+/* Mobile: stack search on row 1, Status+count on row 2 right-aligned */
+@media (max-width: 600px) {
+  .events-search-filter-bar {
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 0.5rem !important;
+  }
+  .events-search-filter-bar .search-box-wrapper {
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+  .events-filter-row {
+    justify-content: flex-end !important;
+    width: 100% !important;
+  }
+}
+
+/* ================================================================
+   mob-card-actions — ALWAYS one row, RIGHT-aligned, never wrap
+   At 377px and below, keep all 3 buttons on one line
+   ================================================================ */
+.mob-card-actions {
+  display: flex !important;
+  flex-direction: row !important;
+  flex-wrap: nowrap !important;
+  justify-content: flex-end !important;
+  align-items: center !important;
+  gap: 0.3rem !important;
+  padding-top: 8px !important;
+  border-top: 1px solid #f3f4f6 !important;
+  margin-top: 4px !important;
+  width: 100% !important;
+}
+
+.mob-card-actions > .action-btn {
+  flex: 0 0 auto !important;
+  white-space: nowrap !important;
+  min-width: 0 !important;
+  padding: 0.3rem 0.5rem !important;
+  font-size: 0.78rem !important;
+  gap: 0.2rem !important;
+}
+
+/* At very small screens (<=377px): shrink button text slightly */
+@media (max-width: 377px) {
+  .mob-card-actions > .action-btn {
+    padding: 0.25rem 0.375rem !important;
+    font-size: 0.75rem !important;
+    gap: 0.15rem !important;
+  }
+
+  .mob-card-actions > .action-btn .action-label {
+    display: inline !important;
+  }
+
+  .mob-card-actions > .action-btn svg {
+    width: 12px !important;
+    height: 12px !important;
+  }
+}
+
+
+/* MOBILE BUTTON RIGHT-ALIGN + STATUS LABEL + MOB-CARD-ACTIONS FIX */
+@media (max-width: 768px) {
+  .page-header-row {
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    gap: 0.75rem !important;
+  }
+  .page-header-row > div:first-child {
+    width: 100% !important;
+  }
+  .header-actions-group,
+  .events-header-actions {
+    display: flex !important;
+    flex-direction: row !important;
+    flex-wrap: nowrap !important;
+    justify-content: flex-end !important;
+    align-items: center !important;
+    width: 100% !important;
+    gap: 0.375rem !important;
+    margin-left: 0 !important;
+  }
+  .header-actions-group > .btn,
+  .header-actions-group > .books-btn,
+  .header-actions-group > .download-dropdown-wrapper,
+  .events-header-actions > .btn,
+  .events-header-actions > .books-btn,
+  .events-header-actions > .download-dropdown-wrapper {
+    flex: 0 0 auto !important;
+    width: auto !important;
+    white-space: nowrap !important;
+  }
+}
+
+/* events-filter-row Status label + select + badge */
+.events-filter-row {
+  display: flex !important;
+  align-items: center !important;
+  gap: 0.5rem !important;
+  flex-wrap: nowrap !important;
+  flex-shrink: 0 !important;
+}
+.events-filter-row label {
+  flex-shrink: 0 !important;
+  font-size: 0.8125rem !important;
+  font-weight: 600 !important;
+  color: var(--text-secondary) !important;
+  white-space: nowrap !important;
+}
+.events-filter-row .filter-select { flex: 0 0 auto !important; min-width: 90px !important; }
+.events-filter-row .table-stats-badge { flex-shrink: 0 !important; white-space: nowrap !important; }
+
+@media (max-width: 600px) {
+  .events-search-filter-bar {
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 0.5rem !important;
+  }
+  .events-search-filter-bar .search-box-wrapper { width: 100% !important; max-width: 100% !important; }
+  .events-filter-row { justify-content: flex-end !important; width: 100% !important; }
+}
+
+/* mob-card-actions: always one row, right-aligned, never wrap */
+.mob-card-actions {
+  display: flex !important;
+  flex-direction: row !important;
+  flex-wrap: nowrap !important;
+  justify-content: flex-end !important;
+  align-items: center !important;
+  gap: 0.3rem !important;
+  padding-top: 8px !important;
+  border-top: 1px solid #f3f4f6 !important;
+  margin-top: 4px !important;
+  width: 100% !important;
+}
+.mob-card-actions > .action-btn {
+  flex: 0 0 auto !important;
+  white-space: nowrap !important;
+  min-width: 0 !important;
+  padding: 0.3rem 0.5rem !important;
+  font-size: 0.78rem !important;
+  gap: 0.2rem !important;
+}
+
+/* At <=377px: keep all 3 buttons on one line by reducing padding slightly */
+@media (max-width: 377px) {
+  .mob-card-actions > .action-btn {
+    padding: 0.25rem 0.35rem !important;
+    font-size: 0.75rem !important;
+    gap: 0.15rem !important;
+  }
+  .mob-card-actions > .action-btn svg {
+    width: 12px !important;
+    height: 12px !important;
+    flex-shrink: 0 !important;
+  }
+}
+
+/* === FINAL OVERRIDE: Events page header buttons RIGHT on mobile === */
+@media (max-width: 768px) {
+  .events-page .page-header-row {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    width: 100% !important;
+  }
+  .events-page .events-header-actions {
+    display: flex !important;
+    flex-direction: row !important;
+    flex-wrap: nowrap !important;
+    justify-content: flex-end !important;
+    align-items: center !important;
+    width: 100% !important;
+    margin-left: auto !important;
+    gap: 0.5rem !important;
+  }
+  .events-page .events-header-actions > * {
+    flex: 0 0 auto !important;
+  }
+}
+
+/* ================================================================
+   ENB MODAL OVERLAY — always full-screen centered, never offset
+   by header/sidebar. Inline styles on the div take priority but
+   this CSS ensures the class itself is also correct.
+   ================================================================ */
+.enb-modal-overlay {
+  position: fixed !important;
+  inset: 0 !important;
+  top: 0 !important;
+  left: 0 !important;
+  right: 0 !important;
+  bottom: 0 !important;
+  z-index: 9999 !important;
+  background: rgba(0, 0, 0, 0.6) !important;
+  backdrop-filter: blur(4px) !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  padding: 1rem !important;
+}
+
+.enb-modal-card {
+  width: 100% !important;
+  max-width: 680px !important;
+  max-height: 90vh !important;
+  display: flex !important;
+  flex-direction: column !important;
+  background: #fff !important;
+  border-radius: 14px !important;
+  box-shadow: 0 25px 50px rgba(0, 0, 0, 0.25) !important;
+  overflow: hidden !important;
+  margin: auto !important;
+}
+
+.enb-modal-header {
+  flex-shrink: 0 !important;
+  padding: 1.125rem 1.5rem !important;
+  border-bottom: 1px solid var(--border-color) !important;
+  display: flex !important;
+  align-items: flex-start !important;
+  justify-content: space-between !important;
+  gap: 0.75rem !important;
+}
+
+.enb-modal-body {
+  flex: 1 !important;
+  overflow-y: auto !important;
+  padding: 1.25rem 1.5rem !important;
+  -webkit-overflow-scrolling: touch !important;
+}
+
+.enb-modal-footer {
+  flex-shrink: 0 !important;
+  padding: 0.875rem 1.5rem !important;
+  border-top: 1px solid var(--border-color) !important;
+  display: flex !important;
+  justify-content: flex-end !important;
+}
+
+@media (max-width: 640px) {
+  .enb-modal-overlay {
+    padding: 0.75rem !important;
+  }
+  .enb-modal-card {
+    max-height: 92vh !important;
+    border-radius: 12px !important;
+  }
+}
+
+/* ================================================================
+   PASSWORD TOGGLE EYE — always inside the input, right-aligned
+   ================================================================ */
+.input-wrapper {
+  position: relative !important;
+  display: flex !important;
+  align-items: center !important;
+  width: 100% !important;
+}
+
+/* The input must have right padding to never overlap the eye icon */
+.input-wrapper .form-input {
+  width: 100% !important;
+  padding-right: 2.75rem !important;
+  box-sizing: border-box !important;
+}
+
+/* Eye toggle: absolutely positioned inside the input wrapper */
+.input-wrapper .password-toggle-btn {
+  position: absolute !important;
+  right: 0.625rem !important;
+  top: 50% !important;
+  transform: translateY(-50%) !important;
+  z-index: 2 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  width: 28px !important;
+  height: 28px !important;
+  padding: 0 !important;
+  border: none !important;
+  background: transparent !important;
+  color: var(--text-secondary) !important;
+  cursor: pointer !important;
+  border-radius: 4px !important;
+  transition: color 0.2s, background 0.2s !important;
+  flex-shrink: 0 !important;
+}
+
+.input-wrapper .password-toggle-btn:hover {
+  color: var(--color-black) !important;
+  background-color: var(--bg-active) !important;
+}
+/* ================================================================
+   FIX 1: Students mobile — total count badge + Download button
+   ================================================================ */
+
+/* Total count badge: never clip, shrink gracefully */
+@media (max-width: 768px) {
+  .students-bar-right {
+    min-width: 0 !important;
+    overflow: visible !important;
+  }
+  .students-bar-right .table-stats-badge {
+    white-space: nowrap !important;
+    font-size: 0.75rem !important;
+    padding: 0.25rem 0.5rem !important;
+    overflow: visible !important;
+    min-width: 0 !important;
+    flex-shrink: 1 !important;
+  }
+
+  /* Download button: keep icon+text fully visible, shrink padding */
+  .students-page .download-trigger-btn,
+  .venues-page .download-trigger-btn,
+  .alumni-page .download-trigger-btn,
+  .staff-page .download-trigger-btn,
+  .departments-page .download-trigger-btn {
+    padding-left: 0.5rem !important;
+    padding-right: 0.5rem !important;
+    font-size: 0.8rem !important;
+    gap: 0.25rem !important;
+    white-space: nowrap !important;
+    overflow: visible !important;
+  }
+
+  .students-page .download-trigger-btn span,
+  .venues-page .download-trigger-btn span,
+  .alumni-page .download-trigger-btn span,
+  .staff-page .download-trigger-btn span {
+    display: inline !important;
+    overflow: visible !important;
+  }
+}
+
+/* ================================================================
+   FIX 2: Mobile card actions — full width equal buttons (like Books)
+   Books reference: each button flex:1, justify-content:center
+   ================================================================ */
+.mob-card-actions {
+  display: flex !important;
+  flex-direction: row !important;
+  flex-wrap: nowrap !important;
+  justify-content: stretch !important;
+  align-items: stretch !important;
+  gap: 0.375rem !important;
+  padding-top: 8px !important;
+  border-top: 1px solid #f3f4f6 !important;
+  margin-top: 4px !important;
+  width: 100% !important;
+}
+
+/* Each button: equal width, centered content */
+.mob-card-actions .action-btn {
+  flex: 1 1 0 !important;
+  justify-content: center !important;
+  text-align: center !important;
+  white-space: nowrap !important;
+  padding: 0.375rem 0.25rem !important;
+  font-size: 0.8125rem !important;
+  min-width: 0 !important;
+}
+
+.mob-card-actions .action-btn .action-label {
+  display: inline !important;
+}
+/* ================================================================
+   STUDENTS MOBILE: total count + Download button text fully visible
+   ================================================================ */
+
+/* filter-count-row: allow it to wrap on tiny screens */
+@media (max-width: 480px) {
+  .filter-count-row {
+    gap: 0.25rem !important;
+  }
+
+  /* Filter button: compact */
+  .filter-count-row > .students-filter-btn {
+    padding-left: 0.5rem !important;
+    padding-right: 0.5rem !important;
+    font-size: 0.78rem !important;
+    white-space: nowrap !important;
+    flex-shrink: 0 !important;
+  }
+
+  /* Badge: shrink font so full text shows */
+  .filter-count-row .students-bar-right,
+  .filter-count-row .students-bar-right .table-stats-badge {
+    font-size: 0.75rem !important;
+    white-space: nowrap !important;
+    overflow: visible !important;
+    padding: 0.2rem 0.4rem !important;
+    min-width: 0 !important;
+  }
+
+  /* badge-label-full: always show on mobile */
+  .badge-label-full {
+    display: inline !important;
+    font-size: 0.75rem !important;
+  }
+}
+
+/* Download / Upload / Add buttons: always show full text + icon */
+@media (max-width: 768px) {
+  .students-page .header-actions-group .btn span,
+  .students-page .header-actions-group .books-btn span,
+  .students-page .header-actions-group .download-trigger-btn span {
+    display: inline !important;
+    white-space: nowrap !important;
+    overflow: visible !important;
+    text-overflow: clip !important;
+  }
+
+  .students-page .header-actions-group .btn,
+  .students-page .header-actions-group .books-btn,
+  .students-page .header-actions-group .download-trigger-btn {
+    overflow: visible !important;
+    min-width: 0 !important;
+    padding-left: 0.5rem !important;
+    padding-right: 0.5rem !important;
+    font-size: 0.8rem !important;
+    gap: 0.25rem !important;
+    white-space: nowrap !important;
+  }
+
+  /* ChevronDown icon in Download button: always visible */
+  .students-page .download-trigger-btn svg {
+    flex-shrink: 0 !important;
+    display: inline-block !important;
+  }
+}
+/* Transport mobile: hide 4 individual add buttons, show only Add New dropdown */
+@media (max-width: 768px) {
+  .trn-header-desktop { display: none !important; }
+  .trn-header-mobile  { display: flex !important; }
+}
+@media (min-width: 769px) {
+  .trn-header-desktop { display: flex !important; }
+  .trn-header-mobile  { display: none !important; }
 }

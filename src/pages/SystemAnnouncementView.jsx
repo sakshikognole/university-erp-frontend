@@ -102,8 +102,15 @@ const SystemAnnouncementView = () => {
         URL.revokeObjectURL(objectUrl);
       }, 150);
     } catch {
-      // Last-resort fallback: open in new tab
-      window.open(url, '_blank', 'noopener,noreferrer');
+      // Fallback: use an anchor tag instead of window.open to avoid mobile system popup
+      const a = document.createElement('a');
+      a.href = url;
+      a.target = '_blank';
+      a.rel = 'noopener noreferrer';
+      a.download = '';
+      document.body.appendChild(a);
+      a.click();
+      setTimeout(() => document.body.removeChild(a), 150);
     } finally {
       setDownloading(false);
     }
@@ -114,24 +121,22 @@ const SystemAnnouncementView = () => {
     <div className="page-container">
       {/* Header row */}
       <div className="page-header" style={{ marginBottom: '1.5rem' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-          <button
-            type="button"
-            className="btn-back"
-            onClick={() => navigate('/system-announcements')}
-            title="Back to Announcements"
-          >
-            <ArrowLeft size={18} />
-          </button>
-          <div>
-            <h1 className="page-title" style={{ fontSize: '1.5rem' }}>
-              Announcement Details
-            </h1>
-            <p className="page-subtitle">View System Announcement Details</p>
-          </div>
+        <button
+          type="button"
+          className="btn-back"
+          onClick={() => navigate('/system-announcements')}
+          title="Back to Announcements"
+          style={{ marginBottom: '0.5rem' }}
+        >
+          <ArrowLeft size={18} />
+        </button>
+        <div>
+          <h1 className="page-title" style={{ fontSize: '1.5rem' }}>
+            Announcement Details
+          </h1>
+          <p className="page-subtitle">View System Announcement Details</p>
         </div>
       </div>
-
       {/* Loading */}
       {loading && (
         <div

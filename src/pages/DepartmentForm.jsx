@@ -169,7 +169,6 @@ const DepartmentFormModal = ({ isOpen, deptId, onClose, onSuccess }) => {
                     maxLength={30} autoComplete="off" />
                   {isEditMode && <small className="sf-field-hint">Department ID cannot be changed after creation.</small>}
                   {fieldErrors.departmentId && <p className="sf-field-error"><AlertCircle size={12} />{fieldErrors.departmentId}</p>}
-                  {!fieldErrors.departmentId && !isEditMode && <p style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', marginTop: '0.2rem' }}>Letters, digits, one hyphen allowed. Must be unique.</p>}
                 </div>
                 <div className="sf-group">
                   <label className="sf-label" htmlFor="dept-name">Department Name <span className="sf-required">*</span></label>

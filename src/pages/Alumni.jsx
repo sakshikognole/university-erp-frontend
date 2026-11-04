@@ -108,7 +108,7 @@ const exportPDF = (rows, setFeedback) => {
     <h2>Alumni Directory</h2>
     <p>Generated: ${new Date().toLocaleString()} &bull; Total: ${rows.length}</p>
     <table><thead><tr>
-      <th>#</th><th>ID</th><th>Name</th><th>Year</th>
+                    <th style={{ minWidth: '110px' }}>Name</th>
       <th>Job Title</th><th>Company</th><th>Email</th><th>Phone</th>
     </tr></thead><tbody>${rowsHtml}</tbody></table>
   </body></html>`;
@@ -353,11 +353,12 @@ const Alumni = () => {
       {/* Table Card */}
       <div className="card table-card" style={{ marginTop: '1.25rem' }}>
         <div className="table-controls-bar">
-          <div className="search-box-wrapper">
+          <div className="search-box-wrapper" data-tooltip="Search alumni">
             <Search size={16} className="search-icon" />
             <input type="text" className="search-input"
               placeholder="Search by Name, ID, Email, Job Title, or Company…"
               value={search}
+              title="Search alumni"
               onChange={(e) => { setSearch(e.target.value); setCurrentPage(1); }} />
             {search && (
               <button type="button" className="search-clear-btn" onClick={() => setSearch('')}>Clear</button>
@@ -374,6 +375,7 @@ const Alumni = () => {
             >
               <Filter size={15} />
               <span>Filter{activeFilterCount > 0 ? ` (${activeFilterCount})` : ''}</span>
+              <ChevronDown size={13} />
             </button>
             <div className="table-stats-badge">
               Total: <strong>{filteredAlumni.length}</strong> Alumni
@@ -442,34 +444,26 @@ const Alumni = () => {
               <table className="data-table">
                 <thead>
                   <tr>
-                    <th style={{ width: '50px' }}>#</th>
-                    <th style={{ width: '110px' }}>Alumni ID</th>
-                    <th>Name</th>
-                    <th style={{ width: '90px' }}>Year</th>
-                    <th>Job Title</th>
-                    <th>Company</th>
-                    {/* Improvement C: Email + Phone instead of Profile Links */}
-                    <th style={{ width: '170px' }}>Email</th>
-                    <th style={{ width: '120px' }}>Phone</th>
-                    <th style={{ width: '220px', textAlign: 'center' }}>Actions</th>
+                    <th style={{ width: '40px' }}>#</th>
+                    <th style={{ width: '105px' }}>Alumni ID</th>
+                    <th style={{ minWidth: '110px' }}>Name</th>
+                    <th style={{ width: '60px' }}>Year</th>
+                    <th style={{ width: '110px' }}>Job Title</th>
+                    <th style={{ width: '100px' }}>Company</th>
+
+                    <th style={{ width: '115px' }}>Phone</th>
+                    <th style={{ width: '185px', textAlign: 'center' }}>Actions</th>
                   </tr>
                 </thead>
                 <tbody>
                   {currentItems.map((a, i) => (
                     <tr key={a._id || a.alumniId}>
-                      <td className="text-secondary">{startIndex + i + 1}</td>
+                      <td className="stu-num-cell">{startIndex + i + 1}</td>
                       <td><span className="code-badge">{a.alumniId}</span></td>
                       <td><span className="dept-name-cell">{a.name}</span></td>
                       <td>{a.graduationYear}</td>
                       <td>{a.jobTitle || '—'}</td>
                       <td>{a.currentCompany || '—'}</td>
-                      {/* Improvement C: Email cell */}
-                      <td style={{ fontSize: '0.8125rem', color: a.email ? 'var(--text-primary)' : 'var(--text-secondary)' }}>
-                        {a.email
-                          ? <a href={`mailto:${a.email}`} style={{ color: 'inherit', textDecoration: 'none' }}
-                              title={a.email}>{a.email}</a>
-                          : '—'}
-                      </td>
                       {/* Improvement C: Phone cell */}
                       <td style={{ fontSize: '0.8125rem', color: a.phone ? 'var(--text-primary)' : 'var(--text-secondary)' }}>
                         {a.phone || '—'}
@@ -560,7 +554,7 @@ const Alumni = () => {
             <div className="delete-dialog-header">
               <div className="delete-dialog-icon"><AlertTriangle size={22} /></div>
               <div className="delete-dialog-title-box">
-                <h3 className="delete-dialog-title">Delete Alumni Profile</h3>
+                <h3 className="delete-dialog-title">Delete</h3>
                 <p className="delete-dialog-desc">This will permanently remove the alumni record.</p>
               </div>
               <button type="button" className="close-modal-btn"

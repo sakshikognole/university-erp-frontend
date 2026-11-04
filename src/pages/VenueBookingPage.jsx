@@ -640,11 +640,12 @@ export default function VenueBookingPage() {
       {/* ── All Booking Requests ─────────────────────────────────────────────── */}
       <div className="card">
         <div className="books-toolbar" style={{ justifyContent: 'space-between', alignItems: 'center' }}>
-          <div className="search-box-wrapper">
+          <div className="search-box-wrapper" data-tooltip="Search venue bookings">
             <Search size={16} className="search-icon" />
             <input
               className="search-input"
               placeholder="Search by Booking ID, Event, Venue, or Requester..."
+              title="Search venue bookings"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
             />
@@ -745,7 +746,7 @@ export default function VenueBookingPage() {
                             <button
                               type="button"
                               className="action-btn delete-btn"
-                              title="Delete Booking"
+                              title="Delete"
                               onClick={() => handleDelete(b)}
                             >
                               <Trash2 size={14} /><span className="action-label">Delete</span>
@@ -849,8 +850,8 @@ export default function VenueBookingPage() {
 
       <ConfirmDialog
         isOpen={!!delBooking}
-        title="Delete Venue Booking"
-        description="Are you sure you want to delete this venue booking request? This action will permanently remove the record."
+        title="Delete"
+        description="Are you sure you want to delete this record? This action is permanent and cannot be undone."
         itemName={delBooking ? `${eventLabel(delBooking.eventId)} at ${venueLabel(delBooking.venueId)}` : ''}
         itemSubtext={delBooking ? `Date: ${fmtDate(delBooking.bookingDate)} (${fmt12(delBooking.startTime)} - ${fmt12(delBooking.endTime)})` : 'Booking Record'}
         itemBadge={delBooking?.bookingId}

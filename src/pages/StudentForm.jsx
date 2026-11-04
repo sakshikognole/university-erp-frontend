@@ -177,8 +177,8 @@ const StudentFormModal = ({ isOpen, studentId, onClose, onSuccess }) => {
     const { name, value } = e.target;
     let newValue = value;
     if (name === 'prn') {
-      // Allow letters, digits, and one hyphen — strip everything else, then uppercase
-      newValue = value.replace(/[^A-Za-z0-9-]/g, '').toUpperCase();
+      // Allow letters, digits, hyphens, underscores — strip everything else, then uppercase
+      newValue = value.replace(/[^A-Za-z0-9_-]/g, '').toUpperCase();
     }
     if (name === 'division') {
       // Single letter A-Z only — take first letter, strip everything else

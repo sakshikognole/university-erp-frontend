@@ -116,7 +116,8 @@ const SystemAnnouncementFormModal = ({ isOpen, annId, onClose, onSuccess }) => {
   const clearFile = () => { setSelectedFile(null); setFilePreviewUrl(''); setExistingFileUrl(''); setFileError(''); setUploadProgress(0); };
   const toggleDept = (id) => setSelectedDepts((p) => p.includes(id) ? p.filter((d) => d !== id) : [...p, id]);
   const getDeptLabel = () => {
-    if (!selectedDepts.length || selectedDepts.length === allDepartments.length) return 'All Departments';
+    if (!selectedDepts.length) return 'Select Departments';
+    if (selectedDepts.length === allDepartments.length && allDepartments.length > 0) return 'All Departments';
     const names = selectedDepts.map((id) => allDepartments.find((d) => d._id === id)?.name).filter(Boolean);
     return names.length <= 2 ? names.join(', ') : `${names.slice(0, 2).join(', ')} +${names.length - 2} more`;
   };

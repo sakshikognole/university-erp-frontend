@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useCallback } from 'react';
+﻿import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   GraduationCap,
@@ -62,9 +62,9 @@ function StuMobCard({ student, num, onView, onEdit, onDelete, expanded, onToggle
           <div className="mob-card-row"><span className="mob-card-label">Degree</span><span className="mob-card-value">{student.degree || '—'}</span></div>
           <div className="mob-card-row"><span className="mob-card-label">Year</span><span className="mob-card-value">{student.yearOfEnrollment || '—'}</span></div>
           <div className="mob-card-actions">
-            <button type="button" className="action-btn view-btn" onClick={onView}><Eye size={14} /><span className="action-label">View</span></button>
-            <button type="button" className="action-btn edit-btn" onClick={onEdit}><Edit size={14} /><span className="action-label">Edit</span></button>
-            <button type="button" className="action-btn delete-btn" onClick={onDelete}><Trash2 size={14} /><span className="action-label">Delete</span></button>
+            <button type="button" className="action-btn view-btn" title="View" onClick={onView}><Eye size={14} /><span className="action-label">View</span></button>
+            <button type="button" className="action-btn edit-btn" title="Edit" onClick={onEdit}><Edit size={14} /><span className="action-label">Edit</span></button>
+            <button type="button" className="action-btn delete-btn" title="Delete" onClick={onDelete}><Trash2 size={14} /><span className="action-label">Delete</span></button>
           </div>
         </div>
       )}
@@ -329,6 +329,7 @@ const Students = () => {
             type="button"
             className="books-btn books-btn-primary"
             onClick={openAddModal}
+            title="Add new student"
           >
             <Plus size={16} />
             <span>Add Student</span>
@@ -373,7 +374,7 @@ const Students = () => {
 
         {/* ── Search + filter bar ── */}
         <div className="table-controls-bar">
-          <div className="search-box-wrapper">
+          <div className="search-box-wrapper" data-tooltip="Search students">
             <Search size={16} className="search-icon" />
             <input
               type="text"
@@ -381,6 +382,7 @@ const Students = () => {
               placeholder="Search by Name, PRN, Class or Degree…"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
+              title="Search students"
             />
             {search && (
               <button type="button" className="search-clear-btn" onClick={() => setSearch('')}>
@@ -409,16 +411,7 @@ const Students = () => {
             </button>
 
             <div className="students-bar-right">
-              {(activeFilterCount > 0 || search) && (
-                <button type="button" className="students-clear-all-btn" onClick={clearAll}>
-                  <X size={13} />
-                  <span>Clear all</span>
-                </button>
-              )}
-              <div className="table-stats-badge">
-                Total: <strong>{filteredStudents.length}</strong>{' '}
-                <span className="badge-label-full">{filteredStudents.length === 1 ? 'Student' : 'Students'}</span>
-              </div>
+              <div className="table-stats-badge">Total:&nbsp;<strong>{filteredStudents.length}</strong>&nbsp;<span className="badge-label-full">{filteredStudents.length === 1 ? 'Student' : 'Students'}</span></div>
             </div>
           </div>
         </div>
@@ -457,9 +450,11 @@ const Students = () => {
                 </select>
               </div>
             </div>
+
             {activeFilterCount > 0 && (
-              <div style={{ paddingTop: '0.25rem' }}>
-                <button type="button" className="students-clear-filters-btn" onClick={clearFilters}>
+              <div style={{ paddingTop: '0.5rem' }}>
+                <button type="button" className="students-clear-filters-btn"
+                  onClick={clearFilters}>
                   <X size={13} /><span>Clear filters</span>
                 </button>
               </div>
@@ -511,21 +506,20 @@ const Students = () => {
               <table className="data-table">
                 <thead>
                   <tr>
-                    <th style={{ width: '52px' }}>#</th>
-                    <th style={{ width: '160px' }}>PRN</th>
-                    <th>Name</th>
-                    <th style={{ width: '130px' }}>Class</th>
-                    <th style={{ width: '90px' }}>Division</th>
-                    <th>Degree</th>
-                    <th style={{ width: '80px' }}>Year</th>
-                    <th>Email</th>
-                    <th style={{ width: '220px', textAlign: 'center' }}>Actions</th>
+                    <th style={{ width: '40px' }}>#</th>
+                    <th style={{ width: '130px' }}>PRN</th>
+                    <th style={{ width: '130px' }}>Name</th>
+                    <th style={{ width: '100px' }}>Class</th>
+                    <th style={{ width: '62px' }}>Division</th>
+                    <th style={{ width: '160px' }}>Degree</th>
+
+                    <th style={{ width: '185px', textAlign: 'center' }}>Actions</th>
                   </tr>
                 </thead>
                 <tbody>
                   {currentStudents.map((student, index) => (
                     <tr key={student._id || student.prn || index}>
-                      <td className="text-secondary">{startIndex + index + 1}</td>
+                      <td className="stu-num-cell">{startIndex + index + 1}</td>
                       <td>
                         <span className="code-badge">{student.prn}</span>
                       </td>
@@ -535,13 +529,7 @@ const Students = () => {
                       <td>{student.class}</td>
                       <td>{student.division || '—'}</td>
                       <td>{student.degree}</td>
-                      <td>{student.yearOfEnrollment}</td>
-                      <td>
-                        {student.email
-                          ? <span className="students-email-cell">{student.email}</span>
-                          : <span className="text-secondary">—</span>
-                        }
-                      </td>
+
                       <td style={{ textAlign: 'center' }}>
                         <div className="action-buttons-cell" style={{ justifyContent: 'center' }}>
                           <button
@@ -565,7 +553,7 @@ const Students = () => {
                           <button
                             type="button"
                             className="action-btn delete-btn"
-                            title="Delete Student"
+                            title="Delete"
                             onClick={() => setDelStudent(student)}
                           >
                             <Trash2 size={14} />
@@ -691,8 +679,8 @@ const Students = () => {
 
       <ConfirmDialog
         isOpen={!!delStudent}
-        title="Delete Student"
-        description={`Are you sure you want to delete student "${delStudent?.name}"? This action will permanently remove the record.`}
+        title="Delete"
+        description={`Are you sure you want to delete "${delStudent?.name}"? This action will permanently remove the record.`}
         itemName={delStudent?.name}
         itemSubtext={delStudent?.class ? `Class: ${delStudent.class}` : 'Student Record'}
         itemBadge={delStudent?.prn}

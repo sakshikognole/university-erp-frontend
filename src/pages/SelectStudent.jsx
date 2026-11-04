@@ -138,11 +138,12 @@ export default function SelectStudent() {
       <div className="card">
         {/* Search + selected tag */}
         <div className="books-toolbar">
-          <div className="search-box-wrapper">
+          <div className="search-box-wrapper" data-tooltip="Search students">
             <Search size={16} className="search-icon" />
             <input
               className="search-input"
               placeholder="Search by Name, PRN, Class or Degree..."
+              title="Search students"
               value={searchInput}
               onChange={onSearch}
             />

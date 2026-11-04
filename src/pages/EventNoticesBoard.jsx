@@ -18,6 +18,7 @@ import {
 } from 'lucide-react';
 
 import { getEventImage } from '../utils/eventImageUtils';
+import { createPortal } from 'react-dom';
 
 const _IS_PROD = typeof window !== 'undefined' && window.location.hostname !== 'localhost';
 const API_BASE_URL = _IS_PROD ? 'https://university-erp-node.onrender.com/api' : 'http://localhost:5000/api';
@@ -126,33 +127,27 @@ const EventNoticesBoard = () => {
       )}
 
       <div className="card" style={{marginTop:'1.25rem',padding:'1rem 1.25rem'}}>
-        <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',flexWrap:'wrap',gap:'1rem'}}>
-          <div className="search-box-wrapper" style={{flex:1,minWidth:'260px'}}>
+        <div className="events-board-filter-wrapper">
+          <div className="search-box-wrapper" data-tooltip="Search event notices" style={{flex:1,minWidth:'200px'}}>
             <Search size={16} className="search-icon"/>
-            <input type="text" className="search-input" placeholder="Search by title, event ID, description, venue, organizer..."
+            <input type="text" className="search-input" placeholder="Search by title, event ID, description, venue, organizer..." title="Search event notices"
               value={search} onChange={(e)=>setSearch(e.target.value)}/>
             {search && <button type="button" className="search-clear-btn" onClick={()=>setSearch('')}>Clear</button>}
           </div>
-          <div style={{display:'flex',alignItems:'center',gap:'0.75rem',flexWrap:'wrap'}}>
-            <div style={{display:'flex',alignItems:'center',gap:'0.5rem'}}>
-              <span style={{fontSize:'0.8125rem',fontWeight:600,color:'var(--text-secondary)'}}>Category:</span>
-              <select value={categoryFilter} onChange={(e)=>{setCategoryFilter(e.target.value);setCurrentPage(1);}} className="filter-select">
-                <option value="ALL">All Categories</option>
-                <option value="ACADEMIC">Academic</option><option value="SPORTS">Sports</option>
-                <option value="CULTURAL">Cultural</option><option value="WORKSHOP">Workshop</option>
-                <option value="SEMINAR">Seminar</option><option value="CONFERENCE">Conference</option>
-                <option value="SOCIAL">Social</option><option value="OTHER">Other</option>
-              </select>
-            </div>
-            <div style={{display:'flex',alignItems:'center',gap:'0.5rem'}}>
-              <span style={{fontSize:'0.8125rem',fontWeight:600,color:'var(--text-secondary)'}}>Status:</span>
-              <select value={statusFilter} onChange={(e)=>{setStatusFilter(e.target.value);setCurrentPage(1);}} className="filter-select">
-                <option value="ALL">All Statuses</option><option value="PUBLISHED">Published</option>
-                <option value="DRAFT">Draft</option><option value="CANCELLED">Cancelled</option><option value="COMPLETED">Completed</option>
-              </select>
-            </div>
-            <div className="table-stats-badge">Total: <strong>{totalEvents}</strong> {totalEvents===1?'Event':'Events'}</div>
+          <div className="filter-selects">
+            <select value={categoryFilter} onChange={(e)=>{setCategoryFilter(e.target.value);setCurrentPage(1);}} className="filter-select">
+              <option value="ALL">All Categories</option>
+              <option value="ACADEMIC">Academic</option><option value="SPORTS">Sports</option>
+              <option value="CULTURAL">Cultural</option><option value="WORKSHOP">Workshop</option>
+              <option value="SEMINAR">Seminar</option><option value="CONFERENCE">Conference</option>
+              <option value="SOCIAL">Social</option><option value="OTHER">Other</option>
+            </select>
+            <select value={statusFilter} onChange={(e)=>{setStatusFilter(e.target.value);setCurrentPage(1);}} className="filter-select">
+              <option value="ALL">All Statuses</option><option value="PUBLISHED">Published</option>
+              <option value="DRAFT">Draft</option><option value="CANCELLED">Cancelled</option><option value="COMPLETED">Completed</option>
+            </select>
           </div>
+          <div className="table-stats-badge">Total: <strong>{totalEvents}</strong> {totalEvents===1?'Event':'Events'}</div>
         </div>
       </div>
 
@@ -223,9 +218,9 @@ const EventNoticesBoard = () => {
       )}
 
       {/* ── View-Only Detail Modal ── */}
-      {modalOpen && selectedEvent && (
-        <div className="enb-modal-overlay" onClick={closeModal} role="dialog" aria-modal="true">
-          <div className="enb-modal-card" onClick={(e)=>e.stopPropagation()}>
+      {modalOpen && selectedEvent && createPortal(
+        <div className="enb-modal-overlay" onClick={closeModal} role="dialog" aria-modal="true" style={{ position: "fixed", inset: 0, top: 0, left: 0, right: 0, bottom: 0, zIndex: 9999, background: "rgba(0,0,0,0.6)", backdropFilter: "blur(4px)", display: "flex", alignItems: "center", justifyContent: "center", padding: "1rem" }}>
+          <div className="enb-modal-card" onClick={(e)=>e.stopPropagation()} style={{ width: "100%", maxWidth: "680px", maxHeight: "90vh", display: "flex", flexDirection: "column", background: "#fff", borderRadius: "14px", boxShadow: "0 25px 50px rgba(0,0,0,0.25)", overflow: "hidden" }}>
             <div className="enb-modal-header">
               <div>
                 <h2 className="enb-modal-title">Event Details</h2>
@@ -234,7 +229,7 @@ const EventNoticesBoard = () => {
               <button type="button" className="enb-modal-close" onClick={closeModal} title="Close"><X size={20}/></button>
             </div>
 
-            <div className="enb-modal-body">
+            <div className="enb-modal-body" style={{ flex: 1, overflowY: "auto", padding: "1.25rem 1.5rem" }}>
               <img
                 src={getEventImage(selectedEvent.category||selectedEvent.eventType, selectedEvent.imageUrl)}
                 alt={selectedEvent.title} className="enb-modal-image"
@@ -327,7 +322,7 @@ const EventNoticesBoard = () => {
             </div>
           </div>
         </div>
-      )}
+      , document.body)}
     </div>
   );
 };

@@ -47,7 +47,7 @@ const BulkUploadAlumni = () => {
     return { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` };
   };
 
-  // ── Sample CSV download ───────────────────────────────────────────────────
+  // â”€â”€ Sample CSV download â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
   const downloadSampleCSV = () => {
     const rows = [
@@ -70,7 +70,7 @@ const BulkUploadAlumni = () => {
     setTimeout(() => { document.body.removeChild(a); URL.revokeObjectURL(url); }, 150);
   };
 
-  // ── CSV parsing ───────────────────────────────────────────────────────────
+  // â”€â”€ CSV parsing â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
   const parseCSVLine = (line) => {
     const result = []; let current = ''; let inQuotes = false;
@@ -105,23 +105,23 @@ const BulkUploadAlumni = () => {
 
       const rowNum = i + 1;
 
-      // ── D12: Name ──────────────────────────────────────────────────────────
+      // â”€â”€ D12: Name â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
       const nameErr = validateName(row['name']);
       if (nameErr) { errs.push(`Row ${rowNum} (Name): ${nameErr}`); }
 
-      // ── Graduation Year ────────────────────────────────────────────────────
+      // â”€â”€ Graduation Year â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
       const yearErr = validateGraduationYear(row['graduation year']);
       if (yearErr) { errs.push(`Row ${rowNum} (Graduation Year): ${yearErr}`); }
 
-      // ── D13: Email ─────────────────────────────────────────────────────────
+      // â”€â”€ D13: Email â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
       const emailErr = validateEmail(row['email']);
       if (emailErr) { errs.push(`Row ${rowNum} (Email): ${emailErr}`); }
 
-      // ── D14: Phone ─────────────────────────────────────────────────────────
+      // â”€â”€ D14: Phone â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
       const phoneErr = validatePhone(row['phone']);
       if (phoneErr) { errs.push(`Row ${rowNum} (Phone): ${phoneErr}`); }
 
-      // ── Improvement B: contact required ────────────────────────────────────
+      // â”€â”€ Improvement B: contact required â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
       if (!emailErr && !phoneErr) {
         const contactErr = validateContactRequired(row['email'], row['phone']);
         if (contactErr) { errs.push(`Row ${rowNum}: ${contactErr}`); }
@@ -130,11 +130,11 @@ const BulkUploadAlumni = () => {
       // Only if this row had no errors, add it to the data set.
       // We still collect ALL errors first so we can show them all at once.
       if (!nameErr && !yearErr && !emailErr && !phoneErr) {
-        // Contact error does not prevent the row from being queued — it's
+        // Contact error does not prevent the row from being queued â€” it's
         // shown as a warning but does not block rows that have at least one contact.
         const hasContact = (row['email']||'').trim() || (row['phone']||'').trim();
         if (!hasContact) {
-          // Row already flagged via contactErr above — skip adding to data
+          // Row already flagged via contactErr above â€” skip adding to data
         } else {
           data.push({
             alumniId:       row['alumni id']?.trim().toUpperCase() || '',
@@ -158,7 +158,7 @@ const BulkUploadAlumni = () => {
     return { data, errors: errs };
   };
 
-  // ── File selection ────────────────────────────────────────────────────────
+  // â”€â”€ File selection â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
   const handleFileSelect = (e) => {
     const file = e.target.files[0];
@@ -186,7 +186,7 @@ const BulkUploadAlumni = () => {
     reader.readAsText(file);
   };
 
-  // ── Upload (blocked if any validation errors exist) ───────────────────────
+  // â”€â”€ Upload (blocked if any validation errors exist) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
   const handleUpload = async () => {
     // D12/D13/D14: do not upload if validation errors were found during parse
@@ -224,19 +224,17 @@ const BulkUploadAlumni = () => {
     setErrors([]); setUploadResult(null);
   };
 
-  // ── Render ────────────────────────────────────────────────────────────────
+  // â”€â”€ Render â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
   return (
     <div className="page-container">
       <div className="page-header" style={{ marginBottom: '1.5rem' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-          <button type="button" className="btn-back" onClick={() => navigate('/alumni')}>
-            <ArrowLeft size={18} />
-          </button>
-          <div>
-            <h1 className="page-title" style={{ fontSize: '1.5rem' }}>Bulk Upload Alumni</h1>
-            <p className="page-subtitle">Upload multiple alumni profiles at once using a CSV file</p>
-          </div>
+        <button type="button" className="btn-back" onClick={() => navigate('/alumni')} title="Back to Alumni" style={{ marginBottom: '0.5rem' }}>
+          <ArrowLeft size={18} />
+        </button>
+        <div>
+          <h1 className="page-title" style={{ fontSize: '1.5rem' }}>Bulk Upload Alumni</h1>
+          <p className="page-subtitle">Upload multiple alumni profiles at once using a CSV file</p>
         </div>
       </div>
 
@@ -286,7 +284,7 @@ const BulkUploadAlumni = () => {
 
             {loading && (
               <div className="loading-state" style={{ marginTop: '1rem' }}>
-                <Loader2 size={20} className="spin-animate" /><span>Parsing CSV file…</span>
+                <Loader2 size={20} className="spin-animate" /><span>Parsing CSV fileâ€¦</span>
               </div>
             )}
 
@@ -294,7 +292,7 @@ const BulkUploadAlumni = () => {
               <div className="feedback-banner feedback-error" style={{ marginTop: '1rem' }}>
                 <AlertCircle size={18} />
                 <div>
-                  <strong>Validation errors — fix these before uploading:</strong>
+                  <strong>Validation errors â€” fix these before uploading:</strong>
                   <ul style={{ marginTop: '0.5rem', marginLeft: '1.5rem' }}>
                     {errors.map((err, i) => <li key={i}>{err}</li>)}
                   </ul>
@@ -331,10 +329,10 @@ const BulkUploadAlumni = () => {
                           <td><span className="code-badge">{a.alumniId || '(auto)'}</span></td>
                           <td>{a.name}</td>
                           <td>{a.graduationYear}</td>
-                          <td>{a.jobTitle  || '—'}</td>
-                          <td>{a.currentCompany || '—'}</td>
-                          <td>{a.email || '—'}</td>
-                          <td>{a.phone || '—'}</td>
+                          <td>{a.jobTitle  || 'â€”'}</td>
+                          <td>{a.currentCompany || 'â€”'}</td>
+                          <td>{a.email || 'â€”'}</td>
+                          <td>{a.phone || 'â€”'}</td>
                         </tr>
                       ))}
                     </tbody>
@@ -355,7 +353,7 @@ const BulkUploadAlumni = () => {
                     onClick={handleUpload}
                     disabled={uploading || !parsedData.length || errors.length > 0}>
                     {uploading
-                      ? <><Loader2 size={16} className="spin-animate" /><span>Uploading…</span></>
+                      ? <><Loader2 size={16} className="spin-animate" /><span>Uploadingâ€¦</span></>
                       : <><Upload size={16} /><span>Upload {parsedData.length} Alumni</span></>}
                   </button>
                 </div>
@@ -369,7 +367,7 @@ const BulkUploadAlumni = () => {
                 <div>
                   <strong>{uploadResult.message}</strong>
                   {uploadResult.success && (
-                    <p style={{ marginTop: '0.5rem' }}>Redirecting to alumni list…</p>
+                    <p style={{ marginTop: '0.5rem' }}>Redirecting to alumni listâ€¦</p>
                   )}
                 </div>
               </div>

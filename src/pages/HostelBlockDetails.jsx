@@ -1,4 +1,4 @@
-import { springApi } from '../services/api';
+﻿import { springApi } from '../services/api';
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { ArrowLeft, Plus, Trash2, Users } from 'lucide-react';
 import ConfirmDialog from '../components/ConfirmDialog';
@@ -265,21 +265,17 @@ export default function HostelBlockDetails({ block: blockProp, onBack }) {
   if (loading) {
     return (
       <div className="page-container">
-        <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '1.5rem' }}>
           <button
             type="button"
             className="btn-back"
             onClick={onBack}
             title="Back to Hostel Management"
             aria-label="Back to Hostel Management"
+            style={{ marginBottom: '0.5rem' }}
           >
             <ArrowLeft size={18} />
           </button>
-          <span style={{ fontSize: '0.95rem', color: 'var(--text-secondary)' }}>Back to Hostel Management</span>
-        </div>
-        <p className="books-loading" style={{ marginTop: 24 }}>
-          Loading hostel details...
-        </p>
+        <p className="books-loading" style={{ marginTop: 24 }}>Loading hostel details...</p>
       </div>
     );
   }
@@ -288,18 +284,16 @@ export default function HostelBlockDetails({ block: blockProp, onBack }) {
   if (loadError) {
     return (
       <div className="page-container">
-        <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '1.5rem' }}>
           <button
             type="button"
             className="btn-back"
             onClick={onBack}
             title="Back to Hostel Management"
             aria-label="Back to Hostel Management"
+            style={{ marginBottom: '0.5rem' }}
           >
             <ArrowLeft size={18} />
           </button>
-          <span style={{ fontSize: '0.95rem', color: 'var(--text-secondary)' }}>Back to Hostel Management</span>
-        </div>
         <div className="books-alert books-alert-error" style={{ marginTop: 20 }}>
           <span>{loadError}</span>
         </div>
@@ -318,18 +312,16 @@ export default function HostelBlockDetails({ block: blockProp, onBack }) {
   if (!block?.hostelName) {
     return (
       <div className="page-container">
-        <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '1.5rem' }}>
           <button
             type="button"
             className="btn-back"
             onClick={onBack}
             title="Back to Hostel Management"
             aria-label="Back to Hostel Management"
+            style={{ marginBottom: '0.5rem' }}
           >
             <ArrowLeft size={18} />
           </button>
-          <span style={{ fontSize: '0.95rem', color: 'var(--text-secondary)' }}>Back to Hostel Management</span>
-        </div>
         <p className="hst-empty" style={{ marginTop: 24 }}>
           Hostel block not found. Please go back and try again.
         </p>
@@ -342,17 +334,17 @@ export default function HostelBlockDetails({ block: blockProp, onBack }) {
 
       {/* ── Page Header ── */}
       <div className="feature-page-header">
-        <div className="feature-page-header-info" style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+        <div className="feature-page-header-info">
           <button
             type="button"
             className="btn-back"
             onClick={onBack}
             title="Back to Hostel Management"
             aria-label="Back to Hostel Management"
+            style={{ marginBottom: '0.5rem' }}
           >
             <ArrowLeft size={18} />
           </button>
-          <div>
             <h1 className="page-title">{block.hostelName}</h1>
             <p className="page-subtitle">
               {block.blockId} &nbsp;·&nbsp;
@@ -366,7 +358,6 @@ export default function HostelBlockDetails({ block: blockProp, onBack }) {
                 {block.active ? 'Active' : 'Inactive'}
               </span>
             </p>
-          </div>
         </div>
         <div className="feature-page-header-actions">
           <button

@@ -159,7 +159,7 @@ const Attendance = () => {
   // ── Loading ───────────────────────────────────────────────────────────────
   if (loading) {
     return (
-      <div className="page-container">
+      <div className="page-container attendance-page">
         <div style={{ padding: '4rem', textAlign: 'center', color: 'var(--text-secondary)' }}>
           <Loader2 size={32} className="spin-animate" style={{ margin: '0 auto 1rem' }} />
           <p>Loading attendance session...</p>
@@ -169,20 +169,19 @@ const Attendance = () => {
   }
 
   return (
-    <div className="page-container">
+    <div className="page-container attendance-page">
 
       {/* ── Page Header ──────────────────────────────────────────────────── */}
-      <div className="page-header-row" style={{ marginBottom: '1.5rem' }}>
-        <div>
-          <h1 className="page-title">Attendance</h1>
-          <p className="page-subtitle">Mark student attendance, then review before submitting</p>
-        </div>
-        <div className="header-actions-group">
+      <div style={{ marginBottom: '1.5rem' }}>
+        <h1 className="page-title">Attendance</h1>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '0.5rem' }}>
+          <p className="page-subtitle" style={{ margin: 0 }}>Mark student attendance, then review before submitting</p>
           <button
             type="button"
             className="books-btn books-btn-primary"
             onClick={() => navigate('/attendance/history')}
             title="View submitted attendance records"
+            style={{ marginLeft: 'auto', flexShrink: 0 }}
           >
             <Eye size={15} />
             <span>View Attendance</span>
@@ -254,7 +253,7 @@ const Attendance = () => {
         </div>
       </div>
 
-      {/* ── Toolbar: bulk preset buttons (sticky on mobile so always visible) ── */}
+      {/* ── Toolbar: bulk preset buttons — right-aligned ─────────────── */}
       <div className="att-toolbar att-toolbar--sticky">
         <div className="att-chips-row">
           <div className="attendance-chip attendance-chip--total">
@@ -268,7 +267,7 @@ const Attendance = () => {
           </div>
         </div>
 
-        <div className="att-bulk-row">
+        <div className="att-bulk-row" style={{ marginLeft: 'auto' }}>
           <button type="button" className="attendance-bulk-btn" onClick={() => markAll(true)}>
             Mark All Present
           </button>

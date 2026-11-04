@@ -736,19 +736,16 @@ export default function ExamMarksPage() {
     <div className="page-container">
 
       {/* Back — consistent with all other pages */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '1rem' }}>
+      <div className="page-header" style={{ marginBottom: '1rem' }}>
         <button
           type="button"
           className="btn-back"
           onClick={() => navigate('/exams')}
           title="Back to Exams"
+          style={{ marginBottom: '0.5rem' }}
         >
           <ArrowLeft size={18} />
         </button>
-      </div>
-
-      {/* Header and prominent information cards / badges for Subject ID and Academic Year */}
-      <div style={{ marginBottom: 16 }}>
         <h1 className="page-title" style={{ textAlign: 'left', marginBottom: 10 }}>
           {exam.subject}
         </h1>
