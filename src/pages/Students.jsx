@@ -417,7 +417,7 @@ const Students = () => {
               )}
               <div className="table-stats-badge">
                 Total: <strong>{filteredStudents.length}</strong>{' '}
-                {filteredStudents.length === 1 ? 'Student' : 'Students'}
+                <span className="badge-label-full">{filteredStudents.length === 1 ? 'Student' : 'Students'}</span>
               </div>
             </div>
           </div>

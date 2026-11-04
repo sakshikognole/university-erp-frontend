@@ -817,9 +817,6 @@ const EventForm = ({ isDialog = false, dialogId, onClose, onSaved } = {}) => {
                 <h2 className="modal-title" style={{ fontSize: '1.125rem' }}>
                   {isEditMode ? 'Edit Event' : 'Add New Event'}
                 </h2>
-                <p className="page-subtitle" style={{ fontSize: '0.8125rem', marginTop: '0.1rem' }}>
-                  {isEditMode ? 'Update event booking information' : 'Create a new event booking with venue reservation'}
-                </p>
               </div>
             </div>
             <button type="button" className="close-modal-btn" onClick={handleCancel} title="Close">
@@ -859,9 +856,6 @@ const EventForm = ({ isDialog = false, dialogId, onClose, onSaved } = {}) => {
           <h1 className="page-title" style={{ fontSize: '1.5rem' }}>
             {isEditMode ? 'Edit Event' : 'Add New Event'}
           </h1>
-          <p className="page-subtitle">
-            {isEditMode ? 'Update event booking information and details' : 'Create a new event booking with venue reservation'}
-          </p>
         </div>
       </div>
 

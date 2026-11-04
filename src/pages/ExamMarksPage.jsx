@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
-import { Trash2 } from 'lucide-react';
+import { Trash2, ArrowLeft, Upload, Download, ChevronDown, Plus, FileSpreadsheet, FileText, Printer } from 'lucide-react';
 import { springApi } from '../services/api';
 import ConfirmDialog from '../components/ConfirmDialog';
 import * as XLSX from 'xlsx';
@@ -277,6 +277,18 @@ export default function ExamMarksPage() {
   const [saving,    setSaving]      = useState(false);
   const [delRow,    setDelRow]      = useState(null);
   const [deleting,  setDeleting]    = useState(false);
+  const [showDlMenu, setShowDlMenu] = useState(false);
+  const dlMenuRef = useRef(null);
+
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (dlMenuRef.current && !dlMenuRef.current.contains(e.target)) {
+        setShowDlMenu(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
 
 
   // PRN lookup status for auto-name
@@ -723,10 +735,16 @@ export default function ExamMarksPage() {
   return (
     <div className="page-container">
 
-      {/* Back */}
-      <div style={{ display:'flex', alignItems:'center', gap:10, marginBottom:4 }}>
-        <button className="books-btn books-btn-ghost books-btn-sm"
-          onClick={() => navigate('/exams')}>← Back</button>
+      {/* Back — consistent with all other pages */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '1rem' }}>
+        <button
+          type="button"
+          className="btn-back"
+          onClick={() => navigate('/exams')}
+          title="Back to Exams"
+        >
+          <ArrowLeft size={18} />
+        </button>
       </div>
 
       {/* Header and prominent information cards / badges for Subject ID and Academic Year */}
@@ -808,30 +826,82 @@ export default function ExamMarksPage() {
         </span>
       </div>
 
-      {/* Improvement: single toolbar — no duplicate Add Row / Save */}
-      <div style={{ display:'flex', gap:8, marginBottom:14, flexWrap:'wrap' }}>
-        <input ref={fileRef} type="file" accept=".csv"
-          style={{ display:'none' }} onChange={handleImport} />
-        <button className="books-btn books-btn-ghost"
-          onClick={() => fileRef.current.click()}>📥 Import CSV</button>
-        <button className="books-btn books-btn-ghost"
-          onClick={downloadTemplate}>📋 Template</button>
-        <button className="books-btn books-btn-ghost" onClick={addRow}>
-          + Add Row
-        </button>
-        <button className="books-btn books-btn-ghost" onClick={exportCSV}
-          disabled={currentRows.length === 0}>📄 CSV</button>
-        <button className="books-btn books-btn-ghost" onClick={exportExcel}
-          disabled={currentRows.length === 0}>📊 Excel</button>
-        <button className="books-btn books-btn-ghost" onClick={exportPDF}
-          disabled={currentRows.length === 0}>🖨️ PDF</button>
-        {edited[activeTab] && (
+      {/* Toolbar — 3 buttons: Import | Download ▾ | + Add Row */}
+      <div className="page-header-row exam-marks-toolbar" style={{ marginBottom: '1rem', alignItems: 'center' }}>
+        <div>{/* spacer */}</div>
+        <div className="header-actions-group" ref={dlMenuRef}>
+
+          {/* Hidden file input for CSV import */}
+          <input ref={fileRef} type="file" accept=".csv"
+            style={{ display: 'none' }} onChange={handleImport} />
+
+          {/* Import CSV */}
+          <button
+            type="button"
+            className="books-btn books-btn-secondary"
+            onClick={() => fileRef.current.click()}
+            title="Import marks from CSV"
+          >
+            <Upload size={15} /><span>Import</span>
+          </button>
+
+          {/* Download dropdown — CSV / Excel / PDF / Template */}
+          <div className="download-dropdown-wrapper">
+            <button
+              type="button"
+              className="books-btn books-btn-secondary download-trigger-btn"
+              onClick={() => setShowDlMenu((v) => !v)}
+              title="Download / Export"
+            >
+              <Download size={15} /><span>Download</span><ChevronDown size={13} />
+            </button>
+            {showDlMenu && (
+              <div className="download-dropdown-menu">
+                <div className="dropdown-menu-header">Export / Download</div>
+                <button type="button" className="dropdown-menu-item"
+                  onClick={() => { exportCSV(); setShowDlMenu(false); }}
+                  disabled={currentRows.length === 0}>
+                  <FileSpreadsheet size={14} /><span>CSV (.csv)</span>
+                </button>
+                <button type="button" className="dropdown-menu-item"
+                  onClick={() => { exportExcel(); setShowDlMenu(false); }}
+                  disabled={currentRows.length === 0}>
+                  <FileText size={14} /><span>Excel (.xlsx)</span>
+                </button>
+                <button type="button" className="dropdown-menu-item"
+                  onClick={() => { exportPDF(); setShowDlMenu(false); }}
+                  disabled={currentRows.length === 0}>
+                  <Printer size={14} /><span>PDF (.pdf)</span>
+                </button>
+                <button type="button" className="dropdown-menu-item"
+                  onClick={() => { downloadTemplate(); setShowDlMenu(false); }}>
+                  <Download size={14} /><span>CSV Template</span>
+                </button>
+              </div>
+            )}
+          </div>
+
+          {/* Add Row */}
+          <button
+            type="button"
+            className="books-btn books-btn-primary"
+            onClick={addRow}
+          >
+            <Plus size={15} /><span>Add Row</span>
+          </button>
+
+        </div>
+      </div>
+
+      {/* Save banner — shown when there are unsaved changes */}
+      {edited[activeTab] && (
+        <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '0.75rem' }}>
           <button className="books-btn books-btn-primary"
             onClick={saveTab} disabled={saving}>
-            {saving ? 'Saving...' : `💾 Save ${activeTab}`}
+            {saving ? 'Saving…' : `💾 Save ${activeTab}`}
           </button>
-        )}
-      </div>
+        </div>
+      )}
 
       {/* Notifications */}
       {success && (

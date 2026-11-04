@@ -24,6 +24,11 @@ const Sidebar = ({ isOpen, toggleSidebar, isCollapsed, role = 'SUPER_ADMIN' }) =
       return true;
     }
 
+    // Bulk upload pages keep their parent module highlighted
+    if (linkPath === '/students' && currentPath === '/bulk-upload-students') return true;
+    if (linkPath === '/venues'   && currentPath === '/bulk-upload-venues')   return true;
+    if (linkPath === '/alumni'   && currentPath === '/bulk-upload-alumni')   return true;
+
     // Student Certificate flow
     if (
       linkPath === '/select-student' &&

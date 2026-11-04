@@ -247,21 +247,13 @@ const EventNotices = () => {
 
       {/* Filter and Search Bar */}
       <div className="card" style={{ marginTop: '1.25rem', padding: '1rem 1.25rem' }}>
-        <div
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            flexWrap: 'wrap',
-            gap: '1rem',
-          }}
-        >
-          <div className="search-box-wrapper" style={{ flex: 1, minWidth: '260px' }}>
+        <div className="en-filter-bar">
+          <div className="search-box-wrapper en-search">
             <Search size={16} className="search-icon" />
             <input
               type="text"
               className="search-input"
-              placeholder="Search by title, event ID, description, venue, organizer..."
+              placeholder="Search by title, event ID, description..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
             />
@@ -272,51 +264,37 @@ const EventNotices = () => {
             )}
           </div>
 
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', flexWrap: 'wrap' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-              <span style={{ fontSize: '0.8125rem', fontWeight: 600, color: 'var(--text-secondary)' }}>
-                Category:
-              </span>
-              <select
-                value={categoryFilter}
-                onChange={(e) => {
-                  setCategoryFilter(e.target.value);
-                  setCurrentPage(1);
-                }}
-                className="filter-select"
-              >
-                <option value="ALL">All Categories</option>
-                <option value="ACADEMIC">Academic</option>
-                <option value="SPORTS">Sports</option>
-                <option value="CULTURAL">Cultural</option>
-                <option value="WORKSHOP">Workshop</option>
-                <option value="SEMINAR">Seminar</option>
-                <option value="CONFERENCE">Conference</option>
-                <option value="SOCIAL">Social</option>
-                <option value="OTHER">Other</option>
-              </select>
-            </div>
+          <div className="en-filter-row">
+            <select
+              value={categoryFilter}
+              onChange={(e) => { setCategoryFilter(e.target.value); setCurrentPage(1); }}
+              className="filter-select en-filter-select"
+            >
+              <option value="ALL">All Categories</option>
+              <option value="ACADEMIC">Academic</option>
+              <option value="SPORTS">Sports</option>
+              <option value="CULTURAL">Cultural</option>
+              <option value="WORKSHOP">Workshop</option>
+              <option value="SEMINAR">Seminar</option>
+              <option value="CONFERENCE">Conference</option>
+              <option value="SOCIAL">Social</option>
+              <option value="OTHER">Other</option>
+            </select>
 
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-              <span style={{ fontSize: '0.8125rem', fontWeight: 600, color: 'var(--text-secondary)' }}>
-                Status:
-              </span>
-              <select
-                value={statusFilter}
-                onChange={(e) => {
-                  setStatusFilter(e.target.value);
-                  setCurrentPage(1);
-                }}
-                className="filter-select"
-              >
-                <option value="ALL">All Statuses</option>
-                <option value="PUBLISHED">Published</option>
-                <option value="DRAFT">Draft</option>
-                <option value="CANCELLED">Cancelled</option>
-                <option value="COMPLETED">Completed</option>
-              </select>
-            </div>
+            <select
+              value={statusFilter}
+              onChange={(e) => { setStatusFilter(e.target.value); setCurrentPage(1); }}
+              className="filter-select en-filter-select"
+            >
+              <option value="ALL">All Statuses</option>
+              <option value="PUBLISHED">Published</option>
+              <option value="DRAFT">Draft</option>
+              <option value="CANCELLED">Cancelled</option>
+              <option value="COMPLETED">Completed</option>
+            </select>
+          </div>
 
+          <div className="en-filter-count">
             <div className="table-stats-badge">
               Total: <strong>{totalEvents}</strong> {totalEvents === 1 ? 'Event' : 'Events'}
             </div>
