@@ -1,4 +1,5 @@
 import { springApi } from '../services/api';
+import ConfirmDialog from '../components/ConfirmDialog';
 import { useState, useEffect, useRef } from 'react';
 
 const EMPTY = { roomNo: '', capacity: '' };
@@ -24,6 +25,7 @@ export default function HostelRoomModal({ isOpen, blockId, onClose, onSaved }) {
   const [namePreview, setNamePreview] = useState('');
   const [prnStatus,   setPrnStatus]   = useState('idle'); // idle | loading | found | notfound
   const [prnList,     setPrnList]     = useState([]);
+  const [delStudent,  setDelStudent]  = useState(null);
   const lookupTimer = useRef(null);
 
   useEffect(() => {
@@ -314,7 +316,7 @@ export default function HostelRoomModal({ isOpen, blockId, onClose, onSaved }) {
                           <button
                             type="button"
                             className="books-btn books-btn-sm books-btn-ghost"
-                            onClick={() => removePrn(p.prn)}
+                            onClick={() => setDelStudent(p)}
                           >✕</button>
                         </td>
                       </tr>
@@ -343,6 +345,21 @@ export default function HostelRoomModal({ isOpen, blockId, onClose, onSaved }) {
         </form>
 
       </div>
+
+      <ConfirmDialog
+        isOpen={!!delStudent}
+        title="Remove Student"
+        description="Are you sure you want to remove this student from the list? This action will permanently remove the record."
+        itemName={delStudent?.name || delStudent?.prn}
+        itemSubtext={`PRN: ${delStudent?.prn}`}
+        itemBadge={form.roomNo ? `Room ${form.roomNo}` : undefined}
+        confirmText="Delete"
+        onConfirm={() => {
+          setPrnList(prev => prev.filter(p => p.prn !== delStudent?.prn));
+          setDelStudent(null);
+        }}
+        onCancel={() => setDelStudent(null)}
+      />
     </div>
   );
 }

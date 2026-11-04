@@ -102,12 +102,14 @@ export default function HostelBlockDetails({ block: blockProp, onBack }) {
 
   // ── Remove student from room ──────────────────────────────────────────
   const handleRemoveStudent = (roomId, prn, studentName) => {
+    const targetRoom = rooms.find(r => String(r.roomId) === String(roomId)) || selRoom;
     setDelItem({
       title: 'Remove Student',
       description: 'Are you sure you want to remove this student from the room? This action will permanently remove the record.',
       itemName: studentName || prn,
       itemSubtext: `PRN: ${prn}`,
-      itemBadge: roomId,
+      itemBadge: targetRoom?.roomNo ? `Room ${targetRoom.roomNo}` : (roomId ? `Room ${roomId}` : ''),
+      confirmText: 'Delete',
       action: async () => {
         setDeleting(true);
         try {
@@ -208,6 +210,22 @@ export default function HostelBlockDetails({ block: blockProp, onBack }) {
       setPrnList(prev => [...prev, { prn: typed, name: namePreview }]);
       setPrnInput(''); setNamePreview('');
     }
+  };
+
+  const handleRemovePendingStudent = (student) => {
+    const targetRoom = rooms.find(r => String(r.roomId) === String(selRoomId));
+    setDelItem({
+      title: 'Remove Student',
+      description: 'Are you sure you want to remove this student from the list? This action will permanently remove the record.',
+      itemName: student.name || student.prn,
+      itemSubtext: `PRN: ${student.prn}`,
+      itemBadge: targetRoom?.roomNo ? `Room ${targetRoom.roomNo}` : (student.prn || ''),
+      confirmText: 'Delete',
+      action: () => {
+        setPrnList(prev => prev.filter(p => p.prn !== student.prn));
+        setDelItem(null);
+      }
+    });
   };
 
   const removePrnFromList = (prn) =>
@@ -666,7 +684,7 @@ export default function HostelBlockDetails({ block: blockProp, onBack }) {
                         type="button"
                         className="action-btn delete-btn"
                         style={{ padding: '0.25rem 0.5rem', fontSize: '0.75rem' }}
-                        onClick={() => removePrnFromList(p.prn)}
+                        onClick={() => handleRemovePendingStudent(p)}
                       >
                         <Trash2 size={12} />
                         <span>Remove</span>
@@ -712,6 +730,7 @@ export default function HostelBlockDetails({ block: blockProp, onBack }) {
         itemName={delItem?.itemName}
         itemSubtext={delItem?.itemSubtext}
         itemBadge={delItem?.itemBadge}
+        confirmText={delItem?.confirmText}
         onConfirm={() => delItem?.action && delItem.action()}
         onCancel={() => setDelItem(null)}
         loading={deleting}
