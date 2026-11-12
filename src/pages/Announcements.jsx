@@ -141,15 +141,26 @@ const Announcements = () => {
     <div className="page-container">
 
       {/* Header */}
-      <div className="books-page-header">
-        <div>
+      <div className="books-page-header academic-page-header">
+        <div className="academic-page-heading">
           <h1 className="page-title">Announcements</h1>
-          <p className="page-subtitle">Manage and publish assignment announcements</p>
+          <p className="page-subtitle">
+            Manage and publish assignment announcements
+          </p>
         </div>
-        <button className="books-btn books-btn-primary" onClick={() => { setShowForm(!showForm); setSuccess(''); setError(''); }}>
+
+        <button
+          className="books-btn books-btn-primary academic-upload-btn"
+          onClick={() => {
+            setShowForm(!showForm);
+            setSuccess('');
+            setError('');
+          }}
+        >
           + New Announcement
         </button>
       </div>
+
 
       {/* Alerts */}
       {success && (
