@@ -19865,3 +19865,29 @@ td.stu-num-cell {
 .search-box-wrapper[data-tooltip] {
   overflow: visible;
 }
+/* ================================================================
+   DOWNLOAD DROPDOWN — open RIGHT when buttons are left-aligned
+   (Staff, Departments, Events/EventBooking, AlumniJobs)
+   These pages have buttons left-aligned at medium screens, so the
+   dropdown must open rightward to stay visible.
+   ================================================================ */
+@media (min-width: 641px) and (max-width: 1279px) {
+  .staff-page .download-dropdown-menu,
+  .departments-page .download-dropdown-menu,
+  .events-page .download-dropdown-menu,
+  .alumni-jobs-page .download-dropdown-menu {
+    left: 0 !important;
+    right: auto !important;
+  }
+}
+
+/* Also fix on mobile for these pages */
+@media (max-width: 640px) {
+  .staff-page .download-dropdown-menu,
+  .departments-page .download-dropdown-menu,
+  .events-page .download-dropdown-menu,
+  .alumni-jobs-page .download-dropdown-menu {
+    left: 0 !important;
+    right: auto !important;
+  }
+}

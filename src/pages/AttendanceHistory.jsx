@@ -90,7 +90,7 @@ const AttendanceHistory = () => {
     <div className="page-container">
 
       {/* ── Header ────────────────────────────────────────────────────────── */}
-      <div className="page-header-row" style={{ marginBottom: '1.5rem' }}>
+      <div className="page-header" style={{ marginBottom: '1.5rem' }}>
         <button
           type="button"
           className="btn-back"
