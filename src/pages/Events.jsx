@@ -7,7 +7,7 @@
  * Improvement 3:  Add New Event, Edit Event, and View Event Details all open as
  *                 dialogs/modals instead of navigating to separate pages.
  *                 Existing routes (/events/add, /events/edit/:id, /events/view/:id)
- *                 still work for direct navigation — those pages are unchanged.
+ *                 still work for direct navigation  those pages are unchanged.
  */
 
 import React, { useState, useEffect, useRef } from 'react';
@@ -146,7 +146,7 @@ const EventDetailsDialog = ({ eventId, onClose, onEdit, onDeleted }) => {
         {loading ? (
           <div style={{ padding: '3rem', textAlign: 'center', color: 'var(--text-secondary)' }}>
             <Loader2 size={28} className="spin-animate" style={{ margin: '0 auto 0.75rem' }} />
-            <p>Loading event details...</p>
+            <p>Loading event details</p>
           </div>
         ) : event ? (
           <>
@@ -175,13 +175,13 @@ const EventDetailsDialog = ({ eventId, onClose, onEdit, onDeleted }) => {
               <div className="eb-detail-row">
                 <div className="eb-detail-label"><MapPin size={14} /> Venue</div>
                 <div className="eb-detail-value">
-                  {venue ? <><strong>{venue.name}</strong><br /><span style={{ fontSize:'0.8rem', color:'var(--text-secondary)' }}>{venue.venueId}{venue.capacity && ` • Cap. ${venue.capacity}`}</span></> : (event.venueId || 'Not assigned')}
+                  {venue ? <><strong>{venue.name}</strong><br /><span style={{ fontSize:'0.8rem', color:'var(--text-secondary)' }}>{venue.venueId}{venue.capacity && `  Cap. ${venue.capacity}`}</span></> : (event.venueId || 'Not assigned')}
                 </div>
               </div>
               <div className="eb-detail-row">
                 <div className="eb-detail-label"><User size={14} /> Organizer</div>
                 <div className="eb-detail-value">
-                  {club ? <><strong>{club.clubName}</strong><br /><span style={{ fontSize:'0.8rem', color:'var(--text-secondary)' }}>{club.clubId}{club.clubCategory && ` • ${club.clubCategory}`}</span></> : (event.organizerId || 'Not assigned')}
+                  {club ? <><strong>{club.clubName}</strong><br /><span style={{ fontSize:'0.8rem', color:'var(--text-secondary)' }}>{club.clubId}{club.clubCategory && `  ${club.clubCategory}`}</span></> : (event.organizerId || 'Not assigned')}
                 </div>
               </div>
             </div>
@@ -298,10 +298,10 @@ const Events = () => {
       const o = { month: 'short', day: 'numeric', year: 'numeric' };
       if (s && e) {
         if (s.toDateString() === e.toDateString()) return s.toLocaleDateString(undefined, o);
-        return `${s.toLocaleDateString(undefined, { month:'short', day:'numeric' })} – ${e.toLocaleDateString(undefined, o)}`;
+        return `${s.toLocaleDateString(undefined, { month:'short', day:'numeric' })}  ${e.toLocaleDateString(undefined, o)}`;
       }
       return (s||e).toLocaleDateString(undefined, o);
-    } catch { return `${start||''} – ${end||''}`; }
+    } catch { return `${start||''}  ${end||''}`; }
   };
 
   return (
@@ -365,7 +365,7 @@ const Events = () => {
           <div className="search-box-wrapper">
             <Search size={16} className="search-icon" />
             <input type="text" className="search-input"
-              placeholder="Search by Title, Event ID, Type, Organizer, Venue..."
+              placeholder="Search by Title, Event ID, Type, Organizer, Venue"
               value={search}
               title="Search events"
               onChange={e => { setSearch(e.target.value); setCurrentPage(1); }} />
@@ -392,7 +392,7 @@ const Events = () => {
       {loading ? (
         <div style={{ padding: '4rem', textAlign: 'center', color: 'var(--text-secondary)' }}>
           <Loader2 size={32} className="spin-animate" style={{ margin: '0 auto 0.75rem' }} />
-          <p>Loading event bookings...</p>
+          <p>Loading event bookings</p>
         </div>
       ) : filteredEvents.length === 0 ? (
         <div className="card table-empty-state" style={{ marginTop: '1.25rem' }}>
@@ -455,12 +455,12 @@ const Events = () => {
                     </div>
 
                     <div className="event-card-footer">
-                      {/* View — Improvement 3: opens dialog */}
+                      {/* View  Improvement 3: opens dialog */}
                       <button type="button" className="action-btn view-btn" title="View Details"
                         onClick={e => { e.stopPropagation(); setActiveDialog({ mode: 'view', id: event.eventId }); }}>
                         <Eye size={14} /><span className="action-label">View</span>
                       </button>
-                      {/* Edit — Improvement 3: opens dialog */}
+                      {/* Edit  Improvement 3: opens dialog */}
                       <button type="button" className="action-btn edit-btn" title="Edit Event"
                         onClick={e => { e.stopPropagation(); setActiveDialog({ mode: 'edit', id: event.eventId }); }}>
                         <Edit size={14} /><span className="action-label">Edit</span>
@@ -496,7 +496,7 @@ const Events = () => {
                     return <button key={p} type="button" className={`pagination-btn${p===currentPage?' active':''}`}
                       onClick={() => setCurrentPage(p)}>{p}</button>;
                   if (p===currentPage-2||p===currentPage+2)
-                    return <span key={p} className="pagination-dots">...</span>;
+                    return <span key={p} className="pagination-dots"></span>;
                   return null;
                 })}
                 <button type="button" className="pagination-btn"
@@ -546,7 +546,7 @@ const Events = () => {
             <div className="modal-actions">
               <button type="button" className="books-btn books-btn-ghost" onClick={() => setDeleteConfirm(null)} disabled={deleting}>Cancel</button>
               <button type="button" className="btn btn-danger" onClick={() => handleDelete(deleteConfirm.id, deleteConfirm.title)} disabled={deleting}>
-                {deleting ? <><Loader2 size={16} className="spin-animate" /><span>Deleting...</span></> : <><Trash2 size={16} /><span>Delete</span></>}
+                {deleting ? <><Loader2 size={16} className="spin-animate" /><span>Deleting</span></> : <><Trash2 size={16} /><span>Delete</span></>}
               </button>
             </div>
           </div>
