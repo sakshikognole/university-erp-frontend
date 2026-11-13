@@ -807,7 +807,7 @@ const EventForm = ({ isDialog = false, dialogId, onClose, onSaved } = {}) => {
   // ── Dialog mode ──────────────────────────────────────────────────────────
 
   if (isDialog) {
-    return createPortal((
+    return (
       <div className="modal-overlay eb-form-overlay" onClick={(e) => { if (e.target === e.currentTarget) handleCancel(); }} style={{ position: 'fixed', inset: 0, top: 0, left: 0, right: 0, bottom: 0, zIndex: 9999, background: 'rgba(0,0,0,0.6)', backdropFilter: 'blur(4px)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '1rem' }}>
         <div className="modal-content eb-form-dialog" onClick={e => e.stopPropagation()} style={{ width: "100%", maxWidth: "820px", maxHeight: "90vh", display: "flex", flexDirection: "column", background: "#fff", borderRadius: "12px", overflow: "hidden", margin: "auto" }}>
           {/* D5: Back / close button at top-left of dialog header */}
@@ -843,7 +843,7 @@ const EventForm = ({ isDialog = false, dialogId, onClose, onSaved } = {}) => {
           </div>
         </div>
       </div>
-    ), document.body);
+    );
   }
 
   // ── Full-page / standalone mode ───────────────────────────────────────────
