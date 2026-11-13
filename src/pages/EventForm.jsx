@@ -807,11 +807,11 @@ const EventForm = ({ isDialog = false, dialogId, onClose, onSaved } = {}) => {
   // ── Dialog mode ──────────────────────────────────────────────────────────
 
   if (isDialog) {
-    return (
-      <div className="modal-overlay eb-form-overlay" onClick={(e) => { if (e.target === e.currentTarget) handleCancel(); }}>
-        <div className="modal-content eb-form-dialog" onClick={e => e.stopPropagation()}>
+    return createPortal((
+    return createPortal((
+        <div className="modal-content eb-form-dialog" onClick={e => e.stopPropagation()} style={{ width: "100%", maxWidth: "820px", maxHeight: "90vh", display: "flex", flexDirection: "column", background: "#fff", borderRadius: "12px", overflow: "hidden", margin: "auto" }}>
           {/* D5: Back / close button at top-left of dialog header */}
-          <div className="modal-header eb-dialog-header">
+          <div className="modal-header eb-dialog-header" style={{ position: "sticky", top: 0, zIndex: 10, background: "#fff", flexShrink: 0, borderBottom: "1px solid var(--border-color)" }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.625rem' }}>
               <div>
                 <h2 className="modal-title" style={{ fontSize: '1.125rem' }}>
@@ -823,6 +823,8 @@ const EventForm = ({ isDialog = false, dialogId, onClose, onSaved } = {}) => {
               <X size={18} />
             </button>
           </div>
+          {/* Scrollable form body */}
+          <div style={{ flex: 1, overflowY: 'auto', overflowX: 'hidden', padding: '1.25rem 1.5rem', WebkitOverflowScrolling: 'touch' }}>
 
           {feedback.message && (
             <div className={`feedback-banner ${feedback.type === 'success' ? 'feedback-success' : 'feedback-error'}`}
@@ -838,9 +840,10 @@ const EventForm = ({ isDialog = false, dialogId, onClose, onSaved } = {}) => {
               <p>Loading event details…</p>
             </div>
           ) : formContent}
+          </div>
         </div>
       </div>
-    );
+    ), document.body);
   }
 
   // ── Full-page / standalone mode ───────────────────────────────────────────
