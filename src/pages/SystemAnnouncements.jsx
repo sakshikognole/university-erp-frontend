@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+﻿import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   BellRing,
@@ -288,7 +288,7 @@ const SystemAnnouncements = () => {
       <div className="card table-card" style={{ marginTop: '1.25rem' }}>
         {/* Controls bar */}
         <div className="table-controls-bar">
-          <div className="search-box-wrapper" data-tooltip="Search announcements">
+          <div className="search-box-wrapper">
             <Search size={16} className="search-icon" />
             <input
               type="text"

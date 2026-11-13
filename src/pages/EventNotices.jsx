@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+﻿import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   Calendar,
@@ -248,7 +248,7 @@ const EventNotices = () => {
       {/* Filter and Search Bar */}
       <div className="card" style={{ marginTop: '1.25rem', padding: '1rem 1.25rem' }}>
         <div className="en-filter-bar">
-          <div className="search-box-wrapper en-search" data-tooltip="Search event notices">
+          <div className="search-box-wrapper en-search">
             <Search size={16} className="search-icon" />
             <input
               type="text"

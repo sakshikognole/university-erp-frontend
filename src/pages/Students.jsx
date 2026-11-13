@@ -374,7 +374,7 @@ const Students = () => {
 
         {/* ── Search + filter bar ── */}
         <div className="table-controls-bar">
-          <div className="search-box-wrapper" data-tooltip="Search students">
+          <div className="search-box-wrapper">
             <Search size={16} className="search-icon" />
             <input
               type="text"

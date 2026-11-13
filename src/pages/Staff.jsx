@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useCallback } from 'react';
+﻿import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   Users,
@@ -258,7 +258,7 @@ const Staff = () => {
 
         {/* Search bar */}
         <div className="table-controls-bar">
-          <div className="search-box-wrapper" data-tooltip="Search staff">
+          <div className="search-box-wrapper">
             <Search size={16} className="search-icon" />
             <input
               type="text"

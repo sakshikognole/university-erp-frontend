@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useCallback } from 'react';
+﻿import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   Building2, Plus, Download, Search, Edit, Trash2, FileText, FileSpreadsheet,
@@ -404,7 +404,7 @@ const Departments = () => {
       <div className="card table-card" style={{ marginTop: '1.25rem' }}>
         {/* Table Search & Filter Bar */}
         <div className="table-controls-bar">
-          <div className="search-box-wrapper" data-tooltip="Search departments">
+          <div className="search-box-wrapper">
             <Search size={16} className="search-icon" />
             <input
               type="text"

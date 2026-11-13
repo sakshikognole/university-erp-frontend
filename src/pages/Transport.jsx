@@ -365,7 +365,7 @@ const Transport = () => {
 
       <div className="card table-card" style={{ marginTop: '1rem' }}>
         <div className="table-controls-bar">
-          <div className="search-box-wrapper" data-tooltip="Search transport records">
+          <div className="search-box-wrapper">
             <Search size={16} className="search-icon" />
             <input type="text" className="search-input" title="Search transport records"
               placeholder={
@@ -415,13 +415,13 @@ const Transport = () => {
                 <table className="data-table transport-table">
                   <thead>
                     <tr>
-                       <th style={{ width: '40px' }}>#</th>
+                       <th style={{ width: '32px' }}>#</th>
                        <th style={{ width: '95px' }}>Route ID</th>
                        <th style={{ width: '140px' }}>Route Name</th>
                        <th style={{ width: '130px' }}>Driver Name</th>
                        <th style={{ width: '130px' }}>Vehicle Name</th>
                       <th>Stops</th>
-                       <th style={{ width: '165px', textAlign: 'center' }}>Actions</th>
+                       <th style={{ width: '155px', textAlign: 'center' }}>Actions</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -476,7 +476,7 @@ const Transport = () => {
                 <table className="data-table transport-table">
                   <thead>
                     <tr>
-                       <th style={{ width: '40px' }}>#</th>
+                       <th style={{ width: '32px' }}>#</th>
                       <th style={{ width: '110px' }}>Driver ID</th>
                       <th>Driver Name</th>
                       <th>Phone</th>
@@ -522,7 +522,7 @@ const Transport = () => {
                 <table className="data-table transport-table">
                   <thead>
                     <tr>
-                       <th style={{ width: '40px' }}>#</th>
+                       <th style={{ width: '32px' }}>#</th>
                       <th style={{ width: '120px' }}>Vehicle ID</th>
                       <th>Vehicle Name</th>
                       <th>Registration / Plate</th>
@@ -567,15 +567,15 @@ const Transport = () => {
                 <table className="data-table transport-table">
                   <thead>
                     <tr>
-                       <th style={{ width: '40px' }}>#</th>
-                       <th style={{ width: '80px' }}>Pass ID</th>
-                       <th style={{ width: '100px' }}>Student ID</th>
-                       <th style={{ width: '115px' }}>Student Name</th>
-                       <th style={{ width: '75px' }}>Route ID</th>
-                      <th>Stops (From → To)</th>
-                       <th style={{ width: '75px' }}>Payment</th>
-                       <th style={{ width: '80px' }}>Valid Till</th>
-                       <th style={{ width: '165px', textAlign: 'center' }}>Actions</th>
+                       <th style={{ width: '32px' }}>#</th>
+                       <th style={{ width: '75px' }}>Pass ID</th>
+                       <th style={{ width: '95px' }}>Student ID</th>
+                       <th style={{ width: '100px' }}>Student Name</th>
+                       <th style={{ width: '70px' }}>Route ID</th>
+                       <th style={{ width: '145px' }}>Stops (From → To)</th>
+                       <th style={{ width: '68px' }}>Payment</th>
+                       <th style={{ width: '72px' }}>Valid Till</th>
+                       <th style={{ width: '140px', textAlign: 'center' }}>Actions</th>
                     </tr>
                   </thead>
                   <tbody>

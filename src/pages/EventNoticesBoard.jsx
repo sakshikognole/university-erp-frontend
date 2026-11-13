@@ -128,7 +128,7 @@ const EventNoticesBoard = () => {
 
       <div className="card" style={{marginTop:'1.25rem',padding:'1rem 1.25rem'}}>
         <div className="events-board-filter-wrapper">
-          <div className="search-box-wrapper" data-tooltip="Search event notices" style={{flex:1,minWidth:'200px'}}>
+          <div className="search-box-wrapper" style={{flex:1,minWidth:'200px'}}>
             <Search size={16} className="search-icon"/>
             <input type="text" className="search-input" placeholder="Search by title, event ID, description, venue, organizer..." title="Search event notices"
               value={search} onChange={(e)=>setSearch(e.target.value)}/>

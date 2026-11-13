@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Alumni.jsx — Alumni Profiles listing page
  *
  * Defects fixed:
@@ -353,7 +353,7 @@ const Alumni = () => {
       {/* Table Card */}
       <div className="card table-card" style={{ marginTop: '1.25rem' }}>
         <div className="table-controls-bar">
-          <div className="search-box-wrapper" data-tooltip="Search alumni">
+          <div className="search-box-wrapper">
             <Search size={16} className="search-icon" />
             <input type="text" className="search-input"
               placeholder="Search by Name, ID, Email, Job Title, or Company…"

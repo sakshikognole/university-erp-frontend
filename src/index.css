@@ -19857,3 +19857,11 @@ td.stu-num-cell {
   .trn-header-desktop { display: flex !important; }
   .trn-header-mobile  { display: none !important; }
 }
+/* Remove CSS tooltip from search-box-wrapper — native title on input is enough */
+.search-box-wrapper[data-tooltip]::after {
+  display: none !important;
+  content: none !important;
+}
+.search-box-wrapper[data-tooltip] {
+  overflow: visible;
+}

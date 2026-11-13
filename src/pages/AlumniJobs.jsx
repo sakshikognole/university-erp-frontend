@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+﻿import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   Briefcase, Plus, Download, Search, ChevronDown, FileText, FileSpreadsheet,
@@ -314,7 +314,7 @@ const AlumniJobs = () => {
 
       <div className="card table-card" style={{ marginTop: '1.25rem' }}>
         <div className="table-controls-bar">
-          <div className="search-box-wrapper" data-tooltip="Search alumni jobs">
+          <div className="search-box-wrapper">
             <Search size={16} className="search-icon" />
             <input
               type="text"
