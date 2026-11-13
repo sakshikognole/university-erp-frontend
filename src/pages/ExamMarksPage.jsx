@@ -887,18 +887,25 @@ export default function ExamMarksPage() {
             <Plus size={15} /><span>Add Row</span>
           </button>
 
+          {/* Separator */}
+          <div style={{ width: '1px', height: '28px', background: 'var(--border-color)', margin: '0 0.25rem' }} />
+
+          {/* Save Tab */}
+          {edited[activeTab] && (
+            <button
+              type="button"
+              className="books-btn books-btn-primary"
+              onClick={saveTab}
+              disabled={saving}
+              style={{ background: '#16a34a', borderColor: '#16a34a' }}
+            >
+              {saving ? 'Saving...' : `Save ${activeTab}`}
+            </button>
+          )}
+
         </div>
       </div>
 
-      {/* Save banner — shown when there are unsaved changes */}
-      {edited[activeTab] && (
-        <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '0.75rem' }}>
-          <button className="books-btn books-btn-primary"
-            onClick={saveTab} disabled={saving}>
-            {saving ? 'Saving…' : `💾 Save ${activeTab}`}
-          </button>
-        </div>
-      )}
 
       {/* Notifications */}
       {success && (
