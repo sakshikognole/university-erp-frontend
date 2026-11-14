@@ -14201,7 +14201,7 @@ input[type='password']::-webkit-inner-spin-button {
    ========================================== */
 .feature-page-header {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   justify-content: space-between;
   gap: 1rem;
   margin-bottom: 1.5rem;
@@ -14228,7 +14228,7 @@ input[type='password']::-webkit-inner-spin-button {
   display: inline;
 }
 
-@media (max-width: 768px) {
+@media (max-width: 1024px) {
   .mob-only-text {
     display: inline !important;
   }
