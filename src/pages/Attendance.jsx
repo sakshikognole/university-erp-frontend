@@ -176,7 +176,7 @@ const Attendance = () => {
           <h1 className="page-title">Attendance</h1>
           <p className="page-subtitle">Mark student attendance, then review before submitting</p>
         </div>
-        <div className="header-actions-group">
+        <div className="header-actions-group" style={{ marginLeft: "auto", justifyContent: "flex-end" }}>
           <button
             type="button"
             className="books-btn books-btn-primary"
