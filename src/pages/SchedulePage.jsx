@@ -159,7 +159,7 @@ function ExamScheduleModal({ isOpen, mode, schedule, onSave, onClose, saving }) 
 
   return (
     <div className="books-overlay">
-      <div className="books-modal" style={{ maxWidth: 520 }}>
+      <div className="books-modal" style={{ maxWidth: 520, display: 'flex', flexDirection: 'column', maxHeight: 'min(90vh, 700px)' }}>
         <div className="books-modal-head">
           <h3>{mode === 'edit' ? 'Edit Exam Schedule' : 'Add Exam Schedule'}</h3>
           <button className="books-modal-close" onClick={onClose} disabled={saving}>×</button>
@@ -187,8 +187,8 @@ function ExamScheduleModal({ isOpen, mode, schedule, onSave, onClose, saving }) 
               }}>↻ Retry</button>
           </div>
         ) : (
-          <form onSubmit={submit}>
-            <div className="books-modal-body" style={{ maxHeight: '70vh', overflowY: 'auto' }}>
+          <form onSubmit={submit} style={{ display: 'flex', flexDirection: 'column', flex: 1, minHeight: 0, overflow: 'hidden' }}>
+            <div className="books-modal-body" style={{ overflowY: 'auto', flex: 1, minHeight: 0 }}>
               <div className="books-form-group">
                 <label className="books-form-label">Exam <span style={{ color: '#dc2626' }}>*</span></label>
                 <select className={`books-form-control ${errors.examId ? 'err' : ''}`} value={form.examId}
@@ -408,7 +408,7 @@ function ClassScheduleModal({ isOpen, mode = 'add', schedule = null, onSave, onC
 
   return (
     <div className="books-overlay">
-      <div className="books-modal" style={{ maxWidth: 560 }}>
+      <div className="books-modal" style={{ maxWidth: 560, display: 'flex', flexDirection: 'column', maxHeight: 'min(90vh, 700px)' }}>
         <div className="books-modal-head">
           <h3>{mode === 'edit' ? 'Edit Class Schedule' : 'Add Class Schedule'}</h3>
           <button className="books-modal-close" onClick={onClose} disabled={saving}>×</button>
@@ -418,8 +418,8 @@ function ClassScheduleModal({ isOpen, mode = 'add', schedule = null, onSave, onC
             <p>Loading data...</p>
           </div>
         ) : (
-          <form onSubmit={submit}>
-            <div className="books-modal-body" style={{ maxHeight: '70vh', overflowY: 'auto' }}>
+          <form onSubmit={submit} style={{ display: 'flex', flexDirection: 'column', flex: 1, minHeight: 0, overflow: 'hidden' }}>
+            <div className="books-modal-body" style={{ overflowY: 'auto', flex: 1, minHeight: 0 }}>
               <div className="club-form-row">
                 <div className="books-form-group">
                   <label className="books-form-label">Department *</label>

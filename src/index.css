@@ -3971,9 +3971,14 @@ html.modal-open {
 .books-modal-foot {
   display: flex;
   justify-content: flex-end;
-  gap: 8px;
-  padding: 14px 20px;
+  align-items: center;
+  gap: 12px;
+  padding: 16px 24px 20px 24px;
   border-top: 1px solid var(--border-color);
+  background: var(--bg-primary, #ffffff);
+  border-radius: 0 0 10px 10px;
+  flex-shrink: 0;
+  box-sizing: border-box;
 }
 
 /* ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ Form fields ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ */
@@ -6452,6 +6457,11 @@ html.modal-open {
 
   .books-modal-body {
     padding: 16px !important;
+  }
+
+  .books-modal-foot {
+    padding: 14px 20px 18px 20px !important;
+    gap: 10px !important;
   }
 
   .books-form-control {

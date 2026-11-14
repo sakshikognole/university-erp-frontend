@@ -98,15 +98,15 @@ export default function ExamModal({
 
   return (
     <div className="books-overlay">
-      <div className="books-modal" style={{ maxWidth: 480 }}>
+      <div className="books-modal" style={{ maxWidth: 480, display: 'flex', flexDirection: 'column', maxHeight: 'min(90vh, 650px)' }}>
         <div className="books-modal-head">
           <h3>{mode === 'add' ? 'Add Exam' : 'Edit Exam'}</h3>
           <button className="books-modal-close" onClick={onClose}>x</button>
         </div>
 
         <form onSubmit={submit} style={{ display: 'flex', flexDirection: 'column',
-                                        maxHeight: '85vh', overflow: 'hidden' }}>
-          <div className="books-modal-body" style={{ overflowY: 'auto', flex: 1 }}>
+                                        flex: 1, minHeight: 0, overflow: 'hidden' }}>
+          <div className="books-modal-body" style={{ overflowY: 'auto', flex: 1, minHeight: 0 }}>
 
             {/* Duplicate error */}
             {dupError && (
@@ -301,7 +301,7 @@ export default function ExamModal({
             <button type="button" className="books-btn books-btn-ghost"
               onClick={onClose} disabled={loading}>Cancel</button>
             <button type="submit" className="books-btn books-btn-primary" disabled={loading}>
-              {loading ? 'Saving...' : mode === 'add' ? 'Add Exam' : 'Save Changes'}
+              {loading ? 'Saving...' : mode === 'add' ? 'Save Changes' : 'Update Changes'}
             </button>
           </div>
         </form>

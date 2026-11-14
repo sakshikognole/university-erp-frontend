@@ -218,14 +218,14 @@ function EditModal({ booking, events, venues, onSave, onClose, saving }) {
 
   return (
     <div className="books-overlay">
-      <div className="books-modal" style={{ maxWidth: 560 }}>
+      <div className="books-modal" style={{ maxWidth: 560, display: 'flex', flexDirection: 'column', maxHeight: 'min(90vh, 650px)' }}>
         <div className="books-modal-head">
           <h3>Edit Booking</h3>
           <button className="books-modal-close" onClick={onClose}>×</button>
         </div>
         <form onSubmit={submit} style={{ display: 'flex', flexDirection: 'column',
-                                         maxHeight: '85vh', overflow: 'hidden' }}>
-          <div className="books-modal-body" style={{ overflowY: 'auto', flex: 1 }}>
+                                         flex: 1, minHeight: 0, overflow: 'hidden' }}>
+          <div className="books-modal-body" style={{ overflowY: 'auto', flex: 1, minHeight: 0 }}>
 
             {/* Booking ID read-only */}
             <div className="books-form-group">
@@ -326,7 +326,7 @@ function EditModal({ booking, events, venues, onSave, onClose, saving }) {
             <button type="button" className="books-btn books-btn-ghost"
                     onClick={onClose} disabled={saving}>Cancel</button>
             <button type="submit" className="books-btn books-btn-primary" disabled={saving}>
-              {saving ? 'Saving...' : 'Save Changes'}
+              {saving ? 'Saving...' : 'Update Changes'}
             </button>
           </div>
         </form>
@@ -522,7 +522,7 @@ export default function VenueBookingPage() {
       {/* ── New Booking Request Form — Modal like Books ─────────────────────── */}
       {showForm && (
         <div className="books-overlay">
-          <div className="books-modal" style={{ maxWidth: 580 }}>
+          <div className="books-modal" style={{ maxWidth: 580, display: 'flex', flexDirection: 'column', maxHeight: 'min(90vh, 650px)' }}>
             <div className="books-modal-head">
               <h3>New Booking Request</h3>
               <button className="books-modal-close" onClick={() => { setShowForm(false); setFormErrs({}); }}>x</button>
@@ -533,8 +533,8 @@ export default function VenueBookingPage() {
             ) : dropError ? (
               <div className="books-modal-body"><PageError message={dropError} /></div>
             ) : (
-              <form onSubmit={(e) => { handleSubmit(e); }}>
-                <div className="books-modal-body" style={{ maxHeight: '70vh', overflowY: 'auto' }}>
+              <form onSubmit={(e) => { handleSubmit(e); }} style={{ display: 'flex', flexDirection: 'column', flex: 1, minHeight: 0, overflow: 'hidden' }}>
+                <div className="books-modal-body" style={{ overflowY: 'auto', flex: 1, minHeight: 0 }}>
 
                   {/* Booking ID */}
                   <div className="books-form-group">
@@ -640,12 +640,11 @@ export default function VenueBookingPage() {
       {/* ── All Booking Requests ─────────────────────────────────────────────── */}
       <div className="card">
         <div className="books-toolbar" style={{ justifyContent: 'space-between', alignItems: 'center' }}>
-          <div className="search-box-wrapper" data-tooltip="Search venue bookings">
+          <div className="search-box-wrapper">
             <Search size={16} className="search-icon" />
             <input
               className="search-input"
               placeholder="Search by Booking ID, Event, Venue, or Requester..."
-              title="Search venue bookings"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
             />
@@ -746,7 +745,7 @@ export default function VenueBookingPage() {
                             <button
                               type="button"
                               className="action-btn delete-btn"
-                              title="Delete"
+                              title="Delete Booking"
                               onClick={() => handleDelete(b)}
                             >
                               <Trash2 size={14} /><span className="action-label">Delete</span>
@@ -850,8 +849,8 @@ export default function VenueBookingPage() {
 
       <ConfirmDialog
         isOpen={!!delBooking}
-        title="Delete"
-        description="Are you sure you want to delete this record? This action is permanent and cannot be undone."
+        title="Delete Venue Booking"
+        description="Are you sure you want to delete this venue booking request? This action will permanently remove the record."
         itemName={delBooking ? `${eventLabel(delBooking.eventId)} at ${venueLabel(delBooking.venueId)}` : ''}
         itemSubtext={delBooking ? `Date: ${fmtDate(delBooking.bookingDate)} (${fmt12(delBooking.startTime)} - ${fmt12(delBooking.endTime)})` : 'Booking Record'}
         itemBadge={delBooking?.bookingId}

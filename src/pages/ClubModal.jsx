@@ -154,15 +154,15 @@ export default function ClubModal({ isOpen, mode, club, parentClubs, onSave, onC
 
     return (
         <div className="books-overlay">
-            <div className="books-modal" style={{ maxWidth: 540 }}>
+            <div className="books-modal" style={{ maxWidth: 540, display: 'flex', flexDirection: 'column', maxHeight: 'min(90vh, 700px)' }}>
 
                 <div className="books-modal-head">
                     <h3>{mode === 'add' ? 'Add Club' : 'Edit Club'}</h3>
                     <button className="books-modal-close" onClick={onClose}>x</button>
                 </div>
 
-                <form onSubmit={submit} onKeyDown={handleKeyDown}>
-                    <div className="books-modal-body" style={{ maxHeight: '70vh', overflowY: 'auto' }}>
+                <form onSubmit={submit} onKeyDown={handleKeyDown} style={{ display: 'flex', flexDirection: 'column', flex: 1, minHeight: 0, overflow: 'hidden' }}>
+                    <div className="books-modal-body" style={{ overflowY: 'auto', flex: 1, minHeight: 0 }}>
 
                         {/* Row 1 — Club ID + Club Name */}
                         <div className="club-form-row">
