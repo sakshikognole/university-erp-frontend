@@ -171,12 +171,14 @@ const Attendance = () => {
   return (
     <div className="page-container attendance-page">
 
-      <div className="page-header-row" style={{ marginBottom: '1.5rem' }}>
+
+      {/* Attendance page header - flex column, button always right */}
+      <div style={{ marginBottom: '1.5rem', display: 'flex', flexDirection: 'column', gap: '0.625rem' }}>
         <div>
           <h1 className="page-title">Attendance</h1>
           <p className="page-subtitle">Mark student attendance, then review before submitting</p>
         </div>
-        <div className="header-actions-group" style={{ marginLeft: "auto", justifyContent: "flex-end" }}>
+        <div style={{ display: 'flex', justifyContent: 'flex-end', width: '100%' }}>
           <button
             type="button"
             className="books-btn books-btn-primary"
