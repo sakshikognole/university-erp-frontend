@@ -132,7 +132,7 @@ const AttendanceHistory = () => {
               <ChevronDown size={13} style={{ transform: showFilters ? 'rotate(180deg)' : 'none', transition: 'transform 0.2s' }} />
             </button>
             <div className="table-stats-badge">
-              <strong>{filtered.length}</strong> Records
+              Total: <strong>{filtered.length}</strong> Records
             </div>
           </div>
         </div>
