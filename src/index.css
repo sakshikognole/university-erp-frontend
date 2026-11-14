@@ -1,4 +1,4 @@
-﻿/* ==========================================
+/* ==========================================
    CSS VARIABLES - WHITE THEME (Black & White)
    ========================================== */
 :root {
@@ -20367,4 +20367,35 @@ body:has(.eb-form-overlay),body:has(.enb-modal-overlay) {
   .sidebar-overlay {
     z-index: 1199 !important;
   }
+}
+
+/* Final fix: Academic Resources and Announcements header layout */
+.academic-page-header {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  justify-content: flex-start;
+  gap: 12px;
+  width: 100%;
+}
+
+.academic-page-heading {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  width: 100%;
+}
+
+.academic-page-heading .page-title {
+  margin: 0 0 4px !important;
+}
+
+.academic-page-heading .page-subtitle {
+  margin: 0 !important;
+}
+
+.academic-upload-btn {
+  margin-top: 0;
+  align-self: flex-end;
+  flex-shrink: 0;
 }
