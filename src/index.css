@@ -20304,3 +20304,24 @@ body:has(.enf-overlay),body:has(.env-overlay),body:has(.ann-view-overlay),
 body:has(.eb-form-overlay),body:has(.enb-modal-overlay) {
   overflow: hidden !important;
 }
+
+/* ================================================================
+   SIDEBAR ALWAYS ABOVE MODALS — navbar stays fully navigable
+   ================================================================ */
+.sidebar,
+.sidebar.open,
+.sidebar.collapsed {
+  z-index: 1000 !important;
+  pointer-events: auto !important;
+}
+.sidebar .nav-link,
+.sidebar .nav-list,
+.sidebar-nav {
+  pointer-events: auto !important;
+  position: relative !important;
+  z-index: 1001 !important;
+}
+/* Sidebar backdrop (closes sidebar on tap) stays below sidebar but above page */
+.sidebar-overlay {
+  z-index: 999 !important;
+}
