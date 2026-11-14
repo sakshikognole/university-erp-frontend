@@ -1,4 +1,4 @@
-﻿import React, { useState, useEffect, useRef, useCallback } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   GraduationCap,
@@ -411,7 +411,7 @@ const Students = () => {
             </button>
 
             <div className="students-bar-right">
-              <div className="table-stats-badge">Total:&nbsp;<strong>{filteredStudents.length}</strong>&nbsp;<span className="badge-label-full">{filteredStudents.length === 1 ? 'Student' : 'Students'}</span></div>
+              <div className="table-stats-badge">Total: <strong>{filteredStudents.length}</strong> <span className="badge-label-full">{filteredStudents.length === 1 ? 'Student' : 'Students'}</span></div>
             </div>
           </div>
         </div>
