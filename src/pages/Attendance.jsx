@@ -171,24 +171,23 @@ const Attendance = () => {
   return (
     <div className="page-container attendance-page">
 
-      {/* ── Page Header ──────────────────────────────────────────────────── */}
-      <div style={{ marginBottom: '1.5rem' }}>
-        <h1 className="page-title">Attendance</h1>
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '0.5rem' }}>
-          <p className="page-subtitle" style={{ margin: 0 }}>Mark student attendance, then review before submitting</p>
+      <div className="page-header-row" style={{ marginBottom: '1.5rem' }}>
+        <div>
+          <h1 className="page-title">Attendance</h1>
+          <p className="page-subtitle">Mark student attendance, then review before submitting</p>
+        </div>
+        <div className="header-actions-group">
           <button
             type="button"
             className="books-btn books-btn-primary"
             onClick={() => navigate('/attendance/history')}
             title="View submitted attendance records"
-            style={{ marginLeft: 'auto', flexShrink: 0 }}
           >
             <Eye size={15} />
             <span>View Attendance</span>
           </button>
         </div>
       </div>
-
       {/* ════════════════════════════════════════════════════════════════════
           SESSION HEADER CARD
       ════════════════════════════════════════════════════════════════════ */}
