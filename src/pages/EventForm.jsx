@@ -806,40 +806,49 @@ const EventForm = ({ isDialog = false, dialogId, onClose, onSaved } = {}) => {
 
   // ── Dialog mode ──────────────────────────────────────────────────────────
 
+
   if (isDialog) {
     return (
-      <div className="modal-overlay eb-form-overlay" onClick={(e) => { if (e.target === e.currentTarget) handleCancel(); }} style={{ position: 'fixed', inset: 0, top: 0, left: 0, right: 0, bottom: 0, zIndex: 9999, background: 'rgba(0,0,0,0.6)', backdropFilter: 'blur(4px)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '1rem' }}>
-        <div className="modal-content eb-form-dialog" onClick={e => e.stopPropagation()} style={{ width: "100%", maxWidth: "820px", maxHeight: "90vh", display: "flex", flexDirection: "column", background: "#fff", borderRadius: "12px", overflow: "hidden", margin: "auto" }}>
-          {/* D5: Back / close button at top-left of dialog header */}
-          <div className="modal-header eb-dialog-header" style={{ position: "sticky", top: 0, zIndex: 10, background: "#fff", flexShrink: 0, borderBottom: "1px solid var(--border-color)" }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.625rem' }}>
+      <div
+        className="sf-overlay"
+        onClick={(e) => { if (e.target === e.currentTarget) handleCancel(); }}
+        style={{ position: "fixed", inset: 0, zIndex: 9999, background: "rgba(0,0,0,0.55)", backdropFilter: "blur(4px)", display: "flex", alignItems: "center", justifyContent: "center", padding: "1rem" }}
+      >
+        <div
+          className="sf-modal"
+          onClick={(e) => e.stopPropagation()}
+          style={{ width: "100%", maxWidth: "760px", maxHeight: "92vh", display: "flex", flexDirection: "column", background: "#fff", borderRadius: "14px", boxShadow: "0 20px 48px rgba(0,0,0,0.22)", overflow: "hidden" }}
+        >
+          {/* Header */}
+          <div className="sf-header" style={{ flexShrink: 0 }}>
+            <div className="sf-header-left">
+              <div className="sf-header-icon"><Calendar size={18} /></div>
               <div>
-                <h2 className="modal-title" style={{ fontSize: '1.125rem' }}>
-                  {isEditMode ? 'Edit Event' : 'Add New Event'}
-                </h2>
+                <h2 className="sf-title">{isEditMode ? "Edit Event" : "Add New Event"}</h2>
+                <p className="sf-subtitle">{isEditMode ? "Update event details" : "Fill in the event details below"}</p>
               </div>
             </div>
-            <button type="button" className="close-modal-btn" onClick={handleCancel} title="Close">
+            <button type="button" className="sf-close-btn" onClick={handleCancel} title="Close">
               <X size={18} />
             </button>
           </div>
-          {/* Scrollable form body */}
-          <div style={{ flex: 1, overflowY: 'auto', overflowX: 'hidden', padding: '1.25rem 1.5rem', WebkitOverflowScrolling: 'touch' }}>
 
+          {/* Feedback */}
           {feedback.message && (
-            <div className={`feedback-banner ${feedback.type === 'success' ? 'feedback-success' : 'feedback-error'}`}
-              style={{ marginBottom: '1rem' }}>
-              {feedback.type === 'success' ? <CheckCircle2 size={18} /> : <AlertCircle size={18} />}
-              <span>{feedback.message}</span>
+            <div className={`sf-feedback ${feedback.type === "success" ? "sf-feedback-success" : "sf-feedback-error"}`}>
+              {feedback.type === "success" ? <CheckCircle2 size={16} /> : <AlertCircle size={16} />}
+              <span style={{ flex: 1 }}>{feedback.message}</span>
             </div>
           )}
 
-          {fetching ? (
-            <div style={{ padding: '3rem', textAlign: 'center', color: 'var(--text-secondary)' }}>
-              <Loader2 size={28} className="spin-animate" style={{ margin: '0 auto 0.75rem' }} />
-              <p>Loading event details…</p>
-            </div>
-          ) : formContent}
+          {/* Body */}
+          <div className="sf-body">
+            {fetching ? (
+              <div style={{ padding: "3rem", textAlign: "center", color: "var(--text-secondary)" }}>
+                <Loader2 size={28} className="spin-animate" style={{ margin: "0 auto 0.75rem" }} />
+                <p>Loading event details...</p>
+              </div>
+            ) : formContent}
           </div>
         </div>
       </div>
