@@ -20016,3 +20016,291 @@ td.stu-num-cell {
     flex-wrap: wrap !important;
   }
 }
+/* ================================================================
+   FINAL MODAL OVERLAY FIX — full viewport coverage on ALL screens
+   Covers header, sidebar, everything. No white space anywhere.
+   Navbar/sidebar remain functional (pointer-events auto on sidebar).
+   ================================================================ */
+.sf-overlay,
+.modal-overlay,
+.books-overlay,
+.enf-overlay,
+.env-overlay,
+.ann-view-overlay,
+.eb-form-overlay,
+.enb-modal-overlay,
+.books-overlay {
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  right: 0 !important;
+  bottom: 0 !important;
+  width: 100vw !important;
+  height: 100vh !important;
+  height: 100dvh !important;
+  z-index: 9999 !important;
+  overflow-y: auto !important;
+}
+
+/* Prevent background scroll when modal open */
+body.modal-open {
+  overflow: hidden !important;
+  position: fixed !important;
+  width: 100% !important;
+}
+/* ================================================================
+   ISSUE 1: Overlay always starts at top:0 — no white space gap
+   ISSUE 2: Sidebar z-index above overlay so navbar stays clickable
+   ================================================================ */
+
+/* Force ALL overlays to start from absolute top of viewport */
+.sf-overlay,
+.modal-overlay,
+.books-overlay,
+.enf-overlay,
+.env-overlay,
+.ann-view-overlay,
+.eb-form-overlay,
+.enb-modal-overlay {
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  right: 0 !important;
+  bottom: 0 !important;
+  width: 100% !important;
+  height: 100% !important;
+  z-index: 400 !important;
+}
+
+/* Sidebar above overlay so navbar links remain clickable */
+.sidebar {
+  z-index: 1000 !important;
+}
+
+/* Sidebar overlay (the dark backdrop behind open sidebar) stays below modals */
+.sidebar-overlay {
+  z-index: 999 !important;
+}
+
+/* Modal cards render above the overlay */
+.sf-modal,
+.modal-content,
+.modal-card,
+.books-modal,
+.enf-card,
+.env-modal,
+.ann-view-modal,
+.eb-form-dialog,
+.enb-modal-card {
+  position: relative !important;
+  z-index: 401 !important;
+}
+
+/* Prevent background list from scrolling when modal is open */
+body:has(.sf-overlay),
+body:has(.modal-overlay),
+body:has(.books-overlay),
+body:has(.enf-overlay),
+body:has(.env-overlay),
+body:has(.ann-view-overlay),
+body:has(.eb-form-overlay),
+body:has(.enb-modal-overlay) {
+  overflow: hidden !important;
+}
+/* ================================================================
+   MODAL POSITIONING FIX
+   - Overlay covers full viewport from top:0 (no white gap)
+   - Modal card is centered in the CONTENT area (below header)
+   - Header height is accounted for via padding-top
+   ================================================================ */
+
+/* Overlay: full screen dark backdrop */
+.sf-overlay,
+.modal-overlay,
+.books-overlay,
+.enf-overlay,
+.env-overlay,
+.ann-view-overlay,
+.eb-form-overlay,
+.enb-modal-overlay {
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  right: 0 !important;
+  bottom: 0 !important;
+  width: 100% !important;
+  height: 100% !important;
+  z-index: 400 !important;
+  /* Center modal in the VISIBLE area below the header */
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  padding: var(--header-height, 60px) 1rem 1rem 1rem !important;
+  box-sizing: border-box !important;
+}
+
+/* On desktop where sidebar is visible, also offset left */
+@media (min-width: 769px) {
+  .sf-overlay,
+  .modal-overlay,
+  .books-overlay,
+  .enf-overlay,
+  .env-overlay,
+  .ann-view-overlay,
+  .eb-form-overlay,
+  .enb-modal-overlay {
+    padding-left: calc(var(--sidebar-width, 250px) + 1rem) !important;
+  }
+}
+
+/* Modal cards: auto margin so flex centering works */
+.sf-modal,
+.modal-content,
+.modal-card,
+.books-modal,
+.enf-card,
+.env-modal,
+.ann-view-modal,
+.eb-form-dialog,
+.enb-modal-card {
+  position: relative !important;
+  z-index: 401 !important;
+  margin: auto !important;
+  max-height: calc(100vh - var(--header-height, 60px) - 2rem) !important;
+}
+
+/* Sidebar stays on top so navbar is always clickable */
+.sidebar {
+  z-index: 1000 !important;
+}
+.sidebar-overlay {
+  z-index: 999 !important;
+}
+
+/* Prevent background scroll */
+body:has(.sf-overlay),
+body:has(.modal-overlay),
+body:has(.books-overlay),
+body:has(.enf-overlay),
+body:has(.env-overlay),
+body:has(.ann-view-overlay),
+body:has(.eb-form-overlay),
+body:has(.enb-modal-overlay) {
+  overflow: hidden !important;
+}
+/* MODAL POSITION FIX: full backdrop + content below header + sidebar above overlay */
+.sf-overlay,.modal-overlay,.books-overlay,.enf-overlay,.env-overlay,.ann-view-overlay,.eb-form-overlay,.enb-modal-overlay {
+  position: fixed !important; top: 0 !important; left: 0 !important;
+  right: 0 !important; bottom: 0 !important;
+  width: 100% !important; height: 100% !important; z-index: 400 !important;
+  display: flex !important; align-items: flex-start !important; justify-content: center !important;
+  padding-top: var(--header-height, 60px) !important;
+  padding-left: 1rem !important; padding-right: 1rem !important; padding-bottom: 1rem !important;
+  box-sizing: border-box !important; overflow-y: auto !important;
+}
+@media (min-width: 769px) {
+  .sf-overlay,.modal-overlay,.books-overlay,.enf-overlay,.env-overlay,.ann-view-overlay,.eb-form-overlay,.enb-modal-overlay {
+    padding-left: calc(var(--sidebar-width, 250px) + 1rem) !important;
+  }
+}
+.sf-modal,.modal-content,.modal-card,.books-modal,.enf-card,.env-modal,.ann-view-modal,.eb-form-dialog,.enb-modal-card {
+  position: relative !important; z-index: 401 !important; margin: 0 auto !important;
+  max-height: calc(100vh - var(--header-height, 60px) - 2rem) !important; overflow-y: auto !important;
+}
+.sidebar { z-index: 1000 !important; }
+.sidebar-overlay { z-index: 999 !important; }
+body:has(.sf-overlay),body:has(.modal-overlay),body:has(.books-overlay),body:has(.enf-overlay),
+body:has(.env-overlay),body:has(.ann-view-overlay),body:has(.eb-form-overlay),body:has(.enb-modal-overlay) {
+  overflow: hidden !important;
+}
+
+/* MODAL CENTER FIX: backdrop full screen, card centered in area BELOW header */
+.sf-overlay,.modal-overlay,.books-overlay,.enf-overlay,.env-overlay,.ann-view-overlay,.eb-form-overlay,.enb-modal-overlay {
+  position: fixed !important;
+  top: 0 !important; left: 0 !important; right: 0 !important; bottom: 0 !important;
+  width: 100% !important; height: 100% !important;
+  z-index: 400 !important;
+  background: rgba(0,0,0,0.55) !important;
+  display: grid !important;
+  grid-template-rows: var(--header-height, 60px) 1fr !important;
+  grid-template-columns: 1fr !important;
+  overflow-y: auto !important;
+}
+
+/* First grid row = header height spacer (empty, just dark bg) */
+/* Second grid row = real content area where modal card sits centered */
+.sf-overlay > *,.modal-overlay > *,.books-overlay > *,.enf-overlay > *,
+.env-overlay > *,.ann-view-overlay > *,.eb-form-overlay > *,.enb-modal-overlay > * {
+  grid-row: 2 !important;
+  grid-column: 1 !important;
+  align-self: center !important;
+  justify-self: center !important;
+  margin: auto !important;
+}
+
+@media (min-width: 769px) {
+  .sf-overlay,.modal-overlay,.books-overlay,.enf-overlay,.env-overlay,.ann-view-overlay,.eb-form-overlay,.enb-modal-overlay {
+    grid-template-columns: var(--sidebar-width, 250px) 1fr !important;
+  }
+  .sf-overlay > *,.modal-overlay > *,.books-overlay > *,.enf-overlay > *,
+  .env-overlay > *,.ann-view-overlay > *,.eb-form-overlay > *,.enb-modal-overlay > * {
+    grid-column: 2 !important;
+    grid-row: 2 !important;
+  }
+}
+
+.sf-modal,.modal-content,.modal-card,.books-modal,.enf-card,.env-modal,.ann-view-modal,.eb-form-dialog,.enb-modal-card {
+  position: relative !important; z-index: 401 !important;
+  max-height: calc(100vh - var(--header-height, 60px) - 2rem) !important;
+  overflow-y: auto !important; margin: auto !important;
+}
+.sidebar { z-index: 1000 !important; }
+.sidebar-overlay { z-index: 999 !important; }
+body:has(.sf-overlay),body:has(.modal-overlay),body:has(.books-overlay),body:has(.enf-overlay),
+body:has(.env-overlay),body:has(.ann-view-overlay),body:has(.eb-form-overlay),body:has(.enb-modal-overlay) {
+  overflow: hidden !important;
+}
+
+/* ================================================================
+   FINAL MODAL FIX — backdrop covers full screen, card has
+   breathing room from header AND footer, never touching either.
+   ================================================================ */
+.sf-overlay,.modal-overlay,.books-overlay,.enf-overlay,.env-overlay,
+.ann-view-overlay,.eb-form-overlay,.enb-modal-overlay {
+  position: fixed !important;
+  top: 0 !important; left: 0 !important;
+  right: 0 !important; bottom: 0 !important;
+  width: 100vw !important; height: 100vh !important;
+  z-index: 400 !important;
+  background: rgba(0,0,0,0.55) !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  /* Top padding = header height + gap; bottom = same gap */
+  padding: calc(var(--header-height, 60px) + 1rem) 1rem 1.5rem 1rem !important;
+  box-sizing: border-box !important;
+  overflow-y: auto !important;
+}
+@media (min-width: 769px) {
+  .sf-overlay,.modal-overlay,.books-overlay,.enf-overlay,.env-overlay,
+  .ann-view-overlay,.eb-form-overlay,.enb-modal-overlay {
+    padding-left: calc(var(--sidebar-width, 250px) + 1rem) !important;
+  }
+}
+.sf-modal,.modal-content,.modal-card,.books-modal,.enf-card,
+.env-modal,.ann-view-modal,.eb-form-dialog,.enb-modal-card {
+  position: relative !important;
+  z-index: 401 !important;
+  margin: auto !important;
+  flex-shrink: 0 !important;
+  /* Max height = viewport minus header minus top/bottom gaps */
+  max-height: calc(100vh - var(--header-height, 60px) - 4rem) !important;
+  overflow-y: auto !important;
+}
+.sidebar { z-index: 1000 !important; }
+.sidebar-overlay { z-index: 999 !important; }
+body:has(.sf-overlay),body:has(.modal-overlay),body:has(.books-overlay),
+body:has(.enf-overlay),body:has(.env-overlay),body:has(.ann-view-overlay),
+body:has(.eb-form-overlay),body:has(.enb-modal-overlay) {
+  overflow: hidden !important;
+}
