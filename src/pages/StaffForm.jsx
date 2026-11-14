@@ -1,4 +1,5 @@
-﻿import React, { useState, useEffect, useCallback } from 'react';
+import { createPortal } from 'react-dom';
+import React, { useState, useEffect, useCallback } from 'react';
 import { X, Save, AlertCircle, CheckCircle2, Loader2 } from 'lucide-react';
 import {
   validateName,
@@ -243,7 +244,7 @@ const StaffFormModal = ({ isOpen, staffId, onClose, onSuccess }) => {
   if (!isOpen) return null;
 
   // ── Render ────────────────────────────────────────────────────────────
-  return (
+  return createPortal((
     <div
       className="sf-overlay"
       role="dialog"
@@ -464,7 +465,7 @@ const StaffFormModal = ({ isOpen, staffId, onClose, onSuccess }) => {
 
       </div>
     </div>
-  );
+  ), document.body);
 };
 
 export default StaffFormModal;

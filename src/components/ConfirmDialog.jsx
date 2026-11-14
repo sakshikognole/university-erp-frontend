@@ -1,3 +1,4 @@
+import { createPortal } from 'react-dom';
 import React from 'react';
 import { AlertTriangle, AlertCircle, Trash2, X, Loader2 } from 'lucide-react';
 
@@ -22,7 +23,7 @@ export default function ConfirmDialog({
     `Are you sure you want to delete this ${title.toLowerCase().replace('delete ', '')}? This action will permanently remove the record.`;
   const btnLabel = confirmText || 'Delete';
 
-  return (
+  return createPortal((
     <div className="modal-overlay" onClick={() => !loading && onCancel && onCancel()}>
       <div className="modal-content delete-dialog" onClick={(e) => e.stopPropagation()}>
         <div className="delete-dialog-header">
@@ -93,6 +94,6 @@ export default function ConfirmDialog({
         </div>
       </div>
     </div>
-  );
+  ), document.body);
 }
 
