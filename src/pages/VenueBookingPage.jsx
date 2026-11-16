@@ -218,14 +218,13 @@ function EditModal({ booking, events, venues, onSave, onClose, saving }) {
 
   return (
     <div className="books-overlay">
-      <div className="books-modal" style={{ maxWidth: 560, display: 'flex', flexDirection: 'column', maxHeight: 'min(90vh, 650px)' }}>
+      <div className="books-modal" style={{ maxWidth: 560 }}>
         <div className="books-modal-head">
           <h3>Edit Booking</h3>
           <button className="books-modal-close" onClick={onClose}>×</button>
         </div>
-        <form onSubmit={submit} style={{ display: 'flex', flexDirection: 'column',
-                                         flex: 1, minHeight: 0, overflow: 'hidden' }}>
-          <div className="books-modal-body" style={{ overflowY: 'auto', flex: 1, minHeight: 0 }}>
+        <form onSubmit={submit}>
+          <div className="books-modal-body">
 
             {/* Booking ID read-only */}
             <div className="books-form-group">
@@ -522,7 +521,7 @@ export default function VenueBookingPage() {
       {/* ── New Booking Request Form — Modal like Books ─────────────────────── */}
       {showForm && (
         <div className="books-overlay">
-          <div className="books-modal" style={{ maxWidth: 580, display: 'flex', flexDirection: 'column', maxHeight: 'min(90vh, 650px)' }}>
+          <div className="books-modal" style={{ maxWidth: 580 }}>
             <div className="books-modal-head">
               <h3>New Booking Request</h3>
               <button className="books-modal-close" onClick={() => { setShowForm(false); setFormErrs({}); }}>x</button>
@@ -533,8 +532,8 @@ export default function VenueBookingPage() {
             ) : dropError ? (
               <div className="books-modal-body"><PageError message={dropError} /></div>
             ) : (
-              <form onSubmit={(e) => { handleSubmit(e); }} style={{ display: 'flex', flexDirection: 'column', flex: 1, minHeight: 0, overflow: 'hidden' }}>
-                <div className="books-modal-body" style={{ overflowY: 'auto', flex: 1, minHeight: 0 }}>
+              <form onSubmit={(e) => { handleSubmit(e); }}>
+                <div className="books-modal-body">
 
                   {/* Booking ID */}
                   <div className="books-form-group">

@@ -123,7 +123,7 @@ export default function BookModal({ isOpen, mode, book, onSave, onClose, loading
 
   return (
     <div className="books-overlay">
-      <div className="books-modal">
+      <div className="books-modal" style={{ maxWidth: 480 }}>
         <div className="books-modal-head">
           <h3>{mode === 'add' ? 'Add Book' : 'Edit Book'}</h3>
           <button className="books-modal-close" onClick={onClose}>x</button>
