@@ -1,4 +1,4 @@
-/* ==========================================
+﻿/* ==========================================
    CSS VARIABLES - WHITE THEME (Black & White)
    ========================================== */
 :root {
@@ -20598,4 +20598,17 @@ body:has(.eb-form-overlay),body:has(.enb-modal-overlay) {
     font-size: 13px !important;
     min-height: 34px !important;
   }
+}
+
+/* ================================================================
+   DEFINITIVE Z-INDEX — header 1100, sidebar 1050, overlays 500
+   This block is last in file so it wins all conflicts.
+   ================================================================ */
+.header { z-index: 1100 !important; position: relative !important; }
+.sidebar, .sidebar.open { z-index: 1050 !important; pointer-events: auto !important; }
+.sidebar .nav-link, .sidebar .nav-list, .sidebar-nav { pointer-events: auto !important; }
+.sidebar-overlay { z-index: 1049 !important; }
+.sf-overlay, .modal-overlay, .books-overlay, .enf-overlay,
+.env-overlay, .ann-view-overlay, .eb-form-overlay, .enb-modal-overlay {
+  z-index: 500 !important;
 }
