@@ -148,14 +148,15 @@ const SystemAnnouncements = () => {
     return /\.(jpg|jpeg|png|webp|gif)(\?.*)?$/i.test(url) || url.includes('/image/upload/');
   };
 
-  // Returns a URL that opens the file inline in a new tab instead of downloading.
-  // Cloudinary raw uploads always set Content-Disposition: attachment, so we
-  // route non-image files through Google Docs Viewer which handles PDF, DOC,
-  // DOCX, PPT, XLS etc. Images have no attachment header and open fine directly.
+  // Returns a proxy URL that opens the file inline in a new browser tab.
+  // Routes through the backend proxy with ?inline=true so Content-Disposition
+  // is set to 'inline' — the browser renders the file rather than downloading it.
+  // Works for PDF, DOCX and all other raw Cloudinary assets.
+  // Images open directly (no attachment header on Cloudinary image URLs).
   const getViewUrl = (url) => {
     if (!url) return url;
     if (isImageUrl(url)) return url;
-    return `https://docs.google.com/viewer?url=${encodeURIComponent(url)}&embedded=false`;
+    return `${API_BASE_URL}/system-announcements/download-proxy?url=${encodeURIComponent(url)}&inline=true`;
   };
 
   // Pagination state
@@ -667,30 +668,37 @@ const SystemAnnouncements = () => {
                     </div>
                   )}
 
-                  {/* Attachment */}
+                  {/* File */}
                   {viewAnn.fileUrl && (
                     <div>
-                      <p style={{ fontSize: '0.75rem', fontWeight: 700, color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '0.5rem' }}>Attachment</p>
+                      <p style={{ fontSize: '0.75rem', fontWeight: 700, color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '0.6rem' }}>File</p>
                       {isImageUrl(viewAnn.fileUrl) ? (
+                        /* ── Image preview ── */
                         <div style={{ borderRadius: 8, overflow: 'hidden', border: '1px solid var(--border-color)', maxWidth: 480 }}>
-                          <img src={viewAnn.fileUrl} alt="Attachment" style={{ width: '100%', display: 'block', objectFit: 'contain', maxHeight: 300 }} onError={e => { e.target.style.display = 'none'; }} />
-                          <div style={{ padding: '6px 12px', borderTop: '1px solid var(--border-color)', display: 'flex', justifyContent: 'flex-end' }}>
-                            <a href={viewAnn.fileUrl} target="_blank" rel="noopener noreferrer" style={{ display: 'inline-flex', alignItems: 'center', gap: 4, fontSize: '0.8125rem', color: '#6366f1', textDecoration: 'none', fontWeight: 500 }}>
-                              <ExternalLink size={12} />Open full image
+                          <img src={viewAnn.fileUrl} alt="File" style={{ width: '100%', display: 'block', objectFit: 'contain', maxHeight: 300 }} onError={e => { e.target.style.display = 'none'; }} />
+                          <div style={{ padding: '6px 12px', borderTop: '1px solid var(--border-color)', display: 'flex', gap: 8 }}>
+                            <a href={viewAnn.fileUrl} target="_blank" rel="noopener noreferrer"
+                              style={{ display: 'inline-flex', alignItems: 'center', gap: 6, padding: '6px 12px', borderRadius: 6, background: 'var(--bg-secondary)', border: '1px solid var(--border-color)', color: '#6366f1', fontSize: '0.8125rem', fontWeight: 500, textDecoration: 'none', whiteSpace: 'nowrap' }}>
+                              <ExternalLink size={13} /><span>View</span>
                             </a>
+                            <button type="button" onClick={() => downloadFile(viewAnn.fileUrl)} disabled={viewDownloading}
+                              style={{ display: 'inline-flex', alignItems: 'center', gap: 6, padding: '6px 12px', borderRadius: 6, background: 'var(--bg-secondary)', border: '1px solid var(--border-color)', color: viewDownloading ? 'var(--text-secondary)' : '#6366f1', fontSize: '0.8125rem', fontWeight: 500, cursor: viewDownloading ? 'not-allowed' : 'pointer', whiteSpace: 'nowrap' }}>
+                              {viewDownloading ? <Loader2 size={13} className="spin-animate" /> : <Download size={13} />}
+                              <span>{viewDownloading ? 'Downloading…' : 'Download'}</span>
+                            </button>
                           </div>
                         </div>
                       ) : (
-                        <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+                        /* ── Document (PDF, DOCX, etc.) ── */
+                        <div style={{ display: 'flex', flexDirection: 'row', gap: 8, flexWrap: 'nowrap', maxWidth: '100%' }}>
                           <a href={getViewUrl(viewAnn.fileUrl)} target="_blank" rel="noopener noreferrer"
-                            style={{ display: 'inline-flex', alignItems: 'center', gap: 8, padding: '10px 16px', borderRadius: 8, background: 'var(--bg-secondary)', border: '1px solid var(--border-color)', color: '#6366f1', fontSize: '0.875rem', fontWeight: 500, textDecoration: 'none' }}>
-                            <ExternalLink size={16} />
-                            <span>View Attachment</span>
+                            style={{ display: 'inline-flex', alignItems: 'center', gap: 6, padding: '9px 14px', borderRadius: 8, background: 'var(--bg-secondary)', border: '1px solid var(--border-color)', color: '#6366f1', fontSize: '0.875rem', fontWeight: 500, textDecoration: 'none', whiteSpace: 'nowrap', flex: '0 1 auto', minWidth: 0 }}>
+                            <ExternalLink size={15} /><span>View</span>
                           </a>
                           <button type="button" onClick={() => downloadFile(viewAnn.fileUrl)} disabled={viewDownloading}
-                            style={{ display: 'inline-flex', alignItems: 'center', gap: 8, padding: '10px 16px', borderRadius: 8, background: 'var(--bg-secondary)', border: '1px solid var(--border-color)', color: viewDownloading ? 'var(--text-secondary)' : '#6366f1', fontSize: '0.875rem', fontWeight: 500, cursor: viewDownloading ? 'not-allowed' : 'pointer' }}>
-                            {viewDownloading ? <Loader2 size={16} className="spin-animate" /> : <Download size={16} />}
-                            <span>{viewDownloading ? 'Downloading…' : 'Download Attachment'}</span>
+                            style={{ display: 'inline-flex', alignItems: 'center', gap: 6, padding: '9px 14px', borderRadius: 8, background: 'var(--bg-secondary)', border: '1px solid var(--border-color)', color: viewDownloading ? 'var(--text-secondary)' : '#6366f1', fontSize: '0.875rem', fontWeight: 500, cursor: viewDownloading ? 'not-allowed' : 'pointer', whiteSpace: 'nowrap', flex: '0 1 auto', minWidth: 0 }}>
+                            {viewDownloading ? <Loader2 size={15} className="spin-animate" /> : <Download size={15} />}
+                            <span>{viewDownloading ? 'Downloading…' : 'Download'}</span>
                           </button>
                         </div>
                       )}
