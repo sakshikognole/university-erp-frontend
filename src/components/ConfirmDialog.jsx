@@ -23,6 +23,12 @@ export default function ConfirmDialog({
     `Are you sure you want to delete this ${title.toLowerCase().replace('delete ', '')}? This action will permanently remove the record.`;
   const btnLabel = confirmText || 'Delete';
 
+  React.useEffect(() => {
+    if (!isOpen) return;
+    const handler = (e) => { if (e.key === 'Escape' && onCancel) onCancel(); };
+    document.addEventListener('keydown', handler);
+    return () => document.removeEventListener('keydown', handler);
+  }, [isOpen, onCancel]);
   return createPortal((
     <div className="modal-overlay" onClick={() => !loading && onCancel && onCancel()}>
       <div className="modal-content delete-dialog" onClick={(e) => e.stopPropagation()}>

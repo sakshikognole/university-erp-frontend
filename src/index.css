@@ -20612,3 +20612,40 @@ body:has(.eb-form-overlay),body:has(.enb-modal-overlay) {
 .env-overlay, .ann-view-overlay, .eb-form-overlay, .enb-modal-overlay {
   z-index: 500 !important;
 }
+
+/* ================================================================
+   ROOT CAUSE FIX: Header needs position:sticky to create stacking
+   context at root level so z-index beats portaled overlays.
+   Portaled overlays are at document.body (z-index 500).
+   Header at position:sticky z-index:1100 beats them.
+   Sidebar at position:fixed z-index:1050 beats them.
+   ================================================================ */
+
+/* Header: sticky so it always floats above portaled overlays */
+.header {
+  position: sticky !important;
+  top: 0 !important;
+  z-index: 1100 !important;
+}
+
+/* dashboard-main must NOT have overflow:hidden or transforms
+   that would trap the stacking context */
+.dashboard-main {
+  overflow: visible !important;
+}
+
+/* main-content can still scroll */
+.main-content {
+  overflow-y: auto !important;
+}
+
+/* Sidebar: fixed on mobile, static on desktop — both above overlays */
+.sidebar {
+  z-index: 1050 !important;
+}
+
+/* All portaled overlays: below header and sidebar */
+.sf-overlay, .modal-overlay, .books-overlay, .enf-overlay,
+.env-overlay, .ann-view-overlay, .eb-form-overlay, .enb-modal-overlay {
+  z-index: 500 !important;
+}

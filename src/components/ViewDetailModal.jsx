@@ -3,6 +3,12 @@ import { createPortal } from 'react-dom';
 
 
 export default function ViewDetailModal({ isOpen, title, subtitle, rows, onClose }) {
+  React.useEffect(() => {
+    if (!isOpen) return;
+    const handler = (e) => { if (e.key === 'Escape') onClose(); };
+    document.addEventListener('keydown', handler);
+    return () => document.removeEventListener('keydown', handler);
+  }, [isOpen, onClose]);
   if (!isOpen) return null;
 
   return (
