@@ -74,6 +74,16 @@ const SystemAnnouncementView = () => {
     return /\.(jpg|jpeg|png|webp|gif)(\?.*)?$/i.test(url) || url.includes('/image/upload/');
   };
 
+  // Returns a URL that opens the file inline in a new tab instead of downloading.
+  // Cloudinary raw uploads always set Content-Disposition: attachment, so we
+  // route non-image files through Google Docs Viewer which handles PDF, DOC,
+  // DOCX, PPT, XLS etc. Images have no attachment header and open fine directly.
+  const getViewUrl = (url) => {
+    if (!url) return url;
+    if (isImageUrl(url)) return url;
+    return `https://docs.google.com/viewer?url=${encodeURIComponent(url)}&embedded=false`;
+  };
+
   // Download a file via the backend proxy.
   // The backend fetches the file server-side from Cloudinary (bypassing CORS and
   // raw-file delivery restrictions) and streams it to the browser.
@@ -388,30 +398,54 @@ const SystemAnnouncementView = () => {
                   </div>
                 </div>
               ) : (
-                <button
-                  type="button"
-                  onClick={() => downloadFile(announcement.fileUrl)}
-                  disabled={downloading}
-                  style={{
-                    display: 'inline-flex',
-                    alignItems: 'center',
-                    gap: '10px',
-                    padding: '12px 18px',
-                    borderRadius: '8px',
-                    background: 'var(--hover-bg, #f9fafb)',
-                    border: '1px solid var(--border-color, #e5e7eb)',
-                    color: downloading ? 'var(--text-secondary)' : 'var(--primary, #6366f1)',
-                    fontSize: '0.875rem',
-                    fontWeight: 500,
-                    cursor: downloading ? 'not-allowed' : 'pointer',
-                    transition: 'background 0.15s',
-                  }}
-                >
-                  {downloading
-                    ? <Loader2 size={18} className="spin-animate" />
-                    : <Download size={18} />}
-                  <span>{downloading ? 'Downloading…' : 'Download Attachment'}</span>
-                </button>
+                <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
+                  <a
+                    href={getViewUrl(announcement.fileUrl)}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    style={{
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: '10px',
+                      padding: '12px 18px',
+                      borderRadius: '8px',
+                      background: 'var(--hover-bg, #f9fafb)',
+                      border: '1px solid var(--border-color, #e5e7eb)',
+                      color: 'var(--primary, #6366f1)',
+                      fontSize: '0.875rem',
+                      fontWeight: 500,
+                      textDecoration: 'none',
+                      transition: 'background 0.15s',
+                    }}
+                  >
+                    <ExternalLink size={18} />
+                    <span>View Attachment</span>
+                  </a>
+                  <button
+                    type="button"
+                    onClick={() => downloadFile(announcement.fileUrl)}
+                    disabled={downloading}
+                    style={{
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: '10px',
+                      padding: '12px 18px',
+                      borderRadius: '8px',
+                      background: 'var(--hover-bg, #f9fafb)',
+                      border: '1px solid var(--border-color, #e5e7eb)',
+                      color: downloading ? 'var(--text-secondary)' : 'var(--primary, #6366f1)',
+                      fontSize: '0.875rem',
+                      fontWeight: 500,
+                      cursor: downloading ? 'not-allowed' : 'pointer',
+                      transition: 'background 0.15s',
+                    }}
+                  >
+                    {downloading
+                      ? <Loader2 size={18} className="spin-animate" />
+                      : <Download size={18} />}
+                    <span>{downloading ? 'Downloading…' : 'Download Attachment'}</span>
+                  </button>
+                </div>
               )}
             </div>
           )}
