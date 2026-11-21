@@ -20649,3 +20649,16 @@ body:has(.eb-form-overlay),body:has(.enb-modal-overlay) {
 .env-overlay, .ann-view-overlay, .eb-form-overlay, .enb-modal-overlay {
   z-index: 500 !important;
 }
+
+/* FINAL: overlay covers FULL viewport always (like Books module) */
+.sf-overlay, .modal-overlay, .books-overlay, .enf-overlay,
+.env-overlay, .ann-view-overlay, .eb-form-overlay, .enb-modal-overlay {
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  right: 0 !important;
+  bottom: 0 !important;
+  width: 100vw !important;
+  height: 100vh !important;
+  padding: calc(var(--header-height, 60px) + 1rem) 1rem 1.5rem !important;
+}

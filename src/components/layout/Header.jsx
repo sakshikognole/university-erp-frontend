@@ -32,7 +32,7 @@ const Header = ({ toggleSidebar }) => {
   return (
     <header className="header">
       <div className="header-left">
-        <button className="hamburger-btn" onClick={() => { document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true, cancelable: true })); toggleSidebar(); }}>
+        <button className="hamburger-btn" onClick={toggleSidebar}>
           <Menu size={24} />
         </button>
       </div>
