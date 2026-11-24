@@ -13717,19 +13717,6 @@ input[type='password']::-webkit-inner-spin-button {
 }
 
 
-  .student-bulk-card .form-actions-row {
-    flex-direction: column-reverse;
-    align-items: stretch;
-    gap: 0.625rem;
-  }
-
-  .student-bulk-card .form-actions-row .books-btn {
-    width: 100%;
-    justify-content: center;
-
-  }
-
-
 /* ================================================================
    UI FIXES — applied per task list
    ================================================================ */
@@ -18985,6 +18972,13 @@ td.stu-num-cell {
 .stf-desk-table .dept-name-cell {
   white-space: normal !important;
   word-break: break-word !important;
+}
+
+/* Students/Staff action column: tighter padding to match Venues */
+.stu-desk-table .data-table td:last-child,
+.stf-desk-table .data-table td:last-child {
+  padding: 6px 8px !important;
+  vertical-align: middle !important;
 }
 
 
