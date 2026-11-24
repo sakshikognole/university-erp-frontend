@@ -20406,3 +20406,49 @@ body:has(.enb-modal-overlay) {
   }
 }
 /* END MOBILE ACTION BUTTON SIZING FIX */
+
+/* ================================================================
+   NOTIFICATION BELL — UNREAD COUNT BADGE
+   The badge uses position:absolute over the notification-btn which
+   has position:relative set inline in Header.jsx. overflow:visible
+   is forced here so the badge is never clipped by border-radius.
+   ================================================================ */
+.notification-btn {
+  overflow: visible !important;
+}
+
+/* Badge itself */
+.notif-badge {
+  position: absolute !important;
+  top: 1px !important;
+  right: 1px !important;
+  min-width: 17px !important;
+  height: 17px !important;
+  padding: 0 4px !important;
+  border-radius: 999px !important;
+  background-color: #ef4444 !important; /* red-500 */
+  color: #ffffff !important;
+  font-size: 10px !important;
+  font-weight: 700 !important;
+  line-height: 17px !important;
+  text-align: center !important;
+  white-space: nowrap !important;
+  pointer-events: none !important;
+  border: 1.5px solid #ffffff !important; /* white halo */
+  box-sizing: border-box !important;
+  z-index: 10 !important;
+  -webkit-font-smoothing: antialiased !important;
+}
+
+/* Mobile: keep badge proportional */
+@media (max-width: 480px) {
+  .notif-badge {
+    min-width: 15px !important;
+    height: 15px !important;
+    font-size: 9px !important;
+    line-height: 15px !important;
+    top: 0px !important;
+    right: 0px !important;
+  }
+}
+/* END NOTIFICATION BADGE */

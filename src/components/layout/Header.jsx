@@ -6,6 +6,9 @@ import { useAuth } from '../../context/AuthContext';
 const _IS_PROD = typeof window !== 'undefined' && window.location.hostname !== 'localhost';
 const API_BASE_URL = _IS_PROD ? 'https://university-erp-node.onrender.com/api' : 'http://localhost:5000/api';
 
+// How often (ms) to silently refresh the unread count in the background.
+const POLL_INTERVAL_MS = 60_000; // 1 minute
+
 const Header = ({ toggleSidebar }) => {
   const navigate = useNavigate();
   const { user, logout } = useAuth();
@@ -19,11 +22,29 @@ const Header = ({ toggleSidebar }) => {
   const [notifLoading, setNotifLoading] = useState(false);
   const [notifError, setNotifError] = useState(false);
 
+  // Unread badge count — null means "not yet fetched"
+  const [unreadCount, setUnreadCount] = useState(null);
+
   const authHeader = useCallback(() => ({
     'Content-Type': 'application/json',
     Authorization: `Bearer ${localStorage.getItem('erp_token')}`,
   }), []);
 
+  // ── Fetch just the unread count (lightweight, runs on mount + poll) ─────────
+  const fetchUnreadCount = useCallback(async () => {
+    try {
+      const res = await fetch(`${API_BASE_URL}/system-announcements/unread-count`, {
+        headers: authHeader(),
+      });
+      if (!res.ok) return; // silently ignore errors for the badge
+      const data = await res.json();
+      setUnreadCount(data.unreadCount ?? 0);
+    } catch {
+      // Network failure — leave existing count unchanged
+    }
+  }, [authHeader]);
+
+  // ── Fetch full notification list (runs when dropdown opens) ─────────────────
   const fetchNotifications = useCallback(async () => {
     setNotifLoading(true);
     setNotifError(false);
@@ -42,13 +63,36 @@ const Header = ({ toggleSidebar }) => {
     }
   }, [authHeader]);
 
-  // Fetch when dropdown opens
+  // ── Mark all visible notifications as read, then update badge ───────────────
+  const markAllRead = useCallback(async () => {
+    try {
+      await fetch(`${API_BASE_URL}/system-announcements/mark-all-read`, {
+        method: 'PATCH',
+        headers: authHeader(),
+      });
+      setUnreadCount(0);
+    } catch {
+      // Non-critical — badge will self-correct on next poll
+    }
+  }, [authHeader]);
+
+  // ── Fetch unread count on mount and start background poll ───────────────────
+  useEffect(() => {
+    if (!user) return; // not logged in yet
+    fetchUnreadCount();
+    const timer = setInterval(fetchUnreadCount, POLL_INTERVAL_MS);
+    return () => clearInterval(timer);
+  }, [user, fetchUnreadCount]);
+
+  // ── When dropdown opens: load notifications and mark them all as read ────────
   useEffect(() => {
     if (isNotifOpen) {
       fetchNotifications();
+      markAllRead();
     }
-  }, [isNotifOpen, fetchNotifications]);
+  }, [isNotifOpen, fetchNotifications, markAllRead]);
 
+  // ── Close dropdowns on outside click ────────────────────────────────────────
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
@@ -82,6 +126,10 @@ const Header = ({ toggleSidebar }) => {
     return new Date(d).toLocaleDateString('en-IN', { day: '2-digit', month: 'short' });
   };
 
+  // Badge label: cap at 99+
+  const badgeLabel = unreadCount > 99 ? '99+' : String(unreadCount);
+  const showBadge = unreadCount !== null && unreadCount > 0;
+
   return (
     <header className="header">
       <div className="header-left">
@@ -92,13 +140,23 @@ const Header = ({ toggleSidebar }) => {
 
       <div className="header-right">
         <div className="notif-wrapper" ref={notifRef}>
+          {/* Bell button — position:relative so the badge can sit over the top-right corner */}
           <button
             className="notification-btn"
             title="View Notifications"
             onClick={() => setIsNotifOpen(!isNotifOpen)}
+            style={{ position: 'relative' }}
           >
             <Bell size={20} />
+
+            {/* Unread count badge */}
+            {showBadge && (
+              <span className="notif-badge" aria-label={`${unreadCount} unread notifications`}>
+                {badgeLabel}
+              </span>
+            )}
           </button>
+
           {isNotifOpen && (
             <div className="notif-dropdown">
               <div className="notif-dropdown-header">Notifications</div>
