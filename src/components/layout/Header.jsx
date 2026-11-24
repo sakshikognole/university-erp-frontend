@@ -1,7 +1,10 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { Menu, Bell, LogOut, ChevronDown } from 'lucide-react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
+import { Menu, Bell, BellRing, LogOut, ChevronDown, Calendar, Loader2 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
+
+const _IS_PROD = typeof window !== 'undefined' && window.location.hostname !== 'localhost';
+const API_BASE_URL = _IS_PROD ? 'https://university-erp-node.onrender.com/api' : 'http://localhost:5000/api';
 
 const Header = ({ toggleSidebar }) => {
   const navigate = useNavigate();
@@ -10,6 +13,41 @@ const Header = ({ toggleSidebar }) => {
   const [isNotifOpen, setIsNotifOpen] = useState(false);
   const dropdownRef = useRef(null);
   const notifRef = useRef(null);
+
+  // Notification state
+  const [notifItems, setNotifItems] = useState([]);
+  const [notifLoading, setNotifLoading] = useState(false);
+  const [notifError, setNotifError] = useState(false);
+
+  const authHeader = useCallback(() => ({
+    'Content-Type': 'application/json',
+    Authorization: `Bearer ${localStorage.getItem('erp_token')}`,
+  }), []);
+
+  const fetchNotifications = useCallback(async () => {
+    setNotifLoading(true);
+    setNotifError(false);
+    try {
+      const res = await fetch(`${API_BASE_URL}/system-announcements?page=1&limit=5`, {
+        headers: authHeader(),
+      });
+      if (!res.ok) throw new Error('fetch failed');
+      const data = await res.json();
+      setNotifItems(data.announcements || []);
+    } catch {
+      setNotifError(true);
+      setNotifItems([]);
+    } finally {
+      setNotifLoading(false);
+    }
+  }, [authHeader]);
+
+  // Fetch when dropdown opens
+  useEffect(() => {
+    if (isNotifOpen) {
+      fetchNotifications();
+    }
+  }, [isNotifOpen, fetchNotifications]);
 
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -27,6 +65,21 @@ const Header = ({ toggleSidebar }) => {
   const handleLogout = () => {
     logout();
     navigate('/login');
+  };
+
+  const timeAgo = (d) => {
+    if (!d) return '';
+    const now = new Date();
+    const dt = new Date(d);
+    const diffMs = now - dt;
+    const diffMins = Math.floor(diffMs / 60000);
+    if (diffMins < 1) return 'Just now';
+    if (diffMins < 60) return `${diffMins}m ago`;
+    const diffHrs = Math.floor(diffMins / 60);
+    if (diffHrs < 24) return `${diffHrs}h ago`;
+    const diffDays = Math.floor(diffHrs / 24);
+    if (diffDays < 7) return `${diffDays}d ago`;
+    return new Date(d).toLocaleDateString('en-IN', { day: '2-digit', month: 'short' });
   };
 
   return (
@@ -49,9 +102,46 @@ const Header = ({ toggleSidebar }) => {
           {isNotifOpen && (
             <div className="notif-dropdown">
               <div className="notif-dropdown-header">Notifications</div>
-              <div className="notif-dropdown-empty">
-                <Bell size={28} style={{ color: 'var(--text-secondary)', opacity: 0.5 }} />
-                <p>No new notifications</p>
+              <div className="notif-dropdown-body">
+                {notifLoading ? (
+                  <div className="notif-dropdown-empty">
+                    <Loader2 size={22} className="spin-animate" style={{ color: 'var(--text-secondary)', opacity: 0.6 }} />
+                    <p>Loading…</p>
+                  </div>
+                ) : notifError ? (
+                  <div className="notif-dropdown-empty">
+                    <Bell size={28} style={{ color: 'var(--text-secondary)', opacity: 0.5 }} />
+                    <p>Unable to load</p>
+                  </div>
+                ) : notifItems.length === 0 ? (
+                  <div className="notif-dropdown-empty">
+                    <Bell size={28} style={{ color: 'var(--text-secondary)', opacity: 0.5 }} />
+                    <p>No new notifications</p>
+                  </div>
+                ) : (
+                  notifItems.map((n) => (
+                    <button
+                      key={n._id}
+                      type="button"
+                      className="notif-dropdown-item"
+                      onClick={() => { setIsNotifOpen(false); navigate('/notifications'); }}
+                    >
+                      <div className="notif-dropdown-item-icon">
+                        <BellRing size={14} />
+                      </div>
+                      <div className="notif-dropdown-item-content">
+                        <div className="notif-dropdown-item-title">{n.title}</div>
+                        {n.description && (
+                          <div className="notif-dropdown-item-desc">{n.description}</div>
+                        )}
+                        <div className="notif-dropdown-item-time">
+                          <Calendar size={10} />
+                          <span>{timeAgo(n.createdAt)}</span>
+                        </div>
+                      </div>
+                    </button>
+                  ))
+                )}
               </div>
               <div className="notif-dropdown-footer">
                 <button

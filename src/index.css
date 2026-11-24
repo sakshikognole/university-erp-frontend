@@ -16731,9 +16731,10 @@ body:has(.ann-view-overlay) {
 
 /* ── D1: Notification dropdown — View All + scroll ──────────────── */
 .notif-dropdown {
-  max-height: 400px;
+  max-height: 440px;
   display: flex;
   flex-direction: column;
+  width: 320px;
 }
 
 .academic-upload-btn {
@@ -16804,6 +16805,100 @@ body:has(.ann-view-overlay) {
 
 .notif-view-all-btn:hover {
   background: var(--bg-secondary, #f9fafb);
+}
+
+/* ── Notification dropdown body — scrollable list ── */
+.notif-dropdown-body {
+  flex: 1;
+  overflow-y: auto;
+  max-height: 320px;
+}
+
+/* ── Notification dropdown item ── */
+.notif-dropdown-item {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  padding: 10px 16px;
+  width: 100%;
+  text-align: left;
+  background: none;
+  border: none;
+  border-bottom: 1px solid var(--border-primary, #e5e7eb);
+  cursor: pointer;
+  transition: background 0.12s;
+}
+.notif-dropdown-item:last-child {
+  border-bottom: none;
+}
+.notif-dropdown-item:hover {
+  background: var(--bg-secondary, #f9fafb);
+}
+
+.notif-dropdown-item-icon {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: #eef2ff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  margin-top: 1px;
+  color: #6366f1;
+}
+
+.notif-dropdown-item-content {
+  flex: 1;
+  min-width: 0;
+}
+
+.notif-dropdown-item-title {
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: var(--text-primary, #111827);
+  line-height: 1.35;
+  margin-bottom: 2px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.notif-dropdown-item-desc {
+  font-size: 0.75rem;
+  color: var(--text-secondary, #6b7280);
+  line-height: 1.4;
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 1;
+  -webkit-box-orient: vertical;
+  margin-bottom: 2px;
+}
+
+.notif-dropdown-item-time {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  font-size: 0.6875rem;
+  color: var(--text-secondary, #6b7280);
+  opacity: 0.75;
+}
+
+/* ── Notification card item hover — All Notifications page ── */
+.notif-card-item:hover {
+  background: var(--bg-secondary, #f9fafb) !important;
+}
+
+/* ── Mobile: notification dropdown responsive ── */
+@media (max-width: 480px) {
+  .notif-dropdown {
+    right: 0.5rem !important;
+    left: 0.5rem !important;
+    width: auto !important;
+  }
+  .notif-dropdown-body {
+    max-height: 260px;
+  }
 }
 
 /* ── D36: BulkUploadVenues download button — ensure icon visible ── */
