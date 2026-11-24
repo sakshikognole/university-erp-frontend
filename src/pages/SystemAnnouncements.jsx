@@ -136,8 +136,8 @@ const SystemAnnouncements = () => {
       a.download = decodeURIComponent(url.split('/').pop().split('?')[0]) || 'attachment';
       document.body.appendChild(a); a.click();
       setTimeout(() => { document.body.removeChild(a); URL.revokeObjectURL(objectUrl); }, 150);
-    } catch {
-      window.open(url, '_blank', 'noopener,noreferrer');
+    } catch (err) {
+      console.error('Download failed:', err);
     } finally {
       setViewDownloading(false);
     }
@@ -148,15 +148,41 @@ const SystemAnnouncements = () => {
     return /\.(jpg|jpeg|png|webp|gif)(\?.*)?$/i.test(url) || url.includes('/image/upload/');
   };
 
-  // Returns a proxy URL that opens the file inline in a new browser tab.
-  // Routes through the backend proxy with ?inline=true so Content-Disposition
-  // is set to 'inline' — the browser renders the file rather than downloading it.
-  // Works for PDF, DOCX and all other raw Cloudinary assets.
-  // Images open directly (no attachment header on Cloudinary image URLs).
-  const getViewUrl = (url) => {
-    if (!url) return url;
-    if (isImageUrl(url)) return url;
-    return `${API_BASE_URL}/system-announcements/download-proxy?url=${encodeURIComponent(url)}&inline=true`;
+  const isDocUrl = (url) => /\.(docx?|pptx?|xlsx?)(\?.*)?$/i.test(url);
+
+  // Opens a file in a new tab:
+  //   DOCX/PPT/XLS → Office Online Viewer (handles Office formats natively)
+  //   PDF / image  → fetches /view-proxy (authenticated), gets back HTML,
+  //                  creates a blob:text/html URL and navigates the pre-opened tab to it
+  const viewFile = async (url) => {
+    if (!url) return;
+
+    if (isDocUrl(url)) {
+      window.open(
+        `https://view.officeapps.live.com/op/view.aspx?src=${encodeURIComponent(url)}`,
+        '_blank', 'noopener,noreferrer'
+      );
+      return;
+    }
+
+    // Must open tab synchronously (user-gesture context) before any await
+    const tab = window.open('', '_blank', 'noopener,noreferrer');
+    if (!tab) return;
+
+    try {
+      const proxyUrl = `${API_BASE_URL}/system-announcements/view-proxy?url=${encodeURIComponent(url)}`;
+      const res = await fetch(proxyUrl, {
+        headers: { Authorization: `Bearer ${localStorage.getItem('erp_token')}` },
+      });
+      if (!res.ok) { tab.close(); return; }
+      const html = await res.text();
+      const blob = new Blob([html], { type: 'text/html' });
+      const blobUrl = URL.createObjectURL(blob);
+      tab.location.replace(blobUrl);
+      setTimeout(() => URL.revokeObjectURL(blobUrl), 60000);
+    } catch {
+      tab.close();
+    }
   };
 
   // Pagination state
@@ -677,10 +703,10 @@ const SystemAnnouncements = () => {
                         <div style={{ borderRadius: 8, overflow: 'hidden', border: '1px solid var(--border-color)', maxWidth: 480 }}>
                           <img src={viewAnn.fileUrl} alt="File" style={{ width: '100%', display: 'block', objectFit: 'contain', maxHeight: 300 }} onError={e => { e.target.style.display = 'none'; }} />
                           <div style={{ padding: '6px 12px', borderTop: '1px solid var(--border-color)', display: 'flex', gap: 8 }}>
-                            <a href={viewAnn.fileUrl} target="_blank" rel="noopener noreferrer"
-                              style={{ display: 'inline-flex', alignItems: 'center', gap: 6, padding: '6px 12px', borderRadius: 6, background: 'var(--bg-secondary)', border: '1px solid var(--border-color)', color: '#6366f1', fontSize: '0.8125rem', fontWeight: 500, textDecoration: 'none', whiteSpace: 'nowrap' }}>
+                            <button type="button" onClick={() => viewFile(viewAnn.fileUrl)}
+                              style={{ display: 'inline-flex', alignItems: 'center', gap: 6, padding: '6px 12px', borderRadius: 6, background: 'var(--bg-secondary)', border: '1px solid var(--border-color)', color: '#6366f1', fontSize: '0.8125rem', fontWeight: 500, cursor: 'pointer', whiteSpace: 'nowrap' }}>
                               <ExternalLink size={13} /><span>View</span>
-                            </a>
+                            </button>
                             <button type="button" onClick={() => downloadFile(viewAnn.fileUrl)} disabled={viewDownloading}
                               style={{ display: 'inline-flex', alignItems: 'center', gap: 6, padding: '6px 12px', borderRadius: 6, background: 'var(--bg-secondary)', border: '1px solid var(--border-color)', color: viewDownloading ? 'var(--text-secondary)' : '#6366f1', fontSize: '0.8125rem', fontWeight: 500, cursor: viewDownloading ? 'not-allowed' : 'pointer', whiteSpace: 'nowrap' }}>
                               {viewDownloading ? <Loader2 size={13} className="spin-animate" /> : <Download size={13} />}
@@ -691,10 +717,10 @@ const SystemAnnouncements = () => {
                       ) : (
                         /* ── Document (PDF, DOCX, etc.) ── */
                         <div style={{ display: 'flex', flexDirection: 'row', gap: 8, flexWrap: 'nowrap', maxWidth: '100%' }}>
-                          <a href={getViewUrl(viewAnn.fileUrl)} target="_blank" rel="noopener noreferrer"
-                            style={{ display: 'inline-flex', alignItems: 'center', gap: 6, padding: '9px 14px', borderRadius: 8, background: 'var(--bg-secondary)', border: '1px solid var(--border-color)', color: '#6366f1', fontSize: '0.875rem', fontWeight: 500, textDecoration: 'none', whiteSpace: 'nowrap', flex: '0 1 auto', minWidth: 0 }}>
+                          <button type="button" onClick={() => viewFile(viewAnn.fileUrl)}
+                            style={{ display: 'inline-flex', alignItems: 'center', gap: 6, padding: '9px 14px', borderRadius: 8, background: 'var(--bg-secondary)', border: '1px solid var(--border-color)', color: '#6366f1', fontSize: '0.875rem', fontWeight: 500, cursor: 'pointer', whiteSpace: 'nowrap', flex: '0 1 auto', minWidth: 0 }}>
                             <ExternalLink size={15} /><span>View</span>
-                          </a>
+                          </button>
                           <button type="button" onClick={() => downloadFile(viewAnn.fileUrl)} disabled={viewDownloading}
                             style={{ display: 'inline-flex', alignItems: 'center', gap: 6, padding: '9px 14px', borderRadius: 8, background: 'var(--bg-secondary)', border: '1px solid var(--border-color)', color: viewDownloading ? 'var(--text-secondary)' : '#6366f1', fontSize: '0.875rem', fontWeight: 500, cursor: viewDownloading ? 'not-allowed' : 'pointer', whiteSpace: 'nowrap', flex: '0 1 auto', minWidth: 0 }}>
                             {viewDownloading ? <Loader2 size={15} className="spin-animate" /> : <Download size={15} />}

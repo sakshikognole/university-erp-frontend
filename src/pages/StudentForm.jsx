@@ -1,4 +1,3 @@
-import { createPortal } from 'react-dom';
 import React, { useState, useEffect, useCallback } from 'react';
 import {
   X,
@@ -337,7 +336,7 @@ const StudentFormModal = ({ isOpen, studentId, onClose, onSuccess }) => {
   if (!isOpen) return null;
 
   // ── Render ─────────────────────────────────────────────────────────────
-  return createPortal((
+  return (
     <div
       className="sf-overlay"
       role="dialog"
@@ -647,7 +646,7 @@ const StudentFormModal = ({ isOpen, studentId, onClose, onSuccess }) => {
 
       </div>
     </div>
-  ), document.body);
+  );
 };
 
 export default StudentFormModal;

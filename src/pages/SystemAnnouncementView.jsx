@@ -74,33 +74,56 @@ const SystemAnnouncementView = () => {
     return /\.(jpg|jpeg|png|webp|gif)(\?.*)?$/i.test(url) || url.includes('/image/upload/');
   };
 
-  // Returns a proxy URL that opens the file inline in a new browser tab.
-  // Routes through the backend proxy with ?inline=true so Content-Disposition
-  // is set to 'inline' — the browser renders the file rather than downloading it.
-  // Works for PDF, DOCX and all other raw Cloudinary assets.
-  // Images open directly (no attachment header on Cloudinary image URLs).
-  const getViewUrl = (url) => {
-    if (!url) return url;
-    if (isImageUrl(url)) return url;
-    return `${API_BASE_URL}/system-announcements/download-proxy?url=${encodeURIComponent(url)}&inline=true`;
+  const isDocUrl = (url) => /\.(docx?|pptx?|xlsx?)(\?.*)?$/i.test(url);
+
+  // Opens a file in a new tab:
+  //   DOCX/PPT/XLS → Office Online Viewer (handles Office formats natively)
+  //   PDF / image  → fetches /view-proxy (authenticated), gets back HTML,
+  //                  creates a blob:text/html URL and navigates the pre-opened tab to it
+  const viewFile = async (url) => {
+    if (!url) return;
+
+    if (isDocUrl(url)) {
+      window.open(
+        `https://view.officeapps.live.com/op/view.aspx?src=${encodeURIComponent(url)}`,
+        '_blank', 'noopener,noreferrer'
+      );
+      return;
+    }
+
+    // Must open tab synchronously (user-gesture context) before any await
+    const tab = window.open('', '_blank', 'noopener,noreferrer');
+    if (!tab) return;
+
+    try {
+      const proxyUrl = `${API_BASE_URL}/system-announcements/view-proxy?url=${encodeURIComponent(url)}`;
+      const res = await fetch(proxyUrl, {
+        headers: { Authorization: `Bearer ${localStorage.getItem('erp_token')}` },
+      });
+      if (!res.ok) { tab.close(); return; }
+      const html = await res.text();
+      // Create a blob URL from the HTML — same-origin, no document.write needed
+      const blob = new Blob([html], { type: 'text/html' });
+      const blobUrl = URL.createObjectURL(blob);
+      tab.location.replace(blobUrl);
+      // Revoke after the tab has had time to load
+      setTimeout(() => URL.revokeObjectURL(blobUrl), 60000);
+    } catch {
+      tab.close();
+    }
   };
 
-  // Download a file via the backend proxy.
-  // The backend fetches the file server-side from Cloudinary (bypassing CORS and
-  // raw-file delivery restrictions) and streams it to the browser.
+  // Downloads a file via the backend proxy with the auth token in the header.
   const downloadFile = async (url) => {
     if (!url) return;
     setDownloading(true);
     try {
       const token = localStorage.getItem('erp_token');
       const proxyUrl = `${API_BASE_URL}/system-announcements/download-proxy?url=${encodeURIComponent(url)}`;
-
       const res = await fetch(proxyUrl, {
         headers: { Authorization: `Bearer ${token}` },
       });
-
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
-
       const blob = await res.blob();
       const objectUrl = URL.createObjectURL(blob);
       const a = document.createElement('a');
@@ -108,20 +131,9 @@ const SystemAnnouncementView = () => {
       a.download = decodeURIComponent(url.split('/').pop().split('?')[0]) || 'attachment';
       document.body.appendChild(a);
       a.click();
-      setTimeout(() => {
-        document.body.removeChild(a);
-        URL.revokeObjectURL(objectUrl);
-      }, 150);
-    } catch {
-      // Fallback: use an anchor tag instead of window.open to avoid mobile system popup
-      const a = document.createElement('a');
-      a.href = url;
-      a.target = '_blank';
-      a.rel = 'noopener noreferrer';
-      a.download = '';
-      document.body.appendChild(a);
-      a.click();
-      setTimeout(() => document.body.removeChild(a), 150);
+      setTimeout(() => { document.body.removeChild(a); URL.revokeObjectURL(objectUrl); }, 150);
+    } catch (err) {
+      console.error('Download failed:', err);
     } finally {
       setDownloading(false);
     }
@@ -373,14 +385,13 @@ const SystemAnnouncementView = () => {
                     onError={(e) => { e.target.style.display = 'none'; }}
                   />
                   <div style={{ padding: '8px 14px', borderTop: '1px solid var(--border-color, #e5e7eb)', display: 'flex', gap: '8px' }}>
-                    <a
-                      href={announcement.fileUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', padding: '7px 14px', borderRadius: '6px', background: 'var(--hover-bg, #f9fafb)', border: '1px solid var(--border-color, #e5e7eb)', color: 'var(--primary, #6366f1)', fontSize: '0.8125rem', fontWeight: 500, textDecoration: 'none', whiteSpace: 'nowrap' }}
+                    <button
+                      type="button"
+                      onClick={() => viewFile(announcement.fileUrl)}
+                      style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', padding: '7px 14px', borderRadius: '6px', background: 'var(--hover-bg, #f9fafb)', border: '1px solid var(--border-color, #e5e7eb)', color: 'var(--primary, #6366f1)', fontSize: '0.8125rem', fontWeight: 500, cursor: 'pointer', whiteSpace: 'nowrap' }}
                     >
                       <ExternalLink size={14} /><span>View</span>
-                    </a>
+                    </button>
                     <button
                       type="button"
                       onClick={() => downloadFile(announcement.fileUrl)}
@@ -395,14 +406,13 @@ const SystemAnnouncementView = () => {
               ) : (
                 /* ── Document (PDF, DOCX, etc.) ── */
                 <div style={{ display: 'flex', flexDirection: 'row', gap: '10px', flexWrap: 'nowrap', maxWidth: '100%' }}>
-                  <a
-                    href={getViewUrl(announcement.fileUrl)}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', padding: '10px 18px', borderRadius: '8px', background: 'var(--hover-bg, #f9fafb)', border: '1px solid var(--border-color, #e5e7eb)', color: 'var(--primary, #6366f1)', fontSize: '0.875rem', fontWeight: 500, textDecoration: 'none', whiteSpace: 'nowrap', flex: '0 1 auto', minWidth: 0 }}
+                  <button
+                    type="button"
+                    onClick={() => viewFile(announcement.fileUrl)}
+                    style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', padding: '10px 18px', borderRadius: '8px', background: 'var(--hover-bg, #f9fafb)', border: '1px solid var(--border-color, #e5e7eb)', color: 'var(--primary, #6366f1)', fontSize: '0.875rem', fontWeight: 500, cursor: 'pointer', whiteSpace: 'nowrap', flex: '0 1 auto', minWidth: 0 }}
                   >
                     <ExternalLink size={16} /><span>View</span>
-                  </a>
+                  </button>
                   <button
                     type="button"
                     onClick={() => downloadFile(announcement.fileUrl)}
