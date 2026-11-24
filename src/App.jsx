@@ -114,6 +114,9 @@ import SystemAnnouncementView from './pages/SystemAnnouncementView';
 import EventNoticesBoard from './pages/EventNoticesBoard';
 import SystemAnnouncementsBoard from './pages/SystemAnnouncementsBoard';
 
+// --- Notifications ---
+import NotificationsPage from './pages/NotificationsPage';
+
 // --- Announcements, Submissions, Academic Resources ---
 import Announcements from './pages/Announcements';
 import Submission from './pages/Submission';
@@ -633,6 +636,9 @@ function AppRoutes() {
           path="system-announcements/edit/:id"
           element={<SystemAnnouncementForm />}
         />
+
+        {/* ==================== NOTIFICATIONS ==================== */}
+        <Route path="notifications" element={<NotificationsPage />} />
 
         {/* ==================== VIEW-ONLY BOARDS ==================== */}
         <Route path="event-notices-board" element={<EventNoticesBoard />} />

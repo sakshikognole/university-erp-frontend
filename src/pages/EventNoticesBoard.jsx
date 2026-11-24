@@ -1,4 +1,4 @@
-﻿import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Calendar,
   Search,
@@ -317,7 +317,7 @@ const EventNoticesBoard = () => {
 
             <div className="enb-modal-footer">
               <button type="button" className="books-btn books-btn-ghost" onClick={closeModal}>
-                <X size={16}/><span>Close</span>
+                <span>Close</span>
               </button>
             </div>
           </div>

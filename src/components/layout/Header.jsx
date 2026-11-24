@@ -57,7 +57,7 @@ const Header = ({ toggleSidebar }) => {
                 <button
                   type="button"
                   className="notif-view-all-btn"
-                  onClick={() => setIsNotifOpen(false)}
+                  onClick={() => { setIsNotifOpen(false); navigate('/notifications'); }}
                 >
                   View All
                 </button>

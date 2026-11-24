@@ -195,7 +195,7 @@ const EventDetailsDialog = ({ eventId, onClose, onEdit, onDeleted }) => {
             {/* Actions */}
               <div className="modal-footer">
                 <button type="button" className="books-btn books-btn-ghost" onClick={onClose}>
-                  <X size={14} /><span>Close</span>
+                  <span>Close</span>
                 </button>
               </div>
           </>
