@@ -40,6 +40,25 @@ async function withRetry(fn, retries = 3, delayMs = 1000) {
 export const springApi = axios.create({ baseURL: SPRING_BASE });
 export const nodeApi   = axios.create({ baseURL: NODE_BASE });
 
+// ── Request interceptor ──────────────────────────────────────────────────────
+// Unifies security model across Spring Boot and Node backends.
+// Automatically injects Authorization: Bearer <token> for all authenticated requests.
+const requestInterceptor = (config) => {
+  try {
+    const token = localStorage.getItem('erp_token');
+    if (token) {
+      config.headers = config.headers || {};
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+  } catch (e) {
+    // Graceful fallback if localStorage is unavailable
+  }
+  return config;
+};
+
+springApi.interceptors.request.use(requestInterceptor, (err) => Promise.reject(err));
+nodeApi.interceptors.request.use(requestInterceptor, (err) => Promise.reject(err));
+
 // ── Response interceptor ─────────────────────────────────────────────────────
 // Unwraps axios response so callers receive the body directly.
 // Surfaces a clean error message on failure.
