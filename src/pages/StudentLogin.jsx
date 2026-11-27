@@ -73,7 +73,7 @@ const StudentLogin = () => {
                 id="prn-input"
                 type="text"
                 className="form-input"
-                placeholder="e.g. PRN2026001"
+                placeholder="Enter PRN"
                 value={prn}
                 onChange={(e) => setPrn(e.target.value)}
                 required
@@ -91,7 +91,7 @@ const StudentLogin = () => {
                 id="student-password"
                 type="password"
                 className="form-input"
-                placeholder="Enter password (e.g. Sakshi@123)"
+                placeholder="Enter password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
@@ -109,11 +109,6 @@ const StudentLogin = () => {
             <ArrowRight size={18} />
           </button>
         </form>
-
-        {/* Password Format Helper */}
-        <div style={{ background: '#f8fafc', padding: '10px 14px', borderRadius: '8px', border: '1px solid #e2e8f0', marginTop: '14px', fontSize: '12.5px', color: '#475569' }}>
-          <span><strong>Password Format:</strong> Student Name + @123 (e.g. <code>Sakshi@123</code>)</span>
-        </div>
 
         {/* Footer Navigation */}
         <div className="auth-footer">

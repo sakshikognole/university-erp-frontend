@@ -39,7 +39,7 @@ const Login = () => {
           navigate('/fee-payment');
         }, 600);
       } catch (err) {
-        setError(err.message || 'Authentication failed. Please verify your PRN number and password (e.g. Name@123).');
+        setError(err.message || 'Authentication failed. Please verify your PRN number and password.');
         setEmail('');
         setPassword('');
         setShowPassword(false);
@@ -137,7 +137,7 @@ const Login = () => {
                 id="email-input"
                 type={adminType === 'STUDENT' ? 'text' : 'email'}
                 className="form-input"
-                placeholder={adminType === 'STUDENT' ? 'Enter PRN (e.g. PRN2026001)' : 'Enter your Email ID'}
+                placeholder={adminType === 'STUDENT' ? 'Enter PRN' : 'Enter your Email ID'}
                 value={email}
                 onChange={(e) => {
                   const val = e.target.value;
@@ -167,7 +167,7 @@ const Login = () => {
                 id="password-input"
                 type={showPassword ? 'text' : 'password'}
                 className="form-input"
-                placeholder={adminType === 'STUDENT' ? 'Enter password (e.g. Name@123)' : 'Enter password'}
+                placeholder="Enter password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
