@@ -3168,6 +3168,19 @@ button {
   color: #b91c1c;
 }
 
+/* Pay Button — Light Emerald/Green */
+.action-btn.pay-btn {
+  background-color: #f0fdf4;
+  color: #16a34a;
+  border: 1px solid #bbf7d0;
+}
+
+.action-btn.pay-btn:hover {
+  background-color: #dcfce7;
+  border-color: #86efac;
+  color: #15803d;
+}
+
 
 .action-label {
   font-size: 0.8125rem;
@@ -10472,6 +10485,19 @@ input[type='password']::-webkit-inner-spin-button {
   background-color: #fee2e2;
   border-color: #fca5a5;
   color: #b91c1c;
+}
+
+/* Pay Button — Light Emerald/Green */
+.action-btn.pay-btn {
+  background-color: #f0fdf4;
+  color: #16a34a;
+  border: 1px solid #bbf7d0;
+}
+
+.action-btn.pay-btn:hover {
+  background-color: #dcfce7;
+  border-color: #86efac;
+  color: #15803d;
 }
 
 

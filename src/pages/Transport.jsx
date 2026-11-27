@@ -20,7 +20,7 @@ import AddBusPassModal from './AddBusPass';
 import {
   Bus, Plus, Search, AlertCircle, AlertTriangle, CheckCircle2, Loader2,
   ChevronLeft, ChevronRight, Edit, Trash2, UserCheck, Truck, Ticket, X, Eye,
-  ChevronDown,
+  ChevronDown, CreditCard,
 } from 'lucide-react';
 import ViewDetailModal from '../components/ViewDetailModal';
 import { useAuth } from '../context/AuthContext';
@@ -28,7 +28,7 @@ const _IS_PROD = typeof window !== 'undefined' && window.location.hostname !== '
 const API_BASE_URL = _IS_PROD ? 'https://university-erp-node.onrender.com/api' : 'http://localhost:5000/api';
 
 // Mobile accordion card for Transport
-function TrnMobCard({ item, tab, num, openModal, setDeleteConfirm, onView, expanded, onToggle, isStudent }) {
+function TrnMobCard({ item, tab, num, openModal, setDeleteConfirm, onView, onPay, expanded, onToggle, isStudent }) {
   const fmtDate = (d) => {
     if (!d) return '—';
     try { return new Date(d).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' }); }
@@ -52,10 +52,31 @@ function TrnMobCard({ item, tab, num, openModal, setDeleteConfirm, onView, expan
         <div className="mob-card-details">
           {tab === 'routes' && <>
             <div className="mob-card-row"><span className="mob-card-label">Route ID</span><span className="mob-card-value mono">{item.routeId}</span></div>
-            <div className="mob-card-row"><span className="mob-card-label">Driver</span><span className="mob-card-value">{item.driverName || '—'}</span></div>
-            <div className="mob-card-row"><span className="mob-card-label">Vehicle</span><span className="mob-card-value">{item.vehicleName || '—'}</span></div>
+            {!isStudent && (
+              <>
+                <div className="mob-card-row"><span className="mob-card-label">Driver</span><span className="mob-card-value">{item.driverName || '—'}</span></div>
+                <div className="mob-card-row"><span className="mob-card-label">Vehicle</span><span className="mob-card-value">{item.vehicleName || '—'}</span></div>
+              </>
+            )}
             <div className="mob-card-row"><span className="mob-card-label">Fee</span><span className="mob-card-value" style={{ fontWeight: 600, color: '#0f766e' }}>{item.fee != null && item.fee !== '' ? `₹${Number(item.fee).toLocaleString('en-IN')}` : '—'}</span></div>
             <div className="mob-card-row"><span className="mob-card-label">Stops</span><span className="mob-card-value">{(item.stops||[]).join(', ') || '—'}</span></div>
+            {!isStudent && (
+              <div className="mob-card-row">
+                <span className="mob-card-label">Status</span>
+                <span className="mob-card-value">
+                  <span style={{
+                    padding: '2px 8px',
+                    borderRadius: '12px',
+                    fontSize: '0.78rem',
+                    fontWeight: 600,
+                    backgroundColor: ((item.status || '').toLowerCase() === 'visible' || item.status === 'ACTIVE') ? '#dcfce7' : '#fef3c7',
+                    color: ((item.status || '').toLowerCase() === 'visible' || item.status === 'ACTIVE') ? '#15803d' : '#b45309',
+                  }}>
+                    {((item.status || '').toLowerCase() === 'visible' || item.status === 'ACTIVE') ? 'Visible' : 'Pending'}
+                  </span>
+                </span>
+              </div>
+            )}
           </>}
           {tab === 'drivers' && <>
             <div className="mob-card-row"><span className="mob-card-label">Driver ID</span><span className="mob-card-value mono">{item.driverId}</span></div>
@@ -79,6 +100,11 @@ function TrnMobCard({ item, tab, num, openModal, setDeleteConfirm, onView, expan
           </>}
           <div className="mob-card-actions">
             <button type="button" className="action-btn view-btn" onClick={onView}><Eye size={14} /><span className="action-label">View</span></button>
+            {isStudent && (
+              <button type="button" className="action-btn pay-btn" onClick={onPay}>
+                <CreditCard size={14} /><span className="action-label">Pay</span>
+              </button>
+            )}
             {!isStudent && (
               <>
                 <button type="button" className="action-btn edit-btn" onClick={() => openModal(tab === 'passes' ? 'pass' : tab === 'routes' ? 'route' : tab === 'drivers' ? 'driver' : 'vehicle', item._id || (tab === 'routes' ? item.routeId : tab === 'drivers' ? item.driverId : tab === 'vehicles' ? item.vehicleId : item.passId))}><Edit size={14} /><span className="action-label">Edit</span></button>
@@ -92,17 +118,32 @@ function TrnMobCard({ item, tab, num, openModal, setDeleteConfirm, onView, expan
   );
 }
 
+const DEFAULT_ROUTES = [
+  { _id: 'def-1', routeId: 1, routeName: 'Campus Express', driverName: 'Ramesh Patil', vehicleName: 'Tata Starbus', fee: 1500, stops: ['Main Gate', 'Library', 'Hostel Block A', 'Engineering Bldg'], status: 'Visible' },
+  { _id: 'def-2', routeId: 2, routeName: 'City Metro Connector', driverName: 'Suresh More', vehicleName: 'Eicher Skyline', fee: 2000, stops: ['Central Metro', 'South Extension', 'Tech Park', 'North Gate'], status: 'Visible' },
+  { _id: 'def-3', routeId: 3, routeName: 'Suburban Shuttle', driverName: 'Vijay Shinde', vehicleName: 'Ashok Leyland', fee: 2500, stops: ['Railway Station', 'West Circle', 'Sports Complex', 'Campus'], status: 'Visible' },
+];
+
 const Transport = () => {
   const { user } = useAuth();
   const isStudent = user?.role === 'STUDENT' || user?.adminType === 'STUDENT';
   const navigate = useNavigate();
 
   const [activeTab, setActiveTab] = useState('routes');
-  const [routes,   setRoutes]   = useState([]);
+  const [routes,   setRoutes]   = useState(() => {
+    try {
+      const saved = localStorage.getItem('erp_transport_routes');
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+      }
+    } catch {}
+    return DEFAULT_ROUTES;
+  });
   const [drivers,  setDrivers]  = useState([]);
   const [vehicles, setVehicles] = useState([]);
   const [passes,   setPasses]   = useState([]);
-  const [loading,  setLoading]  = useState(true);
+  const [loading,  setLoading]  = useState(false);
   const [deleting, setDeleting] = useState(false);
   const [deleteConfirm, setDeleteConfirm] = useState(null);
   const [viewItem, setViewItem] = useState(null);
@@ -129,8 +170,8 @@ const Transport = () => {
   const feedbackTimerRef = useRef(null);
 
   const authHeader = () => {
-    const token = localStorage.getItem('erp_token');
-    return { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` };
+    const token = localStorage.getItem('erp_token') || localStorage.getItem('token') || '';
+    return { 'Content-Type': 'application/json', Authorization: token ? `Bearer ${token}` : '' };
   };
 
   // D3: set feedback and schedule auto-dismiss for success messages only
@@ -159,18 +200,26 @@ const Transport = () => {
   }, []);
 
   const fetchAllData = async () => {
-    setLoading(true);
     try {
-      const [routesRes, driversRes, vehiclesRes, passesRes] = await Promise.all([
-        fetch(`${API_BASE_URL}/transport/routes`,  { headers: authHeader() }),
-        fetch(`${API_BASE_URL}/transport/drivers`, { headers: authHeader() }),
-        fetch(`${API_BASE_URL}/transport/vehicles`,{ headers: authHeader() }),
-        fetch(`${API_BASE_URL}/transport/passes`,  { headers: authHeader() }),
-      ]);
-      if (routesRes.ok)   setRoutes(await routesRes.json());
-      if (driversRes.ok)  setDrivers(await driversRes.json());
-      if (vehiclesRes.ok) setVehicles(await vehiclesRes.json());
-      if (passesRes.ok)   setPasses(await passesRes.json());
+      const routesRes = await fetch(`${API_BASE_URL}/transport/routes`, { headers: authHeader() });
+      if (routesRes.ok) {
+        const data = await routesRes.json();
+        if (Array.isArray(data) && data.length > 0) {
+          setRoutes(data);
+          try { localStorage.setItem('erp_transport_routes', JSON.stringify(data)); } catch {}
+        }
+      }
+
+      if (!isStudent) {
+        const [driversRes, vehiclesRes, passesRes] = await Promise.all([
+          fetch(`${API_BASE_URL}/transport/drivers`, { headers: authHeader() }),
+          fetch(`${API_BASE_URL}/transport/vehicles`,{ headers: authHeader() }),
+          fetch(`${API_BASE_URL}/transport/passes`,  { headers: authHeader() }),
+        ]);
+        if (driversRes.ok)  setDrivers(await driversRes.json());
+        if (vehiclesRes.ok) setVehicles(await vehiclesRes.json());
+        if (passesRes.ok)   setPasses(await passesRes.json());
+      }
     } catch (err) {
       console.warn('Transport backend unavailable:', err);
     } finally {
@@ -261,7 +310,15 @@ const Transport = () => {
       case 'drivers':  return filteredDrivers;
       case 'vehicles': return filteredVehicles;
       case 'passes':   return filteredPasses;
-      default:         return filteredRoutes;
+      default: {
+        if (isStudent) {
+          // Student role: strictly show routes where status is 'Visible'
+          return filteredRoutes.filter(
+            (r) => (r.status || '').toLowerCase() === 'visible' || r.status === 'ACTIVE'
+          );
+        }
+        return filteredRoutes;
+      }
     }
   };
 
@@ -269,6 +326,23 @@ const Transport = () => {
   const totalPages  = Math.ceil(currentDataset.length / itemsPerPage) || 1;
   const startIndex  = (currentPage - 1) * itemsPerPage;
   const paginatedData = currentDataset.slice(startIndex, startIndex + itemsPerPage);
+
+  // Handle student clicking Pay on route: navigate to fee payment with route info
+  const handleStudentPay = (route) => {
+    if (!route) return;
+    const title = route.routeName && route.routeName.trim()
+      ? route.routeName.trim()
+      : `Route #${route.routeId}`;
+    navigate('/fee-payment', {
+      state: {
+        fromStudentPay: true,
+        routeId: route.routeId,
+        transportTitle: title,
+        fee: route.fee || 0,
+        routeData: route,
+      },
+    });
+  };
 
   // D7: tab button style (active vs inactive) — used inline to keep logic clear
   const tabStyle = (tab) => ({
@@ -356,24 +430,26 @@ const Transport = () => {
       )}
 
       {/* D7: transport-tabs enables horizontal scrolling on narrow screens */}
-      <div className="transport-tabs">
-        <button type="button" style={tabStyle('routes')}
-          onClick={() => { setActiveTab('routes');   setCurrentPage(1); }}>
-          <Bus size={15} /><span>Bus Routes ({routes.length})</span>
-        </button>
-        <button type="button" style={tabStyle('drivers')}
-          onClick={() => { setActiveTab('drivers');  setCurrentPage(1); }}>
-          <UserCheck size={15} /><span>Drivers ({drivers.length})</span>
-        </button>
-        <button type="button" style={tabStyle('vehicles')}
-          onClick={() => { setActiveTab('vehicles'); setCurrentPage(1); }}>
-          <Truck size={15} /><span>Vehicles ({vehicles.length})</span>
-        </button>
-        <button type="button" style={tabStyle('passes')}
-          onClick={() => { setActiveTab('passes');   setCurrentPage(1); }}>
-          <Ticket size={15} /><span>Bus Passes ({passes.length})</span>
-        </button>
-      </div>
+      {!isStudent && (
+        <div className="transport-tabs">
+          <button type="button" style={tabStyle('routes')}
+            onClick={() => { setActiveTab('routes');   setCurrentPage(1); }}>
+            <Bus size={15} /><span>Bus Routes ({routes.length})</span>
+          </button>
+          <button type="button" style={tabStyle('drivers')}
+            onClick={() => { setActiveTab('drivers');  setCurrentPage(1); }}>
+            <UserCheck size={15} /><span>Drivers ({drivers.length})</span>
+          </button>
+          <button type="button" style={tabStyle('vehicles')}
+            onClick={() => { setActiveTab('vehicles'); setCurrentPage(1); }}>
+            <Truck size={15} /><span>Vehicles ({vehicles.length})</span>
+          </button>
+          <button type="button" style={tabStyle('passes')}
+            onClick={() => { setActiveTab('passes');   setCurrentPage(1); }}>
+            <Ticket size={15} /><span>Bus Passes ({passes.length})</span>
+          </button>
+        </div>
+      )}
 
       <div className="card table-card" style={{ marginTop: '1rem' }}>
         <div className="table-controls-bar">
@@ -429,12 +505,13 @@ const Transport = () => {
                     <tr>
                       <th style={{ width: '50px' }}>#</th>
                       <th style={{ width: '110px' }}>Route ID</th>
-                      <th style={{ width: '170px' }}>Route Name</th>
-                      <th style={{ width: '155px' }}>Driver Name</th>
-                      <th style={{ width: '155px' }}>Vehicle Name</th>
+                      <th style={{ width: isStudent ? '200px' : '170px' }}>Route Name</th>
+                      {!isStudent && <th style={{ width: '155px' }}>Driver Name</th>}
+                      {!isStudent && <th style={{ width: '155px' }}>Vehicle Name</th>}
                       <th style={{ width: '110px' }}>Fee (₹)</th>
                       <th>Stops</th>
-                      <th style={{ width: '130px', textAlign: 'center' }}>Actions</th>
+                      {!isStudent && <th style={{ width: '100px', textAlign: 'center' }}>Status</th>}
+                      <th style={{ width: isStudent ? '180px' : '130px', textAlign: 'center' }}>Actions</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -443,18 +520,22 @@ const Transport = () => {
                         <td className="text-secondary">{startIndex + i + 1}</td>
                         <td><span className="code-badge">Route #{route.routeId}</span></td>
                         <td><span className="dept-name-cell">{route.routeName || '—'}</span></td>
-                        <td>
-                          <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
-                            <UserCheck size={14} style={{ color: 'var(--text-secondary)' }} />
-                            <span>{route.driverName}</span>
-                          </div>
-                        </td>
-                        <td>
-                          <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
-                            <Truck size={14} style={{ color: 'var(--text-secondary)' }} />
-                            <span>{route.vehicleName}</span>
-                          </div>
-                        </td>
+                        {!isStudent && (
+                          <>
+                            <td>
+                              <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+                                <UserCheck size={14} style={{ color: 'var(--text-secondary)' }} />
+                                <span>{route.driverName}</span>
+                              </div>
+                            </td>
+                            <td>
+                              <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+                                <Truck size={14} style={{ color: 'var(--text-secondary)' }} />
+                                <span>{route.vehicleName}</span>
+                              </div>
+                            </td>
+                          </>
+                        )}
                         <td>
                           <span style={{ fontWeight: 600, color: '#0f766e' }}>
                             {route.fee != null && route.fee !== '' ? `₹${Number(route.fee).toLocaleString('en-IN')}` : '—'}
@@ -471,11 +552,35 @@ const Transport = () => {
                             <span style={{ color: 'var(--text-secondary)', fontStyle: 'italic' }}>No stops defined</span>
                           )}
                         </td>
+                        {!isStudent && (
+                          <td style={{ textAlign: 'center' }}>
+                            <span style={{
+                              padding: '2px 10px',
+                              borderRadius: '12px',
+                              fontSize: '0.78rem',
+                              fontWeight: 600,
+                              backgroundColor: ((route.status || '').toLowerCase() === 'visible' || route.status === 'ACTIVE') ? '#dcfce7' : '#fef3c7',
+                              color: ((route.status || '').toLowerCase() === 'visible' || route.status === 'ACTIVE') ? '#15803d' : '#b45309',
+                            }}>
+                              {((route.status || '').toLowerCase() === 'visible' || route.status === 'ACTIVE') ? 'Visible' : 'Pending'}
+                            </span>
+                          </td>
+                        )}
                         <td style={{ textAlign: 'center' }}>
                           <div className="action-buttons-cell" style={{ justifyContent: 'center' }}>
                             <button type="button" className="action-btn view-btn" title="View" onClick={() => setViewItem({ type: 'route', data: route })}>
                               <Eye size={14} /><span className="action-label">View</span>
                             </button>
+                            {isStudent && (
+                              <button
+                                type="button"
+                                className="action-btn pay-btn"
+                                title="Pay"
+                                onClick={() => handleStudentPay(route)}
+                              >
+                                <CreditCard size={14} /><span className="action-label">Pay</span>
+                              </button>
+                            )}
                             {!isStudent && (
                               <>
                                 <button type="button" className="action-btn edit-btn" title="Edit" onClick={() => openModal('route', route._id || route.routeId)}>
@@ -663,6 +768,7 @@ const Transport = () => {
                       openModal={openModal}
                       setDeleteConfirm={setDeleteConfirm}
                       onView={() => setViewItem({ type: activeTab === 'passes' ? 'pass' : activeTab === 'routes' ? 'route' : activeTab === 'drivers' ? 'driver' : 'vehicle', data: item })}
+                      onPay={() => handleStudentPay(item)}
                       expanded={trnExpanded === id}
                       onToggle={() => setTrnExpanded(p => p === id ? null : id)}
                       isStudent={isStudent}
@@ -774,14 +880,22 @@ const Transport = () => {
           viewItem?.data.studentId
         }
         rows={
-          viewItem?.type === 'route' ? [
-            { label: 'Route ID', value: viewItem.data.routeId },
-            { label: 'Route Name', value: viewItem.data.routeName },
-            { label: 'Driver', value: viewItem.data.driverName },
-            { label: 'Vehicle', value: viewItem.data.vehicleName },
-            { label: 'Route Fee', value: viewItem.data.fee != null && viewItem.data.fee !== '' ? `₹${Number(viewItem.data.fee).toLocaleString('en-IN')}` : '—' },
-            { label: 'Stops', value: Array.isArray(viewItem.data.stops) ? viewItem.data.stops.join(', ') : 'None' },
-          ] :
+          viewItem?.type === 'route' ? (
+            isStudent ? [
+              { label: 'Route ID', value: viewItem.data.routeId },
+              { label: 'Route Name', value: viewItem.data.routeName },
+              { label: 'Route Fee', value: viewItem.data.fee != null && viewItem.data.fee !== '' ? `₹${Number(viewItem.data.fee).toLocaleString('en-IN')}` : '—' },
+              { label: 'Stops', value: Array.isArray(viewItem.data.stops) ? viewItem.data.stops.join(', ') : 'None' },
+            ] : [
+              { label: 'Route ID', value: viewItem.data.routeId },
+              { label: 'Route Name', value: viewItem.data.routeName },
+              { label: 'Driver', value: viewItem.data.driverName },
+              { label: 'Vehicle', value: viewItem.data.vehicleName },
+              { label: 'Route Fee', value: viewItem.data.fee != null && viewItem.data.fee !== '' ? `₹${Number(viewItem.data.fee).toLocaleString('en-IN')}` : '—' },
+              { label: 'Stops', value: Array.isArray(viewItem.data.stops) ? viewItem.data.stops.join(', ') : 'None' },
+              { label: 'Status', value: ((viewItem.data.status || '').toLowerCase() === 'visible' || viewItem.data.status === 'ACTIVE') ? 'Visible' : 'Pending' },
+            ]
+          ) :
           viewItem?.type === 'driver' ? [
             { label: 'Driver ID', value: viewItem.data.driverId },
             { label: 'Name', value: viewItem.data.name },

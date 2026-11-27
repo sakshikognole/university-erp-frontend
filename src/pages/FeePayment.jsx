@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import {
   CreditCard,
   AlertCircle,
@@ -130,6 +130,32 @@ function FeeMobCard({ record, num, processingId, onPay, onReceipt, expanded, onT
 
 const FeePayment = () => {
   const navigate = useNavigate();
+  const location = useLocation();
+
+  const [pendingPaymentTitle, setPendingPaymentTitle] = useState(() => {
+    if (location.state?.fromTransport && location.state?.transportTitle) {
+      return {
+        routeId: location.state.routeId,
+        transportTitle: location.state.transportTitle,
+        fee: location.state.fee || 0,
+        routeData: location.state.routeData,
+      };
+    }
+    return null;
+  });
+
+  const [pendingStudentPay, setPendingStudentPay] = useState(() => {
+    if (location.state?.fromStudentPay) {
+      return {
+        routeId: location.state.routeId,
+        transportTitle: location.state.transportTitle || `Route #${location.state.routeId}`,
+        fee: location.state.fee || 0,
+        routeData: location.state.routeData,
+      };
+    }
+    return null;
+  });
+
   const [feeRecords, setFeeRecords] = useState(() => {
     // Restore any locally-persisted payment progress (paid/remaining amounts)
     // so the UI isn't blank while the backend fetch is in flight.
@@ -143,12 +169,160 @@ const FeePayment = () => {
   const [processingId, setProcessingId] = useState(null);
   const [feedback, setFeedback] = useState({ type: '', message: '' });
   const [selectedRecord, setSelectedRecord] = useState(null);
+  const [confirmingPayRecord, setConfirmingPayRecord] = useState(null);
   const detailRef = useRef(null);
 
   // Pagination State
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(10);
   const [feeExpanded, setFeeExpanded] = useState(null);
+
+  // Handle adding payment title from Transport
+  const handleAddPaymentTitle = async () => {
+    if (!pendingPaymentTitle) return;
+    const { routeId, transportTitle, fee, routeData } = pendingPaymentTitle;
+
+    // 1. Add record to feeRecords
+    const newRecord = {
+      _id: `trn-${routeId || Date.now()}`,
+      paymentId: `PAY-TRN-${routeId || Date.now()}`,
+      feeType: transportTitle,
+      totalFeeAmount: Number(fee) || 0,
+      discountAmount: 0,
+      paidAmount: 0,
+      remainingAmount: Number(fee) || 0,
+      status: 'PENDING',
+    };
+
+    setFeeRecords((prev) => {
+      const filtered = prev.filter((r) => r._id !== newRecord._id && r.feeType !== newRecord.feeType);
+      const updated = [newRecord, ...filtered];
+      localStorage.setItem('university_erp_fee_records_simple', JSON.stringify(updated));
+      return updated;
+    });
+
+    // 2. Set transport route status to 'Visible'
+    try {
+      const savedRoutes = localStorage.getItem('erp_transport_routes');
+      let routesList = savedRoutes ? JSON.parse(savedRoutes) : [];
+      let found = false;
+      routesList = routesList.map((r) => {
+        if (String(r.routeId) === String(routeId)) {
+          found = true;
+          return { ...r, status: 'Visible' };
+        }
+        return r;
+      });
+      if (!found && routeData) {
+        routesList.push({ ...routeData, status: 'Visible' });
+      }
+      localStorage.setItem('erp_transport_routes', JSON.stringify(routesList));
+    } catch (e) {
+      console.warn('Could not update localStorage routes:', e);
+    }
+
+    if (routeId) {
+      try {
+        await fetch(`${API_BASE_URL}/transport/routes/${routeId}`, {
+          method: 'PUT',
+          headers: authHeader(),
+          body: JSON.stringify({ status: 'Visible' }),
+        });
+      } catch (e) {
+        /* non-fatal */
+      }
+    }
+
+    setFeedback({
+      type: 'success',
+      message: `Payment Title "${transportTitle}" added to fee payment table and transport route status set to Visible.`,
+    });
+    setPendingPaymentTitle(null);
+  };
+
+  // Handle cancelling payment title from Transport
+  const handleCancelPaymentTitle = async () => {
+    if (!pendingPaymentTitle) return;
+    const { routeId, transportTitle, routeData } = pendingPaymentTitle;
+
+    // Set transport route status to 'Pending'
+    try {
+      const savedRoutes = localStorage.getItem('erp_transport_routes');
+      let routesList = savedRoutes ? JSON.parse(savedRoutes) : [];
+      let found = false;
+      routesList = routesList.map((r) => {
+        if (String(r.routeId) === String(routeId)) {
+          found = true;
+          return { ...r, status: 'Pending' };
+        }
+        return r;
+      });
+      if (!found && routeData) {
+        routesList.push({ ...routeData, status: 'Pending' });
+      }
+      localStorage.setItem('erp_transport_routes', JSON.stringify(routesList));
+    } catch (e) {
+      console.warn('Could not update localStorage routes:', e);
+    }
+
+    if (routeId) {
+      try {
+        await fetch(`${API_BASE_URL}/transport/routes/${routeId}`, {
+          method: 'PUT',
+          headers: authHeader(),
+          body: JSON.stringify({ status: 'Pending' }),
+        });
+      } catch (e) {
+        /* non-fatal */
+      }
+    }
+
+    setFeedback({
+      type: 'error',
+      message: `Cancelled adding Payment Title "${transportTitle}". Transport route status remains Pending.`,
+    });
+    setPendingPaymentTitle(null);
+  };
+
+  // Handle cancelling student payment modal
+  const handleCancelStudentPay = () => {
+    setPendingStudentPay(null);
+  };
+
+  // Handle confirming student payment for route
+  const handleConfirmStudentPay = async () => {
+    if (!pendingStudentPay) return;
+    const { routeId, transportTitle, fee } = pendingStudentPay;
+    const feeNum = Number(fee) || 0;
+
+    let target = feeRecords.find(
+      (r) =>
+        r._id === `trn-${routeId}` ||
+        (r.feeType && (r.feeType === transportTitle || (routeId && r.feeType.includes(String(routeId)))))
+    );
+
+    if (!target) {
+      target = {
+        _id: `trn-${routeId || Date.now()}`,
+        paymentId: `PAY-TRN-${routeId || Date.now()}`,
+        feeType: transportTitle,
+        totalFeeAmount: feeNum,
+        discountAmount: 0,
+        paidAmount: 0,
+        remainingAmount: feeNum,
+        status: 'PENDING',
+      };
+      setFeeRecords((prev) => {
+        const filtered = prev.filter((r) => r._id !== target._id && r.feeType !== target.feeType);
+        const updated = [target, ...filtered];
+        localStorage.setItem('university_erp_fee_records_simple', JSON.stringify(updated));
+        return updated;
+      });
+    }
+
+    setPendingStudentPay(null);
+    await handlePay(target);
+  };
 
   // Receipt navigation helper (used by both desktop and mobile views)
   const handleReceipt = (record) => {
@@ -234,8 +408,10 @@ const FeePayment = () => {
             return fresh;
           });
 
-          setFeeRecords(merged);
-          localStorage.setItem('university_erp_fee_records_simple', JSON.stringify(merged));
+          const localOnly = localRecords.filter((l) => !freshRecords.some((f) => f._id === l._id));
+          const allRecords = [...localOnly, ...merged];
+          setFeeRecords(allRecords);
+          localStorage.setItem('university_erp_fee_records_simple', JSON.stringify(allRecords));
           setLoading(false);
           return;
         }
@@ -474,6 +650,359 @@ const FeePayment = () => {
         </div>
       )}
 
+      {/* Overlapping Modal Popup for Adding Payment Title from Transport */}
+      {pendingPaymentTitle && (
+        <div
+          className="modal-overlay"
+          role="dialog"
+          aria-modal="true"
+          onClick={handleCancelPaymentTitle}
+        >
+          <div
+            className="modal-content"
+            onClick={(e) => e.stopPropagation()}
+            style={{ maxWidth: '460px' }}
+          >
+            <div className="modal-header">
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
+                <div
+                  style={{
+                    width: 36,
+                    height: 36,
+                    borderRadius: '50%',
+                    backgroundColor: '#dbeafe',
+                    color: '#1d4ed8',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    flexShrink: 0,
+                  }}
+                >
+                  <CreditCard size={18} />
+                </div>
+                <h3 className="modal-title" style={{ fontSize: '1.05rem', margin: 0 }}>
+                  Add Payment Title
+                </h3>
+              </div>
+              <button
+                type="button"
+                className="close-modal-btn"
+                onClick={handleCancelPaymentTitle}
+                aria-label="Close"
+              >
+                <X size={18} />
+              </button>
+            </div>
+
+            <div style={{ padding: '0.5rem 0 1rem 0' }}>
+              <p
+                style={{
+                  fontSize: '1.05rem',
+                  fontWeight: 600,
+                  color: '#111827',
+                  margin: '0 0 0.85rem 0',
+                  lineHeight: '1.5',
+                }}
+              >
+                Are you sure you want to add {
+                  (() => {
+                    const t = (pendingPaymentTitle.transportTitle || '').trim();
+                    const match = t.match(/^Route\s*#?\s*(\d+)$/i);
+                    return match ? `route ${match[1]}` : t;
+                  })()
+                }?
+              </p>
+
+              <div
+                style={{
+                  background: '#f9fafb',
+                  border: '1px solid #e5e7eb',
+                  borderRadius: '8px',
+                  padding: '0.85rem 1rem',
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
+                }}
+              >
+                <div>
+                  <div style={{ fontSize: '0.75rem', color: '#6b7280', textTransform: 'uppercase', letterSpacing: '0.05em', fontWeight: 600 }}>
+                    Transport Title
+                  </div>
+                  <div style={{ fontSize: '0.95rem', fontWeight: 600, color: '#1f2937', marginTop: '0.2rem' }}>
+                    {pendingPaymentTitle.transportTitle}
+                  </div>
+                </div>
+                {pendingPaymentTitle.fee > 0 && (
+                  <div style={{ textAlign: 'right' }}>
+                    <div style={{ fontSize: '0.75rem', color: '#6b7280', textTransform: 'uppercase', letterSpacing: '0.05em', fontWeight: 600 }}>
+                      Fee Amount
+                    </div>
+                    <div style={{ fontSize: '1rem', fontWeight: 700, color: '#0f766e', marginTop: '0.2rem' }}>
+                      ₹{Number(pendingPaymentTitle.fee).toLocaleString('en-IN')}
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            <div className="modal-actions" style={{ marginTop: '0.5rem' }}>
+              <button
+                type="button"
+                className="btn btn-secondary"
+                onClick={handleCancelPaymentTitle}
+                style={{ minWidth: '90px' }}
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                className="books-btn books-btn-primary"
+                onClick={handleAddPaymentTitle}
+                style={{ minWidth: '90px' }}
+              >
+                Add
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Overlapping Modal Popup for Student Paying Route Fee */}
+      {pendingStudentPay && (
+        <div
+          className="modal-overlay"
+          role="dialog"
+          aria-modal="true"
+          onClick={handleCancelStudentPay}
+        >
+          <div
+            className="modal-content"
+            onClick={(e) => e.stopPropagation()}
+            style={{ maxWidth: '460px' }}
+          >
+            <div className="modal-header">
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
+                <div
+                  style={{
+                    width: 36,
+                    height: 36,
+                    borderRadius: '50%',
+                    backgroundColor: '#dbeafe',
+                    color: '#1d4ed8',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    flexShrink: 0,
+                  }}
+                >
+                  <CreditCard size={18} />
+                </div>
+                <h3 className="modal-title" style={{ fontSize: '1.05rem', margin: 0 }}>
+                  Pay Route Fee
+                </h3>
+              </div>
+              <button
+                type="button"
+                className="close-modal-btn"
+                onClick={handleCancelStudentPay}
+                aria-label="Close"
+              >
+                <X size={18} />
+              </button>
+            </div>
+
+            <div style={{ padding: '0.5rem 0 1rem 0' }}>
+              <p
+                style={{
+                  fontSize: '1.05rem',
+                  fontWeight: 600,
+                  color: '#111827',
+                  margin: '0 0 0.85rem 0',
+                  lineHeight: '1.5',
+                }}
+              >
+                Are you sure you want to pay {
+                  (() => {
+                    const t = (pendingStudentPay.transportTitle || '').trim();
+                    const match = t.match(/^Route\s*#?\s*(\d+)$/i);
+                    if (match) return `route ${match[1]}`;
+                    if (pendingStudentPay.routeId) {
+                      return `route ${pendingStudentPay.routeId}`;
+                    }
+                    return t || 'route';
+                  })()
+                } ?
+              </p>
+
+              <div
+                style={{
+                  background: '#f9fafb',
+                  border: '1px solid #e5e7eb',
+                  borderRadius: '8px',
+                  padding: '0.85rem 1rem',
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
+                }}
+              >
+                <div>
+                  <div style={{ fontSize: '0.75rem', color: '#6b7280', textTransform: 'uppercase', letterSpacing: '0.05em', fontWeight: 600 }}>
+                    Transport Title
+                  </div>
+                  <div style={{ fontSize: '0.95rem', fontWeight: 600, color: '#1f2937', marginTop: '0.2rem' }}>
+                    {pendingStudentPay.transportTitle}
+                  </div>
+                </div>
+                {pendingStudentPay.fee > 0 && (
+                  <div style={{ textAlign: 'right' }}>
+                    <div style={{ fontSize: '0.75rem', color: '#6b7280', textTransform: 'uppercase', letterSpacing: '0.05em', fontWeight: 600 }}>
+                      Fee Amount
+                    </div>
+                    <div style={{ fontSize: '1rem', fontWeight: 700, color: '#0f766e', marginTop: '0.2rem' }}>
+                      ₹{Number(pendingStudentPay.fee).toLocaleString('en-IN')}
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            <div className="modal-actions" style={{ marginTop: '0.5rem' }}>
+              <button
+                type="button"
+                className="btn btn-secondary"
+                onClick={handleCancelStudentPay}
+                style={{ minWidth: '90px' }}
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                className="books-btn books-btn-primary"
+                onClick={handleConfirmStudentPay}
+                style={{ minWidth: '90px' }}
+              >
+                Pay
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Confirmation Modal Popup for Paying Fee Record (for all roles) */}
+      {confirmingPayRecord && (
+        <div
+          className="modal-overlay"
+          role="dialog"
+          aria-modal="true"
+          onClick={() => setConfirmingPayRecord(null)}
+        >
+          <div
+            className="modal-content"
+            onClick={(e) => e.stopPropagation()}
+            style={{ maxWidth: '460px' }}
+          >
+            <div className="modal-header">
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
+                <div
+                  style={{
+                    width: 36,
+                    height: 36,
+                    borderRadius: '50%',
+                    backgroundColor: '#dbeafe',
+                    color: '#1d4ed8',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    flexShrink: 0,
+                  }}
+                >
+                  <CreditCard size={18} />
+                </div>
+                <h3 className="modal-title" style={{ fontSize: '1.05rem', margin: 0 }}>
+                  Confirm Payment
+                </h3>
+              </div>
+              <button
+                type="button"
+                className="close-modal-btn"
+                onClick={() => setConfirmingPayRecord(null)}
+                aria-label="Close"
+              >
+                <X size={18} />
+              </button>
+            </div>
+
+            <div style={{ padding: '0.5rem 0 1rem 0' }}>
+              <p
+                style={{
+                  fontSize: '1.05rem',
+                  fontWeight: 600,
+                  color: '#111827',
+                  margin: '0 0 0.85rem 0',
+                  lineHeight: '1.5',
+                }}
+              >
+                Are you sure you want to pay {confirmingPayRecord.feeType || 'this fee'} ?
+              </p>
+
+              <div
+                style={{
+                  background: '#f9fafb',
+                  border: '1px solid #e5e7eb',
+                  borderRadius: '8px',
+                  padding: '0.85rem 1rem',
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
+                }}
+              >
+                <div>
+                  <div style={{ fontSize: '0.75rem', color: '#6b7280', textTransform: 'uppercase', letterSpacing: '0.05em', fontWeight: 600 }}>
+                    Payment Title
+                  </div>
+                  <div style={{ fontSize: '0.95rem', fontWeight: 600, color: '#1f2937', marginTop: '0.2rem' }}>
+                    {confirmingPayRecord.feeType || 'Academic Fee'}
+                  </div>
+                </div>
+                {((confirmingPayRecord.remainingAmount ?? confirmingPayRecord.totalFeeAmount) > 0) && (
+                  <div style={{ textAlign: 'right' }}>
+                    <div style={{ fontSize: '0.75rem', color: '#6b7280', textTransform: 'uppercase', letterSpacing: '0.05em', fontWeight: 600 }}>
+                      Payable Amount
+                    </div>
+                    <div style={{ fontSize: '1rem', fontWeight: 700, color: '#0f766e', marginTop: '0.2rem' }}>
+                      ₹{Number(confirmingPayRecord.remainingAmount ?? confirmingPayRecord.totalFeeAmount).toLocaleString('en-IN')}
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            <div className="modal-actions" style={{ marginTop: '0.5rem' }}>
+              <button
+                type="button"
+                className="btn btn-secondary"
+                onClick={() => setConfirmingPayRecord(null)}
+                style={{ minWidth: '90px' }}
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                className="books-btn books-btn-primary"
+                onClick={() => {
+                  const rec = confirmingPayRecord;
+                  setConfirmingPayRecord(null);
+                  handlePay(rec);
+                }}
+                style={{ minWidth: '90px' }}
+              >
+                Pay
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Main Table Card */}
       <div className="card table-card" style={{ marginTop: '1.25rem' }}>
         <div className="table-container">
@@ -579,7 +1108,7 @@ const FeePayment = () => {
                                   alignItems: 'center',
                                   gap: '6px',
                                 }}
-                                onClick={(e) => { e.stopPropagation(); handlePay(record); }}
+                                onClick={(e) => { e.stopPropagation(); setConfirmingPayRecord(record); }}
                                 disabled={isRowProcessing}
                                 title="Pay fee online via Razorpay"
                               >
@@ -648,7 +1177,7 @@ const FeePayment = () => {
                       record={record}
                       num={startIndex + index + 1}
                       processingId={processingId}
-                      onPay={() => handlePay(record)}
+                      onPay={() => setConfirmingPayRecord(record)}
                       onReceipt={() => navigate("/fee-payment/success", { state: { receipt: { receiptNumber: "RCP-PAID-COMPLETED", transactionId: "TXN_VERIFIED_ONLINE", razorpayPaymentId: "pay_verified_razorpay", feeType: record.feeType || "Tuition & Academic Fee", totalFeeAmount: record.totalFeeAmount, discountAmount: record.discountAmount || 0, amountPaidThisTransaction: record.paidAmount, totalPaidSoFar: record.paidAmount, remainingBalance: 0, status: "PAID", paymentMethod: "Razorpay", paidAt: new Date().toISOString() } } })}
                       expanded={feeExpanded === (record._id || index)}
                       onToggle={() => setFeeExpanded(prev => prev === (record._id || index) ? null : (record._id || index))}
@@ -1007,7 +1536,7 @@ const FeePayment = () => {
                     alignItems: 'center',
                     gap: '8px',
                   }}
-                  onClick={() => handlePay(selectedRecord)}
+                  onClick={() => setConfirmingPayRecord(selectedRecord)}
                   disabled={processingId === selectedRecord._id}
                   title="Pay remaining balance online via Razorpay"
                 >

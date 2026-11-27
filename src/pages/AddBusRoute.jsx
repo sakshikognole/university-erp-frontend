@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { X, Save, AlertCircle, CheckCircle2, Loader2, Plus } from 'lucide-react';
 import { validateRouteName } from '../utils/transportValidation';
 const _IS_PROD = typeof window !== 'undefined' && window.location.hostname !== 'localhost';
@@ -8,6 +9,7 @@ const authHeader = () => ({ 'Content-Type': 'application/json', Authorization: `
 const FieldError = ({ msg }) => msg ? <p className="sf-field-error"><AlertCircle size={12} style={{ flexShrink: 0 }} />{msg}</p> : null;
 
 const AddBusRouteModal = ({ isOpen, routeId: routeIdProp, onClose, onSuccess }) => {
+  const navigate = useNavigate();
   const isEdit = Boolean(routeIdProp);
   const [loading, setLoading] = useState(false);
   const [fetching, setFetching] = useState(false);
@@ -17,7 +19,7 @@ const AddBusRouteModal = ({ isOpen, routeId: routeIdProp, onClose, onSuccess }) 
   const [vehicles, setVehicles] = useState([]);
   const [stopInput, setStopInput] = useState('');
 
-  const emptyForm = { routeId: '', hasCustomName: false, routeName: '', driverId: '', driverName: '', vehicleId: '', vehicleName: '', stops: [], fee: '', status: 'ACTIVE' };
+  const emptyForm = { routeId: '', hasCustomName: false, routeName: '', driverId: '', driverName: '', vehicleId: '', vehicleName: '', stops: [], fee: '', status: 'Pending' };
   const [form, setForm] = useState(emptyForm);
 
   const reset = useCallback(() => { setForm(emptyForm); setRouteNameError(''); setFeedback({ type: '', message: '' }); setStopInput(''); }, []); // eslint-disable-line
@@ -82,15 +84,137 @@ const AddBusRouteModal = ({ isOpen, routeId: routeIdProp, onClose, onSuccess }) 
     if (form.hasCustomName) { const err = validateRouteName(form.routeName); if (err) { setRouteNameError(err); return; } }
     setRouteNameError('');
     setLoading(true);
+
+    const transportTitle = form.hasCustomName && form.routeName.trim() ? form.routeName.trim() : (form.routeName.trim() || `Route #${form.routeId}`);
+    const routeFee = form.fee !== '' && form.fee !== null ? Number(form.fee) : 0;
+    const initialStatus = 'Pending';
+
     try {
       const url = isEdit ? `${API_BASE_URL}/transport/routes/${routeIdProp}` : `${API_BASE_URL}/transport/routes`;
-      const res = await fetch(url, { method: isEdit ? 'PUT' : 'POST', headers: authHeader(), body: JSON.stringify({ routeId: Number(form.routeId), hasCustomName: form.hasCustomName, routeName: form.hasCustomName ? form.routeName.trim() : '', driverId: form.driverId || null, driverName: form.driverName.trim(), vehicleId: form.vehicleId || '', vehicleName: form.vehicleName.trim(), stops: form.stops, fee: form.fee !== '' && form.fee !== null ? Number(form.fee) : 0, status: form.status }) });
+      const res = await fetch(url, {
+        method: isEdit ? 'PUT' : 'POST',
+        headers: authHeader(),
+        body: JSON.stringify({
+          routeId: Number(form.routeId),
+          hasCustomName: form.hasCustomName,
+          routeName: form.hasCustomName ? form.routeName.trim() : '',
+          driverId: form.driverId || null,
+          driverName: form.driverName.trim(),
+          vehicleId: form.vehicleId || '',
+          vehicleName: form.vehicleName.trim(),
+          stops: form.stops,
+          fee: routeFee,
+          status: isEdit ? form.status : initialStatus,
+        }),
+      });
       const data = await res.json();
       if (!res.ok) { setFeedback({ type: 'error', message: data.message || 'Failed to save.' }); return; }
+
+      // Save to localStorage erp_transport_routes as fallback cache
+      try {
+        const saved = localStorage.getItem('erp_transport_routes');
+        let routesList = saved ? JSON.parse(saved) : [];
+        const newRouteObj = {
+          _id: data.route?._id || `rt-${form.routeId}`,
+          routeId: Number(form.routeId),
+          hasCustomName: form.hasCustomName,
+          routeName: transportTitle,
+          driverId: form.driverId || null,
+          driverName: form.driverName.trim(),
+          vehicleId: form.vehicleId || '',
+          vehicleName: form.vehicleName.trim(),
+          stops: form.stops,
+          fee: routeFee,
+          status: isEdit ? form.status : initialStatus,
+        };
+        const idx = routesList.findIndex((r) => String(r.routeId) === String(form.routeId));
+        if (idx >= 0) routesList[idx] = newRouteObj;
+        else routesList.push(newRouteObj);
+        localStorage.setItem('erp_transport_routes', JSON.stringify(routesList));
+      } catch (e) {
+        /* non-fatal */
+      }
+
       setFeedback({ type: 'success', message: data.message || (isEdit ? 'Route updated.' : 'Route created.') });
-      setTimeout(() => onSuccess(), 900);
-    } catch { setFeedback({ type: 'error', message: 'Unable to connect.' }); }
-    finally { setLoading(false); }
+
+      if (!isEdit) {
+        // Navigate to Fee Payment page with transport route details
+        setTimeout(() => {
+          onClose();
+          navigate('/fee-payment', {
+            state: {
+              fromTransport: true,
+              routeId: Number(form.routeId),
+              transportTitle: transportTitle,
+              fee: routeFee,
+              routeData: {
+                routeId: Number(form.routeId),
+                routeName: transportTitle,
+                driverName: form.driverName.trim(),
+                vehicleName: form.vehicleName.trim(),
+                stops: form.stops,
+                fee: routeFee,
+                status: initialStatus,
+              },
+            },
+          });
+        }, 500);
+      } else {
+        setTimeout(() => onSuccess(), 900);
+      }
+    } catch {
+      // Local fallback save and navigate
+      try {
+        const saved = localStorage.getItem('erp_transport_routes');
+        let routesList = saved ? JSON.parse(saved) : [];
+        const newRouteObj = {
+          _id: `rt-${form.routeId}`,
+          routeId: Number(form.routeId),
+          hasCustomName: form.hasCustomName,
+          routeName: transportTitle,
+          driverId: form.driverId || null,
+          driverName: form.driverName.trim(),
+          vehicleId: form.vehicleId || '',
+          vehicleName: form.vehicleName.trim(),
+          stops: form.stops,
+          fee: routeFee,
+          status: isEdit ? form.status : initialStatus,
+        };
+        const idx = routesList.findIndex((r) => String(r.routeId) === String(form.routeId));
+        if (idx >= 0) routesList[idx] = newRouteObj;
+        else routesList.push(newRouteObj);
+        localStorage.setItem('erp_transport_routes', JSON.stringify(routesList));
+      } catch (e) {
+        /* non-fatal */
+      }
+
+      if (!isEdit) {
+        setTimeout(() => {
+          onClose();
+          navigate('/fee-payment', {
+            state: {
+              fromTransport: true,
+              routeId: Number(form.routeId),
+              transportTitle: transportTitle,
+              fee: routeFee,
+              routeData: {
+                routeId: Number(form.routeId),
+                routeName: transportTitle,
+                driverName: form.driverName.trim(),
+                vehicleName: form.vehicleName.trim(),
+                stops: form.stops,
+                fee: routeFee,
+                status: initialStatus,
+              },
+            },
+          });
+        }, 500);
+      } else {
+        setFeedback({ type: 'error', message: 'Unable to connect.' });
+      }
+    } finally {
+      setLoading(false);
+    }
   };
 
   if (!isOpen) return null;
