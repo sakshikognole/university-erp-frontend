@@ -137,8 +137,6 @@ const Sidebar = ({ isOpen, toggleSidebar, isCollapsed, role = 'SUPER_ADMIN' }) =
                       to={link.path}
                       className={({ isActive }) => `nav-link ${isActive || active ? 'active' : ''}`}
                       onClick={() => {
-                        // Close any open modal overlay before navigating
-                        document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true, cancelable: true }));
                         // Close sidebar on mobile when a link is clicked
                         if (window.innerWidth <= 768) {
                           toggleSidebar();

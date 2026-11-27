@@ -286,14 +286,7 @@ function AppRoutes() {
         />
 
         {/* ==================== VENUES ==================== */}
-        <Route
-          path="venues"
-          element={
-            <SuperAdminRoute>
-              <Venues />
-            </SuperAdminRoute>
-          }
-        />
+        <Route path="venues" element={<Venues />} />
         <Route
           path="venues/add"
           element={
@@ -323,14 +316,7 @@ function AppRoutes() {
         <Route path="books" element={<BooksPage />} />
 
         {/* ==================== CLUBS ==================== */}
-        <Route
-          path="clubs"
-          element={
-            <SuperAdminRoute>
-              <ClubsPage />
-            </SuperAdminRoute>
-          }
-        />
+        <Route path="clubs" element={<ClubsPage />} />
 
         {/* ==================== SPORTS ==================== */}
         <Route path="sports" element={<SportsPage />} />
@@ -489,14 +475,7 @@ function AppRoutes() {
         <Route path="letterhead" element={<LetterHeadEditorPage />} />
 
         {/* ==================== TRANSPORT ==================== */}
-        <Route
-          path="transport"
-          element={
-            <SuperAdminRoute>
-              <Transport />
-            </SuperAdminRoute>
-          }
-        />
+        <Route path="transport" element={<Transport />} />
         <Route
           path="transport/add-route"
           element={
@@ -597,14 +576,7 @@ function AppRoutes() {
         />
 
         {/* ==================== ALUMNI JOBS ==================== */}
-        <Route
-          path="alumni-jobs"
-          element={
-            <SuperAdminRoute>
-              <AlumniJobs />
-            </SuperAdminRoute>
-          }
-        />
+        <Route path="alumni-jobs" element={<AlumniJobs />} />
         <Route
           path="alumni-jobs/add"
           element={
@@ -637,12 +609,12 @@ function AppRoutes() {
           element={<SystemAnnouncementForm />}
         />
 
-        {/* ==================== NOTIFICATIONS ==================== */}
-        <Route path="notifications" element={<NotificationsPage />} />
-
         {/* ==================== VIEW-ONLY BOARDS ==================== */}
         <Route path="event-notices-board" element={<EventNoticesBoard />} />
         <Route path="system-announcements-board" element={<SystemAnnouncementsBoard />} />
+
+        {/* ==================== NOTIFICATIONS ==================== */}
+        <Route path="notifications" element={<NotificationsPage />} />
 
         {/* ==================== ATTENDANCE ==================== */}
         <Route path="attendance" element={<Attendance />} />

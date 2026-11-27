@@ -3,6 +3,7 @@ import { Plus, Eye, Edit, Trash2, Search } from 'lucide-react';
 import { springApi, springGet } from '../services/api';
 import PageError from '../components/PageError';
 import ConfirmDialog from '../components/ConfirmDialog';
+import { useAuth } from '../context/AuthContext';
 
 // ── Empty form ─────────────────────────────────────────────────────────────
 const EMPTY = { subjectName: '', description: '' };
@@ -203,6 +204,8 @@ function ViewSubjectModal({ isOpen, subject, onClose }) {
 // SubjectsPage
 // ══════════════════════════════════════════════════════════════════════════
 export default function SubjectsPage() {
+  const { user } = useAuth();
+  const isStudent = user?.role === 'STUDENT' || user?.adminType === 'STUDENT';
 
   const [subjects,  setSubjects]  = useState([]);
   const [loading,   setLoading]   = useState(true);
@@ -333,18 +336,20 @@ export default function SubjectsPage() {
       <div className="feature-page-header">
         <div className="feature-page-header-info">
           <h1 className="page-title">Subjects</h1>
-          <p className="page-subtitle">Manage university subjects</p>
+          <p className="page-subtitle">{isStudent ? 'View academic subjects' : 'Manage university subjects'}</p>
         </div>
-        <div className="feature-page-header-actions">
-          <button
-            type="button"
-            className="books-btn books-btn-primary"
-            onClick={openAdd}
-          >
-            <Plus size={16} />
-            <span>Add Subject</span>
-          </button>
-        </div>
+        {!isStudent && (
+          <div className="feature-page-header-actions">
+            <button
+              type="button"
+              className="books-btn books-btn-primary"
+              onClick={openAdd}
+            >
+              <Plus size={16} />
+              <span>Add Subject</span>
+            </button>
+          </div>
+        )}
       </div>
 
       {/* ── Alerts ── */}
@@ -440,10 +445,12 @@ export default function SubjectsPage() {
               <p style={{ fontSize: 15, marginBottom: 16 }}>
                 No subjects added yet.
               </p>
-              <button className="books-btn books-btn-primary" onClick={openAdd}>
-                <Plus size={16} />
-                <span>Add First Subject</span>
-              </button>
+              {!isStudent && (
+                <button className="books-btn books-btn-primary" onClick={openAdd}>
+                  <Plus size={16} />
+                  <span>Add First Subject</span>
+                </button>
+              )}
             </div>
           ) : filteredSubjects.length === 0 ? (
             <div style={{ textAlign: 'center', padding: '40px 24px', color: 'var(--text-secondary)' }}>
@@ -500,23 +507,27 @@ export default function SubjectsPage() {
                               >
                                 <Eye size={14} /><span className="action-label">View</span>
                               </button>
-                              <button
-                                type="button"
-                                className="action-btn edit-btn"
-                                title="Edit Subject"
-                                onClick={() => openEdit(sub)}
-                              >
-                                <Edit size={14} /><span className="action-label">Edit</span>
-                              </button>
-                              <button
-                                type="button"
-                                className="action-btn delete-btn"
-                                title="Delete Subject"
-                                onClick={() => handleDelete(sub)}
-                                disabled={deleting === sub.subjectId}
-                              >
-                                <Trash2 size={14} /><span className="action-label">{deleting === sub.subjectId ? 'Deleting...' : 'Delete'}</span>
-                              </button>
+                              {!isStudent && (
+                                <>
+                                  <button
+                                    type="button"
+                                    className="action-btn edit-btn"
+                                    title="Edit Subject"
+                                    onClick={() => openEdit(sub)}
+                                  >
+                                    <Edit size={14} /><span className="action-label">Edit</span>
+                                  </button>
+                                  <button
+                                    type="button"
+                                    className="action-btn delete-btn"
+                                    title="Delete Subject"
+                                    onClick={() => handleDelete(sub)}
+                                    disabled={deleting === sub.subjectId}
+                                  >
+                                    <Trash2 size={14} /><span className="action-label">{deleting === sub.subjectId ? 'Deleting...' : 'Delete'}</span>
+                                  </button>
+                                </>
+                              )}
                             </div>
                           </td>
                         </tr>
@@ -570,23 +581,27 @@ export default function SubjectsPage() {
                             >
                               <Eye size={14} /><span className="action-label">View</span>
                             </button>
-                            <button
-                              type="button"
-                              className="action-btn edit-btn"
-                              style={{ flex: 1, justifyContent: 'center' }}
-                              onClick={() => openEdit(sub)}
-                            >
-                              <Edit size={14} /><span className="action-label">Edit</span>
-                            </button>
-                            <button
-                              type="button"
-                              className="action-btn delete-btn"
-                              style={{ flex: 1, justifyContent: 'center' }}
-                              onClick={() => handleDelete(sub)}
-                              disabled={deleting === sub.subjectId}
-                            >
-                              <Trash2 size={14} /><span className="action-label">{deleting === sub.subjectId ? 'Deleting...' : 'Delete'}</span>
-                            </button>
+                            {!isStudent && (
+                              <>
+                                <button
+                                  type="button"
+                                  className="action-btn edit-btn"
+                                  style={{ flex: 1, justifyContent: 'center' }}
+                                  onClick={() => openEdit(sub)}
+                                >
+                                  <Edit size={14} /><span className="action-label">Edit</span>
+                                </button>
+                                <button
+                                  type="button"
+                                  className="action-btn delete-btn"
+                                  style={{ flex: 1, justifyContent: 'center' }}
+                                  onClick={() => handleDelete(sub)}
+                                  disabled={deleting === sub.subjectId}
+                                >
+                                  <Trash2 size={14} /><span className="action-label">{deleting === sub.subjectId ? 'Deleting...' : 'Delete'}</span>
+                                </button>
+                              </>
+                            )}
                           </div>
                         </div>
                       )}

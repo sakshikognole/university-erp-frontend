@@ -8,6 +8,7 @@ import ViewBookModal from './ViewBookModal';
 import Pagination from '../components/Pagination';
 import Alert from '../components/Alert';
 import ConfirmDialog from '../components/ConfirmDialog';
+import { useAuth } from '../context/AuthContext';
 
 const DEFAULT_PAGE = {
   pageNumber: 0, pageSize: 10, totalElements: 0,
@@ -15,7 +16,7 @@ const DEFAULT_PAGE = {
 };
 
 // ── Mobile accordion card — shown only on small screens via CSS ──────────────
-function BookMobileCard({ book, index, page, size, isExpanded, onToggle, onView, onEdit, onDel }) {
+function BookMobileCard({ book, index, page, size, isExpanded, onToggle, onView, onEdit, onDel, isStudent }) {
   return (
     <div className="book-mob-card">
       {/* Tap header to expand/collapse */}
@@ -58,8 +59,12 @@ function BookMobileCard({ book, index, page, size, isExpanded, onToggle, onView,
           </div>
           <div className="book-mob-actions">
             <button className="books-btn books-btn-sm books-btn-ghost"  onClick={() => onView(book)}><span style={{display:"inline-flex",alignItems:"center",gap:4}}><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>View</span></button>
-            <button className="books-btn books-btn-sm books-btn-warning" onClick={() => onEdit(book)}><span style={{display:"inline-flex",alignItems:"center",gap:4}}><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>Edit</span></button>
-            <button className="books-btn books-btn-sm books-btn-danger"  onClick={() => onDel(book)}><span style={{display:"inline-flex",alignItems:"center",gap:4}}><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>Delete</span></button>
+            {!isStudent && (
+              <>
+                <button className="books-btn books-btn-sm books-btn-warning" onClick={() => onEdit(book)}><span style={{display:"inline-flex",alignItems:"center",gap:4}}><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>Edit</span></button>
+                <button className="books-btn books-btn-sm books-btn-danger"  onClick={() => onDel(book)}><span style={{display:"inline-flex",alignItems:"center",gap:4}}><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>Delete</span></button>
+              </>
+            )}
           </div>
         </div>
       )}
@@ -68,6 +73,9 @@ function BookMobileCard({ book, index, page, size, isExpanded, onToggle, onView,
 }
 
 export default function BooksPage() {
+  const { user } = useAuth();
+  const isStudent = user?.role === 'STUDENT' || user?.adminType === 'STUDENT';
+
   const [books,    setBooks]    = useState([]);
   const [pageData, setPageData] = useState(DEFAULT_PAGE);
   const [search,   setSearch]   = useState('');
@@ -221,13 +229,15 @@ export default function BooksPage() {
       <div className="feature-page-header">
         <div className="feature-page-header-info">
           <h1 className="page-title">Books</h1>
-          <p className="page-subtitle">Manage all library books</p>
+          <p className="page-subtitle">{isStudent ? 'Browse library books catalog' : 'Manage all library books'}</p>
         </div>
-        <div className="feature-page-header-actions">
-          <button className="books-btn books-btn-primary" onClick={openAdd}>
-            + Add Book
-          </button>
-        </div>
+        {!isStudent && (
+          <div className="feature-page-header-actions">
+            <button className="books-btn books-btn-primary" onClick={openAdd}>
+              + Add Book
+            </button>
+          </div>
+        )}
       </div>
 
       <Alert type={alert.type} message={alert.message} onClose={dismiss} />
@@ -312,6 +322,7 @@ export default function BooksPage() {
                   onView={openView}
                   onEdit={openEdit}
                   onDel={openDel}
+                  isStudent={isStudent}
                 />
               ))}
             </div>
@@ -353,8 +364,12 @@ export default function BooksPage() {
                         <td>
                           <div className="books-actions">
                             <button className="books-btn books-btn-sm books-btn-ghost"   onClick={() => openView(b)} title="View"><span style={{display:"inline-flex",alignItems:"center",gap:4}}><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>View</span></button>
-                            <button className="books-btn books-btn-sm books-btn-warning" onClick={() => openEdit(b)} title="Edit"><span style={{display:"inline-flex",alignItems:"center",gap:4}}><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>Edit</span></button>
-                            <button className="books-btn books-btn-sm books-btn-danger"  onClick={() => openDel(b)}  title="Delete"><span style={{display:"inline-flex",alignItems:"center",gap:4}}><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>Delete</span></button>
+                            {!isStudent && (
+                              <>
+                                <button className="books-btn books-btn-sm books-btn-warning" onClick={() => openEdit(b)} title="Edit"><span style={{display:"inline-flex",alignItems:"center",gap:4}}><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>Edit</span></button>
+                                <button className="books-btn books-btn-sm books-btn-danger"  onClick={() => openDel(b)}  title="Delete"><span style={{display:"inline-flex",alignItems:"center",gap:4}}><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>Delete</span></button>
+                              </>
+                            )}
                           </div>
                         </td>
                       </tr>

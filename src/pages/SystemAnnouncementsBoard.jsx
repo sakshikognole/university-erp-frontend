@@ -116,15 +116,7 @@ const SystemAnnouncementsBoard = () => {
       document.body.appendChild(a); a.click();
       setTimeout(() => { document.body.removeChild(a); URL.revokeObjectURL(objectUrl); }, 150);
     } catch {
-      // Fallback: use an anchor tag instead of window.open to avoid mobile system popup
-      const a = document.createElement('a');
-      a.href = url;
-      a.target = '_blank';
-      a.rel = 'noopener noreferrer';
-      a.download = '';
-      document.body.appendChild(a);
-      a.click();
-      setTimeout(() => document.body.removeChild(a), 150);
+      window.open(url, '_blank', 'noopener,noreferrer');
     } finally {
       setViewDownloading(false);
     }
@@ -236,13 +228,12 @@ const SystemAnnouncementsBoard = () => {
       <div className="card table-card" style={{ marginTop: '1.25rem' }}>
         {/* Controls bar */}
         <div className="table-controls-bar">
-          <div className="search-box-wrapper" data-tooltip="Search announcements">
+          <div className="search-box-wrapper">
             <Search size={16} className="search-icon" />
             <input
               type="text"
               className="search-input"
               placeholder="Search by title..."
-              title="Search announcements"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
             />

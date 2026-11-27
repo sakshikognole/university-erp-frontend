@@ -7,9 +7,10 @@
  */
 
 // ---------------------------------------------------------------------------
-// PRN — only rejects special characters (spaces, @, #, $, %, etc.)
-// Accepts any combination of letters, digits, hyphens, underscores
-export const PRN_REGEX = /^[A-Za-z0-9_-]+$/;
+// PRN — alphanumeric only, at least 2 characters, no spaces or symbols.
+// Stored uppercased. Accepts letters, digits, one optional hyphen (e.g. PRN2024001, 2024001, PRN-001).
+// ---------------------------------------------------------------------------
+export const PRN_REGEX = /^[A-Za-z0-9]+(-[A-Za-z0-9]+)?$/;
 
 // ---------------------------------------------------------------------------
 // Name — letters (including accented / Unicode letters), spaces, hyphens,
@@ -93,9 +94,10 @@ export function validatePRN(raw) {
     return 'PRN is required.';
   }
   const prn = raw.trim();
+  if (prn.length < 2) return 'PRN must be at least 2 characters.';
   if (prn.length > 30) return 'PRN must not exceed 30 characters.';
   if (!PRN_REGEX.test(prn)) {
-    return 'PRN cannot contain spaces or special characters.';
+    return 'PRN may only contain letters, digits, and one hyphen (e.g. PRN001, PRN-2024).';
   }
   return '';
 }

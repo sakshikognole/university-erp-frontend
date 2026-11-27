@@ -1,4 +1,4 @@
-﻿import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   Briefcase, Plus, Download, Search, ChevronDown, FileText, FileSpreadsheet,
@@ -8,6 +8,7 @@ import {
 
 import AlumniJobFormModal from './AlumniJobForm';
 import ViewDetailModal from '../components/ViewDetailModal';
+import { useAuth } from '../context/AuthContext';
 const _IS_PROD = typeof window !== 'undefined' && window.location.hostname !== 'localhost';
 const API_BASE_URL = _IS_PROD ? 'https://university-erp-node.onrender.com/api' : 'http://localhost:5000/api';
 
@@ -87,7 +88,7 @@ const exportPDF = (rows, setFeedback) => {
     td{padding:5px 8px;border-bottom:1px solid #e5e5e5}
   </style></head><body>
     <h2>Alumni Job Postings</h2><p>Generated: ${new Date().toLocaleString()} &bull; Total: ${rows.length}</p>
-                    <th style={{ minWidth: '90px' }}>Role</th>
+    <table><thead><tr><th>#</th><th>Job ID</th><th>Alumni ID</th><th>Company</th><th>Role</th><th>Status</th><th>Expiry</th></tr></thead>
     <tbody>${rowsHtml}</tbody></table>
   </body></html>`;
   const w = window.open('', '_blank');
@@ -106,7 +107,7 @@ const STATUS_CLASSES = {
 };
 
 // Mobile accordion card for AlumniJobs
-function AjbMobCard({ j, num, fmtDate, isExpired, getJobStatus, STATUS_CLASSES, onView, onEdit, onDelete, expanded, onToggle }) {
+function AjbMobCard({ j, num, fmtDate, isExpired, getJobStatus, STATUS_CLASSES, onView, onEdit, onDelete, expanded, onToggle, isStudent }) {
   const status = getJobStatus(j);
   return (
     <div className="mob-card">
@@ -131,9 +132,13 @@ function AjbMobCard({ j, num, fmtDate, isExpired, getJobStatus, STATUS_CLASSES, 
           <div className="mob-card-row"><span className="mob-card-label">Expiry</span><span className="mob-card-value" style={{color: isExpired(j.dateOfExpiry) ? '#ef4444' : 'inherit'}}>{fmtDate(j.dateOfExpiry)}</span></div>
           {j.applicationLink && <div className="mob-card-row"><span className="mob-card-label">Apply</span><span className="mob-card-value"><a href={j.applicationLink} target="_blank" rel="noopener noreferrer">Link</a></span></div>}
           <div className="mob-card-actions">
-            <button type="button" className="action-btn view-btn" title="View" onClick={onView}><Eye size={14} /><span className="action-label">View</span></button>
-            <button type="button" className="action-btn edit-btn" title="Edit" onClick={onEdit}><Edit size={14} /><span className="action-label">Edit</span></button>
-            <button type="button" className="action-btn delete-btn" title="Delete" onClick={onDelete}><Trash2 size={14} /><span className="action-label">Delete</span></button>
+            <button type="button" className="action-btn view-btn" onClick={onView}><Eye size={14} /><span className="action-label">View</span></button>
+            {!isStudent && (
+              <>
+                <button type="button" className="action-btn edit-btn" onClick={onEdit}><Edit size={14} /><span className="action-label">Edit</span></button>
+                <button type="button" className="action-btn delete-btn" onClick={onDelete}><Trash2 size={14} /><span className="action-label">Delete</span></button>
+              </>
+            )}
           </div>
         </div>
       )}
@@ -142,6 +147,8 @@ function AjbMobCard({ j, num, fmtDate, isExpired, getJobStatus, STATUS_CLASSES, 
 }
 
 const AlumniJobs = () => {
+  const { user } = useAuth();
+  const isStudent = user?.role === 'STUDENT' || user?.adminType === 'STUDENT';
   const navigate = useNavigate();
   const [jobs, setJobs] = useState([]);
   const [viewJob, setViewJob] = useState(null);
@@ -296,9 +303,11 @@ const AlumniJobs = () => {
               </div>
             )}
           </div>
-          <button type="button" className="books-btn books-btn-primary" onClick={openAddModal}>
-            <Plus size={16} /><span>Add Job</span>
-          </button>
+          {!isStudent && (
+            <button type="button" className="books-btn books-btn-primary" onClick={openAddModal}>
+              <Plus size={16} /><span>Add Job</span>
+            </button>
+          )}
         </div>
       </div>
 
@@ -320,7 +329,6 @@ const AlumniJobs = () => {
               type="text"
               className="search-input"
               placeholder="Search by Job ID, Alumni ID, Company, or Role..."
-              title="Search alumni jobs"
               value={search}
               onChange={(e) => { setSearch(e.target.value); setCurrentPage(1); }}
             />
@@ -363,7 +371,7 @@ const AlumniJobs = () => {
                     ? 'No jobs matched your filters.'
                     : 'Get started by adding the first alumni job posting.'}
               </p>
-              {!loadError && !search && statusFilter === 'ALL' && (
+              {!loadError && !search && statusFilter === 'ALL' && !isStudent && (
                 <button
                   type="button"
                   className="books-btn books-btn-primary"
@@ -380,22 +388,22 @@ const AlumniJobs = () => {
               <table className="data-table">
                 <thead>
                   <tr>
-                    <th style={{ width: '40px' }}>#</th>
-                    <th style={{ width: '85px' }}>Job ID</th>
-                    <th style={{ width: '85px' }}>Alumni ID</th>
-                    <th style={{ width: '100px' }}>Company</th>
-                    <th style={{ minWidth: '90px' }}>Role</th>
-                    <th style={{ width: '75px' }}>Status</th>
-                    <th style={{ width: '70px' }}>Posted</th>
-                    <th style={{ width: '70px' }}>Expiry</th>
-                    <th style={{ width: '65px', textAlign: 'center' }}>Apply</th>
-                    <th style={{ width: '185px', textAlign: 'center' }}>Actions</th>
+                    <th style={{ width: '50px' }}>#</th>
+                    <th style={{ width: '110px' }}>Job ID</th>
+                    <th style={{ width: '110px' }}>Alumni ID</th>
+                    <th>Company</th>
+                    <th>Role</th>
+                    <th style={{ width: '100px' }}>Status</th>
+                    <th style={{ width: '120px' }}>Posted</th>
+                    <th style={{ width: '120px' }}>Expiry</th>
+                    <th style={{ width: '160px' }}>Application Link</th>
+                    <th style={{ width: '220px', textAlign: 'center' }}>Actions</th>
                   </tr>
                 </thead>
                 <tbody>
                   {current.map((j, i) => (
                     <tr key={j._id || j.jobId}>
-                      <td className="stu-num-cell">{startIndex + i + 1}</td>
+                      <td className="text-secondary">{startIndex + i + 1}</td>
                       <td><span className="code-badge">{j.jobId}</span></td>
                       <td><span className="code-badge">{j.alumniId}</span></td>
                       <td><span className="dept-name-cell">{j.company}</span></td>
@@ -447,22 +455,26 @@ const AlumniJobs = () => {
                           >
                             <Eye size={14} /><span className="action-label">View</span>
                           </button>
-                          <button
-                            type="button"
-                            className="action-btn edit-btn"
-                            title="Edit"
-                            onClick={() => openEditModal(j._id || j.jobId)}
-                          >
-                            <Edit size={14} /><span className="action-label">Edit</span>
-                          </button>
-                          <button
-                            type="button"
-                            className="action-btn delete-btn"
-                            title="Delete"
-                            onClick={() => setDeleteConfirm({ id: j._id || j.jobId, label: `${j.role} @ ${j.company}` })}
-                          >
-                            <Trash2 size={14} /><span className="action-label">Delete</span>
-                          </button>
+                          {!isStudent && (
+                            <>
+                              <button
+                                type="button"
+                                className="action-btn edit-btn"
+                                title="Edit"
+                                onClick={() => openEditModal(j._id || j.jobId)}
+                              >
+                                <Edit size={14} /><span className="action-label">Edit</span>
+                              </button>
+                              <button
+                                type="button"
+                                className="action-btn delete-btn"
+                                title="Delete"
+                                onClick={() => setDeleteConfirm({ id: j._id || j.jobId, label: `${j.role} @ ${j.company}` })}
+                              >
+                                <Trash2 size={14} /><span className="action-label">Delete</span>
+                              </button>
+                            </>
+                          )}
                         </div>
                       </td>
                     </tr>
@@ -486,6 +498,7 @@ const AlumniJobs = () => {
                     onDelete={() => setDeleteConfirm({ id: j._id || j.jobId, label: `${j.role} @ ${j.company}` })}
                     expanded={ajbExpanded === (j._id || j.jobId)}
                     onToggle={() => setAjbExpanded(prev => prev === (j._id || j.jobId) ? null : (j._id || j.jobId))}
+                    isStudent={isStudent}
                   />
                 ))}
               </div>
@@ -555,7 +568,7 @@ const AlumniJobs = () => {
             <div className="delete-dialog-header">
               <div className="delete-dialog-icon"><AlertTriangle size={22} /></div>
               <div className="delete-dialog-title-box">
-                <h3 className="delete-dialog-title">Delete</h3>
+                <h3 className="delete-dialog-title">Delete Job Posting</h3>
                 <p className="delete-dialog-desc">This will permanently remove the job posting.</p>
               </div>
               <button

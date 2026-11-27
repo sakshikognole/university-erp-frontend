@@ -506,7 +506,7 @@ const EventDetails = () => {
               ) : (
                 <>
                   <Trash2 size={16} />
-                  <span>Delete</span>
+                  <span>Delete Event</span>
                 </>
               )}
             </button>
@@ -587,7 +587,7 @@ const EventDetails = () => {
                 ) : (
                   <>
                     <Trash2 size={16} />
-                    <span>Delete</span>
+                    <span>Delete Event</span>
                   </>
                 )}
               </button>

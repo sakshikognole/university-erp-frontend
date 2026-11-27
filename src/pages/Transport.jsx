@@ -1,4 +1,4 @@
-﻿/**
+/**
  * Transport.jsx
  *
  * Defects fixed:
@@ -23,11 +23,12 @@ import {
   ChevronDown,
 } from 'lucide-react';
 import ViewDetailModal from '../components/ViewDetailModal';
+import { useAuth } from '../context/AuthContext';
 const _IS_PROD = typeof window !== 'undefined' && window.location.hostname !== 'localhost';
 const API_BASE_URL = _IS_PROD ? 'https://university-erp-node.onrender.com/api' : 'http://localhost:5000/api';
 
 // Mobile accordion card for Transport
-function TrnMobCard({ item, tab, num, openModal, setDeleteConfirm, onView, expanded, onToggle }) {
+function TrnMobCard({ item, tab, num, openModal, setDeleteConfirm, onView, expanded, onToggle, isStudent }) {
   const fmtDate = (d) => {
     if (!d) return '—';
     try { return new Date(d).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' }); }
@@ -53,6 +54,7 @@ function TrnMobCard({ item, tab, num, openModal, setDeleteConfirm, onView, expan
             <div className="mob-card-row"><span className="mob-card-label">Route ID</span><span className="mob-card-value mono">{item.routeId}</span></div>
             <div className="mob-card-row"><span className="mob-card-label">Driver</span><span className="mob-card-value">{item.driverName || '—'}</span></div>
             <div className="mob-card-row"><span className="mob-card-label">Vehicle</span><span className="mob-card-value">{item.vehicleName || '—'}</span></div>
+            <div className="mob-card-row"><span className="mob-card-label">Fee</span><span className="mob-card-value" style={{ fontWeight: 600, color: '#0f766e' }}>{item.fee != null && item.fee !== '' ? `₹${Number(item.fee).toLocaleString('en-IN')}` : '—'}</span></div>
             <div className="mob-card-row"><span className="mob-card-label">Stops</span><span className="mob-card-value">{(item.stops||[]).join(', ') || '—'}</span></div>
           </>}
           {tab === 'drivers' && <>
@@ -76,9 +78,13 @@ function TrnMobCard({ item, tab, num, openModal, setDeleteConfirm, onView, expan
             <div className="mob-card-row"><span className="mob-card-label">Valid till</span><span className="mob-card-value">{fmtDate(item.validTill)}</span></div>
           </>}
           <div className="mob-card-actions">
-            <button type="button" className="action-btn view-btn" title="View" onClick={onView}><Eye size={14} /><span className="action-label">View</span></button>
-            <button type="button" className="action-btn edit-btn" title="Edit" onClick={() => openModal(tab === 'passes' ? 'pass' : tab === 'routes' ? 'route' : tab === 'drivers' ? 'driver' : 'vehicle', item._id || (tab === 'routes' ? item.routeId : tab === 'drivers' ? item.driverId : tab === 'vehicles' ? item.vehicleId : item.passId))}><Edit size={14} /><span className="action-label">Edit</span></button>
-            <button type="button" className="action-btn delete-btn" title="Delete" onClick={() => setDeleteConfirm({ type: tab === 'passes' ? 'pass' : tab === 'routes' ? 'route' : tab === 'drivers' ? 'driver' : 'vehicle', item })}><Trash2 size={14} /><span className="action-label">Delete</span></button>
+            <button type="button" className="action-btn view-btn" onClick={onView}><Eye size={14} /><span className="action-label">View</span></button>
+            {!isStudent && (
+              <>
+                <button type="button" className="action-btn edit-btn" onClick={() => openModal(tab === 'passes' ? 'pass' : tab === 'routes' ? 'route' : tab === 'drivers' ? 'driver' : 'vehicle', item._id || (tab === 'routes' ? item.routeId : tab === 'drivers' ? item.driverId : tab === 'vehicles' ? item.vehicleId : item.passId))}><Edit size={14} /><span className="action-label">Edit</span></button>
+                <button type="button" className="action-btn delete-btn" onClick={() => setDeleteConfirm({ type: tab === 'passes' ? 'pass' : tab === 'routes' ? 'route' : tab === 'drivers' ? 'driver' : 'vehicle', item })}><Trash2 size={14} /><span className="action-label">Delete</span></button>
+              </>
+            )}
           </div>
         </div>
       )}
@@ -87,6 +93,8 @@ function TrnMobCard({ item, tab, num, openModal, setDeleteConfirm, onView, expan
 }
 
 const Transport = () => {
+  const { user } = useAuth();
+  const isStudent = user?.role === 'STUDENT' || user?.adminType === 'STUDENT';
   const navigate = useNavigate();
 
   const [activeTab, setActiveTab] = useState('routes');
@@ -275,7 +283,7 @@ const Transport = () => {
   });
 
   return (
-    <div className="page-container transport-page">
+    <div className="page-container">
       {/* D6: transport-header-actions keeps buttons compact + one row on mobile */}
       <div className="page-header-row">
         <div>
@@ -283,56 +291,60 @@ const Transport = () => {
           <p className="page-subtitle">Manage campus bus routes, drivers, vehicles, and student passes</p>
         </div>
         {/* Desktop: 4 individual buttons — hidden on mobile */}
-        <div className="header-actions-group transport-header-actions trn-header-desktop">
-          <button type="button" className="btn btn-secondary" onClick={() => openModal('driver')}>
-            <UserCheck size={15} /><span>Add Driver</span>
-          </button>
-          <button type="button" className="btn btn-secondary" onClick={() => openModal('vehicle')}>
-            <Truck size={15} /><span>Add Vehicle</span>
-          </button>
-          <button type="button" className="btn btn-secondary" onClick={() => openModal('pass')}>
-            <Ticket size={15} /><span>Add Bus Pass</span>
-          </button>
-          <button type="button" className="books-btn books-btn-primary" onClick={() => openModal('route')}>
-            <Plus size={15} /><span>Add Bus Route</span>
-          </button>
-        </div>
-
-        {/* Mobile: single dropdown button — hidden on desktop */}
-        <div className="download-dropdown-wrapper trn-header-mobile" ref={addMenuRef}>
-          <button
-            type="button"
-            className="books-btn books-btn-primary"
-            onClick={() => setShowAddMenu(!showAddMenu)}
-            title="Add new transport record"
-          >
-            <Plus size={16} />
-            <span>Add New</span>
-            <ChevronDown size={14} />
-          </button>
-
-          {showAddMenu && (
-            <div className="download-dropdown-menu">
-              <div className="dropdown-menu-header">Select Record Type</div>
-              <button type="button" className="dropdown-menu-item"
-                onClick={() => { setShowAddMenu(false); openModal('route'); }}>
-                <Bus size={15} /><span>Add Bus Route</span>
-              </button>
-              <button type="button" className="dropdown-menu-item"
-                onClick={() => { setShowAddMenu(false); openModal('driver'); }}>
+        {!isStudent && (
+          <>
+            <div className="header-actions-group transport-header-actions trn-header-desktop">
+              <button type="button" className="btn btn-secondary" onClick={() => openModal('driver')}>
                 <UserCheck size={15} /><span>Add Driver</span>
               </button>
-              <button type="button" className="dropdown-menu-item"
-                onClick={() => { setShowAddMenu(false); openModal('vehicle'); }}>
+              <button type="button" className="btn btn-secondary" onClick={() => openModal('vehicle')}>
                 <Truck size={15} /><span>Add Vehicle</span>
               </button>
-              <button type="button" className="dropdown-menu-item"
-                onClick={() => { setShowAddMenu(false); openModal('pass'); }}>
+              <button type="button" className="btn btn-secondary" onClick={() => openModal('pass')}>
                 <Ticket size={15} /><span>Add Bus Pass</span>
               </button>
+              <button type="button" className="books-btn books-btn-primary" onClick={() => openModal('route')}>
+                <Plus size={15} /><span>Add Bus Route</span>
+              </button>
             </div>
-          )}
-        </div>
+
+            {/* Mobile: single dropdown button — hidden on desktop */}
+            <div className="download-dropdown-wrapper trn-header-mobile" ref={addMenuRef}>
+              <button
+                type="button"
+                className="books-btn books-btn-primary"
+                onClick={() => setShowAddMenu(!showAddMenu)}
+                title="Add new transport record"
+              >
+                <Plus size={16} />
+                <span>Add New</span>
+                <ChevronDown size={14} />
+              </button>
+
+              {showAddMenu && (
+                <div className="download-dropdown-menu">
+                  <div className="dropdown-menu-header">Select Record Type</div>
+                  <button type="button" className="dropdown-menu-item"
+                    onClick={() => { setShowAddMenu(false); openModal('route'); }}>
+                    <Bus size={15} /><span>Add Bus Route</span>
+                  </button>
+                  <button type="button" className="dropdown-menu-item"
+                    onClick={() => { setShowAddMenu(false); openModal('driver'); }}>
+                    <UserCheck size={15} /><span>Add Driver</span>
+                  </button>
+                  <button type="button" className="dropdown-menu-item"
+                    onClick={() => { setShowAddMenu(false); openModal('vehicle'); }}>
+                    <Truck size={15} /><span>Add Vehicle</span>
+                  </button>
+                  <button type="button" className="dropdown-menu-item"
+                    onClick={() => { setShowAddMenu(false); openModal('pass'); }}>
+                    <Ticket size={15} /><span>Add Bus Pass</span>
+                  </button>
+                </div>
+              )}
+            </div>
+          </>
+        )}
       </div>
 
       {feedback.message && (
@@ -367,7 +379,7 @@ const Transport = () => {
         <div className="table-controls-bar">
           <div className="search-box-wrapper">
             <Search size={16} className="search-icon" />
-            <input type="text" className="search-input" title="Search transport records"
+            <input type="text" className="search-input"
               placeholder={
                 activeTab === 'routes'  ? 'Search by Route ID, Name, Driver, Vehicle, or Stop...' :
                 activeTab === 'drivers' ? 'Search by Driver ID, Name, Phone...' :
@@ -415,19 +427,20 @@ const Transport = () => {
                 <table className="data-table transport-table">
                   <thead>
                     <tr>
-                       <th style={{ width: '32px' }}>#</th>
-                       <th style={{ width: '95px' }}>Route ID</th>
-                       <th style={{ width: '140px' }}>Route Name</th>
-                       <th style={{ width: '130px' }}>Driver Name</th>
-                       <th style={{ width: '130px' }}>Vehicle Name</th>
+                      <th style={{ width: '50px' }}>#</th>
+                      <th style={{ width: '110px' }}>Route ID</th>
+                      <th style={{ width: '170px' }}>Route Name</th>
+                      <th style={{ width: '155px' }}>Driver Name</th>
+                      <th style={{ width: '155px' }}>Vehicle Name</th>
+                      <th style={{ width: '110px' }}>Fee (₹)</th>
                       <th>Stops</th>
-                       <th style={{ width: '155px', textAlign: 'center' }}>Actions</th>
+                      <th style={{ width: '130px', textAlign: 'center' }}>Actions</th>
                     </tr>
                   </thead>
                   <tbody>
                     {paginatedData.map((route, i) => (
                       <tr key={route._id || route.routeId}>
-                         <td className="stu-num-cell">{startIndex + i + 1}</td>
+                        <td className="text-secondary">{startIndex + i + 1}</td>
                         <td><span className="code-badge">Route #{route.routeId}</span></td>
                         <td><span className="dept-name-cell">{route.routeName || '—'}</span></td>
                         <td>
@@ -441,6 +454,11 @@ const Transport = () => {
                             <Truck size={14} style={{ color: 'var(--text-secondary)' }} />
                             <span>{route.vehicleName}</span>
                           </div>
+                        </td>
+                        <td>
+                          <span style={{ fontWeight: 600, color: '#0f766e' }}>
+                            {route.fee != null && route.fee !== '' ? `₹${Number(route.fee).toLocaleString('en-IN')}` : '—'}
+                          </span>
                         </td>
                         <td>
                           {route.stops && route.stops.length > 0 ? (
@@ -458,12 +476,16 @@ const Transport = () => {
                             <button type="button" className="action-btn view-btn" title="View" onClick={() => setViewItem({ type: 'route', data: route })}>
                               <Eye size={14} /><span className="action-label">View</span>
                             </button>
-                            <button type="button" className="action-btn edit-btn" title="Edit" onClick={() => openModal('route', route._id || route.routeId)}>
-                              <Edit size={14} /><span className="action-label">Edit</span>
-                            </button>
-                            <button type="button" className="action-btn delete-btn" title="Delete" onClick={() => setDeleteConfirm({ type: 'route', item: route })}>
-                              <Trash2 size={14} /><span className="action-label">Delete</span>
-                            </button>
+                            {!isStudent && (
+                              <>
+                                <button type="button" className="action-btn edit-btn" title="Edit" onClick={() => openModal('route', route._id || route.routeId)}>
+                                  <Edit size={14} /><span className="action-label">Edit</span>
+                                </button>
+                                <button type="button" className="action-btn delete-btn" title="Delete" onClick={() => setDeleteConfirm({ type: 'route', item: route })}>
+                                  <Trash2 size={14} /><span className="action-label">Delete</span>
+                                </button>
+                              </>
+                            )}
                           </div>
                         </td>
                       </tr>
@@ -476,7 +498,7 @@ const Transport = () => {
                 <table className="data-table transport-table">
                   <thead>
                     <tr>
-                       <th style={{ width: '32px' }}>#</th>
+                      <th style={{ width: '50px' }}>#</th>
                       <th style={{ width: '110px' }}>Driver ID</th>
                       <th>Driver Name</th>
                       <th>Phone</th>
@@ -488,7 +510,7 @@ const Transport = () => {
                   <tbody>
                     {paginatedData.map((driver, i) => (
                       <tr key={driver._id || driver.driverId}>
-                         <td className="stu-num-cell">{startIndex + i + 1}</td>
+                        <td className="text-secondary">{startIndex + i + 1}</td>
                         <td><span className="code-badge">{driver.driverId}</span></td>
                         <td><span className="dept-name-cell">{driver.name}</span></td>
                         <td>{driver.phone || '—'}</td>
@@ -503,12 +525,16 @@ const Transport = () => {
                             <button type="button" className="action-btn view-btn" title="View" onClick={() => setViewItem({ type: 'driver', data: driver })}>
                               <Eye size={14} /><span className="action-label">View</span>
                             </button>
-                            <button type="button" className="action-btn edit-btn" title="Edit" onClick={() => openModal('driver', driver._id || driver.driverId)}>
-                              <Edit size={14} /><span className="action-label">Edit</span>
-                            </button>
-                            <button type="button" className="action-btn delete-btn" title="Delete" onClick={() => setDeleteConfirm({ type: 'driver', item: driver })}>
-                              <Trash2 size={14} /><span className="action-label">Delete</span>
-                            </button>
+                            {!isStudent && (
+                              <>
+                                <button type="button" className="action-btn edit-btn" title="Edit" onClick={() => openModal('driver', driver._id || driver.driverId)}>
+                                  <Edit size={14} /><span className="action-label">Edit</span>
+                                </button>
+                                <button type="button" className="action-btn delete-btn" title="Delete" onClick={() => setDeleteConfirm({ type: 'driver', item: driver })}>
+                                  <Trash2 size={14} /><span className="action-label">Delete</span>
+                                </button>
+                              </>
+                            )}
                           </div>
                         </td>
                       </tr>
@@ -522,7 +548,7 @@ const Transport = () => {
                 <table className="data-table transport-table">
                   <thead>
                     <tr>
-                       <th style={{ width: '32px' }}>#</th>
+                      <th style={{ width: '50px' }}>#</th>
                       <th style={{ width: '120px' }}>Vehicle ID</th>
                       <th>Vehicle Name</th>
                       <th>Registration / Plate</th>
@@ -534,7 +560,7 @@ const Transport = () => {
                   <tbody>
                     {paginatedData.map((vehicle, i) => (
                       <tr key={vehicle._id || vehicle.vehicleId}>
-                         <td className="stu-num-cell">{startIndex + i + 1}</td>
+                        <td className="text-secondary">{startIndex + i + 1}</td>
                         <td><span className="code-badge">{vehicle.vehicleId}</span></td>
                         <td><span className="dept-name-cell">{vehicle.name}</span></td>
                         <td>{vehicle.vehicleNumber || '—'}</td>
@@ -549,12 +575,16 @@ const Transport = () => {
                             <button type="button" className="action-btn view-btn" title="View" onClick={() => setViewItem({ type: 'vehicle', data: vehicle })}>
                               <Eye size={14} /><span className="action-label">View</span>
                             </button>
-                            <button type="button" className="action-btn edit-btn" title="Edit" onClick={() => openModal('vehicle', vehicle._id || vehicle.vehicleId)}>
-                              <Edit size={14} /><span className="action-label">Edit</span>
-                            </button>
-                            <button type="button" className="action-btn delete-btn" title="Delete" onClick={() => setDeleteConfirm({ type: 'vehicle', item: vehicle })}>
-                              <Trash2 size={14} /><span className="action-label">Delete</span>
-                            </button>
+                            {!isStudent && (
+                              <>
+                                <button type="button" className="action-btn edit-btn" title="Edit" onClick={() => openModal('vehicle', vehicle._id || vehicle.vehicleId)}>
+                                  <Edit size={14} /><span className="action-label">Edit</span>
+                                </button>
+                                <button type="button" className="action-btn delete-btn" title="Delete" onClick={() => setDeleteConfirm({ type: 'vehicle', item: vehicle })}>
+                                  <Trash2 size={14} /><span className="action-label">Delete</span>
+                                </button>
+                              </>
+                            )}
                           </div>
                         </td>
                       </tr>
@@ -567,21 +597,21 @@ const Transport = () => {
                 <table className="data-table transport-table">
                   <thead>
                     <tr>
-                       <th style={{ width: '32px' }}>#</th>
-                       <th style={{ width: '75px' }}>Pass ID</th>
-                       <th style={{ width: '95px' }}>Student ID</th>
-                       <th style={{ width: '100px' }}>Student Name</th>
-                       <th style={{ width: '70px' }}>Route ID</th>
-                       <th style={{ width: '145px' }}>Stops (From → To)</th>
-                       <th style={{ width: '68px' }}>Payment</th>
-                       <th style={{ width: '72px' }}>Valid Till</th>
-                       <th style={{ width: '140px', textAlign: 'center' }}>Actions</th>
+                      <th style={{ width: '50px' }}>#</th>
+                      <th style={{ width: '110px' }}>Pass ID</th>
+                      <th style={{ width: '120px' }}>Student ID</th>
+                      <th>Student Name</th>
+                      <th style={{ width: '100px' }}>Route ID</th>
+                      <th>Stops (From → To)</th>
+                      <th style={{ width: '110px' }}>Payment</th>
+                      <th style={{ width: '110px' }}>Valid Till</th>
+                      <th style={{ width: '220px', textAlign: 'center' }}>Actions</th>
                     </tr>
                   </thead>
                   <tbody>
                     {paginatedData.map((pass, i) => (
                       <tr key={pass._id || pass.passId}>
-                         <td className="stu-num-cell">{startIndex + i + 1}</td>
+                        <td className="text-secondary">{startIndex + i + 1}</td>
                         <td><span className="code-badge">{pass.passId}</span></td>
                         <td>{pass.studentId}</td>
                         <td>{pass.studentName || '—'}</td>
@@ -602,12 +632,16 @@ const Transport = () => {
                             <button type="button" className="action-btn view-btn" title="View" onClick={() => setViewItem({ type: 'pass', data: pass })}>
                               <Eye size={14} /><span className="action-label">View</span>
                             </button>
-                            <button type="button" className="action-btn edit-btn" title="Edit" onClick={() => openModal('pass', pass._id || pass.passId)}>
-                              <Edit size={14} /><span className="action-label">Edit</span>
-                            </button>
-                            <button type="button" className="action-btn delete-btn" title="Delete" onClick={() => setDeleteConfirm({ type: 'pass', item: pass })}>
-                              <Trash2 size={14} /><span className="action-label">Delete</span>
-                            </button>
+                            {!isStudent && (
+                              <>
+                                <button type="button" className="action-btn edit-btn" title="Edit" onClick={() => openModal('pass', pass._id || pass.passId)}>
+                                  <Edit size={14} /><span className="action-label">Edit</span>
+                                </button>
+                                <button type="button" className="action-btn delete-btn" title="Delete" onClick={() => setDeleteConfirm({ type: 'pass', item: pass })}>
+                                  <Trash2 size={14} /><span className="action-label">Delete</span>
+                                </button>
+                              </>
+                            )}
                           </div>
                         </td>
                       </tr>
@@ -631,6 +665,7 @@ const Transport = () => {
                       onView={() => setViewItem({ type: activeTab === 'passes' ? 'pass' : activeTab === 'routes' ? 'route' : activeTab === 'drivers' ? 'driver' : 'vehicle', data: item })}
                       expanded={trnExpanded === id}
                       onToggle={() => setTrnExpanded(p => p === id ? null : id)}
+                      isStudent={isStudent}
                     />
                   );
                 })}
@@ -679,7 +714,9 @@ const Transport = () => {
             <div className="delete-dialog-header">
               <div className="delete-dialog-icon"><AlertTriangle size={22} /></div>
               <div className="delete-dialog-title-box">
-                <h3 className="delete-dialog-title">Delete</h3>
+                <h3 className="delete-dialog-title">
+                  Delete {deleteConfirm.type === 'route' ? 'Bus Route' : deleteConfirm.type === 'driver' ? 'Driver' : deleteConfirm.type === 'vehicle' ? 'Vehicle' : 'Bus Pass'}
+                </h3>
                 <p className="delete-dialog-desc">This will permanently remove the record.</p>
               </div>
               <button type="button" className="close-modal-btn" onClick={() => !deleting && setDeleteConfirm(null)} disabled={deleting}><X size={18} /></button>
@@ -742,6 +779,7 @@ const Transport = () => {
             { label: 'Route Name', value: viewItem.data.routeName },
             { label: 'Driver', value: viewItem.data.driverName },
             { label: 'Vehicle', value: viewItem.data.vehicleName },
+            { label: 'Route Fee', value: viewItem.data.fee != null && viewItem.data.fee !== '' ? `₹${Number(viewItem.data.fee).toLocaleString('en-IN')}` : '—' },
             { label: 'Stops', value: Array.isArray(viewItem.data.stops) ? viewItem.data.stops.join(', ') : 'None' },
           ] :
           viewItem?.type === 'driver' ? [

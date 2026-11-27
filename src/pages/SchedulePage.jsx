@@ -4,6 +4,7 @@ import { springApi, springGet } from '../services/api';
 import PageError from '../components/PageError';
 import ViewDetailModal from '../components/ViewDetailModal';
 import ConfirmDialog from '../components/ConfirmDialog';
+import { useAuth } from '../context/AuthContext';
 
 // URL helpers
 const onLocalhost = window.location.hostname === 'localhost';
@@ -557,7 +558,7 @@ function ClassScheduleModal({ isOpen, mode = 'add', schedule = null, onSave, onC
 }
 
 // Schedule Mobile Card (accordion — same pattern as BookMobileCard)
-function ScheduleMobileCard({ sch, index, activeTab, isExpanded, onToggle, onView, onEdit, onDelete, deleting }) {
+function ScheduleMobileCard({ sch, index, activeTab, isExpanded, onToggle, onView, onEdit, onDelete, deleting, isStudent }) {
   const isExam = activeTab === 'exam';
 
   // Header title and subtitle
@@ -666,32 +667,36 @@ function ScheduleMobileCard({ sch, index, activeTab, isExpanded, onToggle, onVie
                 View
               </span>
             </button>
-            <button className="books-btn books-btn-sm books-btn-warning" onClick={() => onEdit(sch)}>
-              <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}>
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
-                  <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
-                </svg>
-                Edit
-              </span>
-            </button>
-            <button
-              className="books-btn books-btn-sm books-btn-danger"
-              onClick={() => onDelete(sch)}
-              disabled={deleting === sch.scheduleId}
-            >
-              {deleting === sch.scheduleId ? '...' : (
-                <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}>
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <polyline points="3 6 5 6 21 6"/>
-                    <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/>
-                    <path d="M10 11v6"/><path d="M14 11v6"/>
-                    <path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/>
-                  </svg>
-                  Delete
-                </span>
-              )}
-            </button>
+            {!isStudent && (
+              <>
+                <button className="books-btn books-btn-sm books-btn-warning" onClick={() => onEdit(sch)}>
+                  <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}>
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+                      <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+                    </svg>
+                    Edit
+                  </span>
+                </button>
+                <button
+                  className="books-btn books-btn-sm books-btn-danger"
+                  onClick={() => onDelete(sch)}
+                  disabled={deleting === sch.scheduleId}
+                >
+                  {deleting === sch.scheduleId ? '...' : (
+                    <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}>
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <polyline points="3 6 5 6 21 6"/>
+                        <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/>
+                        <path d="M10 11v6"/><path d="M14 11v6"/>
+                        <path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/>
+                      </svg>
+                      Delete
+                    </span>
+                  )}
+                </button>
+              </>
+            )}
           </div>
         </div>
       )}
@@ -701,6 +706,8 @@ function ScheduleMobileCard({ sch, index, activeTab, isExpanded, onToggle, onVie
 
 // Main Page
 export default function SchedulePage() {
+  const { user } = useAuth();
+  const isStudent = user?.role === 'STUDENT' || user?.adminType === 'STUDENT';
   const [activeTab, setActiveTab] = useState('exam'); // 'exam' or 'schedule'
   const [schedules, setSchedules] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -866,18 +873,20 @@ export default function SchedulePage() {
       <div className="feature-page-header">
         <div className="feature-page-header-info">
           <h1 className="page-title">Schedule</h1>
-          <p className="page-subtitle">Manage exam and class schedules</p>
+          <p className="page-subtitle">{isStudent ? 'View exam and class schedules' : 'Manage exam and class schedules'}</p>
         </div>
-        <div className="feature-page-header-actions">
-          <button className="books-btn books-btn-primary" onClick={openExamAdd}>
-            <span className="desk-only-text">+ Add Exam Schedule</span>
-            <span className="mob-only-text">+ Add Exam</span>
-          </button>
-          <button className="books-btn books-btn-primary" onClick={openClassAdd}>
-            <span className="desk-only-text">+ Add Class Schedule</span>
-            <span className="mob-only-text">+ Add Class</span>
-          </button>
-        </div>
+        {!isStudent && (
+          <div className="feature-page-header-actions">
+            <button className="books-btn books-btn-primary" onClick={openExamAdd}>
+              <span className="desk-only-text">+ Add Exam Schedule</span>
+              <span className="mob-only-text">+ Add Exam</span>
+            </button>
+            <button className="books-btn books-btn-primary" onClick={openClassAdd}>
+              <span className="desk-only-text">+ Add Class Schedule</span>
+              <span className="mob-only-text">+ Add Class</span>
+            </button>
+          </div>
+        )}
       </div>
 
       {/* Tabs */}
@@ -944,12 +953,14 @@ export default function SchedulePage() {
           <p style={{ fontSize: 15, marginBottom: 16 }}>
             {activeTab === 'exam' ? 'No exam schedules yet.' : 'No class schedules yet.'}
           </p>
-          <button
-            className="books-btn books-btn-primary"
-            onClick={() => activeTab === 'exam' ? openExamAdd() : openClassAdd()}
-          >
-            + Add {activeTab === 'exam' ? 'Exam Schedule' : 'Class Schedule'}
-          </button>
+          {!isStudent && (
+            <button
+              className="books-btn books-btn-primary"
+              onClick={() => activeTab === 'exam' ? openExamAdd() : openClassAdd()}
+            >
+              + Add {activeTab === 'exam' ? 'Exam Schedule' : 'Class Schedule'}
+            </button>
+          )}
         </div>
       ) : (
         <div className="card table-card" style={{ padding: '1rem', marginTop: '1.25rem' }}>
@@ -1108,51 +1119,55 @@ export default function SchedulePage() {
                             View
                           </span>
                         </button>
-                        {activeTab === 'exam' ? (
-                          <button
-                            type="button"
-                            className="books-btn books-btn-sm books-btn-warning"
-                            onClick={() => openExamEdit(sch)}
-                            title="Edit"
-                          >
-                            <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}>
-                              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                                <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
-                              </svg>
-                              Edit
-                            </span>
-                          </button>
-                        ) : (
-                          <button
-                            type="button"
-                            className="books-btn books-btn-sm books-btn-warning"
-                            onClick={() => openClassEdit(sch)}
-                            title="Edit"
-                          >
-                            <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}>
-                              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                                <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
-                              </svg>
-                              Edit
-                            </span>
-                          </button>
+                        {!isStudent && (
+                          <>
+                            {activeTab === 'exam' ? (
+                              <button
+                                type="button"
+                                className="books-btn books-btn-sm books-btn-warning"
+                                onClick={() => openExamEdit(sch)}
+                                title="Edit"
+                              >
+                                <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}>
+                                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                    <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+                                  </svg>
+                                  Edit
+                                </span>
+                              </button>
+                            ) : (
+                              <button
+                                type="button"
+                                className="books-btn books-btn-sm books-btn-warning"
+                                onClick={() => openClassEdit(sch)}
+                                title="Edit"
+                              >
+                                <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}>
+                                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                    <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+                                  </svg>
+                                  Edit
+                                </span>
+                              </button>
+                            )}
+                            <button
+                              type="button"
+                              className="books-btn books-btn-sm books-btn-danger"
+                              onClick={() => handleDelete(sch)}
+                              disabled={deleting === sch.scheduleId}
+                              title="Delete"
+                            >
+                              {deleting === sch.scheduleId ? '...' : (
+                                <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}>
+                                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                    <polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/>
+                                  </svg>
+                                  Delete
+                                </span>
+                              )}
+                            </button>
+                          </>
                         )}
-                        <button
-                          type="button"
-                          className="books-btn books-btn-sm books-btn-danger"
-                          onClick={() => handleDelete(sch)}
-                          disabled={deleting === sch.scheduleId}
-                          title="Delete"
-                        >
-                          {deleting === sch.scheduleId ? '...' : (
-                            <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}>
-                              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                                <polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/>
-                              </svg>
-                              Delete
-                            </span>
-                          )}
-                        </button>
                       </div>
                     </td>
                   </tr>
@@ -1176,6 +1191,7 @@ export default function SchedulePage() {
                 onEdit={() => activeTab === 'exam' ? openExamEdit(sch) : openClassEdit(sch)}
                 onDelete={handleDelete}
                 deleting={deleting}
+                isStudent={isStudent}
               />
             ))}
           </div>

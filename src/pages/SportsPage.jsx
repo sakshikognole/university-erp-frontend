@@ -1,16 +1,20 @@
 import { useState, useEffect, useCallback } from 'react';
-import { Eye, Edit, Trash2 } from 'lucide-react';
+import { Eye, Edit, Trash2, Sparkles } from 'lucide-react';
 import { springApi, springGet } from '../services/api';
 import PageLoader from '../components/PageLoader';
 import PageError  from '../components/PageError';
 import SportModal from './SportModal';
 import ViewSportModal from './ViewSportModal';
 import ConfirmDialog from '../components/ConfirmDialog';
+import { useAuth } from '../context/AuthContext';
 
 const _IS_PROD_SP = window.location.hostname !== 'localhost';
 const NODE_API = _IS_PROD_SP ? 'https://university-erp-node.onrender.com/api' : 'http://localhost:5000/api';
 
 export default function SportsPage() {
+  const { user } = useAuth();
+  const isStudent = user?.role === 'STUDENT' || user?.adminType === 'STUDENT';
+
   const [sports,     setSports]     = useState([]);
   const [venues,     setVenues]     = useState([]);
   const [loading,    setLoading]    = useState(true);
@@ -26,6 +30,28 @@ export default function SportsPage() {
   const [success,    setSuccess]    = useState('');
   const [error,      setError]      = useState('');
   const [dupError,   setDupError]   = useState(''); // shown inside modal
+
+  const [interestedSports, setInterestedSports] = useState(() => {
+    try {
+      const saved = localStorage.getItem('erp_interested_sports');
+      return saved ? JSON.parse(saved) : {};
+    } catch { return {}; }
+  });
+
+  const handleToggleInterest = (sport) => {
+    const sportKey = sport.sportId;
+    const isNowInterested = !interestedSports[sportKey];
+    const updated = { ...interestedSports, [sportKey]: isNowInterested };
+    setInterestedSports(updated);
+    try {
+      localStorage.setItem('erp_interested_sports', JSON.stringify(updated));
+    } catch {}
+    if (isNowInterested) {
+      setSuccess(`Interest submitted for "${sport.sportName}"! The sports coordinator has been notified.`);
+    } else {
+      setSuccess(`Interest withdrawn for "${sport.sportName}".`);
+    }
+  };
 
   // silent=true means refresh without showing loading spinner (no flicker)
   const load = useCallback(async (silent = false) => {
@@ -132,13 +158,15 @@ export default function SportsPage() {
       <div className="feature-page-header">
         <div className="feature-page-header-info">
           <h1 className="page-title">Sports</h1>
-          <p className="page-subtitle">Manage all university sports</p>
+          <p className="page-subtitle">{isStudent ? 'Explore university sports and activities' : 'Manage all university sports'}</p>
         </div>
-        <div className="feature-page-header-actions">
-          <button className="books-btn books-btn-primary" onClick={openAdd}>
-            + Add Sport
-          </button>
-        </div>
+        {!isStudent && (
+          <div className="feature-page-header-actions">
+            <button className="books-btn books-btn-primary" onClick={openAdd}>
+              + Add Sport
+            </button>
+          </div>
+        )}
       </div>
 
       {/* Notifications */}
@@ -217,23 +245,39 @@ export default function SportsPage() {
                 >
                   <Eye size={14} /><span className="action-label">View</span>
                 </button>
-                <button
-                  type="button"
-                  className="action-btn edit-btn"
-                  title="Edit Sport"
-                  onClick={() => openEdit(sport)}
-                >
-                  <Edit size={14} /><span className="action-label">Edit</span>
-                </button>
-                <button
-                  type="button"
-                  className="action-btn delete-btn"
-                  title="Delete Sport"
-                  onClick={() => handleDelete(sport)}
-                  disabled={deleting === sport.sportId}
-                >
-                  <Trash2 size={14} /><span className="action-label">{deleting === sport.sportId ? 'Deleting...' : 'Delete'}</span>
-                </button>
+                {isStudent ? (
+                  <button
+                    type="button"
+                    className={`action-btn ${interestedSports[sport.sportId] ? 'interested-btn' : 'interest-btn'}`}
+                    title={interestedSports[sport.sportId] ? 'Withdraw Interest' : 'Show Interest'}
+                    onClick={() => handleToggleInterest(sport)}
+                  >
+                    <Sparkles size={14} />
+                    <span className="action-label">
+                      {interestedSports[sport.sportId] ? 'Interested ✓' : 'Show Interest'}
+                    </span>
+                  </button>
+                ) : (
+                  <>
+                    <button
+                      type="button"
+                      className="action-btn edit-btn"
+                      title="Edit Sport"
+                      onClick={() => openEdit(sport)}
+                    >
+                      <Edit size={14} /><span className="action-label">Edit</span>
+                    </button>
+                    <button
+                      type="button"
+                      className="action-btn delete-btn"
+                      title="Delete Sport"
+                      onClick={() => handleDelete(sport)}
+                      disabled={deleting === sport.sportId}
+                    >
+                      <Trash2 size={14} /><span className="action-label">{deleting === sport.sportId ? 'Deleting...' : 'Delete'}</span>
+                    </button>
+                  </>
+                )}
               </div>
 
             </div>

@@ -17,7 +17,7 @@ const AddBusRouteModal = ({ isOpen, routeId: routeIdProp, onClose, onSuccess }) 
   const [vehicles, setVehicles] = useState([]);
   const [stopInput, setStopInput] = useState('');
 
-  const emptyForm = { routeId: '', hasCustomName: false, routeName: '', driverId: '', driverName: '', vehicleId: '', vehicleName: '', stops: [], status: 'ACTIVE' };
+  const emptyForm = { routeId: '', hasCustomName: false, routeName: '', driverId: '', driverName: '', vehicleId: '', vehicleName: '', stops: [], fee: '', status: 'ACTIVE' };
   const [form, setForm] = useState(emptyForm);
 
   const reset = useCallback(() => { setForm(emptyForm); setRouteNameError(''); setFeedback({ type: '', message: '' }); setStopInput(''); }, []); // eslint-disable-line
@@ -54,7 +54,7 @@ const AddBusRouteModal = ({ isOpen, routeId: routeIdProp, onClose, onSuccess }) 
       const res = await fetch(`${API_BASE_URL}/transport/routes/${routeIdProp}`, { headers: authHeader() });
       if (res.ok) {
         const r = await res.json();
-        setForm({ routeId: r.routeId || '', hasCustomName: Boolean(r.hasCustomName || r.routeName), routeName: r.routeName || '', driverId: r.driverId || '', driverName: r.driverName || '', vehicleId: r.vehicleId || '', vehicleName: r.vehicleName || '', stops: r.stops || [], status: r.status || 'ACTIVE' });
+        setForm({ routeId: r.routeId || '', hasCustomName: Boolean(r.hasCustomName || r.routeName), routeName: r.routeName || '', driverId: r.driverId || '', driverName: r.driverName || '', vehicleId: r.vehicleId || '', vehicleName: r.vehicleName || '', stops: r.stops || [], fee: r.fee !== undefined && r.fee !== null ? r.fee : '', status: r.status || 'ACTIVE' });
       } else setFeedback({ type: 'error', message: 'Bus route not found.' });
     } catch { setFeedback({ type: 'error', message: 'Unable to connect.' }); }
     finally { setFetching(false); }
@@ -84,7 +84,7 @@ const AddBusRouteModal = ({ isOpen, routeId: routeIdProp, onClose, onSuccess }) 
     setLoading(true);
     try {
       const url = isEdit ? `${API_BASE_URL}/transport/routes/${routeIdProp}` : `${API_BASE_URL}/transport/routes`;
-      const res = await fetch(url, { method: isEdit ? 'PUT' : 'POST', headers: authHeader(), body: JSON.stringify({ routeId: Number(form.routeId), hasCustomName: form.hasCustomName, routeName: form.hasCustomName ? form.routeName.trim() : '', driverId: form.driverId || null, driverName: form.driverName.trim(), vehicleId: form.vehicleId || '', vehicleName: form.vehicleName.trim(), stops: form.stops, status: form.status }) });
+      const res = await fetch(url, { method: isEdit ? 'PUT' : 'POST', headers: authHeader(), body: JSON.stringify({ routeId: Number(form.routeId), hasCustomName: form.hasCustomName, routeName: form.hasCustomName ? form.routeName.trim() : '', driverId: form.driverId || null, driverName: form.driverName.trim(), vehicleId: form.vehicleId || '', vehicleName: form.vehicleName.trim(), stops: form.stops, fee: form.fee !== '' && form.fee !== null ? Number(form.fee) : 0, status: form.status }) });
       const data = await res.json();
       if (!res.ok) { setFeedback({ type: 'error', message: data.message || 'Failed to save.' }); return; }
       setFeedback({ type: 'success', message: data.message || (isEdit ? 'Route updated.' : 'Route created.') });
@@ -143,12 +143,18 @@ const AddBusRouteModal = ({ isOpen, routeId: routeIdProp, onClose, onSuccess }) 
                   </select>
                 </div>
               </div>
-              <div className="sf-row"><div className="sf-group">
-                <label className="sf-label" htmlFor="r-status">Status</label>
-                <select id="r-status" name="status" className="sf-input" value={form.status} onChange={handleChange}>
-                  <option value="ACTIVE">Active</option><option value="INACTIVE">Inactive</option>
-                </select>
-              </div></div>
+              <div className="sf-row">
+                <div className="sf-group">
+                  <label className="sf-label" htmlFor="r-fee">Route Fee (₹)</label>
+                  <input id="r-fee" name="fee" type="number" min="0" step="any" className="sf-input" placeholder="e.g. 1500" value={form.fee} onChange={handleChange} />
+                </div>
+                <div className="sf-group">
+                  <label className="sf-label" htmlFor="r-status">Status</label>
+                  <select id="r-status" name="status" className="sf-input" value={form.status} onChange={handleChange}>
+                    <option value="ACTIVE">Active</option><option value="INACTIVE">Inactive</option>
+                  </select>
+                </div>
+              </div>
               <div className="sf-custom-input-row">
                 <div className="sf-group" style={{ flex: 1 }}>
                   <label className="sf-label">Stops</label>

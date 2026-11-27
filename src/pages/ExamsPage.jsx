@@ -5,9 +5,12 @@ import { springApi, springGet } from '../services/api';
 import PageError from '../components/PageError';
 import ConfirmDialog from '../components/ConfirmDialog';
 import ExamModal from './ExamModal';
+import { useAuth } from '../context/AuthContext';
 
 export default function ExamsPage() {
   const navigate = useNavigate();
+  const { user } = useAuth();
+  const isStudent = user?.role === 'STUDENT' || user?.adminType === 'STUDENT';
 
   const [exams,     setExams]     = useState([]);
   const [loading,   setLoading]   = useState(true);
@@ -124,19 +127,21 @@ export default function ExamsPage() {
         <div className="feature-page-header-info">
           <h1 className="page-title">Exam Management</h1>
           <p className="page-subtitle">
-            Manage exams and student marks
+            {isStudent ? 'View examination schedules and marks' : 'Manage exams and student marks'}
           </p>
         </div>
-        <div className="feature-page-header-actions">
-          <button
-            type="button"
-            className="btn btn-primary"
-            onClick={openAdd}
-          >
-            <Plus size={16} />
-            <span>Add Exam</span>
-          </button>
-        </div>
+        {!isStudent && (
+          <div className="feature-page-header-actions">
+            <button
+              type="button"
+              className="btn btn-primary"
+              onClick={openAdd}
+            >
+              <Plus size={16} />
+              <span>Add Exam</span>
+            </button>
+          </div>
+        )}
       </div>
 
       {/* Notifications */}
@@ -252,22 +257,26 @@ export default function ExamsPage() {
                           >
                             <Eye size={14} /><span className="action-label">Marks</span>
                           </button>
-                          <button
-                            type="button"
-                            className="action-btn edit-btn"
-                            title="Edit Exam"
-                            onClick={() => openEdit(exam)}
-                          >
-                            <Edit size={14} /><span className="action-label">Edit</span>
-                          </button>
-                          <button
-                            type="button"
-                            className="action-btn delete-btn"
-                            title="Delete Exam"
-                            onClick={() => handleDelete(exam)}
-                          >
-                            <Trash2 size={14} /><span className="action-label">Delete</span>
-                          </button>
+                          {!isStudent && (
+                            <>
+                              <button
+                                type="button"
+                                className="action-btn edit-btn"
+                                title="Edit Exam"
+                                onClick={() => openEdit(exam)}
+                              >
+                                <Edit size={14} /><span className="action-label">Edit</span>
+                              </button>
+                              <button
+                                type="button"
+                                className="action-btn delete-btn"
+                                title="Delete Exam"
+                                onClick={() => handleDelete(exam)}
+                              >
+                                <Trash2 size={14} /><span className="action-label">Delete</span>
+                              </button>
+                            </>
+                          )}
                         </div>
                       </td>
                     </tr>
@@ -306,20 +315,24 @@ export default function ExamsPage() {
                   >
                     <Eye size={15} /><span className="action-label">Marks</span>
                   </button>
-                  <button
-                    type="button"
-                    className="action-btn edit-btn"
-                    onClick={() => openEdit(exam)}
-                  >
-                    <Edit size={15} /><span className="action-label">Edit</span>
-                  </button>
-                  <button
-                    type="button"
-                    className="action-btn delete-btn"
-                    onClick={() => handleDelete(exam)}
-                  >
-                    <Trash2 size={15} /><span className="action-label">Delete</span>
-                  </button>
+                  {!isStudent && (
+                    <>
+                      <button
+                        type="button"
+                        className="action-btn edit-btn"
+                        onClick={() => openEdit(exam)}
+                      >
+                        <Edit size={15} /><span className="action-label">Edit</span>
+                      </button>
+                      <button
+                        type="button"
+                        className="action-btn delete-btn"
+                        onClick={() => handleDelete(exam)}
+                      >
+                        <Trash2 size={15} /><span className="action-label">Delete</span>
+                      </button>
+                    </>
+                  )}
                 </div>
               </div>
             ))}

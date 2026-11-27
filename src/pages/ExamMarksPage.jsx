@@ -736,16 +736,19 @@ export default function ExamMarksPage() {
     <div className="page-container">
 
       {/* Back — consistent with all other pages */}
-      <div className="page-header" style={{ marginBottom: '1rem' }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '1rem' }}>
         <button
           type="button"
           className="btn-back"
           onClick={() => navigate('/exams')}
           title="Back to Exams"
-          style={{ marginBottom: '0.5rem' }}
         >
           <ArrowLeft size={18} />
         </button>
+      </div>
+
+      {/* Header and prominent information cards / badges for Subject ID and Academic Year */}
+      <div style={{ marginBottom: 16 }}>
         <h1 className="page-title" style={{ textAlign: 'left', marginBottom: 10 }}>
           {exam.subject}
         </h1>
@@ -887,25 +890,18 @@ export default function ExamMarksPage() {
             <Plus size={15} /><span>Add Row</span>
           </button>
 
-          {/* Separator */}
-          <div style={{ width: '1px', height: '28px', background: 'var(--border-color)', margin: '0 0.25rem' }} />
-
-          {/* Save Tab */}
-          {edited[activeTab] && (
-            <button
-              type="button"
-              className="books-btn books-btn-primary"
-              onClick={saveTab}
-              disabled={saving}
-              style={{ background: '#16a34a', borderColor: '#16a34a' }}
-            >
-              {saving ? 'Saving...' : `Save ${activeTab}`}
-            </button>
-          )}
-
         </div>
       </div>
 
+      {/* Save banner — shown when there are unsaved changes */}
+      {edited[activeTab] && (
+        <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '0.75rem' }}>
+          <button className="books-btn books-btn-primary"
+            onClick={saveTab} disabled={saving}>
+            {saving ? 'Saving…' : `💾 Save ${activeTab}`}
+          </button>
+        </div>
+      )}
 
       {/* Notifications */}
       {success && (

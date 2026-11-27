@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import {
   ArrowLeft, Calendar, Clock, MapPin, BookOpen, Users,
   UserCheck, UserX, ChevronDown, ChevronUp, Loader2,
-  AlertCircle, Search, X, FileText, Filter,
+  AlertCircle, Search, X, FileText,
 } from 'lucide-react';
 
 const _IS_PROD = typeof window !== 'undefined' && window.location.hostname !== 'localhost';
@@ -24,8 +24,6 @@ const AttendanceHistory = () => {
   const [filterDate,     setFilterDate]     = useState('');
   const [filterSubject,  setFilterSubject]  = useState('');
   const [filterVenue,    setFilterVenue]    = useState('');
-  const [showFilters,    setShowFilters]    = useState(false);
-  const activeFilterCount = [filterDate, filterSubject, filterVenue].filter(Boolean).length;
 
   useEffect(() => {
     const load = async () => {
@@ -92,83 +90,81 @@ const AttendanceHistory = () => {
     <div className="page-container">
 
       {/* ── Header ────────────────────────────────────────────────────────── */}
-      <div className="page-header" style={{ marginBottom: '1.5rem' }}>
-        <button
-          type="button"
-          className="btn-back"
-          onClick={() => navigate('/attendance')}
-          title="Back to Attendance"
-          style={{ marginBottom: '0.5rem' }}
-        >
-          <ArrowLeft size={18} />
-        </button>
-        <div>
-          <h1 className="page-title att-history-page-title">Attendance Records</h1>
-          <p className="page-subtitle">All submitted attendance sessions</p>
+      <div className="page-header-row" style={{ marginBottom: '1.5rem' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+          <button
+            type="button"
+            className="btn-back"
+            onClick={() => navigate('/attendance')}
+            title="Back to Attendance"
+          >
+            <ArrowLeft size={18} />
+          </button>
+          <div>
+            <h1 className="page-title">Attendance Records</h1>
+            <p className="page-subtitle">All submitted attendance sessions</p>
+          </div>
         </div>
       </div>
+
       {/* ── Filters ───────────────────────────────────────────────────────── */}
-      <div className="card table-card" style={{ marginBottom: '0', borderBottom: 'none', borderRadius: '0.5rem 0.5rem 0 0' }}>
-        <div className="table-controls-bar">
-          <div className="search-box-wrapper">
-            <Search size={15} className="search-icon" />
-            <input
-              type="text"
-              className="search-input"
-              placeholder="Search subject, venue, date, time..."
-              value={search}
-              onChange={e => setSearch(e.target.value)}
-            />
-            {search && <button type="button" className="search-clear-btn" onClick={() => setSearch('')}>Clear</button>}
-          </div>
-          <div className="filter-count-row">
-            <button
-              type="button"
-              className={`btn btn-secondary students-filter-btn${activeFilterCount > 0 ? ' filter-active' : ''}`}
-              onClick={() => setShowFilters(v => !v)}
-            >
-              <Filter size={15} />
-              <span>Filter{activeFilterCount > 0 ? ` (${activeFilterCount})` : ''}</span>
-              <ChevronDown size={13} style={{ transform: showFilters ? 'rotate(180deg)' : 'none', transition: 'transform 0.2s' }} />
-            </button>
-            <div className="table-stats-badge">
-              Total: <strong>{filtered.length}</strong> Records
-            </div>
-          </div>
+      <div className="card att-hist-filters">
+        {/* Search */}
+        <div className="search-box-wrapper" style={{ flex: '1 1 200px', minWidth: 0 }}>
+          <Search size={15} className="search-icon" />
+          <input
+            type="text"
+            className="search-input"
+            placeholder="Search subject, venue, date, time…"
+            value={search}
+            onChange={e => setSearch(e.target.value)}
+          />
+          {search && (
+            <button type="button" className="search-clear-btn" onClick={() => setSearch('')}>Clear</button>
+          )}
         </div>
-        {showFilters && (
-          <div className="alumni-filter-panel">
-            <div className="alumni-filter-grid" style={{ gridTemplateColumns: "repeat(3, 1fr)" }}>
-              <div className="alumni-filter-group">
-                <label className="students-filter-label">Date</label>
-                <select className="alumni-filter-select" value={filterDate} onChange={e => setFilterDate(e.target.value)}>
-                  <option value="">All Dates</option>
-                  {uniqueDates.map(d => <option key={d} value={d}>{fmtDate(d)}</option>)}
-                </select>
-              </div>
-              <div className="alumni-filter-group">
-                <label className="students-filter-label">Subject</label>
-                <select className="alumni-filter-select" value={filterSubject} onChange={e => setFilterSubject(e.target.value)}>
-                  <option value="">All Subjects</option>
-                  {uniqueSubjects.map(s => <option key={s} value={s}>{s}</option>)}
-                </select>
-              </div>
-              <div className="alumni-filter-group">
-                <label className="students-filter-label">Venue</label>
-                <select className="alumni-filter-select" value={filterVenue} onChange={e => setFilterVenue(e.target.value)}>
-                  <option value="">All Venues</option>
-                  {uniqueVenues.map(v => <option key={v} value={v}>{v}</option>)}
-                </select>
-              </div>
-            </div>
-            {activeFilterCount > 0 && (
-              <div style={{ paddingTop: '0.5rem' }}>
-                <button type="button" className="students-clear-filters-btn" onClick={clearFilters}>
-                  <X size={13} /><span>Clear filters</span>
-                </button>
-              </div>
-            )}
-          </div>
+
+        {/* Date filter */}
+        <select
+          className="att-hist-select"
+          value={filterDate}
+          onChange={e => setFilterDate(e.target.value)}
+        >
+          <option value="">All Dates</option>
+          {uniqueDates.map(d => (
+            <option key={d} value={d}>{fmtDate(d)}</option>
+          ))}
+        </select>
+
+        {/* Subject filter */}
+        <select
+          className="att-hist-select"
+          value={filterSubject}
+          onChange={e => setFilterSubject(e.target.value)}
+        >
+          <option value="">All Subjects</option>
+          {uniqueSubjects.map(s => (
+            <option key={s} value={s}>{s}</option>
+          ))}
+        </select>
+
+        {/* Venue filter */}
+        <select
+          className="att-hist-select"
+          value={filterVenue}
+          onChange={e => setFilterVenue(e.target.value)}
+        >
+          <option value="">All Venues</option>
+          {uniqueVenues.map(v => (
+            <option key={v} value={v}>{v}</option>
+          ))}
+        </select>
+
+        {/* Clear all filters */}
+        {hasFilters && (
+          <button type="button" className="att-hist-clear-btn" onClick={clearFilters}>
+            <X size={14} /> Clear Filters
+          </button>
         )}
       </div>
 
@@ -308,9 +304,9 @@ const AttendanceHistory = () => {
                       {/* Header */}
                       <div className="att-hist-student-header">
                         <span style={{ width: 32, flexShrink: 0, color: 'var(--text-secondary)', fontSize: '0.75rem' }}>#</span>
-                        <span style={{ flex: '0 0 90px', color: 'var(--text-secondary)', fontSize: '0.75rem', fontWeight: 600 }}>Roll No</span>
+                        <span style={{ flex: '0 0 110px', color: 'var(--text-secondary)', fontSize: '0.75rem', fontWeight: 600 }}>Roll No</span>
                         <span style={{ flex: 1, color: 'var(--text-secondary)', fontSize: '0.75rem', fontWeight: 600 }}>Name</span>
-                        <span style={{ flex: '0 0 80px', textAlign: 'center', color: 'var(--text-secondary)', fontSize: '0.75rem', fontWeight: 600 }}>Status</span>
+                        <span style={{ width: 90, textAlign: 'center', color: 'var(--text-secondary)', fontSize: '0.75rem', fontWeight: 600 }}>Status</span>
                       </div>
                       {record.students.map((s, idx) => (
                         <div
@@ -318,9 +314,9 @@ const AttendanceHistory = () => {
                           className={`att-hist-student-row${s.present ? ' att-hist-student-row--present' : ''}${idx % 2 === 0 ? ' att-hist-student-row--even' : ''}`}
                         >
                           <span style={{ width: 32, flexShrink: 0, fontSize: '0.75rem', color: 'var(--text-secondary)' }}>{idx + 1}</span>
-                          <span style={{ flex: '0 0 90px', fontFamily: 'monospace', fontSize: '0.8rem', fontWeight: 600 }}>{s.rollNo}</span>
-                          <span style={{ flex: 1, fontSize: '0.875rem', minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{s.name}</span>
-                          <span style={{ flex: '0 0 80px', textAlign: 'center' }}>
+                          <span style={{ flex: '0 0 110px', fontFamily: 'monospace', fontSize: '0.8rem', fontWeight: 600 }}>{s.rollNo}</span>
+                          <span style={{ flex: 1, fontSize: '0.875rem' }}>{s.name}</span>
+                          <span style={{ width: 90, textAlign: 'center' }}>
                             {s.present
                               ? <span className="att-present-pill"><UserCheck size={11} /> Present</span>
                               : <span className="att-absent-pill"><UserX size={11} /> Absent</span>}

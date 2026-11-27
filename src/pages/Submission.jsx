@@ -6,11 +6,21 @@ import { useAuth } from '../context/AuthContext';
 const _IS_PROD_SUB = window.location.hostname !== 'localhost';
 const NODE_URL = _IS_PROD_SUB ? 'https://university-erp-node.onrender.com/api' : 'http://localhost:5000/api';
 
+const authHeader = () => ({
+  'Content-Type': 'application/json',
+  Authorization: `Bearer ${localStorage.getItem('erp_token')}`,
+});
+
+const authFormDataHeader = () => ({
+  Authorization: `Bearer ${localStorage.getItem('erp_token')}`,
+});
+
 const Submission = () => {
   const { announcementId } = useParams();
   const navigate = useNavigate();
   const { user } = useAuth();
-  const currentStudent = user?.username || user?.email || user?.prn || 'student123';
+  const isStudent = user?.role === 'STUDENT' || user?.adminType === 'STUDENT';
+  const currentStudent = user?.prn || user?.email || user?.username || user?.name || 'student123';
 
   // State for single announcement submission mode
   const [announcement, setAnnouncement] = useState(null);
@@ -21,6 +31,13 @@ const Submission = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
+  // State for Admin / Sub-admin / Teacher view of student submissions
+  const [adminSubmissions, setAdminSubmissions] = useState([]);
+  const [loadingAdminSubmissions, setLoadingAdminSubmissions] = useState(false);
+  const [marksInput, setMarksInput] = useState({});
+  const [savingMarksId, setSavingMarksId] = useState(null);
+  const [marksSuccess, setMarksSuccess] = useState('');
+
   // State for submissions list mode (when no announcementId)
   const [announcementsList, setAnnouncementsList] = useState([]);
   const [searchQuery, setSearchQuery] = useState('');
@@ -30,7 +47,7 @@ const Submission = () => {
     if (!announcementId) {
       // List mode
       setLoading(true);
-      fetch(`${NODE_URL}/announcements`)
+      fetch(`${NODE_URL}/announcements`, { headers: authHeader() })
         .then((r) => r.json())
         .then((d) => {
           setAnnouncementsList(d.announcements || []);
@@ -43,7 +60,7 @@ const Submission = () => {
     // Single assignment mode
     setLoading(true);
     setError('');
-    fetch(`${NODE_URL}/announcements/single/${announcementId}`)
+    fetch(`${NODE_URL}/announcements/single/${announcementId}`, { headers: authHeader() })
       .then((r) => r.json())
       .then((d) => {
         if (!d.announcement) throw new Error('Assignment not found');
@@ -53,22 +70,40 @@ const Submission = () => {
       .finally(() => setLoading(false));
   }, [announcementId]);
 
-  // Fetch student submission for this announcement
+  // Fetch student submission or all submissions based on role
   useEffect(() => {
     if (!announcementId) return;
-    fetch(`${NODE_URL}/submissions/${announcementId}/student/${currentStudent}`)
-      .then((r) => r.json())
-      .then((d) => {
-        if (d.submission) {
-          setStudentSubmission(d.submission);
-          setSubmitted(true);
-        } else {
-          setStudentSubmission(null);
-          setSubmitted(false);
-        }
-      })
-      .catch((err) => console.error('Fetch student submission error:', err));
-  }, [announcementId, currentStudent]);
+
+    if (isStudent) {
+      fetch(`${NODE_URL}/submissions/${announcementId}/student/${encodeURIComponent(currentStudent)}`, { headers: authHeader() })
+        .then((r) => r.json())
+        .then((d) => {
+          if (d.submission) {
+            setStudentSubmission(d.submission);
+            setSubmitted(true);
+          } else {
+            setStudentSubmission(null);
+            setSubmitted(false);
+          }
+        })
+        .catch((err) => console.error('Fetch student submission error:', err));
+    } else {
+      setLoadingAdminSubmissions(true);
+      fetch(`${NODE_URL}/submissions/${announcementId}`, { headers: authHeader() })
+        .then((r) => r.json())
+        .then((d) => {
+          const list = d.submissions || [];
+          setAdminSubmissions(list);
+          const existingMarks = {};
+          list.forEach((s) => {
+            if (s.marks != null) existingMarks[s._id] = s.marks;
+          });
+          setMarksInput(existingMarks);
+        })
+        .catch((err) => console.error('Fetch submissions error:', err))
+        .finally(() => setLoadingAdminSubmissions(false));
+    }
+  }, [announcementId, isStudent, currentStudent]);
 
   const handleSubmit = async () => {
     setError('');
@@ -80,7 +115,11 @@ const Submission = () => {
       const formData = new FormData();
       formData.append('student', currentStudent);
       formData.append('file', file);
-      const res = await fetch(`${NODE_URL}/submissions/${announcementId}/submit`, { method: 'POST', body: formData });
+      const res = await fetch(`${NODE_URL}/submissions/${announcementId}/submit`, {
+        method: 'POST',
+        headers: authFormDataHeader(),
+        body: formData,
+      });
       const data = await res.json();
       if (!res.ok) throw new Error(data.message || 'Submission failed');
       setStudentSubmission(data.submission);
@@ -88,6 +127,26 @@ const Submission = () => {
       setFile(null);
     } catch (err) { setError(err.message); }
     finally { setSubmitting(false); }
+  };
+
+  const handleSaveMarks = async (submissionId) => {
+    const marks = marksInput[submissionId];
+    if (marks === undefined || marks === '') { setError('Please enter marks.'); return; }
+    if (Number(marks) < 0) { setError('Marks cannot be negative.'); return; }
+    setSavingMarksId(submissionId); setError(''); setMarksSuccess('');
+    try {
+      const res = await fetch(`${NODE_URL}/submissions/${submissionId}/marks`, {
+        method: 'PUT',
+        headers: authHeader(),
+        body: JSON.stringify({ marks: Number(marks) }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.message || 'Failed to save marks');
+      setAdminSubmissions((prev) => prev.map((s) => s._id === submissionId ? { ...s, marks: data.submission.marks } : s));
+      setMarksSuccess('Marks updated successfully!');
+      setTimeout(() => setMarksSuccess(''), 3000);
+    } catch (err) { setError(err.message); }
+    finally { setSavingMarksId(null); }
   };
 
   const filteredAnnouncements = useMemo(() => {
@@ -225,7 +284,11 @@ const Submission = () => {
                         style={{ width: '100%', justifyContent: 'center' }}
                         onClick={() => navigate(`/submissions/${ann._id}`)}
                       >
-                        {isPastDeadline ? 'View Submission / Details' : 'Submit Assignment'}
+                        {!isStudent
+                          ? 'View Submissions'
+                          : isPastDeadline
+                          ? 'View Submission / Details'
+                          : 'Submit Assignment'}
                       </button>
                     </div>
                   </div>
@@ -259,8 +322,12 @@ const Submission = () => {
       {/* Header */}
       <div className="books-page-header">
         <div>
-          <h1 className="page-title">Assignment Submission</h1>
-          <p className="page-subtitle">Submit your assignment for the selected announcement</p>
+          <h1 className="page-title">{!isStudent ? 'Student Submissions' : 'Assignment Submission'}</h1>
+          <p className="page-subtitle">
+            {!isStudent
+              ? 'Review submitted assignments and update marks'
+              : 'Submit your assignment for the selected announcement'}
+          </p>
         </div>
         <button className="btn-back" onClick={() => navigate('/submissions')} title="Back to Submissions">
           <ArrowLeft size={18} />
@@ -288,57 +355,155 @@ const Submission = () => {
         </div>
       )}
 
-      {/* Submission Card */}
-      <div className="card" style={{ padding: '1.25rem' }}>
-        <h2 style={{ fontSize: '1rem', fontWeight: 700, color: '#111827', marginBottom: '1rem' }}>Your Submission</h2>
+      {/* Admin / Teacher Submissions Management Card OR Student Submission Card */}
+      {!isStudent ? (
+        <div className="card" style={{ padding: '1.25rem' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
+            <h2 style={{ fontSize: '1rem', fontWeight: 700, color: '#111827', margin: 0 }}>
+              Submitted Assignments ({adminSubmissions.length})
+            </h2>
+          </div>
 
-        {submitted || studentSubmission ? (
-          <div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: '1rem' }}>
-              <span style={{ fontSize: '1.2rem' }}>✅</span>
-              <span style={{ fontWeight: 700, color: '#16a34a' }}>Assignment Submitted</span>
+          {marksSuccess && (
+            <div className="books-alert books-alert-success" style={{ marginBottom: '1rem' }}>
+              <span>{marksSuccess}</span>
             </div>
-            {studentSubmission && (
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-                <p style={{ fontSize: '0.875rem', color: '#374151' }}>
-                  Submitted At: <strong>{new Date(studentSubmission.submittedAt).toLocaleString('en-IN')}</strong>
-                </p>
-                <p style={{ fontSize: '0.875rem', color: '#374151' }}>
-                  Status: <span className="code-badge">{studentSubmission.status}</span>
-                </p>
-                <p style={{ fontSize: '0.875rem', color: '#374151' }}>
-                  Marks: <strong>{studentSubmission.marks != null ? studentSubmission.marks : 'Not evaluated yet'}</strong>
-                </p>
-                <div style={{ marginTop: 8 }}>
-                  <a href={studentSubmission.file} target="_blank" rel="noopener noreferrer" className="books-btn books-btn-ghost books-btn-sm">
-                    View Submitted File
-                  </a>
+          )}
+
+          {error && (
+            <div className="books-alert books-alert-error" style={{ marginBottom: '1rem' }}>
+              <span>{error}</span>
+            </div>
+          )}
+
+          {loadingAdminSubmissions ? (
+            <div style={{ padding: '2rem', textAlign: 'center', color: '#6b7280' }}>
+              <p>Loading submissions...</p>
+            </div>
+          ) : adminSubmissions.length === 0 ? (
+            <div style={{ padding: '2rem', textAlign: 'center', color: '#6b7280' }}>
+              <p>No student submissions received for this assignment yet.</p>
+            </div>
+          ) : (
+            <div className="books-table-wrap">
+              <table className="books-table">
+                <thead>
+                  <tr>
+                    <th style={{ width: 40 }}>#</th>
+                    <th>Student</th>
+                    <th>Submitted At</th>
+                    <th>File</th>
+                    <th style={{ width: 140 }}>Marks</th>
+                    <th style={{ width: 120, textAlign: 'center' }}>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {adminSubmissions.map((sub, idx) => (
+                    <tr key={sub._id}>
+                      <td style={{ color: '#9ca3af' }}>{idx + 1}</td>
+                      <td>
+                        <span style={{ fontWeight: 600, color: '#111827' }}>{sub.student}</span>
+                      </td>
+                      <td style={{ fontSize: '0.8rem', color: '#6b7280' }}>
+                        {new Date(sub.submittedAt).toLocaleString('en-IN', {
+                          day: 'numeric',
+                          month: 'short',
+                          year: 'numeric',
+                          hour: '2-digit',
+                          minute: '2-digit',
+                        })}
+                      </td>
+                      <td>
+                        <a
+                          href={sub.file}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="books-btn books-btn-ghost books-btn-sm"
+                        >
+                          View File
+                        </a>
+                      </td>
+                      <td>
+                        <input
+                          type="number"
+                          min="0"
+                          max="100"
+                          className="books-form-control"
+                          style={{ padding: '4px 8px', fontSize: '0.85rem' }}
+                          placeholder="Marks"
+                          value={marksInput[sub._id] !== undefined ? marksInput[sub._id] : ''}
+                          onChange={(e) => setMarksInput((p) => ({ ...p, [sub._id]: e.target.value }))}
+                        />
+                      </td>
+                      <td style={{ textAlign: 'center' }}>
+                        <button
+                          type="button"
+                          className="books-btn books-btn-primary books-btn-sm"
+                          disabled={savingMarksId === sub._id}
+                          onClick={() => handleSaveMarks(sub._id)}
+                        >
+                          {savingMarksId === sub._id ? 'Saving...' : 'Save'}
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </div>
+      ) : (
+        <div className="card" style={{ padding: '1.25rem' }}>
+          <h2 style={{ fontSize: '1rem', fontWeight: 700, color: '#111827', marginBottom: '1rem' }}>Your Submission</h2>
+
+          {submitted || studentSubmission ? (
+            <div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: '1rem' }}>
+                <span style={{ fontSize: '1.2rem' }}>✅</span>
+                <span style={{ fontWeight: 700, color: '#16a34a' }}>Assignment Submitted</span>
+              </div>
+              {studentSubmission && (
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+                  <p style={{ fontSize: '0.875rem', color: '#374151' }}>
+                    Submitted At: <strong>{new Date(studentSubmission.submittedAt).toLocaleString('en-IN')}</strong>
+                  </p>
+                  <p style={{ fontSize: '0.875rem', color: '#374151' }}>
+                    Status: <span className="code-badge">{studentSubmission.status}</span>
+                  </p>
+                  <p style={{ fontSize: '0.875rem', color: '#374151' }}>
+                    Marks: <strong>{studentSubmission.marks != null ? studentSubmission.marks : 'Not evaluated yet'}</strong>
+                  </p>
+                  <div style={{ marginTop: 8 }}>
+                    <a href={studentSubmission.file} target="_blank" rel="noopener noreferrer" className="books-btn books-btn-ghost books-btn-sm">
+                      View Submitted File
+                    </a>
+                  </div>
                 </div>
-              </div>
-            )}
-          </div>
-        ) : (
-          <div>
-            <div className="books-form-group">
-              <label className="books-form-label">Upload Assignment</label>
-              <input type="file" className="books-form-control" onChange={(e) => { const f = e.target.files[0]; if (f) { setFile(f); setError(''); } }} />
+              )}
             </div>
-            {file && (
-              <p style={{ fontSize: '0.82rem', color: '#6b7280', marginBottom: '0.75rem' }}>
-                Selected: <strong>{file.name}</strong>
-              </p>
-            )}
-            {error && (
-              <div className="books-alert books-alert-error" style={{ marginBottom: '0.75rem' }}>
-                <span>{error}</span>
+          ) : (
+            <div>
+              <div className="books-form-group">
+                <label className="books-form-label">Upload Assignment</label>
+                <input type="file" className="books-form-control" onChange={(e) => { const f = e.target.files[0]; if (f) { setFile(f); setError(''); } }} />
               </div>
-            )}
-            <button className="books-btn books-btn-primary" onClick={handleSubmit} disabled={submitting}>
-              {submitting ? 'Submitting...' : 'Submit Assignment'}
-            </button>
-          </div>
-        )}
-      </div>
+              {file && (
+                <p style={{ fontSize: '0.82rem', color: '#6b7280', marginBottom: '0.75rem' }}>
+                  Selected: <strong>{file.name}</strong>
+                </p>
+              )}
+              {error && (
+                <div className="books-alert books-alert-error" style={{ marginBottom: '0.75rem' }}>
+                  <span>{error}</span>
+                </div>
+              )}
+              <button className="books-btn books-btn-primary" onClick={handleSubmit} disabled={submitting}>
+                {submitting ? 'Submitting...' : 'Submit Assignment'}
+              </button>
+            </div>
+          )}
+        </div>
+      )}
     </div>
   );
 };

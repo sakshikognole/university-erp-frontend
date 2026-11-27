@@ -16,7 +16,3 @@ services:
         sync: false    # Set to your Node backend Render URL
       - key: VITE_SPRING_API_URL
         sync: false    # Set to your Spring Boot backend Render URL
-      - key: VITE_CLOUDINARY_CLOUD_NAME
-        value: bhsipfy8
-      - key: VITE_CLOUDINARY_UPLOAD_PRESET
-        value: erp_unsigned

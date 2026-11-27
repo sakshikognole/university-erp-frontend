@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { GraduationCap, ShieldCheck, UserCheck, BookOpen, Mail, Lock, ArrowRight, AlertCircle, Eye, EyeOff } from 'lucide-react';
+import { GraduationCap, ShieldCheck, UserCheck, BookOpen, Mail, Lock, KeyRound, ArrowRight, AlertCircle, Eye, EyeOff } from 'lucide-react';
 
 const Login = () => {
   const navigate = useNavigate();
-  const { loginAdmin, loading } = useAuth();
+  const { loginAdmin, loginStudent, loading } = useAuth();
 
   const [adminType, setAdminType] = useState('SUPER_ADMIN');
   const [email, setEmail] = useState('');
@@ -18,6 +18,7 @@ const Login = () => {
     { id: 'SUPER_ADMIN', label: 'Super Admin', icon: ShieldCheck, desc: 'Full System Control' },
     { id: 'SUB_ADMIN', label: 'Sub Admin', icon: UserCheck, desc: 'Departmental Management' },
     { id: 'TEACHER', label: 'Teacher Login', icon: BookOpen, desc: 'Faculty & Academics' },
+    { id: 'STUDENT', label: 'Student Login', icon: GraduationCap, desc: 'PRN & Student Portal' },
   ];
 
   const handleSubmit = async (e) => {
@@ -26,7 +27,28 @@ const Login = () => {
     setSuccess('');
 
     if (!email || !password) {
-      setError('Please enter both Email ID and Password.');
+      setError(adminType === 'STUDENT' ? 'Please enter both PRN Number and Password.' : 'Please enter both Email ID and Password.');
+      return;
+    }
+
+    if (adminType === 'STUDENT') {
+      try {
+        const res = await loginStudent(email.trim(), password);
+        setSuccess(res.message || 'Student login successful. Redirecting...');
+        setTimeout(() => {
+          navigate('/fee-payment');
+        }, 600);
+      } catch (err) {
+        setError(err.message || 'Authentication failed. Please verify your PRN number and password (e.g. Name@123).');
+        setEmail('');
+        setPassword('');
+        setShowPassword(false);
+      }
+      return;
+    }
+
+    if (/[A-Z]/.test(email)) {
+      setError('Email ID field accepts only lowercase letters. Uppercase letters are not allowed.');
       return;
     }
 
@@ -103,19 +125,32 @@ const Login = () => {
         <form onSubmit={handleSubmit} className="auth-form">
           <div className="form-group">
             <label className="form-label" htmlFor="email-input">
-              Email ID
+              {adminType === 'STUDENT' ? 'PRN Number' : 'Email ID'}
             </label>
             <div className="input-wrapper">
-              <Mail size={18} className="input-icon" />
+              {adminType === 'STUDENT' ? (
+                <KeyRound size={18} className="input-icon" />
+              ) : (
+                <Mail size={18} className="input-icon" />
+              )}
               <input
                 id="email-input"
-                type="email"
+                type={adminType === 'STUDENT' ? 'text' : 'email'}
                 className="form-input"
-                placeholder="Enter your Email ID"
+                placeholder={adminType === 'STUDENT' ? 'Enter PRN (e.g. PRN2026001)' : 'Enter your Email ID'}
                 value={email}
                 onChange={(e) => {
-                  setEmail(e.target.value.toLowerCase());
-                  if (error && error.includes('lowercase')) setError('');
+                  const val = e.target.value;
+                  if (adminType !== 'STUDENT') {
+                    if (/[A-Z]/.test(val)) {
+                      setError('Email ID field accepts only lowercase letters. Uppercase letters are not allowed.');
+                    } else if (error && error.includes('lowercase')) {
+                      setError('');
+                    }
+                  } else {
+                    setError('');
+                  }
+                  setEmail(val);
                 }}
                 required
               />
@@ -132,7 +167,7 @@ const Login = () => {
                 id="password-input"
                 type={showPassword ? 'text' : 'password'}
                 className="form-input"
-                placeholder="Enter password"
+                placeholder={adminType === 'STUDENT' ? 'Enter password (e.g. Name@123)' : 'Enter password'}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required

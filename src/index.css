@@ -20452,3 +20452,29 @@ body:has(.enb-modal-overlay) {
   }
 }
 /* END NOTIFICATION BADGE */
+
+
+/* Show Interest Button Styles for Students */
+.action-btn.interest-btn {
+  background-color: #f0fdf4;
+  color: #16a34a;
+  border: 1px solid #bbf7d0;
+}
+
+.action-btn.interest-btn:hover {
+  background-color: #dcfce7;
+  color: #15803d;
+  border-color: #86efac;
+}
+
+.action-btn.interested-btn {
+  background-color: #16a34a;
+  color: #ffffff;
+  border: 1px solid #16a34a;
+}
+
+.action-btn.interested-btn:hover {
+  background-color: #15803d;
+  color: #ffffff;
+  border-color: #15803d;
+}

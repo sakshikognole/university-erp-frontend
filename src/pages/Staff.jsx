@@ -1,4 +1,4 @@
-﻿import React, { useState, useEffect, useRef, useCallback } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   Users,
@@ -54,9 +54,9 @@ function StfMobCard({ staff, num, formatDate, onView, onEdit, onDelete, expanded
           <div className="mob-card-row"><span className="mob-card-label">Role</span><span className="mob-card-value">{staff.role || '\u2014'}</span></div>
           <div className="mob-card-row"><span className="mob-card-label">Join date</span><span className="mob-card-value">{formatDate(staff.dateOfJoining)}</span></div>
           <div className="mob-card-actions">
-            <button type="button" className="action-btn view-btn" title="View" onClick={onView}><Eye size={14} /><span className="action-label">View</span></button>
-            <button type="button" className="action-btn edit-btn" title="Edit" onClick={onEdit}><Edit size={14} /><span className="action-label">Edit</span></button>
-            <button type="button" className="action-btn delete-btn" title="Delete" onClick={onDelete}><Trash2 size={14} /><span className="action-label">Delete</span></button>
+            <button type="button" className="action-btn view-btn" onClick={onView}><Eye size={14} /><span className="action-label">View</span></button>
+            <button type="button" className="action-btn edit-btn" onClick={onEdit}><Edit size={14} /><span className="action-label">Edit</span></button>
+            <button type="button" className="action-btn delete-btn" onClick={onDelete}><Trash2 size={14} /><span className="action-label">Delete</span></button>
           </div>
         </div>
       )}
@@ -266,7 +266,6 @@ const Staff = () => {
               placeholder="Search by Name, Staff ID, Email, Phone or Role…"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              title="Search staff"
             />
             {search && (
               <button type="button" className="search-clear-btn" onClick={() => setSearch('')}>Clear</button>
@@ -311,28 +310,28 @@ const Staff = () => {
               <table className="data-table">
                 <thead>
                   <tr>
-                    <th style={{ width: '40px' }}>#</th>
-                    <th style={{ width: '110px' }}>Staff ID</th>
-                    <th style={{ width: '130px' }}>Name</th>
-
-                    <th style={{ width: '120px' }}>Phone</th>
-                    <th style={{ width: '110px' }}>Role</th>
-                    <th style={{ width: '100px' }}>Join Date</th>
-                    <th style={{ width: '185px', textAlign: 'center' }}>Actions</th>
+                    <th style={{ width: '52px' }}>#</th>
+                    <th style={{ width: '150px' }}>Staff ID</th>
+                    <th>Name</th>
+                    <th>Email</th>
+                    <th style={{ width: '130px' }}>Phone</th>
+                    <th style={{ width: '140px' }}>Role</th>
+                    <th style={{ width: '110px' }}>Join Date</th>
+                    <th style={{ width: '220px', textAlign: 'right' }}>Actions</th>
                   </tr>
                 </thead>
                 <tbody>
                   {currentStaff.map((staff, index) => (
                     <tr key={staff._id || staff.staffId || index}>
-                      <td className="stu-num-cell">{startIndex + index + 1}</td>
+                      <td className="text-secondary">{startIndex + index + 1}</td>
                       <td><span className="code-badge">{staff.staffId}</span></td>
                       <td><span className="dept-name-cell">{staff.name}</span></td>
-
+                      <td>{staff.email}</td>
                       <td>{staff.phone}</td>
                       <td>{staff.role}</td>
                       <td>{formatDate(staff.dateOfJoining)}</td>
-                      <td style={{ textAlign: 'center' }}>
-                        <div className="action-buttons-cell" style={{ justifyContent: 'center' }}>
+                      <td style={{ textAlign: 'right' }}>
+                        <div className="action-buttons-cell" style={{ justifyContent: 'flex-end' }}>
                           <button
                             type="button"
                             className="action-btn view-btn"
@@ -354,7 +353,7 @@ const Staff = () => {
                           <button
                             type="button"
                             className="action-btn delete-btn"
-                            title="Delete"
+                            title="Delete Staff Member"
                             onClick={() => setDelStaff(staff)}
                           >
                             <Trash2 size={14} />
@@ -459,8 +458,8 @@ const Staff = () => {
 
       <ConfirmDialog
         isOpen={!!delStaff}
-        title="Delete"
-        description={`Are you sure you want to delete "${delStaff?.name}"? This action will permanently remove the record.`}
+        title="Delete Staff Member"
+        description={`Are you sure you want to delete staff member "${delStaff?.name}"? This action will permanently remove the record.`}
         itemName={delStaff?.name}
         itemSubtext={delStaff?.role ? `Role: ${delStaff.role}` : 'Staff Record'}
         itemBadge={delStaff?.staffId}

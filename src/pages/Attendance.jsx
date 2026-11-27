@@ -14,8 +14,13 @@ import {
   ChevronRight,
   Eye,
 } from 'lucide-react';
+import { useAuth } from '../context/AuthContext';
 const _IS_PROD = typeof window !== 'undefined' && window.location.hostname !== 'localhost';
 const API_BASE_URL = _IS_PROD ? 'https://university-erp-node.onrender.com/api' : 'http://localhost:5000/api';
+const authHeader = () => ({
+  'Content-Type': 'application/json',
+  Authorization: `Bearer ${localStorage.getItem('erp_token')}`,
+});
 
 // ── sessionStorage key for draft attendance ───────────────────────────────
 const ATT_DRAFT_KEY = 'att_draft_v1';
@@ -37,6 +42,8 @@ export const clearAttendanceDraft = () => {
 };
 
 const Attendance = () => {
+  const { user } = useAuth();
+  const isStudent = user?.role === 'STUDENT' || user?.adminType === 'STUDENT';
   const navigate = useNavigate();
 
   const [loading, setLoading]   = useState(true);
@@ -68,7 +75,7 @@ const Attendance = () => {
     setLoading(true);
     setFeedback({ type: '', message: '' });
     try {
-      const res = await fetch(`${API_BASE_URL}/attendance/session`);
+      const res = await fetch(`${API_BASE_URL}/attendance/session`, { headers: authHeader() });
       if (!res.ok) throw new Error('Failed to load session data');
       const data = await res.json();
 
@@ -159,7 +166,7 @@ const Attendance = () => {
   // ── Loading ───────────────────────────────────────────────────────────────
   if (loading) {
     return (
-      <div className="page-container attendance-page">
+      <div className="page-container">
         <div style={{ padding: '4rem', textAlign: 'center', color: 'var(--text-secondary)' }}>
           <Loader2 size={32} className="spin-animate" style={{ margin: '0 auto 1rem' }} />
           <p>Loading attendance session...</p>
@@ -169,16 +176,15 @@ const Attendance = () => {
   }
 
   return (
-    <div className="page-container attendance-page">
+    <div className="page-container">
 
-
-      {/* Attendance page header - flex column, button always right */}
-      <div style={{ marginBottom: '1.5rem', display: 'flex', flexDirection: 'column', gap: '0.625rem' }}>
+      {/* ── Page Header ──────────────────────────────────────────────────── */}
+      <div className="page-header-row" style={{ marginBottom: '1.5rem' }}>
         <div>
           <h1 className="page-title">Attendance</h1>
           <p className="page-subtitle">Mark student attendance, then review before submitting</p>
         </div>
-        <div style={{ display: 'flex', justifyContent: 'flex-end', width: '100%' }}>
+        <div className="header-actions-group">
           <button
             type="button"
             className="books-btn books-btn-primary"
@@ -190,6 +196,7 @@ const Attendance = () => {
           </button>
         </div>
       </div>
+
       {/* ════════════════════════════════════════════════════════════════════
           SESSION HEADER CARD
       ════════════════════════════════════════════════════════════════════ */}
@@ -209,7 +216,8 @@ const Attendance = () => {
               className="att-session-tile-input"
               type="text"
               value={session.venue}
-              onChange={(e) => setSession((p) => ({ ...p, venue: e.target.value }))}
+              onChange={(e) => !isStudent && setSession((p) => ({ ...p, venue: e.target.value }))}
+              readOnly={isStudent}
               placeholder="e.g. Lecture Hall – A101"
               aria-label="Venue"
             />
@@ -222,7 +230,8 @@ const Attendance = () => {
               className="att-session-tile-input"
               type="text"
               value={session.subjectName}
-              onChange={(e) => setSession((p) => ({ ...p, subjectName: e.target.value }))}
+              onChange={(e) => !isStudent && setSession((p) => ({ ...p, subjectName: e.target.value }))}
+              readOnly={isStudent}
               placeholder="e.g. Data Structures & Algorithms"
               aria-label="Subject Name"
             />
@@ -235,7 +244,8 @@ const Attendance = () => {
               className="att-session-tile-input"
               type="date"
               value={session.date}
-              onChange={(e) => setSession((p) => ({ ...p, date: e.target.value }))}
+              onChange={(e) => !isStudent && setSession((p) => ({ ...p, date: e.target.value }))}
+              readOnly={isStudent}
               aria-label="Date"
             />
           </div>
@@ -247,14 +257,15 @@ const Attendance = () => {
               className="att-session-tile-input"
               type="time"
               value={to24h(session.time)}
-              onChange={(e) => setSession((p) => ({ ...p, time: e.target.value }))}
+              onChange={(e) => !isStudent && setSession((p) => ({ ...p, time: e.target.value }))}
+              readOnly={isStudent}
               aria-label="Time"
             />
           </div>
         </div>
       </div>
 
-      {/* ── Toolbar: bulk preset buttons — right-aligned ─────────────── */}
+      {/* ── Toolbar: bulk preset buttons (sticky on mobile so always visible) ── */}
       <div className="att-toolbar att-toolbar--sticky">
         <div className="att-chips-row">
           <div className="attendance-chip attendance-chip--total">
@@ -268,18 +279,20 @@ const Attendance = () => {
           </div>
         </div>
 
-        <div className="att-bulk-row" style={{ marginLeft: 'auto' }}>
-          <button type="button" className="attendance-bulk-btn" onClick={() => markAll(true)}>
-            Mark All Present
-          </button>
-          <button
-            type="button"
-            className="attendance-bulk-btn attendance-bulk-btn--ghost"
-            onClick={() => markAll(false)}
-          >
-            Clear All
-          </button>
-        </div>
+        {!isStudent && (
+          <div className="att-bulk-row">
+            <button type="button" className="attendance-bulk-btn" onClick={() => markAll(true)}>
+              Mark All Present
+            </button>
+            <button
+              type="button"
+              className="attendance-bulk-btn attendance-bulk-btn--ghost"
+              onClick={() => markAll(false)}
+            >
+              Clear All
+            </button>
+          </div>
+        )}
       </div>
 
       {/* ── Student List ─────────────────────────────────────────────────── */}
@@ -315,8 +328,9 @@ const Attendance = () => {
                 className={`attendance-toggle-btn ${
                   student.present ? 'attendance-toggle-btn--present' : 'attendance-toggle-btn--absent'
                 }`}
-                onClick={() => togglePresent(student.rollNo)}
-                title={student.present ? 'Mark as Absent' : 'Mark as Present'}
+                onClick={() => !isStudent && togglePresent(student.rollNo)}
+                disabled={isStudent}
+                title={isStudent ? (student.present ? 'Present' : 'Absent') : (student.present ? 'Mark as Absent' : 'Mark as Present')}
                 aria-label={`${student.present ? 'Present' : 'Absent'} — click to toggle`}
                 aria-pressed={student.present}
               >
@@ -406,22 +420,24 @@ const Attendance = () => {
       )}
 
       {/* ── Bottom action bar ─────────────────────────────────────────────── */}
-      <div
-        style={{
-          display: 'flex',
-          justifyContent: 'flex-end',
-          paddingBottom: '2rem',
-        }}
-      >
-        <button
-          type="button"
-          className="attendance-submit-btn"
-          onClick={handleShowAttendance}
+      {!isStudent && (
+        <div
+          style={{
+            display: 'flex',
+            justifyContent: 'flex-end',
+            paddingBottom: '2rem',
+          }}
         >
-          <Eye size={16} />
-          Show Attendance
-        </button>
-      </div>
+          <button
+            type="button"
+            className="attendance-submit-btn"
+            onClick={handleShowAttendance}
+          >
+            <Eye size={16} />
+            Show Attendance
+          </button>
+        </div>
+      )}
 
     </div>
   );

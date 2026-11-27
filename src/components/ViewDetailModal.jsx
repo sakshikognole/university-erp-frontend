@@ -1,14 +1,6 @@
 import React from 'react';
-import { createPortal } from 'react-dom';
-
 
 export default function ViewDetailModal({ isOpen, title, subtitle, rows, onClose }) {
-  React.useEffect(() => {
-    if (!isOpen) return;
-    const handler = (e) => { if (e.key === 'Escape') onClose(); };
-    document.addEventListener('keydown', handler);
-    return () => document.removeEventListener('keydown', handler);
-  }, [isOpen, onClose]);
   if (!isOpen) return null;
 
   return (
@@ -16,6 +8,11 @@ export default function ViewDetailModal({ isOpen, title, subtitle, rows, onClose
       <div className="books-modal" style={{ maxWidth: 500 }} onClick={(e) => e.stopPropagation()}>
         <div className="books-modal-head">
           <div>
+            {subtitle && (
+              <p style={{ fontSize: 11, color: 'var(--text-secondary)', marginBottom: 2 }}>
+                {subtitle}
+              </p>
+            )}
             <h3>{title}</h3>
           </div>
           <button type="button" className="books-modal-close" onClick={onClose} aria-label="Close">

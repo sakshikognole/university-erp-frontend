@@ -1,15 +1,19 @@
 import { useState, useEffect, useCallback } from 'react';
 import axios from 'axios';
-import { Edit, Trash2, Eye } from 'lucide-react';
+import { Edit, Trash2, Eye, Sparkles } from 'lucide-react';
 import ClubModal from './ClubModal';
 import ViewClubModal from './ViewClubModal';
 import ConfirmDialog from '../components/ConfirmDialog';
+import { useAuth } from '../context/AuthContext';
 
 const _IS_PROD_SP = typeof window !== 'undefined' && window.location.hostname !== 'localhost';
 const _SPRING_URL = _IS_PROD_SP ? 'https://university-erp-spring.onrender.com' : 'http://localhost:9090';
 const SPRING_API = `${_SPRING_URL}/api`;
 
 export default function ClubsPage() {
+    const { user } = useAuth();
+    const isStudent = user?.role === 'STUDENT' || user?.adminType === 'STUDENT';
+
     const [clubs, setClubs] = useState([]);
     const [loading, setLoading] = useState(true);
     const [saving, setSaving] = useState(false);
@@ -23,6 +27,28 @@ export default function ClubsPage() {
     const [error, setError] = useState('');
     const [success, setSuccess] = useState('');
     const [dupError, setDupError] = useState('');
+
+    const [interestedClubs, setInterestedClubs] = useState(() => {
+        try {
+            const saved = localStorage.getItem('erp_interested_clubs');
+            return saved ? JSON.parse(saved) : {};
+        } catch { return {}; }
+    });
+
+    const handleToggleInterest = (club) => {
+        const clubKey = club.id || club.clubId;
+        const isNowInterested = !interestedClubs[clubKey];
+        const updated = { ...interestedClubs, [clubKey]: isNowInterested };
+        setInterestedClubs(updated);
+        try {
+            localStorage.setItem('erp_interested_clubs', JSON.stringify(updated));
+        } catch { }
+        if (isNowInterested) {
+            setSuccess(`Interest submitted for "${club.clubName}"! The coordinator has been notified.`);
+        } else {
+            setSuccess(`Interest withdrawn for "${club.clubName}".`);
+        }
+    };
 
 
     const load = useCallback(async (silent = false) => {
@@ -137,13 +163,15 @@ export default function ClubsPage() {
             <div className="feature-page-header">
                 <div className="feature-page-header-info">
                     <h1 className="page-title">Clubs</h1>
-                    <p className="stu-page-sub">Manage clubs and sub-clubs</p>
+                    <p className="stu-page-sub">{isStudent ? 'Browse clubs and participate' : 'Manage clubs and sub-clubs'}</p>
                 </div>
-                <div className="feature-page-header-actions">
-                    <button className="books-btn books-btn-primary" onClick={openAdd}>
-                        + Add Club
-                    </button>
-                </div>
+                {!isStudent && (
+                    <div className="feature-page-header-actions">
+                        <button className="books-btn books-btn-primary" onClick={openAdd}>
+                            + Add Club
+                        </button>
+                    </div>
+                )}
             </div>
 
             {/* Notifications */}
@@ -253,25 +281,41 @@ export default function ClubsPage() {
                                     <Eye size={14} />
                                     <span className="action-label">View</span>
                                 </button>
-                                <button
-                                    type="button"
-                                    className="action-btn edit-btn"
-                                    onClick={() => openEdit(club)}
-                                    title="Edit Club"
-                                >
-                                    <Edit size={14} />
-                                    <span className="action-label">Edit</span>
-                                </button>
-                                <button
-                                    type="button"
-                                    className="action-btn delete-btn"
-                                    onClick={() => handleDelete(club)}
-                                    disabled={deleting === club.id}
-                                    title="Delete Club"
-                                >
-                                    <Trash2 size={14} />
-                                    <span className="action-label">{deleting === club.id ? 'Deleting...' : 'Delete'}</span>
-                                </button>
+                                {isStudent ? (
+                                    <button
+                                        type="button"
+                                        className={`action-btn ${interestedClubs[club.id || club.clubId] ? 'interested-btn' : 'interest-btn'}`}
+                                        onClick={() => handleToggleInterest(club)}
+                                        title={interestedClubs[club.id || club.clubId] ? 'Withdraw Interest' : 'Show Interest'}
+                                    >
+                                        <Sparkles size={14} />
+                                        <span className="action-label">
+                                            {interestedClubs[club.id || club.clubId] ? 'Interested ✓' : 'Show Interest'}
+                                        </span>
+                                    </button>
+                                ) : (
+                                    <>
+                                        <button
+                                            type="button"
+                                            className="action-btn edit-btn"
+                                            onClick={() => openEdit(club)}
+                                            title="Edit Club"
+                                        >
+                                            <Edit size={14} />
+                                            <span className="action-label">Edit</span>
+                                        </button>
+                                        <button
+                                            type="button"
+                                            className="action-btn delete-btn"
+                                            onClick={() => handleDelete(club)}
+                                            disabled={deleting === club.id}
+                                            title="Delete Club"
+                                        >
+                                            <Trash2 size={14} />
+                                            <span className="action-label">{deleting === club.id ? 'Deleting...' : 'Delete'}</span>
+                                        </button>
+                                    </>
+                                )}
                             </div>
 
                         </div>
