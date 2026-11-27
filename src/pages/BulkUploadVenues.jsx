@@ -262,26 +262,24 @@ const BulkUploadVenues = () => {
   return (
     <div className="page-container">
       <div className="page-header" style={{ marginBottom: '1.5rem' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-          <button
-            type="button"
-            className="btn-back"
-            onClick={() => navigate('/venues')}
-            title="Back to Venues"
-          >
-            <ArrowLeft size={18} />
-          </button>
-          <div>
-            <h1 className="page-title" style={{ fontSize: '1.5rem' }}>
-              Bulk Upload Venues
-            </h1>
-            <p className="page-subtitle">
-              Upload multiple venue records at once using CSV file
-            </p>
-          </div>
+        <button
+          type="button"
+          className="btn-back"
+          onClick={() => navigate('/venues')}
+          title="Back to Venues"
+          style={{ marginBottom: '0.5rem' }}
+        >
+          <ArrowLeft size={18} />
+        </button>
+        <div>
+          <h1 className="page-title" style={{ fontSize: '1.5rem', whiteSpace: 'nowrap' }}>
+            Bulk Upload Venues
+          </h1>
+          <p className="page-subtitle">
+            Upload multiple venue records at once using CSV file
+          </p>
         </div>
       </div>
-
       <div className="card" style={{ marginTop: '1.5rem' }}>
         <div style={{ padding: '1.5rem' }}>
           <div className="info-banner" style={{ marginBottom: '1.5rem' }}>

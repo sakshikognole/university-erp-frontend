@@ -74,22 +74,56 @@ const SystemAnnouncementView = () => {
     return /\.(jpg|jpeg|png|webp|gif)(\?.*)?$/i.test(url) || url.includes('/image/upload/');
   };
 
-  // Download a file via the backend proxy.
-  // The backend fetches the file server-side from Cloudinary (bypassing CORS and
-  // raw-file delivery restrictions) and streams it to the browser.
+  const isDocUrl = (url) => /\.(docx?|pptx?|xlsx?)(\?.*)?$/i.test(url);
+
+  // Opens a file in a new tab:
+  //   DOCX/PPT/XLS → Office Online Viewer (handles Office formats natively)
+  //   PDF / image  → fetches /view-proxy (authenticated), gets back HTML,
+  //                  creates a blob:text/html URL and navigates the pre-opened tab to it
+  const viewFile = async (url) => {
+    if (!url) return;
+
+    if (isDocUrl(url)) {
+      window.open(
+        `https://view.officeapps.live.com/op/view.aspx?src=${encodeURIComponent(url)}`,
+        '_blank', 'noopener,noreferrer'
+      );
+      return;
+    }
+
+    // Must open tab synchronously (user-gesture context) before any await
+    const tab = window.open('', '_blank', 'noopener,noreferrer');
+    if (!tab) return;
+
+    try {
+      const proxyUrl = `${API_BASE_URL}/system-announcements/view-proxy?url=${encodeURIComponent(url)}`;
+      const res = await fetch(proxyUrl, {
+        headers: { Authorization: `Bearer ${localStorage.getItem('erp_token')}` },
+      });
+      if (!res.ok) { tab.close(); return; }
+      const html = await res.text();
+      // Create a blob URL from the HTML — same-origin, no document.write needed
+      const blob = new Blob([html], { type: 'text/html' });
+      const blobUrl = URL.createObjectURL(blob);
+      tab.location.replace(blobUrl);
+      // Revoke after the tab has had time to load
+      setTimeout(() => URL.revokeObjectURL(blobUrl), 60000);
+    } catch {
+      tab.close();
+    }
+  };
+
+  // Downloads a file via the backend proxy with the auth token in the header.
   const downloadFile = async (url) => {
     if (!url) return;
     setDownloading(true);
     try {
       const token = localStorage.getItem('erp_token');
       const proxyUrl = `${API_BASE_URL}/system-announcements/download-proxy?url=${encodeURIComponent(url)}`;
-
       const res = await fetch(proxyUrl, {
         headers: { Authorization: `Bearer ${token}` },
       });
-
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
-
       const blob = await res.blob();
       const objectUrl = URL.createObjectURL(blob);
       const a = document.createElement('a');
@@ -97,13 +131,9 @@ const SystemAnnouncementView = () => {
       a.download = decodeURIComponent(url.split('/').pop().split('?')[0]) || 'attachment';
       document.body.appendChild(a);
       a.click();
-      setTimeout(() => {
-        document.body.removeChild(a);
-        URL.revokeObjectURL(objectUrl);
-      }, 150);
-    } catch {
-      // Last-resort fallback: open in new tab
-      window.open(url, '_blank', 'noopener,noreferrer');
+      setTimeout(() => { document.body.removeChild(a); URL.revokeObjectURL(objectUrl); }, 150);
+    } catch (err) {
+      console.error('Download failed:', err);
     } finally {
       setDownloading(false);
     }
@@ -114,24 +144,22 @@ const SystemAnnouncementView = () => {
     <div className="page-container">
       {/* Header row */}
       <div className="page-header" style={{ marginBottom: '1.5rem' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-          <button
-            type="button"
-            className="btn-back"
-            onClick={() => navigate('/system-announcements')}
-            title="Back to Announcements"
-          >
-            <ArrowLeft size={18} />
-          </button>
-          <div>
-            <h1 className="page-title" style={{ fontSize: '1.5rem' }}>
-              Announcement Details
-            </h1>
-            <p className="page-subtitle">View System Announcement Details</p>
-          </div>
+        <button
+          type="button"
+          className="btn-back"
+          onClick={() => navigate('/system-announcements')}
+          title="Back to Announcements"
+          style={{ marginBottom: '0.5rem' }}
+        >
+          <ArrowLeft size={18} />
+        </button>
+        <div>
+          <h1 className="page-title" style={{ fontSize: '1.5rem' }}>
+            Announcement Details
+          </h1>
+          <p className="page-subtitle">View System Announcement Details</p>
         </div>
       </div>
-
       {/* Loading */}
       {loading && (
         <div
@@ -334,13 +362,14 @@ const SystemAnnouncementView = () => {
                   color: 'var(--text-secondary)',
                   textTransform: 'uppercase',
                   letterSpacing: '0.05em',
-                  marginBottom: '0.6rem',
+                  marginBottom: '0.75rem',
                 }}
               >
-                Attachment
+                File
               </p>
 
               {isImageUrl(announcement.fileUrl) ? (
+                /* ── Image preview ── */
                 <div
                   style={{
                     borderRadius: '10px',
@@ -351,62 +380,49 @@ const SystemAnnouncementView = () => {
                 >
                   <img
                     src={announcement.fileUrl}
-                    alt="Announcement attachment"
+                    alt="Announcement file"
                     style={{ width: '100%', display: 'block', objectFit: 'contain', maxHeight: '400px' }}
                     onError={(e) => { e.target.style.display = 'none'; }}
                   />
-                  <div
-                    style={{
-                      padding: '8px 14px',
-                      borderTop: '1px solid var(--border-color, #e5e7eb)',
-                      display: 'flex',
-                      justifyContent: 'flex-end',
-                    }}
-                  >
-                    <a
-                      href={announcement.fileUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      style={{
-                        display: 'inline-flex',
-                        alignItems: 'center',
-                        gap: '5px',
-                        fontSize: '0.8125rem',
-                        color: 'var(--primary, #6366f1)',
-                        textDecoration: 'none',
-                        fontWeight: 500,
-                      }}
+                  <div style={{ padding: '8px 14px', borderTop: '1px solid var(--border-color, #e5e7eb)', display: 'flex', gap: '8px' }}>
+                    <button
+                      type="button"
+                      onClick={() => viewFile(announcement.fileUrl)}
+                      style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', padding: '7px 14px', borderRadius: '6px', background: 'var(--hover-bg, #f9fafb)', border: '1px solid var(--border-color, #e5e7eb)', color: 'var(--primary, #6366f1)', fontSize: '0.8125rem', fontWeight: 500, cursor: 'pointer', whiteSpace: 'nowrap' }}
                     >
-                      <ExternalLink size={13} />
-                      Open full image
-                    </a>
+                      <ExternalLink size={14} /><span>View</span>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => downloadFile(announcement.fileUrl)}
+                      disabled={downloading}
+                      style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', padding: '7px 14px', borderRadius: '6px', background: 'var(--hover-bg, #f9fafb)', border: '1px solid var(--border-color, #e5e7eb)', color: downloading ? 'var(--text-secondary)' : 'var(--primary, #6366f1)', fontSize: '0.8125rem', fontWeight: 500, cursor: downloading ? 'not-allowed' : 'pointer', whiteSpace: 'nowrap' }}
+                    >
+                      {downloading ? <Loader2 size={14} className="spin-animate" /> : <Download size={14} />}
+                      <span>{downloading ? 'Downloading…' : 'Download'}</span>
+                    </button>
                   </div>
                 </div>
               ) : (
-                <button
-                  type="button"
-                  onClick={() => downloadFile(announcement.fileUrl)}
-                  disabled={downloading}
-                  style={{
-                    display: 'inline-flex',
-                    alignItems: 'center',
-                    gap: '10px',
-                    padding: '12px 18px',
-                    borderRadius: '8px',
-                    background: 'var(--hover-bg, #f9fafb)',
-                    border: '1px solid var(--border-color, #e5e7eb)',
-                    color: downloading ? 'var(--text-secondary)' : 'var(--primary, #6366f1)',
-                    fontSize: '0.875rem',
-                    fontWeight: 500,
-                    cursor: downloading ? 'not-allowed' : 'pointer',
-                    transition: 'background 0.15s',
-                  }}
-                >
-                  {downloading
-                    ? <Loader2 size={18} className="spin-animate" />
-                    : <Download size={18} />}
-                  <span>{downloading ? 'Downloading…' : 'Download Attachment'}</span>
-                </button>
+                /* ── Document (PDF, DOCX, etc.) ── */
+                <div style={{ display: 'flex', flexDirection: 'row', gap: '10px', flexWrap: 'nowrap', maxWidth: '100%' }}>
+                  <button
+                    type="button"
+                    onClick={() => viewFile(announcement.fileUrl)}
+                    style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', padding: '10px 18px', borderRadius: '8px', background: 'var(--hover-bg, #f9fafb)', border: '1px solid var(--border-color, #e5e7eb)', color: 'var(--primary, #6366f1)', fontSize: '0.875rem', fontWeight: 500, cursor: 'pointer', whiteSpace: 'nowrap', flex: '0 1 auto', minWidth: 0 }}
+                  >
+                    <ExternalLink size={16} /><span>View</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => downloadFile(announcement.fileUrl)}
+                    disabled={downloading}
+                    style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', padding: '10px 18px', borderRadius: '8px', background: 'var(--hover-bg, #f9fafb)', border: '1px solid var(--border-color, #e5e7eb)', color: downloading ? 'var(--text-secondary)' : 'var(--primary, #6366f1)', fontSize: '0.875rem', fontWeight: 500, cursor: downloading ? 'not-allowed' : 'pointer', whiteSpace: 'nowrap', flex: '0 1 auto', minWidth: 0 }}
+                  >
+                    {downloading ? <Loader2 size={16} className="spin-animate" /> : <Download size={16} />}
+                    <span>{downloading ? 'Downloading…' : 'Download'}</span>
+                  </button>
+                </div>
               )}
             </div>
           )}

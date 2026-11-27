@@ -177,8 +177,8 @@ const StudentFormModal = ({ isOpen, studentId, onClose, onSuccess }) => {
     const { name, value } = e.target;
     let newValue = value;
     if (name === 'prn') {
-      // Allow letters, digits, and one hyphen — strip everything else, then uppercase
-      newValue = value.replace(/[^A-Za-z0-9-]/g, '').toUpperCase();
+      // Allow letters, digits, hyphens, underscores — strip everything else, then uppercase
+      newValue = value.replace(/[^A-Za-z0-9_-]/g, '').toUpperCase();
     }
     if (name === 'division') {
       // Single letter A-Z only — take first letter, strip everything else
@@ -610,10 +610,6 @@ const StudentFormModal = ({ isOpen, studentId, onClose, onSuccess }) => {
                   ))}
                 </div>
               )}
-
-              <div style={{ background: '#f8fafc', padding: '10px 14px', borderRadius: '8px', border: '1px solid #e2e8f0', marginTop: '14px', fontSize: '12.5px', color: '#475569' }}>
-                <span>ℹ️ <strong>Student Portal Login:</strong> Student will be able to log in using their <strong>PRN</strong> and password format <code>Name@123</code> (e.g. <code>Sakshi@123</code>).</span>
-              </div>
             </form>
           )}
         </div>

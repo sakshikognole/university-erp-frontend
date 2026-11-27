@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useCallback } from 'react';
+﻿import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   Building2, Plus, Download, Search, Edit, Trash2, FileText, FileSpreadsheet,
@@ -517,7 +517,7 @@ const Departments = () => {
                           <button
                             type="button"
                             className="action-btn delete-btn"
-                            title="Delete Department"
+                            title="Delete"
                             onClick={() => setDeleteConfirm(dept)}
                           >
                             <Trash2 size={14} />
@@ -563,7 +563,7 @@ const Departments = () => {
                 <AlertTriangle size={22} />
               </div>
               <div className="delete-dialog-title-box">
-                <h3 className="delete-dialog-title">Delete Department</h3>
+                <h3 className="delete-dialog-title">Delete</h3>
                 <p className="delete-dialog-desc">
                   Are you sure you want to delete this academic department? This action will
                   permanently remove the record.
@@ -619,7 +619,7 @@ const Departments = () => {
                 ) : (
                   <>
                     <Trash2 size={16} />
-                    <span>Delete Department</span>
+                    <span>Delete</span>
                   </>
                 )}
               </button>

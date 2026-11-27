@@ -638,21 +638,13 @@ const EventForm = ({ isDialog = false, dialogId, onClose, onSaved } = {}) => {
               Start Time <span style={{ color: '#ef4444' }}>*</span>
             </label>
             <input
-              type="text"
+              type="time"
               id="eb-startTimeOnly"
               className={`form-input${fieldErrors.startTimeOnly ? ' input-error' : ''}`}
-              placeholder="HH:MM AM/PM"
-              value={startTimeDisplay}
-              onChange={handleStartTimeChange}
-              onBlur={() => {
-                // Normalise on blur: if user typed 24-h format convert to 12-h display
-                const h24 = to24h(startTimeDisplay) || startTimeDisplay;
-                const display = to12h(h24) || startTimeDisplay;
-                setStartTimeDisplay(display);
-              }}
-              maxLength={10}
+              value={formData.startTimeOnly || ""}
+              onChange={(e) => { handleInputChange({ target: { name: "startTimeOnly", value: e.target.value } }); setStartTimeDisplay(e.target.value); }}
             />
-            <small className="form-field-hint">12-hour format, e.g. 09:30 AM</small>
+            
             <FieldError name="startTimeOnly" />
           </div>
         </div>
@@ -681,20 +673,13 @@ const EventForm = ({ isDialog = false, dialogId, onClose, onSaved } = {}) => {
               End Time <span style={{ color: '#ef4444' }}>*</span>
             </label>
             <input
-              type="text"
+              type="time"
               id="eb-endTimeOnly"
               className={`form-input${fieldErrors.endTimeOnly ? ' input-error' : ''}`}
-              placeholder="HH:MM AM/PM"
-              value={endTimeDisplay}
-              onChange={handleEndTimeChange}
-              onBlur={() => {
-                const h24 = to24h(endTimeDisplay) || endTimeDisplay;
-                const display = to12h(h24) || endTimeDisplay;
-                setEndTimeDisplay(display);
-              }}
-              maxLength={10}
+              value={formData.endTimeOnly || ""}
+              onChange={(e) => { handleInputChange({ target: { name: "endTimeOnly", value: e.target.value } }); setEndTimeDisplay(e.target.value); }}
             />
-            <small className="form-field-hint">12-hour format, e.g. 05:00 PM</small>
+            
             <FieldError name="endTimeOnly" />
           </div>
         </div>
@@ -806,38 +791,50 @@ const EventForm = ({ isDialog = false, dialogId, onClose, onSaved } = {}) => {
 
   // ── Dialog mode ──────────────────────────────────────────────────────────
 
+
   if (isDialog) {
     return (
-      <div className="modal-overlay eb-form-overlay" onClick={(e) => { if (e.target === e.currentTarget) handleCancel(); }}>
-        <div className="modal-content eb-form-dialog" onClick={e => e.stopPropagation()}>
-          {/* D5: Back / close button at top-left of dialog header */}
-          <div className="modal-header eb-dialog-header">
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.625rem' }}>
+      <div
+        className="sf-overlay"
+        onClick={(e) => { if (e.target === e.currentTarget) handleCancel(); }}
+        style={{ position: "fixed", inset: 0, zIndex: 9999, background: "rgba(0,0,0,0.55)", backdropFilter: "blur(4px)", display: "flex", alignItems: "center", justifyContent: "center", padding: "1.5rem", overflowY: "auto" }}
+      >
+        <div
+          className="sf-modal"
+          onClick={(e) => e.stopPropagation()}
+          style={{ width: "100%", maxWidth: "760px", maxHeight: "86vh", display: "flex", flexDirection: "column", background: "#fff", borderRadius: "14px", boxShadow: "0 20px 48px rgba(0,0,0,0.22)", overflow: "hidden", margin: "auto" }}
+        >
+          {/* Header */}
+          <div className="sf-header" style={{ flexShrink: 0 }}>
+            <div className="sf-header-left">
+              <div className="sf-header-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg></div>
               <div>
-                <h2 className="modal-title" style={{ fontSize: '1.125rem' }}>
-                  {isEditMode ? 'Edit Event' : 'Add New Event'}
-                </h2>
+                <h2 className="sf-title">{isEditMode ? "Edit Event" : "Add New Event"}</h2>
+                
               </div>
             </div>
-            <button type="button" className="close-modal-btn" onClick={handleCancel} title="Close">
+            <button type="button" className="sf-close-btn" onClick={handleCancel} title="Close">
               <X size={18} />
             </button>
           </div>
 
+          {/* Feedback */}
           {feedback.message && (
-            <div className={`feedback-banner ${feedback.type === 'success' ? 'feedback-success' : 'feedback-error'}`}
-              style={{ marginBottom: '1rem' }}>
-              {feedback.type === 'success' ? <CheckCircle2 size={18} /> : <AlertCircle size={18} />}
-              <span>{feedback.message}</span>
+            <div className={`sf-feedback ${feedback.type === "success" ? "sf-feedback-success" : "sf-feedback-error"}`}>
+              {feedback.type === "success" ? <CheckCircle2 size={16} /> : <AlertCircle size={16} />}
+              <span style={{ flex: 1 }}>{feedback.message}</span>
             </div>
           )}
 
-          {fetching ? (
-            <div style={{ padding: '3rem', textAlign: 'center', color: 'var(--text-secondary)' }}>
-              <Loader2 size={28} className="spin-animate" style={{ margin: '0 auto 0.75rem' }} />
-              <p>Loading event details…</p>
-            </div>
-          ) : formContent}
+          {/* Body */}
+          <div className="sf-body" style={{ padding: 0 }}>
+            {fetching ? (
+              <div style={{ padding: "3rem", textAlign: "center", color: "var(--text-secondary)" }}>
+                <Loader2 size={28} className="spin-animate" style={{ margin: "0 auto 0.75rem" }} />
+                <p>Loading event details...</p>
+              </div>
+            ) : formContent}
+          </div>
         </div>
       </div>
     );

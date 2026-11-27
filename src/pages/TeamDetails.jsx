@@ -1,5 +1,6 @@
-import { springApi } from '../services/api';
+﻿import { springApi } from '../services/api';
 import { useState, useEffect, useCallback, useRef } from 'react';
+import { ArrowLeft } from 'lucide-react';
 
 // Node.js backend — where students are stored
 const _IS_PROD = window.location.hostname !== 'localhost';
@@ -145,14 +146,12 @@ export default function TeamDetails({ teamId, onBack }) {
   return (
     <div className="page-container">
 
-      {/* Back button — icon only */}
-      <button className="st-back-link" onClick={onBack} style={{ fontSize: '1.2rem', lineHeight: 1 }}>
-        ←
-      </button>
-
-      {/* Page title */}
-      <div className="feature-page-header">
-        <div className="feature-page-header-info">
+      {/* Back button above title */}
+      <div className="page-header" style={{ marginBottom: '1.5rem' }}>
+        <button type="button" className="btn-back" onClick={onBack} title="Back to Sport Teams" style={{ marginBottom: '0.5rem' }}>
+          <ArrowLeft size={18} />
+        </button>
+        <div>
           <h1 className="page-title">{team.teamId}</h1>
           <p className="page-subtitle">{team.sportName} Team</p>
         </div>

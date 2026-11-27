@@ -787,15 +787,6 @@ const EmailCommunication = () => {
             )}
           </div>
           <div className="header-actions-group">
-            <button
-              type="button"
-              className="books-btn books-btn-ghost"
-              onClick={() => setShowAddModal(true)}
-              title="Add a single email address"
-            >
-              <Plus size={16} />
-              <span>Add Email</span>
-            </button>
             {/* Hidden file input */}
             <input
               ref={fileInputRef}
@@ -804,15 +795,6 @@ const EmailCommunication = () => {
               style={{ display: 'none' }}
               onChange={handleFileChange}
             />
-            <button
-              type="button"
-              className="books-btn books-btn-ghost"
-              onClick={() => fileInputRef.current?.click()}
-              title="Import emails from CSV or Excel"
-            >
-              <Upload size={16} />
-              <span>Upload</span>
-            </button>
             {recipientList.length > 0 && (
               <button
                 type="button"
@@ -824,6 +806,24 @@ const EmailCommunication = () => {
                 <span>Clear All</span>
               </button>
             )}
+            <button
+              type="button"
+              className="books-btn books-btn-ghost"
+              onClick={() => fileInputRef.current?.click()}
+              title="Import emails from CSV or Excel"
+            >
+              <Upload size={16} />
+              <span>Upload</span>
+            </button>
+            <button
+              type="button"
+              className="books-btn books-btn-primary"
+              onClick={() => setShowAddModal(true)}
+              title="Add a single email address"
+            >
+              <Plus size={16} />
+              <span>Add Email</span>
+            </button>
           </div>
         </div>
 

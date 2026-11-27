@@ -31,6 +31,26 @@ const DashboardLayout = () => {
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
+  // Global Escape: close any open modal by clicking its close button
+  React.useEffect(() => {
+    const handleEsc = (e) => {
+      if (e.key !== 'Escape') return;
+      const closeSelectors = [
+        '.sf-overlay .sf-close-btn',
+        '.sf-overlay .close-modal-btn',
+        '.books-overlay .books-modal-close',
+        '.modal-overlay .close-modal-btn',
+        '.enb-modal-overlay .enb-modal-close',
+      ];
+      for (const sel of closeSelectors) {
+        const btn = document.querySelector(sel);
+        if (btn) { btn.click(); return; }
+      }
+    };
+    document.addEventListener('keydown', handleEsc);
+    return () => document.removeEventListener('keydown', handleEsc);
+  }, []);
+
   // Prevent background scrolling on mobile when any modal/overlay is open
   useEffect(() => {
     const checkModalScrollLock = () => {

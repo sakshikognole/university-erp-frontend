@@ -1,10 +1,48 @@
 import React, { useEffect, useState } from 'react';
-import { FileText } from 'lucide-react';
+import { FileText, Eye, Download } from 'lucide-react';
 import ConfirmDialog from '../components/ConfirmDialog';
 import { useAuth } from '../context/AuthContext';
 
 const _IS_PROD_AR = window.location.hostname !== 'localhost';
 const NODE_URL = _IS_PROD_AR ? 'https://university-erp-node.onrender.com/api' : 'http://localhost:5000/api';
+
+const getResourceUrl = (fileUrl, nodeUrl) => {
+  return fileUrl.startsWith('/api')
+    ? `${nodeUrl.replace('/api', '')}${fileUrl}`
+    : fileUrl;
+};
+
+const viewResource = (res, nodeUrl) => {
+  const url = getResourceUrl(res.fileUrl, nodeUrl);
+  const fileName = res.publicId || res.title || '';
+  const extension = fileName.split('.').pop().toLowerCase();
+  const officeExtensions = ['doc', 'docx', 'ppt', 'pptx'];
+
+  let viewUrl = url;
+  if (officeExtensions.includes(extension)) {
+    viewUrl = `https://view.officeapps.live.com/op/view.aspx?src=${encodeURIComponent(url)}`;
+  }
+  window.open(viewUrl, '_blank', 'noopener,noreferrer');
+};
+
+const downloadResource = async (res, nodeUrl) => {
+  const url = getResourceUrl(res.fileUrl, nodeUrl);
+  try {
+    const response = await fetch(url);
+    if (!response.ok) throw new Error('File unavailable');
+    const blob = await response.blob();
+    const blobUrl = window.URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = blobUrl;
+    link.download = res.title || 'academic-resource';
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    window.URL.revokeObjectURL(blobUrl);
+  } catch (error) {
+    alert('Unable to download file. Please try again.');
+  }
+};
 
 const authHeader = () => ({
   'Content-Type': 'application/json',
@@ -18,10 +56,6 @@ const authFormDataHeader = () => ({
 // Mobile accordion card
 function ResMobCard({ res, num, nodeUrl, onDelete, expanded, onToggle, isStudent }) {
   const fmtDate = d => new Date(d).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' });
-  const openFile = () => {
-    const url = res.fileUrl.startsWith('/api') ? `${nodeUrl.replace('/api', '')}${res.fileUrl}` : res.fileUrl;
-    window.open(url, '_blank');
-  };
   return (
     <div className="mob-card">
       <button type="button" className="mob-card-header" onClick={onToggle} aria-expanded={expanded}>
@@ -40,7 +74,20 @@ function ResMobCard({ res, num, nodeUrl, onDelete, expanded, onToggle, isStudent
           <div className="mob-card-row"><span className="mob-card-label">Subject</span><span className="mob-card-value mono">{res.subject}</span></div>
           <div className="mob-card-row"><span className="mob-card-label">Uploaded on</span><span className="mob-card-value">{fmtDate(res.createdAt)}</span></div>
           <div className="mob-card-actions">
-            <button className="books-btn books-btn-sm books-btn-ghost" onClick={openFile}><span style={{ display: "inline-flex", alignItems: "center", gap: 4 }}><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" /><circle cx="12" cy="12" r="3" /></svg>Download</span></button>
+            <button
+              className="books-btn books-btn-sm books-btn-ghost"
+              onClick={() => viewResource(res, nodeUrl)}
+            >
+              <Eye size={14} />
+              View
+            </button>
+            <button
+              className="books-btn books-btn-sm books-btn-ghost"
+              onClick={() => downloadResource(res, nodeUrl)}
+            >
+              <Download size={14} />
+              Download
+            </button>
             {!isStudent && (
               <button className="books-btn books-btn-sm books-btn-danger" onClick={() => onDelete(res)}><span style={{ display: "inline-flex", alignItems: "center", gap: 4 }}><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="3 6 5 6 21 6" /><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6" /><path d="M10 11v6" /><path d="M14 11v6" /><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2" /></svg><span className="action-label">Delete</span></span></button>
             )}
@@ -279,15 +326,23 @@ const AcademicResources = () => {
                       </td>
                       <td>
                         <div className="books-actions">
+                          {/* View Button */}
                           <button
                             className="books-btn books-btn-sm books-btn-ghost"
-                            onClick={() => {
-                              const url = res.fileUrl.startsWith('/api')
-                                ? `${NODE_URL.replace('/api', '')}${res.fileUrl}`
-                                : res.fileUrl;
-                              window.open(url, '_blank');
-                            }}
-                          >Download</button>
+                            onClick={() => viewResource(res, NODE_URL)}
+                          >
+                            <Eye size={14} />
+                            View
+                          </button>
+
+                          {/* Download Button */}
+                          <button
+                            className="books-btn books-btn-sm books-btn-ghost"
+                            onClick={() => downloadResource(res, NODE_URL)}
+                          >
+                            <Download size={14} />
+                            Download
+                          </button>
                           {!isStudent && (
                             <button className="books-btn books-btn-sm books-btn-danger" onClick={() => handleDelete(res)}><span style={{ display: "inline-flex", alignItems: "center", gap: 4 }}><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="3 6 5 6 21 6" /><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6" /><path d="M10 11v6" /><path d="M14 11v6" /><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2" /></svg>Delete</span></button>
                           )}

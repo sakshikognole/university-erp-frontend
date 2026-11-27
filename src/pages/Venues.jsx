@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+﻿import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   MapPin,
@@ -53,11 +53,11 @@ function VenMobCard({ venue, num, getStatusBadgeClass, onView, onEdit, onDelete,
           <div className="mob-card-row"><span className="mob-card-label">Facilities</span><span className="mob-card-value">{facilities}</span></div>
           <div className="mob-card-row"><span className="mob-card-label">Status</span><span className="mob-card-value"><span className={getStatusBadgeClass(venue.status)}>{venue.status || 'N/A'}</span></span></div>
           <div className="mob-card-actions">
-            <button type="button" className="action-btn view-btn" onClick={onView}><Eye size={14} /><span className="action-label">View</span></button>
+            <button type="button" className="action-btn view-btn" title="View" onClick={onView}><Eye size={14} /><span className="action-label">View</span></button>
             {!isStudent && (
               <>
-                <button type="button" className="action-btn edit-btn" onClick={onEdit}><Edit size={14} /><span className="action-label">Edit</span></button>
-                <button type="button" className="action-btn delete-btn" onClick={onDelete}><Trash2 size={14} /><span className="action-label">Delete</span></button>
+                <button type="button" className="action-btn edit-btn" title="Edit" onClick={onEdit}><Edit size={14} /><span className="action-label">Edit</span></button>
+                <button type="button" className="action-btn delete-btn" title="Delete" onClick={onDelete}><Trash2 size={14} /><span className="action-label">Delete</span></button>
               </>
             )}
           </div>
@@ -268,28 +268,24 @@ const Venues = () => {
             )}
           </div>
 
-          {!isStudent && (
-            <>
-              <button
-                type="button"
-                className="btn btn-secondary"
-                onClick={() => navigate('/bulk-upload-venues')}
-                title="Bulk upload venues via CSV"
-              >
-                <Upload size={16} />
-                <span>Upload</span>
-              </button>
+          <button
+            type="button"
+            className="btn btn-secondary"
+            onClick={() => navigate('/bulk-upload-venues')}
+            title="Bulk upload venues via CSV"
+          >
+            <Upload size={16} />
+            <span>Upload</span>
+          </button>
 
-              <button
-                type="button"
-                className="books-btn books-btn-primary"
-                onClick={openAddModal}
-              >
-                <Plus size={16} />
-                <span>Add Venue</span>
-              </button>
-            </>
-          )}
+          <button
+            type="button"
+            className="books-btn books-btn-primary"
+            onClick={openAddModal}
+          >
+            <Plus size={16} />
+            <span>Add Venue</span>
+          </button>
         </div>
       </div>
 
@@ -319,6 +315,7 @@ const Venues = () => {
               placeholder="Search by Name, Venue ID, Status, or Facilities..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
+              title="Search venues"
             />
             {search && (
               <button
@@ -368,19 +365,19 @@ const Venues = () => {
               <table className="data-table">
                 <thead>
                   <tr>
-                    <th style={{ width: '80px' }}>#</th>
-                    <th style={{ width: '140px' }}>Venue ID</th>
-                    <th>Name</th>
-                    <th style={{ width: '100px' }}>Capacity</th>
-                    <th>Facilities</th>
-                    <th style={{ width: '120px' }}>Status</th>
-                    <th style={{ width: '220px', textAlign: 'center' }}>Actions</th>
+                    <th style={{ width: '40px' }}>#</th>
+                    <th style={{ width: '110px' }}>Venue ID</th>
+                    <th style={{ minWidth: '120px' }}>Name</th>
+                    <th style={{ width: '75px' }}>Capacity</th>
+                    <th style={{ minWidth: '100px', maxWidth: '170px' }}>Facilities</th>
+                    <th style={{ width: '105px', paddingRight: '12px' }}>Status</th>
+                    <th style={{ width: '185px', textAlign: 'center' }}>Actions</th>
                   </tr>
                 </thead>
                 <tbody>
                   {currentVenues.map((venue, index) => (
                     <tr key={venue._id || venue.venueId || index}>
-                      <td className="text-secondary">{startIndex + index + 1}</td>
+                      <td className="stu-num-cell">{startIndex + index + 1}</td>
                       <td>
                         <span className="code-badge">{venue.venueId}</span>
                       </td>
@@ -424,7 +421,7 @@ const Venues = () => {
                               <button
                                 type="button"
                                 className="action-btn delete-btn"
-                                title="Delete Venue"
+                                title="Delete"
                                 onClick={() => setDeleteConfirm({
                                   id: venue._id || venue.venueId,
                                   venueId: venue.venueId,
@@ -546,7 +543,7 @@ const Venues = () => {
                 <AlertTriangle size={22} />
               </div>
               <div className="delete-dialog-title-box">
-                <h3 className="delete-dialog-title">Delete Venue</h3>
+                <h3 className="delete-dialog-title">Delete</h3>
                 <p className="delete-dialog-desc">
                   Are you sure you want to delete this venue? This action will remove the record permanently.
                 </p>
@@ -602,7 +599,7 @@ const Venues = () => {
                 ) : (
                   <>
                     <Trash2 size={16} />
-                    <span>Delete Venue</span>
+                    <span>Delete</span>
                   </>
                 )}
               </button>

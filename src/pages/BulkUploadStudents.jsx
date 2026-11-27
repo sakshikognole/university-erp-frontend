@@ -315,23 +315,22 @@ const BulkUploadStudents = () => {
     <div className="page-container">
       {/* Page header */}
       <div className="page-header" style={{ marginBottom: '1.5rem' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-          <button
-            type="button"
-            className="btn-back"
-            onClick={() => navigate('/students')}
-            title="Back to Students"
-          >
-            <ArrowLeft size={18} />
-          </button>
-          <div>
-            <h1 className="page-title" style={{ fontSize: '1.5rem' }}>
-              Bulk Upload Students
-            </h1>
-            <p className="page-subtitle">
-              Upload multiple student records at once using a CSV file
-            </p>
-          </div>
+        <button
+          type="button"
+          className="btn-back"
+          onClick={() => navigate('/students')}
+          title="Back to Students"
+          style={{ marginBottom: '0.5rem' }}
+        >
+          <ArrowLeft size={18} />
+        </button>
+        <div>
+          <h1 className="page-title" style={{ fontSize: '1.5rem', whiteSpace: 'nowrap' }}>
+            Bulk Upload Students
+          </h1>
+          <p className="page-subtitle">
+            Upload multiple student records at once using a CSV file
+          </p>
         </div>
       </div>
 
