@@ -418,14 +418,7 @@ function AppRoutes() {
         />
 
         {/* ==================== EVENT NOTICES ==================== */}
-        <Route
-          path="event-notices"
-          element={
-            <SuperAdminRoute>
-              <EventNotices />
-            </SuperAdminRoute>
-          }
-        />
+        <Route path="event-notices" element={<EventNotices />} />
         <Route
           path="event-notices/add"
           element={
@@ -442,14 +435,7 @@ function AppRoutes() {
             </SuperAdminRoute>
           }
         />
-        <Route
-          path="event-notices/view/:id"
-          element={
-            <SuperAdminRoute>
-              <EventNoticeView />
-            </SuperAdminRoute>
-          }
-        />
+        <Route path="event-notices/view/:id" element={<EventNoticeView />} />
 
         {/* ==================== FEE PAYMENT ==================== */}
         <Route path="fee-payment" element={<FeePayment />} />

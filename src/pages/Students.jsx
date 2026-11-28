@@ -133,7 +133,12 @@ const Students = () => {
   const fetchStudents = useCallback(async () => {
     setLoading(true);
     try {
-      const res = await fetch(`${API_BASE_URL}/super-admin/students`, {
+      // Teachers/Faculty use the general students endpoint;
+      // admins use the super-admin endpoint.
+      const endpoint = isTeacher
+        ? `${API_BASE_URL}/students`
+        : `${API_BASE_URL}/super-admin/students`;
+      const res = await fetch(endpoint, {
         headers: authHeader(),
       });
       if (!res.ok) throw new Error('Failed to load students');
@@ -154,7 +159,7 @@ const Students = () => {
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [isTeacher]);
 
   useEffect(() => {
     fetchStudents();
@@ -339,7 +344,8 @@ const Students = () => {
           </button>
           )}
 
-          {/* Student Portal Link */}
+          {/* Student Portal Link — hidden for teachers */}
+          {!isTeacher && (
           <button
             type="button"
             className="btn btn-secondary"
@@ -349,6 +355,7 @@ const Students = () => {
             <GraduationCap size={16} />
             <span>Student Portal</span>
           </button>
+          )}
 
           {/* Add Student — hidden for read-only roles */}
           {!isReadOnly && (
