@@ -15,15 +15,16 @@ const AddBusPassModal = ({ isOpen, passId: passIdProp, onClose, onSuccess }) => 
   const [fieldErrors, setFieldErrors] = useState({});
   const [routes, setRoutes] = useState([]);
   const [availableStops, setAvailableStops] = useState([]);
+  const [routeFee, setRouteFee] = useState(null);
   const [verifying, setVerifying] = useState(false);
   const [studentInfo, setStudentInfo] = useState(null);
   const [studentError, setStudentError] = useState('');
 
   const sixMonthsLater = () => { const d = new Date(); d.setMonth(d.getMonth() + 6); return d.toISOString().split('T')[0]; };
-  const emptyForm = { passId: '', studentId: '', studentName: '', routeId: '', fromStop: '', toStop: 'Main University Campus', paymentStatus: 'PAID', validTill: sixMonthsLater() };
+  const emptyForm = { passId: '', studentId: '', studentName: '', routeId: '', fromStop: '', toStop: 'Main University Campus', paymentStatus: 'PENDING', validTill: sixMonthsLater() };
   const [form, setForm] = useState(emptyForm);
 
-  const reset = useCallback(() => { setForm({ ...emptyForm, validTill: sixMonthsLater() }); setFieldErrors({}); setFeedback({ type: '', message: '' }); setStudentInfo(null); setStudentError(''); setAvailableStops([]); }, []); // eslint-disable-line
+  const reset = useCallback(() => { setForm({ ...emptyForm, validTill: sixMonthsLater() }); setFieldErrors({}); setFeedback({ type: '', message: '' }); setStudentInfo(null); setStudentError(''); setAvailableStops([]); setRouteFee(null); }, []); // eslint-disable-line
 
   useEffect(() => {
     if (!isOpen) return;
@@ -81,6 +82,7 @@ const AddBusPassModal = ({ isOpen, passId: passIdProp, onClose, onSuccess }) => 
     if (name === 'routeId') {
       const route = routes.find((r) => String(r.routeId) === String(value));
       setAvailableStops(route?.stops || []);
+      setRouteFee(route?.fee != null ? route.fee : null);
       setForm((p) => ({ ...p, routeId: value, fromStop: '' }));
     }
     if (fieldErrors[name]) setFieldErrors((p) => ({ ...p, [name]: undefined }));
@@ -151,9 +153,20 @@ const AddBusPassModal = ({ isOpen, passId: passIdProp, onClose, onSuccess }) => 
                 <label className="sf-label" htmlFor="bp-routeId">Route <span className="sf-required">*</span></label>
                 <select id="bp-routeId" name="routeId" className="sf-input" value={form.routeId} onChange={handleChange}>
                   <option value="">— Select Route —</option>
-                  {routes.map((r) => <option key={r._id || r.routeId} value={r.routeId}>Route #{r.routeId}{r.routeName ? ` — ${r.routeName}` : ''} ({r.stops?.length || 0} stops)</option>)}
+                  {routes.map((r) => <option key={r._id || r.routeId} value={r.routeId}>Route #{r.routeId}{r.routeName ? ` — ${r.routeName}` : ''} ({r.stops?.length || 0} stops){r.fee ? ` • ₹${Number(r.fee).toLocaleString('en-IN')}` : ''}</option>)}
                 </select>
               </div></div>
+              {routeFee != null && routeFee > 0 && (
+                <div className="sf-row">
+                  <div className="sf-group sf-group-full">
+                    <div style={{ background: '#f0fdf4', border: '1px solid #bbf7d0', borderRadius: '6px', padding: '0.55rem 0.85rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                      <span style={{ fontSize: '0.78rem', color: '#15803d', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.04em' }}>Transport Fee</span>
+                      <span style={{ fontSize: '1rem', fontWeight: 700, color: '#0f766e', marginLeft: 'auto' }}>₹{Number(routeFee).toLocaleString('en-IN')}</span>
+                    </div>
+                    <small className="sf-field-hint">This fee will be set as Pending payment for the student.</small>
+                  </div>
+                </div>
+              )}
               <div className="sf-row">
                 <div className="sf-group">
                   <label className="sf-label" htmlFor="bp-fromStop">From Stop <span className="sf-required">*</span></label>

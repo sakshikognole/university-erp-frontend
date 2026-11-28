@@ -658,3 +658,28 @@ export const SubmissionIcon = createIcon(
     <path d="m9 15 2 2 4-4" />
   </>
 );
+
+// 36. Role Management
+export const RoleManagementIcon = createIcon(
+  <>
+    <circle cx="12" cy="8" r="3.5" />
+    <path d="M4 20c0-4 3.6-7 8-7s8 3 8 7" />
+    <circle cx="19" cy="8" r="2.2" strokeWidth="1.6" />
+    <path d="M22 14.5c-1-.3-2-.5-3-.5" strokeWidth="1.6" />
+    <line x1="17" y1="11.5" x2="22" y2="11.5" strokeWidth="1.5" />
+    <line x1="19" y1="9.5" x2="19" y2="13.5" strokeWidth="1.5" />
+  </>
+);
+
+// 37. Attendance Matrix (calendar heatmap icon)
+export const AttendanceMatrixIcon = createIcon(
+  <>
+    <rect x="3" y="4" width="18" height="17" rx="2" />
+    <line x1="3" y1="9" x2="21" y2="9" />
+    <rect x="6"  y="12" width="2.5" height="2.5" rx="0.4" fill="currentColor" stroke="none" />
+    <rect x="10" y="12" width="2.5" height="2.5" rx="0.4" fill="currentColor" stroke="none" />
+    <rect x="14" y="12" width="2.5" height="2.5" rx="0.4" fill="currentColor" stroke="none" />
+    <rect x="6"  y="16" width="2.5" height="2.5" rx="0.4" fill="currentColor" stroke="none" />
+    <rect x="10" y="16" width="2.5" height="2.5" rx="0.4" fill="currentColor" stroke="none" />
+  </>
+);

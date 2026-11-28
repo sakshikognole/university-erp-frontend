@@ -93,6 +93,7 @@ import LetterHeadEditorPage from './pages/LetterHeadEditorPage';
 
 // --- Transport Management ---
 import Transport from './pages/Transport';
+import StudentTransport from './pages/StudentTransport';
 import AddBusRoute from './pages/AddBusRoute';
 import AddDriver from './pages/AddDriver';
 import AddVehicle from './pages/AddVehicle';
@@ -126,6 +127,11 @@ import AcademicResources from './pages/AcademicResources';
 import Attendance from './pages/Attendance';
 import AttendanceReview from './pages/AttendanceReview';
 import AttendanceHistory from './pages/AttendanceHistory';
+import AttendanceMatrix from './pages/AttendanceMatrix';
+
+// --- Role Management ---
+import RoleManagement from './pages/RoleManagement';
+import RolePermissionGuard from './components/routes/RolePermissionGuard';
 
 // --- Password Management ---
 import PasswordManagementPage from './pages/PasswordManagement/PasswordManagementPage';
@@ -213,9 +219,9 @@ function AppRoutes() {
         <Route
           path="students"
           element={
-            <SuperAdminRoute>
+            <RolePermissionGuard>
               <Students />
-            </SuperAdminRoute>
+            </RolePermissionGuard>
           }
         />
         <Route
@@ -476,6 +482,7 @@ function AppRoutes() {
 
         {/* ==================== TRANSPORT ==================== */}
         <Route path="transport" element={<Transport />} />
+        <Route path="student-transport" element={<StudentTransport />} />
         <Route
           path="transport/add-route"
           element={
@@ -617,32 +624,44 @@ function AppRoutes() {
         <Route path="notifications" element={<NotificationsPage />} />
 
         {/* ==================== ATTENDANCE ==================== */}
-        <Route path="attendance" element={<Attendance />} />
-        <Route path="attendance/review" element={<AttendanceReview />} />
-        <Route path="attendance/history" element={<AttendanceHistory />} />
+        <Route path="attendance" element={<RolePermissionGuard><Attendance /></RolePermissionGuard>} />
+        <Route path="attendance/review" element={<RolePermissionGuard><AttendanceReview /></RolePermissionGuard>} />
+        <Route path="attendance/history" element={<RolePermissionGuard><AttendanceHistory /></RolePermissionGuard>} />
+        <Route path="attendance/matrix" element={<AttendanceMatrix />} />
 
-        {/* ==================== EMAIL COMMUNICATION ==================== */}
+        {/* ==================== ROLE MANAGEMENT ==================== */}
         <Route
-          path="email-communication"
+          path="role-management"
           element={
             <SuperAdminRoute>
-              <EmailCommunication />
+              <RoleManagement />
             </SuperAdminRoute>
           }
         />
 
+        {/* ==================== EMAIL COMMUNICATION ==================== */}
+        {/* Teachers also need email communication access per requirements */}
+        <Route
+          path="email-communication"
+          element={
+            <RolePermissionGuard>
+              <EmailCommunication />
+            </RolePermissionGuard>
+          }
+        />
+
         {/* ==================== ANNOUNCEMENTS ==================== */}
-        <Route path="announcements" element={<Announcements />} />
-        <Route path="announcements/submission/:announcementId" element={<Submission />} />
+        <Route path="announcements" element={<RolePermissionGuard><Announcements /></RolePermissionGuard>} />
+        <Route path="announcements/submission/:announcementId" element={<RolePermissionGuard><Submission /></RolePermissionGuard>} />
 
         {/* ==================== SUBMISSIONS ==================== */}
-        <Route path="submissions" element={<Submission />} />
-        <Route path="submissions/:announcementId" element={<Submission />} />
-        <Route path="submission" element={<Submission />} />
-        <Route path="submission/:announcementId" element={<Submission />} />
+        <Route path="submissions" element={<RolePermissionGuard><Submission /></RolePermissionGuard>} />
+        <Route path="submissions/:announcementId" element={<RolePermissionGuard><Submission /></RolePermissionGuard>} />
+        <Route path="submission" element={<RolePermissionGuard><Submission /></RolePermissionGuard>} />
+        <Route path="submission/:announcementId" element={<RolePermissionGuard><Submission /></RolePermissionGuard>} />
 
         {/* ==================== ACADEMIC RESOURCES ==================== */}
-        <Route path="academic-resources" element={<AcademicResources />} />
+        <Route path="academic-resources" element={<RolePermissionGuard><AcademicResources /></RolePermissionGuard>} />
       </Route>
 
       {/* Catch-all fallback */}

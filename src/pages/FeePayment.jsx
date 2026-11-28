@@ -464,6 +464,14 @@ const FeePayment = () => {
       const orderData = await orderRes.json();
       console.log('[FeePayment] create-order response:', orderData); // debug
       if (!orderRes.ok || !orderData.success) {
+        // Handle already-paid guard from backend
+        if (orderData.alreadyPaid) {
+          setProcessingId(null);
+          // Refresh the records to show the updated paid status
+          await fetchFeeRecords();
+          setFeedback({ type: 'success', message: orderData.message || 'This fee has already been paid.' });
+          return;
+        }
         throw new Error(orderData.message || `Server error ${orderRes.status}: Failed to create Razorpay order`);
       }
 
@@ -522,24 +530,35 @@ const FeePayment = () => {
               setFeeRecords(updatedList);
               localStorage.setItem('university_erp_fee_records_simple', JSON.stringify(updatedList));
 
+              // Build complete receipt merging backend data with local record
+              const backendReceipt = verifyData.data?.receipt || {};
+              const fullReceipt = {
+                receiptNumber: backendReceipt.receiptNumber || `RCP-${Date.now()}`,
+                transactionId: backendReceipt.transactionId || `TXN_${Date.now()}`,
+                razorpayPaymentId: response.razorpay_payment_id,
+                razorpayOrderId: response.razorpay_order_id,
+                // Student fields — prefer backend receipt, fallback to feeRecord
+                prn: backendReceipt.prn || record.prn || '',
+                studentName: backendReceipt.studentName || record.studentName || '',
+                class: backendReceipt.class || record.class || '',
+                division: backendReceipt.division || record.division || '',
+                degree: backendReceipt.degree || record.degree || '',
+                academicYear: backendReceipt.academicYear || record.academicYear || '',
+                semester: backendReceipt.semester || record.semester || '',
+                feeType: backendReceipt.feeType || record.feeType || 'Fee Payment',
+                totalFeeAmount: record.totalFeeAmount,
+                discountAmount: record.discountAmount || 0,
+                amountPaidThisTransaction: payAmountInRupees,
+                totalPaidSoFar: newPaid,
+                remainingBalance: newRemaining,
+                status: newRemaining === 0 ? 'PAID' : 'PARTIAL',
+                paymentMethod: 'Razorpay',
+                paidAt: new Date().toISOString(),
+              };
+
               // Navigate to dedicated Success Page
               navigate('/fee-payment/success', {
-                state: {
-                  receipt: verifyData.data?.receipt || {
-                    receiptNumber: `RCP-${Date.now()}`,
-                    transactionId: `TXN_${Date.now()}`,
-                    razorpayPaymentId: response.razorpay_payment_id,
-                    razorpayOrderId: response.razorpay_order_id,
-                    totalFeeAmount: record.totalFeeAmount,
-                    discountAmount: record.discountAmount || 0,
-                    amountPaidThisTransaction: payAmountInRupees,
-                    totalPaidSoFar: newPaid,
-                    remainingBalance: newRemaining,
-                    status: newRemaining === 0 ? 'PAID' : 'PARTIAL',
-                    paymentMethod: 'Razorpay',
-                    paidAt: new Date().toISOString(),
-                  },
-                },
+                state: { receipt: fullReceipt },
               });
             } else {
               // Signature verification failed

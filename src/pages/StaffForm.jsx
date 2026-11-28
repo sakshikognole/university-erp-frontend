@@ -8,12 +8,17 @@ import {
   validateRole,
   VALID_ROLES,
 } from '../utils/staffValidation';
+
 const _IS_PROD = typeof window !== 'undefined' && window.location.hostname !== 'localhost';
 const API_BASE_URL = _IS_PROD ? 'https://university-erp-node.onrender.com/api' : 'http://localhost:5000/api';
 
-// ---------------------------------------------------------------------------
-// FieldError — small red helper shown beneath an invalid input
-// ---------------------------------------------------------------------------
+// Roles that require a Department assignment (teacher-type roles)
+const TEACHER_ROLES = [
+  'Professor', 'Associate Professor', 'Assistant Professor',
+  'Lecturer', 'Head of Department', 'Dean', 'Teacher',
+];
+
+// ─── FieldError helper ────────────────────────────────────────────────────────
 const FieldError = ({ message }) =>
   message ? (
     <p className="sf-field-error" role="alert">
@@ -22,25 +27,25 @@ const FieldError = ({ message }) =>
     </p>
   ) : null;
 
-// ---------------------------------------------------------------------------
+// ─────────────────────────────────────────────────────────────────────────────
 // StaffFormModal
-//
 // Props:
 //   isOpen    — boolean
-//   staffId   — string | null   (null = Add mode, string = Edit mode)
+//   staffId   — string | null   (null = Add, string = Edit)
 //   onClose   — () => void
 //   onSuccess — () => void
-// ---------------------------------------------------------------------------
+// ─────────────────────────────────────────────────────────────────────────────
 const StaffFormModal = ({ isOpen, staffId, onClose, onSuccess }) => {
   const isEditMode = Boolean(staffId);
 
-  const [loading, setLoading]   = useState(false);
-  const [fetching, setFetching] = useState(false);
-  const [feedback, setFeedback] = useState({ type: '', message: '' });
+  const [loading, setLoading]     = useState(false);
+  const [fetching, setFetching]   = useState(false);
+  const [feedback, setFeedback]   = useState({ type: '', message: '' });
+  const [departments, setDepartments] = useState([]);
 
   const emptyForm = {
     name: '', staffId: '', email: '', phone: '',
-    dateOfJoining: '', role: '',
+    dateOfJoining: '', role: '', department: '',
     bankName: '', accountHolderName: '', accountNumber: '', ifscCode: '',
   };
 
@@ -48,13 +53,14 @@ const StaffFormModal = ({ isOpen, staffId, onClose, onSuccess }) => {
   const [fieldErrors, setFieldErrors] = useState({});
   const [touched, setTouched]         = useState({});
 
-  // ── Auth ──────────────────────────────────────────────────────────────
   const authHeader = () => {
     const token = localStorage.getItem('erp_token');
     return { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` };
   };
 
-  // ── Reset ──────────────────────────────────────────────────────────────
+  const isTeacherRole = TEACHER_ROLES.includes(formData.role);
+
+  // ── Reset ───────────────────────────────────────────────────────────────
   const resetForm = useCallback(() => {
     setFormData(emptyForm);
     setFieldErrors({});
@@ -63,6 +69,7 @@ const StaffFormModal = ({ isOpen, staffId, onClose, onSuccess }) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  // ── Open / close ─────────────────────────────────────────────────────
   useEffect(() => {
     if (!isOpen) return;
     if (isEditMode) { resetForm(); loadStaffDetails(); }
@@ -70,7 +77,25 @@ const StaffFormModal = ({ isOpen, staffId, onClose, onSuccess }) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isOpen, staffId]);
 
-  // ── Lock body scroll ──────────────────────────────────────────────────
+  // ── Fetch departments (for Teacher role dropdown) ─────────────────────
+  useEffect(() => {
+    if (!isOpen) return;
+    const fetchDepts = async () => {
+      try {
+        const token = localStorage.getItem('erp_token');
+        const res = await fetch(`${API_BASE_URL}/departments`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        if (res.ok) {
+          const data = await res.json();
+          setDepartments(Array.isArray(data) ? data : []);
+        }
+      } catch { /* non-fatal */ }
+    };
+    fetchDepts();
+  }, [isOpen]);
+
+  // ── Scroll lock ───────────────────────────────────────────────────────
   useEffect(() => {
     document.body.style.overflow = isOpen ? 'hidden' : '';
     return () => { document.body.style.overflow = ''; };
@@ -87,9 +112,7 @@ const StaffFormModal = ({ isOpen, staffId, onClose, onSuccess }) => {
   const loadStaffDetails = async () => {
     setFetching(true);
     try {
-      const res = await fetch(`${API_BASE_URL}/super-admin/staff/${staffId}`, {
-        headers: authHeader(),
-      });
+      const res = await fetch(`${API_BASE_URL}/super-admin/staff/${staffId}`, { headers: authHeader() });
       if (res.ok) {
         populateStaffData(await res.json());
       } else {
@@ -110,16 +133,17 @@ const StaffFormModal = ({ isOpen, staffId, onClose, onSuccess }) => {
       catch { formattedDate = staff.dateOfJoining; }
     }
     setFormData({
-      name:               staff.name                       || '',
-      staffId:            staff.staffId                    || '',
-      email:              staff.email                      || '',
-      phone:              staff.phone                      || '',
-      dateOfJoining:      formattedDate,
-      role:               staff.role                       || '',
-      bankName:           staff.bankDetails?.bankName            || '',
-      accountHolderName:  staff.bankDetails?.accountHolderName   || '',
-      accountNumber:      staff.bankDetails?.accountNumber       || '',
-      ifscCode:           staff.bankDetails?.ifscCode            || '',
+      name:              staff.name                            || '',
+      staffId:           staff.staffId                        || '',
+      email:             staff.email                          || '',
+      phone:             staff.phone                          || '',
+      dateOfJoining:     formattedDate,
+      role:              staff.role                           || '',
+      department:        staff.department                     || '',
+      bankName:          staff.bankDetails?.bankName          || '',
+      accountHolderName: staff.bankDetails?.accountHolderName || '',
+      accountNumber:     staff.bankDetails?.accountNumber     || '',
+      ifscCode:          staff.bankDetails?.ifscCode          || '',
     });
     setFieldErrors({});
     setTouched({});
@@ -128,17 +152,17 @@ const StaffFormModal = ({ isOpen, staffId, onClose, onSuccess }) => {
   // ── onChange ──────────────────────────────────────────────────────────
   const handleChange = (e) => {
     const { name, value } = e.target;
-    const newValue = (name === 'staffId' || name === 'ifscCode')
-      ? value.toUpperCase()
-      : value;
-    // Strip spaces and symbols from staffId — letters, digits, one hyphen allowed
-    const sanitised = name === 'staffId'
-      ? value.replace(/[^A-Za-z0-9-]/g, '').toUpperCase()
-      : newValue;
-    setFormData((prev) => ({ ...prev, [name]: sanitised }));
-    if (touched[name]) {
-      setFieldErrors((prev) => ({ ...prev, [name]: getFieldError(name, sanitised) }));
+    let sanitised = value;
+    if (name === 'staffId') sanitised = value.replace(/[^A-Za-z0-9-]/g, '').toUpperCase();
+    if (name === 'ifscCode') sanitised = value.toUpperCase();
+    // When role changes away from a teacher role, clear department
+    if (name === 'role' && !TEACHER_ROLES.includes(value)) {
+      setFormData((prev) => ({ ...prev, role: value, department: '' }));
+      if (touched[name]) setFieldErrors((prev) => ({ ...prev, role: getFieldError(name, value) }));
+      return;
     }
+    setFormData((prev) => ({ ...prev, [name]: sanitised }));
+    if (touched[name]) setFieldErrors((prev) => ({ ...prev, [name]: getFieldError(name, sanitised) }));
   };
 
   // ── onBlur ────────────────────────────────────────────────────────────
@@ -150,13 +174,13 @@ const StaffFormModal = ({ isOpen, staffId, onClose, onSuccess }) => {
 
   const getFieldError = (name, value) => {
     switch (name) {
-      case 'name':    return validateName(value);
-      case 'staffId': return validateStaffId(value);
-      case 'email':   return validateEmail(value);
-      case 'phone':   return validatePhone(value);
-      case 'role':    return validateRole(value);
+      case 'name':         return validateName(value);
+      case 'staffId':      return validateStaffId(value);
+      case 'email':        return validateEmail(value);
+      case 'phone':        return validatePhone(value);
+      case 'role':         return validateRole(value);
       case 'dateOfJoining': return value ? '' : 'Date of Joining is required.';
-      default:        return '';
+      default:             return '';
     }
   };
 
@@ -201,11 +225,12 @@ const StaffFormModal = ({ isOpen, staffId, onClose, onSuccess }) => {
           phone:         formData.phone.trim().replace(/\s/g, ''),
           dateOfJoining: formData.dateOfJoining,
           role:          formData.role.trim(),
+          department:    formData.department.trim(),
           bankDetails: {
-            bankName:           formData.bankName.trim(),
-            accountHolderName:  formData.accountHolderName.trim(),
-            accountNumber:      formData.accountNumber.trim(),
-            ifscCode:           formData.ifscCode.trim(),
+            bankName:          formData.bankName.trim(),
+            accountHolderName: formData.accountHolderName.trim(),
+            accountNumber:     formData.accountNumber.trim(),
+            ifscCode:          formData.ifscCode.trim(),
           },
         }),
       });
@@ -213,9 +238,7 @@ const StaffFormModal = ({ isOpen, staffId, onClose, onSuccess }) => {
       const data = await res.json();
 
       if (!res.ok) {
-        if (data.validationErrors) {
-          setFieldErrors((prev) => ({ ...prev, ...data.validationErrors }));
-        }
+        if (data.validationErrors) setFieldErrors((prev) => ({ ...prev, ...data.validationErrors }));
         throw new Error(data.message || (isEditMode ? 'Failed to update staff member' : 'Failed to add staff member'));
       }
 
@@ -223,10 +246,10 @@ const StaffFormModal = ({ isOpen, staffId, onClose, onSuccess }) => {
         type: 'success',
         message: isEditMode
           ? `Staff member '${formData.name}' updated successfully.`
-          : `Staff member '${formData.name}' added successfully.`,
+          : `Staff member '${formData.name}' added successfully.${isTeacherRole ? ' Teacher login created with password: Teacher@123' : ''}`,
       });
 
-      setTimeout(() => onSuccess(), 900);
+      setTimeout(() => onSuccess(), 1200);
     } catch (err) {
       setFeedback({
         type: 'error',
@@ -242,7 +265,6 @@ const StaffFormModal = ({ isOpen, staffId, onClose, onSuccess }) => {
 
   if (!isOpen) return null;
 
-  // ── Render ────────────────────────────────────────────────────────────
   return (
     <div
       className="sf-overlay"
@@ -253,7 +275,7 @@ const StaffFormModal = ({ isOpen, staffId, onClose, onSuccess }) => {
     >
       <div className="sf-modal">
 
-        {/* ── Header ── */}
+        {/* Header */}
         <div className="sf-header">
           <div className="sf-header-left">
             <h2 className="sf-title">{isEditMode ? 'Edit Staff Member' : 'Add New Staff'}</h2>
@@ -263,14 +285,13 @@ const StaffFormModal = ({ isOpen, staffId, onClose, onSuccess }) => {
           </button>
         </div>
 
-        {/* ── Body ── */}
+        {/* Body */}
         <div className="sf-body">
-
           {feedback.message && (
             <div className={`sf-feedback ${feedback.type === 'success' ? 'sf-feedback-success' : 'sf-feedback-error'}`}>
               {feedback.type === 'success'
                 ? <CheckCircle2 size={16} style={{ flexShrink: 0 }} />
-                : <AlertCircle   size={16} style={{ flexShrink: 0 }} />}
+                : <AlertCircle  size={16} style={{ flexShrink: 0 }} />}
               <span>{feedback.message}</span>
             </div>
           )}
@@ -311,10 +332,9 @@ const StaffFormModal = ({ isOpen, staffId, onClose, onSuccess }) => {
                     value={formData.staffId}
                     onChange={handleChange} onBlur={handleBlur}
                     autoComplete="off"
-                    readOnly={isEditMode} disabled={isEditMode}
-                    maxLength={30}
                     readOnly={isEditMode}
                     disabled={isEditMode}
+                    maxLength={30}
                   />
                   {isEditMode && <small className="sf-field-hint">Staff ID cannot be changed after creation.</small>}
                   <FieldError message={touched.staffId ? fieldErrors.staffId : ''} />
@@ -361,7 +381,6 @@ const StaffFormModal = ({ isOpen, staffId, onClose, onSuccess }) => {
                   <label className="sf-label" htmlFor="stf-dateOfJoining">
                     Date of Joining <span className="sf-required">*</span>
                   </label>
-                  {/* Single native date input — no wrapper, no CSS pseudo-placeholder */}
                   <input
                     id="stf-dateOfJoining" name="dateOfJoining" type="date"
                     className={inputClass('dateOfJoining')}
@@ -390,6 +409,42 @@ const StaffFormModal = ({ isOpen, staffId, onClose, onSuccess }) => {
                 </div>
               </div>
 
+              {/* Department — shown only for Teacher-type roles */}
+              {isTeacherRole && (
+                <div className="sf-row">
+                  <div className="sf-group" style={{ flex: '0 0 calc(50% - 0.5rem)' }}>
+                    <label className="sf-label" htmlFor="stf-department">
+                      Department <span className="sf-required">*</span>
+                    </label>
+                    {departments.length > 0 ? (
+                      <select
+                        id="stf-department" name="department"
+                        className="sf-input"
+                        value={formData.department}
+                        onChange={handleChange}
+                      >
+                        <option value="">— Select Department —</option>
+                        {departments.map((d) => (
+                          <option key={d._id} value={d.name}>{d.name}</option>
+                        ))}
+                      </select>
+                    ) : (
+                      <input
+                        id="stf-department" name="department" type="text"
+                        className="sf-input"
+                        placeholder="e.g. Computer Science"
+                        value={formData.department}
+                        onChange={handleChange}
+                        autoComplete="off"
+                      />
+                    )}
+                    <small className="sf-field-hint">
+                      Required for teacher roles — used for department-wise attendance.
+                    </small>
+                  </div>
+                </div>
+              )}
+
               {/* Bank Name + Account Holder Name */}
               <div className="sf-row">
                 <div className="sf-group">
@@ -403,7 +458,6 @@ const StaffFormModal = ({ isOpen, staffId, onClose, onSuccess }) => {
                     autoComplete="off"
                   />
                 </div>
-
                 <div className="sf-group">
                   <label className="sf-label" htmlFor="stf-accountHolderName">Account Holder Name</label>
                   <input
@@ -430,7 +484,6 @@ const StaffFormModal = ({ isOpen, staffId, onClose, onSuccess }) => {
                     autoComplete="off"
                   />
                 </div>
-
                 <div className="sf-group">
                   <label className="sf-label" htmlFor="stf-ifscCode">IFSC Code</label>
                   <input
@@ -448,7 +501,7 @@ const StaffFormModal = ({ isOpen, staffId, onClose, onSuccess }) => {
           )}
         </div>
 
-        {/* ── Footer ── */}
+        {/* Footer */}
         <div className="sf-footer">
           <button type="button" className="sf-btn-cancel" onClick={onClose} disabled={loading}>
             Cancel

@@ -84,6 +84,10 @@ const Students = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
   const isStudent = user?.role === 'STUDENT' || user?.adminType === 'STUDENT';
+  const isTeacher = user?.role === 'TEACHER' || user?.adminType === 'TEACHER' ||
+                    user?.role === 'FACULTY'  || user?.adminType === 'FACULTY';
+  // Teachers get view-only access — no Add, Edit, Delete, Upload
+  const isReadOnly = isStudent || isTeacher;
 
   // ── Data ────────────────────────────────────────────────────────────────
   const [students, setStudents] = useState([]);
@@ -292,7 +296,8 @@ const Students = () => {
         </div>
 
         <div className="header-actions-group">
-          {/* Download */}
+          {/* Download — hidden for read-only roles */}
+          {!isReadOnly && (
           <div className="download-dropdown-wrapper" ref={downloadMenuRef}>
             <button
               type="button"
@@ -319,8 +324,10 @@ const Students = () => {
               </div>
             )}
           </div>
+          )}
 
-          {/* Upload */}
+          {/* Upload — hidden for read-only roles */}
+          {!isReadOnly && (
           <button
             type="button"
             className="btn btn-secondary"
@@ -330,6 +337,7 @@ const Students = () => {
             <Upload size={16} />
             <span>Upload</span>
           </button>
+          )}
 
           {/* Student Portal Link */}
           <button
@@ -342,7 +350,8 @@ const Students = () => {
             <span>Student Portal</span>
           </button>
 
-          {/* Add Student — opens modal */}
+          {/* Add Student — hidden for read-only roles */}
+          {!isReadOnly && (
           <button
             type="button"
             className="books-btn books-btn-primary"
@@ -352,6 +361,7 @@ const Students = () => {
             <Plus size={16} />
             <span>Add Student</span>
           </button>
+          )}
         </div>
       </div>
 
@@ -506,6 +516,7 @@ const Students = () => {
                   Clear search &amp; filters
                 </button>
               ) : (
+                !isReadOnly && (
                 <button
                   type="button"
                   className="books-btn books-btn-primary"
@@ -515,6 +526,7 @@ const Students = () => {
                   <Plus size={16} />
                   <span>Add Student</span>
                 </button>
+                )
               )}
             </div>
           ) : (
@@ -559,7 +571,7 @@ const Students = () => {
                             <Eye size={14} />
                             <span className="action-label">View</span>
                           </button>
-                          {!isStudent && (
+                          {!isReadOnly && (
                             <>
                               <button
                                 type="button"
@@ -601,7 +613,7 @@ const Students = () => {
                     onDelete={() => setDelStudent(student)}
                     expanded={stuExpanded === (student._id || student.prn)}
                     onToggle={() => setStuExpanded(prev => prev === (student._id || student.prn) ? null : (student._id || student.prn))}
-                    isStudent={isStudent}
+                    isStudent={isReadOnly}
                   />
                 ))}
               </div>

@@ -20594,3 +20594,191 @@ body:has(.enb-modal-overlay) {
   color: #ffffff;
   border-color: #15803d;
 }
+
+
+/* ══════════════════════════════════════════════════════════════════════════
+   ATTENDANCE FILTER TABS  (review page)
+   ══════════════════════════════════════════════════════════════════════════ */
+.att-filter-tabs {
+  display: flex;
+  gap: 0.375rem;
+  flex-wrap: wrap;
+}
+
+.att-filter-tab {
+  padding: 0.35rem 0.9rem;
+  border-radius: 1.5rem;
+  border: 1.5px solid var(--border-color);
+  background: transparent;
+  color: var(--text-secondary);
+  font-size: 0.8rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.15s;
+  white-space: nowrap;
+}
+
+.att-filter-tab:hover {
+  border-color: var(--color-black);
+  color: var(--text-primary);
+}
+
+.att-filter-tab--active {
+  background: var(--color-black);
+  border-color: var(--color-black);
+  color: var(--color-white);
+  font-weight: 600;
+}
+
+/* attendance-col-index (review page numbering column) */
+.attendance-col-index {
+  flex: 0 0 32px;
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+}
+.attendance-review-index {
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+}
+
+/* ══════════════════════════════════════════════════════════════════════════
+   ATTENDANCE MATRIX  (student heatmap calendar)
+   ══════════════════════════════════════════════════════════════════════════ */
+.att-matrix-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 1.5rem;
+}
+
+.att-matrix-month {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.att-matrix-month-label {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 0.2rem;
+}
+
+.att-matrix-day-headers {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 2px;
+}
+
+.att-matrix-day-hdr {
+  font-size: 0.65rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  text-align: center;
+  padding: 2px 0;
+}
+
+.att-matrix-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 3px;
+}
+
+.att-matrix-cell {
+  aspect-ratio: 1;
+  border-radius: 3px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.65rem;
+  font-weight: 500;
+  cursor: default;
+  transition: transform 0.1s;
+  line-height: 1;
+}
+
+.att-matrix-cell:hover {
+  transform: scale(1.15);
+  z-index: 2;
+  position: relative;
+}
+
+.att-matrix-cell--blank {
+  background: transparent !important;
+  cursor: default !important;
+}
+
+.att-matrix-cell--empty {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  color: var(--text-secondary);
+}
+
+.att-matrix-cell--present {
+  background: #dcfce7;
+  border: 1px solid #86efac;
+  color: #15803d;
+}
+
+.att-matrix-cell--absent {
+  background: #fee2e2;
+  border: 1px solid #fca5a5;
+  color: #b91c1c;
+}
+
+.att-matrix-cell--mixed {
+  background: #fef9c3;
+  border: 1px solid #fde047;
+  color: #854d0e;
+}
+
+@media (max-width: 480px) {
+  .att-matrix-container {
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    gap: 1rem;
+  }
+  .att-matrix-cell {
+    font-size: 0.6rem;
+  }
+}
+
+/* ══════════════════════════════════════════════════════════════════════════
+   ROLE MANAGEMENT PAGE
+   Uses .dpt-desk-table / .dpt-mob-list / .mob-card (all existing)
+   Only adding the shield icon empty-state colour
+   ══════════════════════════════════════════════════════════════════════════ */
+.role-mgmt-system-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.1rem 0.4rem;
+  border-radius: 0.25rem;
+  font-size: 0.7rem;
+  font-weight: 600;
+  background: #eff6ff;
+  color: #2563eb;
+  margin-left: 0.4rem;
+  vertical-align: middle;
+}
+
+/* ══════════════════════════════════════════════════════════════════════════
+   STAFF FORM — department field hint animation (teacher role)
+   ══════════════════════════════════════════════════════════════════════════ */
+.sf-dept-appear {
+  animation: sfDeptIn 0.2s ease;
+}
+@keyframes sfDeptIn {
+  from { opacity: 0; transform: translateY(-6px); }
+  to   { opacity: 1; transform: translateY(0);    }
+}
+
+/* ══════════════════════════════════════════════════════════════════════════
+   ATTENDANCE SESSION GRID — department selector tile fix
+   Make select look identical to the text inputs inside session tiles
+   ══════════════════════════════════════════════════════════════════════════ */
+.att-session-tile-input[type="text"],
+.att-session-tile-input[type="date"],
+.att-session-tile-input[type="time"],
+select.att-session-tile-input {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+}

@@ -19,7 +19,7 @@ import {
 const _IS_PROD = typeof window !== 'undefined' && window.location.hostname !== 'localhost';
 const API_BASE_URL = _IS_PROD ? 'https://university-erp-node.onrender.com/api' : 'http://localhost:5000/api';
 
-const ATT_DRAFT_KEY = 'att_draft_v1';
+const ATT_DRAFT_KEY = 'att_draft_v2';
 const clearAttendanceDraft = () => {
   try { sessionStorage.removeItem(ATT_DRAFT_KEY); } catch { /* non-fatal */ }
 };
@@ -79,8 +79,7 @@ const AttendanceReview = () => {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${localStorage.getItem('erp_token')}`,
         },
-        body: JSON.stringify({ ...session, students }),
-      });
+        body: JSON.stringify({ ...session, students }),      });
       const data = await res.json();
       if (!res.ok) throw new Error(data.message || 'Failed to submit attendance');
       setSubmitResult(data);

@@ -21,6 +21,21 @@ import {
 const _IS_PROD = typeof window !== 'undefined' && window.location.hostname !== 'localhost';
 const API_BASE_URL = _IS_PROD ? 'https://university-erp-node.onrender.com/api' : 'http://localhost:5000/api';
 
+// Helper to fetch departments (used inside the modal)
+async function fetchDepartmentList() {
+  try {
+    const token = localStorage.getItem('erp_token');
+    const res = await fetch(`${API_BASE_URL}/departments`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    if (res.ok) {
+      const data = await res.json();
+      return Array.isArray(data) ? data : [];
+    }
+  } catch { /* non-fatal */ }
+  return [];
+}
+
 // ---------------------------------------------------------------------------
 // FieldError — small red helper shown beneath an invalid input
 // ---------------------------------------------------------------------------
@@ -59,6 +74,7 @@ const StudentFormModal = ({ isOpen, studentId, onClose, onSuccess }) => {
   const [touched, setTouched]       = useState({});
   const [customFieldKey, setCustomFieldKey]     = useState('');
   const [customFieldValue, setCustomFieldValue] = useState('');
+  const [departments, setDepartments] = useState([]);
 
   // ── Per-field validators ────────────────────────────────────────────────
   const FIELD_VALIDATORS = {
@@ -99,6 +115,8 @@ const StudentFormModal = ({ isOpen, studentId, onClose, onSuccess }) => {
     } else {
       resetForm();
     }
+    // Fetch department list whenever the modal opens
+    fetchDepartmentList().then(setDepartments);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isOpen, studentId]);
 
@@ -517,19 +535,35 @@ const StudentFormModal = ({ isOpen, studentId, onClose, onSuccess }) => {
               <div className="sf-row">
                 <div className="sf-group">
                   <label className="sf-label" htmlFor="sf-degree">
-                    Degree <span className="sf-required">*</span>
+                    Department / Degree <span className="sf-required">*</span>
                   </label>
-                  <input
-                    id="sf-degree"
-                    name="degree"
-                    type="text"
-                    className={inputClass('degree')}
-                    placeholder="e.g. B.Tech Computer Science"
-                    value={formData.degree}
-                    onChange={handleChange}
-                    onBlur={handleBlur}
-                    autoComplete="off"
-                  />
+                  {departments.length > 0 ? (
+                    <select
+                      id="sf-degree"
+                      name="degree"
+                      className={inputClass('degree')}
+                      value={formData.degree}
+                      onChange={handleChange}
+                      onBlur={handleBlur}
+                    >
+                      <option value="">— Select Department —</option>
+                      {departments.map((d) => (
+                        <option key={d._id} value={d.name}>{d.name}</option>
+                      ))}
+                    </select>
+                  ) : (
+                    <input
+                      id="sf-degree"
+                      name="degree"
+                      type="text"
+                      className={inputClass('degree')}
+                      placeholder="e.g. Computer Science"
+                      value={formData.degree}
+                      onChange={handleChange}
+                      onBlur={handleBlur}
+                      autoComplete="off"
+                    />
+                  )}
                   <FieldError message={touched.degree ? fieldErrors.degree : ''} />
                 </div>
 
