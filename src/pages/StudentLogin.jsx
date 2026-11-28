@@ -110,14 +110,6 @@ const StudentLogin = () => {
           </button>
         </form>
 
-        {/* Footer Navigation */}
-        <div className="auth-footer">
-          <span className="footer-text">Administrative Access?</span>
-          <Link to="/login" className="footer-link">
-            Switch to Admin Login
-          </Link>
-        </div>
-
         {/* Demo Credentials Helper
         <div className="demo-credentials-box">
           <p className="demo-title">Default Student Demo Credential:</p>

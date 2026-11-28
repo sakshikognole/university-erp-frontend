@@ -18,7 +18,6 @@ const Login = () => {
     { id: 'SUPER_ADMIN', label: 'Super Admin', icon: ShieldCheck, desc: 'Full System Control' },
     { id: 'SUB_ADMIN', label: 'Sub Admin', icon: UserCheck, desc: 'Departmental Management' },
     { id: 'TEACHER', label: 'Teacher Login', icon: BookOpen, desc: 'Faculty & Academics' },
-    { id: 'STUDENT', label: 'Student Login', icon: GraduationCap, desc: 'PRN & Student Portal' },
   ];
 
   const handleSubmit = async (e) => {
@@ -27,23 +26,7 @@ const Login = () => {
     setSuccess('');
 
     if (!email || !password) {
-      setError(adminType === 'STUDENT' ? 'Please enter both PRN Number and Password.' : 'Please enter both Email ID and Password.');
-      return;
-    }
-
-    if (adminType === 'STUDENT') {
-      try {
-        const res = await loginStudent(email.trim(), password);
-        setSuccess(res.message || 'Student login successful. Redirecting...');
-        setTimeout(() => {
-          navigate('/fee-payment');
-        }, 600);
-      } catch (err) {
-        setError(err.message || 'Authentication failed. Please verify your PRN number and password.');
-        setEmail('');
-        setPassword('');
-        setShowPassword(false);
-      }
+      setError('Please enter both Email ID and Password.');
       return;
     }
 
@@ -125,29 +108,21 @@ const Login = () => {
         <form onSubmit={handleSubmit} className="auth-form">
           <div className="form-group">
             <label className="form-label" htmlFor="email-input">
-              {adminType === 'STUDENT' ? 'PRN Number' : 'Email ID'}
+              Email ID
             </label>
             <div className="input-wrapper">
-              {adminType === 'STUDENT' ? (
-                <KeyRound size={18} className="input-icon" />
-              ) : (
-                <Mail size={18} className="input-icon" />
-              )}
+              <Mail size={18} className="input-icon" />
               <input
                 id="email-input"
-                type={adminType === 'STUDENT' ? 'text' : 'email'}
+                type="email"
                 className="form-input"
-                placeholder={adminType === 'STUDENT' ? 'Enter PRN' : 'Enter your Email ID'}
+                placeholder="Enter your Email ID"
                 value={email}
                 onChange={(e) => {
                   const val = e.target.value;
-                  if (adminType !== 'STUDENT') {
-                    if (/[A-Z]/.test(val)) {
-                      setError('Email ID field accepts only lowercase letters. Uppercase letters are not allowed.');
-                    } else if (error && error.includes('lowercase')) {
-                      setError('');
-                    }
-                  } else {
+                  if (/[A-Z]/.test(val)) {
+                    setError('Email ID field accepts only lowercase letters. Uppercase letters are not allowed.');
+                  } else if (error && error.includes('lowercase')) {
                     setError('');
                   }
                   setEmail(val);
